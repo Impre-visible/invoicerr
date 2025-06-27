@@ -31,6 +31,27 @@ export class QuotesService {
         return `Q-${currentYear}-${paddedIndex}`;
     }
 
+    async getQuotes(page: string) {
+        const pageNumber = parseInt(page, 10) || 1;
+        const pageSize = 10;
+        const skip = (pageNumber - 1) * pageSize;
+
+        const quotes = await this.prisma.quote.findMany({
+            skip,
+            take: pageSize,
+            orderBy: {
+                createdAt: 'desc',
+            },
+            include: {
+                items: true,
+            },
+        });
+
+        const totalQuotes = await this.prisma.quote.count();
+
+        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
+    }
+
     async createQuote(body: CreateQuoteDto) {
         const { items, ...data } = body;
 
@@ -53,6 +74,65 @@ export class QuotesService {
                 },
                 validUntil: body.validUntil ? new Date(body.validUntil) : null,
             }
+        });
+    }
+
+    async editQuote(body: EditQuotesDto) {
+        const { items, id, ...data } = body;
+
+        if (!id) {
+            throw new Error('Quote ID is required for editing');
+        }
+
+        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+        if (!existingQuote) {
+            throw new Error('Quote not found');
+        }
+
+        return this.prisma.quote.update({
+            where: { id },
+            data: {
+                ...data,
+                totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
+                totalVAT: items.reduce((sum, item) => sum +
+                    (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0),
+                totalTTC: items.reduce((sum, item) => sum +
+                    (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0),
+                validUntil: body.validUntil ? new Date(body.validUntil) : null,
+                items: {
+                    deleteMany: {},
+                    updateMany: items.filter(item => item.id).map(item => ({
+                        where: { id: item.id },
+                        data: {
+                            description: item.description,
+                            quantity: item.quantity,
+                            unitPrice: item.unitPrice,
+                            vatRate: item.vatRate || 0,
+                            order: item.order || 0,
+                        },
+                    })),
+                    create: items.filter(item => !item.id).map(item => ({
+                        description: item.description,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
+                        vatRate: item.vatRate || 0,
+                        order: item.order || 0,
+                    })),
+                },
+            }
+        });
+    }
+
+    async deleteQuote(id: string) {
+        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+
+        if (!existingQuote) {
+            throw new Error('Quote not found');
+        }
+
+        return this.prisma.quote.update({
+            where: { id },
+            data: { isActive: false },
         });
     }
 }

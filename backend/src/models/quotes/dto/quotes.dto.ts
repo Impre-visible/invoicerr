@@ -15,9 +15,9 @@ export class CreateQuoteDto {
 export class EditQuotesDto {
     id: string;
     title?: string;
-    clientId?: string;
+    clientId: string;
     validUntil?: Date;
-    items?: {
+    items: {
         id?: string; // Optional for new items
         description: string;
         quantity: number;

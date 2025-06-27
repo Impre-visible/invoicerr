@@ -8,9 +8,27 @@ import { QuotesService } from './quotes.service';
 export class QuotesController {
     constructor(private readonly quotesService: QuotesService) { }
 
+    @Get()
+    @LoginRequired()
+    async getQuotesInfo(@Param('page') page: string) {
+        return await this.quotesService.getQuotes(page);
+    }
+
     @Post()
     @LoginRequired()
     postQuotesInfo(@Body() body: CreateQuoteDto) {
         return this.quotesService.createQuote(body);
+    }
+
+    @Patch(':id')
+    @LoginRequired()
+    editQuotesInfo(@Param('id') id: string, @Body() body: EditQuotesDto) {
+        return this.quotesService.editQuote({ ...body, id });
+    }
+
+    @Delete(':id')
+    @LoginRequired()
+    deleteQuote(@Param('id') id: string) {
+        return this.quotesService.deleteQuote(id);
     }
 }
