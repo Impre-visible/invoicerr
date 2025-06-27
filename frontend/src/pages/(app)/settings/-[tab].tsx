@@ -35,8 +35,8 @@ export default function Settings() {
 
 
     return (
-        <div className="flex items-center justify-center h-full w-full">
-            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-full p-8">
+        <div className="flex items-center justify-center min-h-fit h-full w-full">
+            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit p-8">
                 <TabsList className="w-full h-12">
                     <TabsTrigger value="company">Company</TabsTrigger>
                     <TabsTrigger value="signature">Signature</TabsTrigger>
@@ -44,7 +44,7 @@ export default function Settings() {
                     <TabsTrigger value="account">Account</TabsTrigger>
                     <TabsTrigger value="danger">Danger Zone</TabsTrigger>
                 </TabsList>
-                <section className="h-full w-full bg-neutral-100 rounded-lg">
+                <section className="h-full w-full bg-neutral-100 rounded-lg p-4">
                     <TabsContent value="company" className="h-full"><CompanySettings /></TabsContent>
                     <TabsContent value="signature" className="h-full"><SignatureSettings /></TabsContent>
                     <TabsContent value="email" className="h-full"><EmailTemplatesSettings /></TabsContent>
