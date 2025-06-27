@@ -16,7 +16,7 @@ interface ClientViewDialogProps {
 export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps) {
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl p-6">
+            <DialogContent className="!max-w-none w-fit p-6">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">Client Details</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
@@ -24,13 +24,13 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
-                        <div>
+                <div className="flex flex-col gap-4 w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 bg-muted/50 p-4 rounded-lg w-full">
+                        <div className="w-fit">
                             <p className="text-sm text-muted-foreground">Company Name</p>
                             <p className="font-medium">{client?.name || "—"}</p>
                         </div>
-                        <div>
+                        <div className="w-fit">
                             <p className="text-sm text-muted-foreground">Contact Person</p>
                             <p className="font-medium">
                                 {client?.contactFirstname} {client?.contactLastname}
@@ -38,13 +38,13 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
-                        <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 bg-muted/50 p-4 rounded-lg w-full">
+                        <div className="w-fit">
                             <p className="text-sm text-muted-foreground">Email</p>
                             <p className="font-medium">{client?.contactEmail || "—"}</p>
                         </div>
                         {client?.contactPhone && (
-                            <div>
+                            <div className="w-fit">
                                 <p className="text-sm text-muted-foreground">Phone</p>
                                 <p className="font-medium">{client.contactPhone}</p>
                             </div>
@@ -52,7 +52,7 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                     </div>
 
                     {(client?.address || client?.postalCode || client?.city || client?.country) && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                             {client?.address && (
                                 <div>
                                     <p className="text-sm text-muted-foreground">Address</p>
