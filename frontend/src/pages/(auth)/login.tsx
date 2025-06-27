@@ -1,10 +1,10 @@
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
 import { usePost } from "@/lib/utils"
@@ -29,7 +29,6 @@ interface LoginResponse {
 export default function LoginPage() {
     const { setAccessToken, setRefreshToken } = useAuth()
     const navigate = useNavigate()
-    const [message, setMessage] = useState("")
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
 
@@ -60,14 +59,14 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (data && !error) {
-            setMessage("Login successful! Redirecting...")
+            toast.success("Login successful! Redirecting...")
             setAccessToken(data.access_token)
             setRefreshToken(data.refresh_token)
             setTimeout(() => {
                 navigate("/")
             }, 1000)
         } else if (error) {
-            setMessage("Invalid credentials. Please try again.")
+            toast.error("Login failed. Please check your credentials.")
         }
     }, [data, error])
 
@@ -93,15 +92,6 @@ export default function LoginPage() {
                             <Input id="password" name="password" type="password" disabled={loading} />
                             {errors.password && <p className="text-sm text-red-600">{errors.password[0]}</p>}
                         </div>
-
-                        {message && (
-                            <Alert className={message.includes("successful") ? "bg-green-50" : "bg-red-50"}>
-                                <AlertDescription className={message.includes("successful") ? "text-green-800" : "text-red-800"}>
-                                    {message}
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? "Logging in..." : "Log in"}
                         </Button>
