@@ -57,15 +57,14 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
 
 export function Sidebar() {
     const location = useLocation()
-    const { isMobile } = useSidebar()
+    const { isMobile, open } = useSidebar()
     const { user, loading: userLoading } = useAuth()
     const { setTheme } = useTheme()
     const { data: company, loading: companyLoading } = useGet<Company>("/api/company/info")
 
     return (
         <RootSidebar collapsible="icon">
-
-            <SidebarHeader>
+            <SidebarHeader className="px-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -89,14 +88,14 @@ export function Sidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
+            <SidebarContent className="px-2">
+                <SidebarGroup className="px-0">
                     <SidebarGroupLabel>Menu</SidebarGroupLabel>
                     <SidebarMenu>
                         {items.map((item, index) => (
                             <SidebarMenuItem key={index}>
                                 <SidebarMenuButton asChild>
-                                    <Link to={item.url} className={`flex items-center gap-2 ${location.pathname === item.url ? 'text-sidebar-accent-foreground bg-sidebar-accent' : ''}`}>
+                                    <Link to={item.url} className={`flex items-center gap-2 py-6 ${location.pathname === item.url ? 'text-sidebar-accent-foreground bg-sidebar-accent' : ''}`}>
                                         {item.icon}
                                         <span>{item.title}</span>
                                     </Link>
@@ -106,12 +105,16 @@ export function Sidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="">
                 <SidebarMenu className="flex flex-col gap-2">
                     <SidebarMenuItem>
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" className="w-8 h-8">
+                            <DropdownMenuTrigger asChild >
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className={`${open ? 'ml-2' : ''} w-8 h-8`}
+                                >
                                     <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                                     <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
                                     <span className="sr-only">Toggle theme</span>
