@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
 import { ClientsService } from './clients.service';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
@@ -19,5 +19,17 @@ export class ClientsController {
     @LoginRequired()
     postClientsInfo(@Body() body: EditClientsDto) {
         return this.clientsService.editClientsInfo(body);
+    }
+
+    @Patch(':id')
+    @LoginRequired()
+    editClientsInfo(@Param('id') id: string, @Body() body: EditClientsDto) {
+        return this.clientsService.editClientsInfo({ ...body, id });
+    }
+
+    @Delete(':id')
+    @LoginRequired()
+    deleteClient(@Param('id') id: string) {
+        return this.clientsService.deleteClient(id);
     }
 }

@@ -21,4 +21,10 @@ export class ClientsService {
             })
             : this.prisma.client.create({ data });
     }
+
+    deleteClient(id: string) {
+        return this.prisma.client.delete({
+            where: { id },
+        });
+    }
 }

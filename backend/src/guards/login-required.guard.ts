@@ -66,7 +66,6 @@ export class LoginRequiredGuard implements CanActivate {
         accessToken,
       } as CurrentUser;
     } catch (error) {
-      console.error('Error in LoginRequiredGuard:', error);
       throw new UnauthorizedException('Invalid access token');
     }
 
