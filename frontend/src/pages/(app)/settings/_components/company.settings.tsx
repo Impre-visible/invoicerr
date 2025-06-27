@@ -26,58 +26,16 @@ interface Company {
 }
 
 const companySchema = z.object({
-    name: z
-        .string({
-            required_error: "Company name is required",
-        })
-        .min(1, "Company name cannot be empty")
-        .max(100, "Name cannot exceed 100 characters"),
-
-    language: z
-        .string({
-            required_error: "Language is required",
-        })
-        .min(1, "Please select a language"),
-
-    currency: z
-        .string({
-            required_error: "Currency is required",
-        })
-        .min(1, "Please select a currency"),
-
-    VAT: z
-        .string({
-            required_error: "VAT number is required",
-        })
-        .min(1, "VAT number cannot be empty")
-        .max(15, "VAT number cannot exceed 15 characters")
-        .refine((val) => {
-            return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-        }, "Invalid VAT number format (e.g., FR12345678901)"),
-
+    name: z.string({ required_error: "Company name is required" }).min(1, "Company name cannot be empty").max(100, "Name cannot exceed 100 characters"),
+    language: z.string({ required_error: "Language is required" }).min(1, "Please select a language"),
+    currency: z.string({ required_error: "Currency is required" }).min(1, "Please select a currency"),
+    VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
     address: z.string().max(200, "Address cannot exceed 200 characters"),
-
-    postalCode: z
-        .string()
-        .refine((val) => {
-            return /^[0-9A-Z\s-]{3,10}$/.test(val)
-        }, "Invalid postal code format"),
-
+    postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
     city: z.string().max(100, "City name cannot exceed 100 characters"),
-
     country: z.string(),
-
-    phone: z
-        .string()
-        .refine((val) => {
-            return /^[+]?[0-9\s\-()]{8,20}$/.test(val)
-        }, "Invalid phone number format"),
-
-    email: z
-        .string()
-        .refine((val) => {
-            return z.string().email().safeParse(val).success
-        }, "Invalid email format"),
+    phone: z.string().refine((val) => { return /^[+]?[0-9\s\-()]{8,20}$/.test(val) }, "Invalid phone number format"),
+    email: z.string().refine((val) => { return z.string().email().safeParse(val).success }, "Invalid email format"),
 })
 
 export default function CompanySettings() {
@@ -164,7 +122,7 @@ export default function CompanySettings() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel required>Language</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select a language" />
@@ -190,7 +148,7 @@ export default function CompanySettings() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel required>Currency</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select a currency" />
