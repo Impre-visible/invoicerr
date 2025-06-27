@@ -54,7 +54,6 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
 }
 
 export function useGet<T = any>(url: string, options?: RequestInit): UseGetResult<T> {
-  console.log(`Fetching GET ${url}`);
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

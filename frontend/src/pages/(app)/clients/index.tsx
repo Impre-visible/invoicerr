@@ -1,6 +1,8 @@
 import { Building2, Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, Users } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
+import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
 import { ClientCreate } from "./_components/client-create"
@@ -12,7 +14,9 @@ import { useGet } from "@/lib/utils"
 import { useState } from "react"
 
 export default function Clients() {
-    const { data: clients, mutate, loading } = useGet<Client[]>("/api/clients")
+    const [page, setPage] = useState(1)
+
+    const { data: clients, mutate, loading } = useGet<{ pageCount: number, clients: Client[] }>(`/api/clients?page=${page}`)
 
     const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
     const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
@@ -24,7 +28,7 @@ export default function Clients() {
 
 
     // Filtrer les clients selon le terme de recherche
-    const filteredClients = clients?.filter(client =>
+    const filteredClients = clients?.clients.filter(client =>
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,7 +96,7 @@ export default function Clients() {
                                 <Users className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-2xl font-semibold text-foreground">{clients?.length || 0}</p>
+                                <p className="text-2xl font-semibold text-foreground">{clients?.clients.length || 0}</p>
                                 <p className="text-sm text-primary">Total Clients</p>
                             </div>
                         </div>
@@ -109,7 +113,7 @@ export default function Clients() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.filter(c => c.isActive).length || 0}
+                                    {clients?.clients.filter(c => c.isActive).length || 0}
                                 </p>
                                 <p className="text-sm text-primary">Active Clients</p>
                             </div>
@@ -127,7 +131,7 @@ export default function Clients() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.filter(c => !c.isActive).length || 0}
+                                    {clients?.clients.filter(c => !c.isActive).length || 0}
                                 </p>
                                 <p className="text-sm text-primary">Inactive Clients</p>
                             </div>
@@ -136,7 +140,7 @@ export default function Clients() {
                 </Card>
             </div>
 
-            <Card>
+            <Card className="gap-0">
                 <CardHeader className="border-b">
                     <CardTitle className="flex items-center space-x-2">
                         <Building2 className="h-5 w-5 " />
@@ -172,7 +176,7 @@ export default function Clients() {
                             )}
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y">
                             {filteredClients.map((client, index) => (
                                 <div key={index} className="p-6">
                                     <div className="flex items-center justify-between">
@@ -243,6 +247,9 @@ export default function Clients() {
                         </div>
                     )}
                 </CardContent>
+                <CardFooter>
+                    <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
+                </CardFooter>
             </Card>
 
             <ClientCreate
