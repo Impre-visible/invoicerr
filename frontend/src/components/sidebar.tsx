@@ -1,10 +1,11 @@
-import { ChevronUp, FileSignature, FileText, LayoutDashboard, Moon, Settings, Sun, User, Users } from "lucide-react"
+import { Building2, ChevronsUpDown, FileSignature, FileText, LayoutDashboard, LogOut, Moon, Settings, Sun, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
 import { Link, useLocation } from "react-router"
 import {
     Sidebar as RootSidebar,
@@ -16,11 +17,14 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
 
 import { Button } from "./ui/button"
+import type { Company } from "@/types"
+import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
-import { useEffect } from "react"
+import { useGet } from "@/lib/utils"
 import { useTheme } from "./theme-provider"
 
 const items: { title: string, icon: React.ReactNode, url: string }[] = [
@@ -53,32 +57,34 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
 
 export function Sidebar() {
     const location = useLocation()
-    const { user } = useAuth()
-    const { theme, setTheme } = useTheme()
-
-    useEffect(() => {
-        console.log(user)
-    }, [user])
-
-    const toggleTheme = () => {
-        setTheme(theme === "light" ? "dark" : "light")
-    }
-
-    useEffect(() => {
-        console.log(user)
-    }, [user])
+    const { isMobile } = useSidebar()
+    const { user, loading: userLoading } = useAuth()
+    const { setTheme } = useTheme()
+    const { data: company, loading: companyLoading } = useGet<Company>("/api/company/info")
 
     return (
         <RootSidebar collapsible="icon">
-            <SidebarHeader >
+
+            <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                            <img src="/favicon.svg" alt="Invoicerr Logo" className="w-5 h-5" />
-                            <h1 className="text-lg font-bold">
-                                Invoicerr
-                            </h1>
+                        <SidebarMenuButton size="lg" asChild>
+                            <section className="flex items-center gap-2">
+                                <div className="bg-accent text-accent-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                                    <Building2 className="size-4" />
+                                </div>
+                                {companyLoading ? (
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <Skeleton className="h-3 w-3/4" />
+                                        <Skeleton className="h-2 w-1/4 mt-1" />
+                                    </div>
+                                ) :
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-medium">{company?.name}</span>
+                                        <span className="truncate text-xs">Enterprise</span>
+                                    </div>
+                                }
+                            </section>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -101,13 +107,13 @@ export function Sidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <SidebarMenu>
+                <SidebarMenu className="flex flex-col gap-2">
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon">
-                                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                                <Button variant="outline" size="icon" className="w-8 h-8">
+                                    <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                                    <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
                                     <span className="sr-only">Toggle theme</span>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -126,25 +132,52 @@ export function Sidebar() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton>
-                                    <User /> {user?.firstname} {user?.lastname}
-                                    <ChevronUp className="ml-auto" />
+                            <DropdownMenuTrigger className="cursor-pointer" asChild>
+                                <SidebarMenuButton
+                                    size="lg"
+                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                >
+                                    <div className="bg-accent text-accent-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                                        <User className="size-4" />
+                                    </div>
+                                    {userLoading ? (
+                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                            <Skeleton className="h-3 w-3/4" />
+                                            <Skeleton className="h-2 w-1/2 mt-1" />
+                                        </div>
+                                    ) :
+                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                            <span className="truncate font-medium">{user?.lastname} {user?.firstname}</span>
+                                            <span className="truncate text-xs">{user?.email}</span>
+                                        </div>
+                                    }
+                                    <ChevronsUpDown className="ml-auto size-4" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
-                                side="top"
-                                className="min-w-60 rounded-lg"
+                                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                                side={isMobile ? "bottom" : "right"}
+                                align="end"
+                                sideOffset={12}
                             >
-                                <DropdownMenuItem asChild >
-                                    <Link to="/settings/account" className="flex items-center gap-2">
-                                        <span>Profile</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link to="/logout" className="flex items-center gap-2">
-                                        <span>Logout</span>
-                                    </Link>
+                                <DropdownMenuLabel className="p-0 font-normal">
+                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                        <div className="grid flex-1 text-left text-sm leading-tight">
+                                            <span className="truncate font-medium">{user?.lastname} {user?.firstname}</span>
+                                            <span className="truncate text-xs">{user?.email}</span>
+                                        </div>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem className="cursor-pointer">
+                                        <User className="w-4 h-4" />
+                                        Account
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuItem className="cursor-pointer">
+                                    <LogOut />
+                                    Log out
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
