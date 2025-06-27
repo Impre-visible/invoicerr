@@ -26,8 +26,8 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
   });
 
   const isExpired = res.headers.get("Www-Authenticate") === "expired_token";
-
   if (isExpired && retry) {
+    console.warn("Access token expired, attempting to refresh...");
     let refreshRes: Response;
     refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
       body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }),
