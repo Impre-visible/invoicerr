@@ -5,7 +5,8 @@
 
 prisma/*.sqlite
 
-prisma/migrations
+prisma/migrations/*
+!prisma/migrations/.gitkeep
 
 # Logs
 logs
