@@ -40,4 +40,5 @@ model Client {
   postalCode       String?
   city             String?
   country          String?
+  isActive         Boolean @default(true)
 }
