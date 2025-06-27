@@ -27,6 +27,7 @@ model Company {
   country    String?
   phone      String?
   email      String?
+  Quote      Quote[]
 }
 
 model Client {
@@ -41,4 +42,47 @@ model Client {
   city             String?
   country          String?
   isActive         Boolean @default(true)
+  Quote            Quote[]
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  SIGNED
+  EXPIRED
+}
+
+model Quote {
+  id           String      @id @default(uuid())
+  number       String      @unique // Ex: "Q-2025-0001"
+  title        String?
+  client       Client      @relation(fields: [clientId], references: [id])
+  clientId     String
+  company      Company     @relation(fields: [companyId], references: [id])
+  companyId    String
+  items        QuoteItem[]
+  status       QuoteStatus @default(DRAFT)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  validUntil   DateTime?
+  signedAt     DateTime?
+  viewedAt     DateTime?
+  signedBy     String?
+  signatureSvg String?
+  totalHT      Float
+  totalVAT     Float
+  totalTTC     Float
+  //invoice      Invoice?       // TODO: Uncomment when the invoice model is created
+}
+
+model QuoteItem {
+  id          String @id @default(uuid())
+  quote       Quote  @relation(fields: [quoteId], references: [id])
+  quoteId     String
+  description String
+  quantity    Int
+  unitPrice   Float
+  vatRate     Float // 20 for 20%
+  order       Int // For sorting items in the quote pdf
 }
