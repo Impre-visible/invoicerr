@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 
+import { AuthService } from 'src/models/auth/auth.service';
 import { CurrentUser } from 'src/types/user';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -29,13 +30,16 @@ export class LoginRequiredGuard implements CanActivate {
       let payload: { sub: string, email: string, iat: number, exp: number };
 
       try {
-        payload = this.jwt.verify(accessToken);
+        payload = this.jwt.verify<typeof payload>(accessToken, {
+          secret: AuthService.getJWTSecret(),
+        });
         if (payload && payload.exp < Math.floor(Date.now() / 1000)) {
           response.setHeader('WWW-Authenticate', 'expired_token');
           throw new UnauthorizedException('Access token has expired');
         }
       } catch (error) {
         response.setHeader('WWW-Authenticate', 'expired_token');
+        console.error('JWT verification failed:', error);
         throw new UnauthorizedException('Invalid access token');
       }
 
@@ -61,7 +65,8 @@ export class LoginRequiredGuard implements CanActivate {
         ...user,
         accessToken,
       } as CurrentUser;
-    } catch {
+    } catch (error) {
+      console.error('Error in LoginRequiredGuard:', error);
       throw new UnauthorizedException('Invalid access token');
     }
 

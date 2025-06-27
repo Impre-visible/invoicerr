@@ -117,6 +117,7 @@ export class AuthService {
 
             return { access_token: newAccessToken };
         } catch (error) {
+            console.error('Error refreshing token:', error);
             throw new Error('Invalid refresh token');
         }
     }
