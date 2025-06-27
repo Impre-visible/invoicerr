@@ -44,6 +44,7 @@ export class QuotesService {
             },
             include: {
                 items: true,
+                client: true
             },
         });
 

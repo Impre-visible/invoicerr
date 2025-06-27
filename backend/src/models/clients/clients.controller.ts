@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { ClientsService } from './clients.service';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
@@ -13,6 +13,12 @@ export class ClientsController {
     @LoginRequired()
     async getClientsInfo(@Param('page') page: string) {
         return await this.clientsService.getClients(page);
+    }
+
+    @Get('search')
+    @LoginRequired()
+    async searchClients(@Query('query') query: string) {
+        return await this.clientsService.searchClients(query);
     }
 
     @Post()
