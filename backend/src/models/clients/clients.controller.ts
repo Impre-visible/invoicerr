@@ -18,7 +18,7 @@ export class ClientsController {
     @Post()
     @LoginRequired()
     postClientsInfo(@Body() body: EditClientsDto) {
-        return this.clientsService.editClientsInfo(body);
+        return this.clientsService.createClient(body);
     }
 
     @Patch(':id')
