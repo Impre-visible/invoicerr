@@ -17,12 +17,12 @@ const companySchema = z.object({
     language: z.string({ required_error: "Language is required" }).min(1, "Please select a language"),
     currency: z.string({ required_error: "Currency is required" }).min(1, "Please select a currency"),
     VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
-    address: z.string().max(200, "Address cannot exceed 200 characters"),
+    address: z.string().min(1, "Address cannot be empty"),
     postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
-    city: z.string().max(100, "City name cannot exceed 100 characters"),
-    country: z.string(),
-    phone: z.string().refine((val) => { return /^[+]?[0-9\s\-()]{8,20}$/.test(val) }, "Invalid phone number format"),
-    email: z.string().refine((val) => { return z.string().email().safeParse(val).success }, "Invalid email format"),
+    city: z.string().min(1, "City cannot be empty"),
+    country: z.string().min(1, "Country cannot be empty"),
+    phone: z.string().min(8, "Phone number must be at least 8 characters").refine((val) => { return /^[+]?[0-9\s\-()]{8,20}$/.test(val) }, "Invalid phone number format"),
+    email: z.string().email().min(1, "Email is required").refine((val) => { return z.string().email().safeParse(val).success }, "Invalid email format"),
 })
 
 export default function CompanySettings() {

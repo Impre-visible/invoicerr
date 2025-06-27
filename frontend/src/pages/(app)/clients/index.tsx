@@ -1,103 +1,268 @@
+import { Building2, Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, Users } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
+import { ClientCreate } from "./_components/client-create"
 import { ClientDeleteDialog } from "./_components/client-delete"
-import { ClientForm } from "./_components/client-form"
-import { ClientList } from "./_components/client-list"
+import { ClientEdit } from "./_components/client-edit"
 import { ClientViewDialog } from "./_components/client-view"
-import { useForm } from "react-hook-form"
+import { Input } from "@/components/ui/input"
+import { useGet } from "@/lib/utils"
 import { useState } from "react"
 
-export function Clients() {
-    const [clients, setClients] = useState<Client[]>([])
-    const [selectedClient, setSelectedClient] = useState<Client | null>(null)
-    const [viewDialogOpen, setViewDialogOpen] = useState(false)
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-    const [editClient, setEditClient] = useState<Client | null>(null)
-    const [formOpen, setFormOpen] = useState(false)
+export default function Clients() {
+    const { data: clients } = useGet<Client[]>("/api/clients")
 
-    const form = useForm<Client>({
-        defaultValues: {
-            name: "",
-            contactFirstname: "",
-            contactLastname: "",
-            contactEmail: "",
-            contactPhone: "",
-            address: "",
-            postalCode: "",
-            city: "",
-            country: "",
-            isActive: true,
-        },
-    })
+    const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
+    const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
+    const [viewClientDialog, setViewClientDialog] = useState<Client | null>(null)
+    const [deleteClientDialog, setDeleteClientDialog] = useState<Client | null>(null)
+
+
+    const [searchTerm, setSearchTerm] = useState("")
+
+
+    // Filtrer les clients selon le terme de recherche
+    const filteredClients = clients?.filter(client =>
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.contactEmail.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || []
 
     function handleAddClick() {
-        form.reset()
-        setEditClient(null)
-        setFormOpen(true)
-    }
-
-    function handleFormSubmit(data: Client) {
-        if (editClient) {
-            // update existing client
-            setClients((prev) =>
-                prev.map((c) => (c.id === editClient.id ? { ...c, ...data } : c))
-            )
-        } else {
-            // add new client
-            const newClient = { ...data, id: Date.now().toString() }
-            setClients((prev) => [...prev, newClient])
-        }
-        setFormOpen(false)
+        setCreateClientDialog(true)
     }
 
     function handleEdit(client: Client) {
-        setEditClient(client)
-        form.reset(client)
-        setFormOpen(true)
+        setEditClientDialog(client)
     }
 
     function handleView(client: Client) {
-        setSelectedClient(client)
-        setViewDialogOpen(true)
+        setViewClientDialog(client)
     }
 
     function handleDelete(client: Client) {
-        setSelectedClient(client)
-        setDeleteDialogOpen(true)
-    }
-
-    function confirmDelete() {
-        if (selectedClient) {
-            setClients((prev) => prev.filter((c) => c.id !== selectedClient.id))
-            setSelectedClient(null)
-        }
+        setDeleteClientDialog(client)
     }
 
     return (
-        <div>
-            <div className="mb-4 flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Clients</h1>
-                <button
-                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    onClick={handleAddClick}
-                >
-                    Add Client
-                </button>
+        <div className="max-w-6xl mx-auto space-y-6 p-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                        <Users className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <div className="text-sm text-primary">Manage your clients</div>
+                        <div className="font-medium text-foreground">
+                            {filteredClients.length} client{filteredClients.length > 1 ? 's' : ''}
+                            {searchTerm && ` trouvé${filteredClients.length > 1 ? 's' : ''}`}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                            placeholder="Search clients..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 w-64"
+                        />
+                    </div>
+
+                    <Button
+                        onClick={handleAddClick}
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add New Client
+                    </Button>
+                </div>
             </div>
 
-            <ClientList clients={clients} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-blue-100 rounded-lg">
+                                <Users className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-semibold text-foreground">{clients?.length || 0}</p>
+                                <p className="text-sm text-primary">Total Clients</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-            {formOpen && (
-                <ClientForm
-                    form={form}
-                    onSubmit={handleFormSubmit}
-                    submitText={editClient ? "Update" : "Create"}
-                    onCancel={() => setFormOpen(false)}
-                />
-            )}
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-green-100 rounded-lg">
+                                <div className="w-6 h-6 flex items-center justify-center">
+                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-semibold text-foreground">
+                                    {clients?.filter(c => c.isActive).length || 0}
+                                </p>
+                                <p className="text-sm text-primary">Active Clients</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-            <ClientViewDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen} client={selectedClient} />
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="flex items-center space-x-4">
+                            <div className="p-3 bg-gray-100 rounded-lg">
+                                <div className="w-6 h-6 flex items-center justify-center">
+                                    <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-semibold text-foreground">
+                                    {clients?.filter(c => !c.isActive).length || 0}
+                                </p>
+                                <p className="text-sm text-primary">Inactive Clients</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
-            <ClientDeleteDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onConfirm={confirmDelete} />
+            <Card>
+                <CardHeader className="border-b">
+                    <CardTitle className="flex items-center space-x-2">
+                        <Building2 className="h-5 w-5 " />
+                        <span>Clients</span>
+                    </CardTitle>
+                    <CardDescription>Manage your clients, view details, edit or delete them.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                    {filteredClients.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Users className="mx-auto h-12 w-12 text-gray-400" />
+                            <h3 className="mt-2 text-sm font-medium text-foreground">
+                                {searchTerm ? 'No clients found' : 'No clients added yet'}
+                            </h3>
+                            <p className="mt-1 text-sm text-primary">
+                                {searchTerm
+                                    ? 'Try a different search term'
+                                    : 'Start adding clients to manage your business effectively.'
+                                }
+                            </p>
+                            {!searchTerm && (
+                                <div className="mt-6">
+                                    <Button onClick={handleAddClick}>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add New Client
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-100">
+                            {filteredClients.map((client, index) => (
+                                <div key={index} className="p-6 hover:bg-gray-50/50 transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                                <Building2 className="h-5 w-5 text-blue-600" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex items-center space-x-2">
+                                                    <h3 className="font-medium text-foreground">{client.name}</h3>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {client.isActive ? 'Actif' : 'Inactif'}
+                                                    </span>
+                                                </div>
+                                                <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
+                                                    <div className="flex items-center space-x-1">
+                                                        <Mail className="h-4 w-4" />
+                                                        <span>{client.contactEmail}</span>
+                                                    </div>
+                                                    {client.contactPhone && (
+                                                        <div className="flex items-center space-x-1">
+                                                            <Phone className="h-4 w-4" />
+                                                            <span>{client.contactPhone}</span>
+                                                        </div>
+                                                    )}
+                                                    {client.city && (
+                                                        <div className="flex items-center space-x-1">
+                                                            <MapPin className="h-4 w-4" />
+                                                            <span>{client.city}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="mt-1 text-sm text-gray-600">
+                                                    Contact: {client.contactFirstname} {client.contactLastname}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleView(client)}
+                                                className="text-gray-600 hover:text-blue-600"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleEdit(client)}
+                                                className="text-gray-600 hover:text-green-600"
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleDelete(client)}
+                                                className="text-gray-600 hover:text-red-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <ClientCreate
+                open={createClientDialog}
+                onOpenChange={(open) => { setCreateClientDialog(open) }}
+            />
+
+            <ClientEdit
+                client={editClientDialog}
+                onOpenChange={(open) => { if (!open) setEditClientDialog(null) }}
+            />
+
+            <ClientViewDialog
+                client={viewClientDialog}
+                onOpenChange={(open) => { if (!open) setViewClientDialog(null) }}
+            />
+
+            <ClientDeleteDialog
+                client={deleteClientDialog}
+                onOpenChange={(open) => { if (!open) setDeleteClientDialog(null) }}
+            />
+
         </div>
     )
 }

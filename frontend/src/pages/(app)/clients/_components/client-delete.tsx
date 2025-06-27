@@ -8,16 +8,19 @@ import {
 } from "@/components/ui/dialog"
 
 import { Button } from "@/components/ui/button"
+import type { Client } from "@/types"
 
 interface ClientDeleteDialogProps {
-    open: boolean
+    client: Client | null
     onOpenChange: (open: boolean) => void
-    onConfirm: () => void
 }
 
-export function ClientDeleteDialog({ open, onOpenChange, onConfirm }: ClientDeleteDialogProps) {
+export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogProps) {
+
+    const handleDelete = () => { }
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={client != null} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Delete Client</DialogTitle>
@@ -29,10 +32,7 @@ export function ClientDeleteDialog({ open, onOpenChange, onConfirm }: ClientDele
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-                    <Button variant="destructive" onClick={() => {
-                        onConfirm()
-                        onOpenChange(false)
-                    }}>
+                    <Button variant="destructive" onClick={handleDelete}>
                         Delete
                     </Button>
                 </DialogFooter>

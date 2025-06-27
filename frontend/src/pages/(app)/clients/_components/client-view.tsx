@@ -9,16 +9,13 @@ import {
 import type { Client } from "@/types"
 
 interface ClientViewDialogProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
     client: Client | null
+    onOpenChange: (open: boolean) => void
 }
 
-export function ClientViewDialog({ open, onOpenChange, client }: ClientViewDialogProps) {
-    if (!client) return null
-
+export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps) {
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={client != null} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Client Details</DialogTitle>
@@ -28,51 +25,51 @@ export function ClientViewDialog({ open, onOpenChange, client }: ClientViewDialo
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="text-sm font-medium">Company Name</label>
-                            <p>{client.name}</p>
+                            <p>{client?.name}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium">Contact</label>
                             <p>
-                                {client.contactFirstname} {client.contactLastname}
+                                {client?.contactFirstname} {client?.contactLastname}
                             </p>
                         </div>
                     </div>
 
                     <div>
                         <label className="text-sm font-medium">Email</label>
-                        <p>{client.contactEmail}</p>
+                        <p>{client?.contactEmail}</p>
                     </div>
-                    {client.contactPhone && (
+                    {client?.contactPhone && (
                         <div>
                             <label className="text-sm font-medium">Phone</label>
-                            <p>{client.contactPhone}</p>
+                            <p>{client?.contactPhone}</p>
                         </div>
                     )}
 
-                    {client.address && (
+                    {client?.address && (
                         <div>
                             <label className="text-sm font-medium">Address</label>
-                            <p>{client.address}</p>
+                            <p>{client?.address}</p>
                         </div>
                     )}
 
                     <div className="grid grid-cols-3 gap-4">
-                        {client.postalCode && (
+                        {client?.postalCode && (
                             <div>
                                 <label className="text-sm font-medium">Postal Code</label>
-                                <p>{client.postalCode}</p>
+                                <p>{client?.postalCode}</p>
                             </div>
                         )}
-                        {client.city && (
+                        {client?.city && (
                             <div>
                                 <label className="text-sm font-medium">City</label>
-                                <p>{client.city}</p>
+                                <p>{client?.city}</p>
                             </div>
                         )}
-                        {client.country && (
+                        {client?.country && (
                             <div>
                                 <label className="text-sm font-medium">Country</label>
-                                <p>{client.country}</p>
+                                <p>{client?.country}</p>
                             </div>
                         )}
                     </div>

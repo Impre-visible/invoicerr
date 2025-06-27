@@ -117,6 +117,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  button, a {
+    @apply cursor-pointer;
+  }
   :root {
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);

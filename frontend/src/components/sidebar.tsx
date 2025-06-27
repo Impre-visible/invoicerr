@@ -25,6 +25,7 @@ import type { Company } from "@/types"
 import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
 import { useGet } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useTheme } from "./theme-provider"
 
 const items: { title: string, icon: React.ReactNode, url: string }[] = [
@@ -56,8 +57,9 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
 ]
 
 export function Sidebar() {
+    const { open: isOpen } = useSidebar()
+    const isMobile = useIsMobile()
     const location = useLocation()
-    const { isMobile, open } = useSidebar()
     const { user, loading: userLoading } = useAuth()
     const { setTheme } = useTheme()
     const { data: company, loading: companyLoading } = useGet<Company>("/api/company/info")
@@ -113,7 +115,7 @@ export function Sidebar() {
                                 <Button
                                     variant="outline"
                                     size="icon"
-                                    className={`${open ? 'ml-2' : ''} w-8 h-8`}
+                                    className={`${isOpen ? 'ml-2' : ''} w-8 h-8`}
                                 >
                                     <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                                     <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
