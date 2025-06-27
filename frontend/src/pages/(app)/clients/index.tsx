@@ -1,6 +1,5 @@
 import { Building2, Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, Users } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -26,8 +25,6 @@ export default function Clients() {
 
     const [searchTerm, setSearchTerm] = useState("")
 
-
-    // Filtrer les clients selon le terme de recherche
     const filteredClients = clients?.clients.filter(client =>
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -248,7 +245,9 @@ export default function Clients() {
                     )}
                 </CardContent>
                 <CardFooter>
-                    <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
+                    {!loading && filteredClients.length > 0 && (
+                        <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
+                    )}
                 </CardFooter>
             </Card>
 
