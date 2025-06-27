@@ -44,7 +44,7 @@ export default function Settings() {
                     <TabsTrigger value="account">Account</TabsTrigger>
                     <TabsTrigger value="danger">Danger Zone</TabsTrigger>
                 </TabsList>
-                <section className="h-full w-full bg-neutral-100 rounded-lg p-4">
+                <section className="h-full w-full rounded-lg pt-4">
                     <TabsContent value="company" className="h-full"><CompanySettings /></TabsContent>
                     <TabsContent value="signature" className="h-full"><SignatureSettings /></TabsContent>
                     <TabsContent value="email" className="h-full"><EmailTemplatesSettings /></TabsContent>
