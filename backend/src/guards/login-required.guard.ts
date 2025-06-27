@@ -39,7 +39,6 @@ export class LoginRequiredGuard implements CanActivate {
         }
       } catch (error) {
         response.setHeader('WWW-Authenticate', 'expired_token');
-        console.error('JWT verification failed:', error);
         throw new UnauthorizedException('Invalid access token');
       }
 
