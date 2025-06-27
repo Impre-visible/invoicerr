@@ -39,6 +39,9 @@ export class QuotesService {
         const quotes = await this.prisma.quote.findMany({
             skip,
             take: pageSize,
+            where: {
+                isActive: true,
+            },
             orderBy: {
                 createdAt: 'desc',
             },

@@ -37,6 +37,7 @@ export class ClientsService {
 
         return this.prisma.client.findMany({
             where: {
+                isActive: true,
                 OR: [
                     { name: { contains: query } },
                     { contactFirstname: { contains: query } },
