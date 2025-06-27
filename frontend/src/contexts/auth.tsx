@@ -42,8 +42,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.removeItem("refreshToken");
     };
 
-    const setAccessToken = (t: string | null) => setAccessToken_(t);
-    const setRefreshToken = (t: string | null) => setRefreshToken_(t);
+    const setAccessToken = (t: string | null) => {
+        setAccessToken_(t);
+        if (t) {
+            localStorage.setItem("accessToken", t);
+        } else {
+            localStorage.removeItem("accessToken");
+        }
+    };
+    const setRefreshToken = (t: string | null) => {
+        setRefreshToken_(t);
+        if (t) {
+            localStorage.setItem("refreshToken", t);
+        } else {
+            localStorage.removeItem("refreshToken");
+        }
+    };
 
     useEffect(() => {
         if (accessToken) {

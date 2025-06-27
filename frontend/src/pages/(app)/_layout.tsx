@@ -13,7 +13,7 @@ const Layout = () => {
                         <header className="p-4 bg-header border-b">
                             <SidebarTrigger />
                         </header>
-                        <section className="verflow-y-auto overflow-x-hidden">
+                        <section className="overflow-y-auto overflow-x-hidden">
                             <Outlet />
                         </section>
                     </section>

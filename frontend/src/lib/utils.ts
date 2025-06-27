@@ -11,7 +11,7 @@ type UseGetResult<T> = {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  refetch: () => void;
+  mutate: () => void;
 };
 
 export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true, accessToken = null, setAccessToken?: (s: string) => any): Promise<Response> {
@@ -93,7 +93,7 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
     data,
     loading,
     error,
-    refetch: () => setRefetchIndex((i) => i + 1),
+    mutate: () => setRefetchIndex((i) => i + 1),
   };
 }
 

@@ -59,12 +59,12 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (data && !error) {
-            toast.success("Login successful! Redirecting...")
             setAccessToken(data.access_token)
             setRefreshToken(data.refresh_token)
             setTimeout(() => {
                 navigate("/")
             }, 1000)
+            toast.success("Login successful! Redirecting...")
         } else if (error) {
             toast.error("Login failed. Please check your credentials.")
         }
