@@ -1,13 +1,28 @@
+export class CreateQuoteDto {
+    // number is auto generated
+    title?: string;
+    clientId: string;
+    validUntil?: Date;
+    items: {
+        description: string;
+        quantity: number;
+        unitPrice: number;
+        vatRate: number;
+        order: number;
+    }[];
+}
+
 export class EditQuotesDto {
     id: string;
-    name: string;
-    contactFirstname: string;
-    contactLastname: string;
-    contactEmail: string;
-    contactPhone?: string;
-    address?: string;
-    postalCode?: string;
-    city?: string;
-    country?: string;
-    isActive?: boolean;
+    title?: string;
+    clientId?: string;
+    validUntil?: Date;
+    items?: {
+        id?: string; // Optional for new items
+        description: string;
+        quantity: number;
+        unitPrice: number;
+        vatRate: number;
+        order: number;
+    }[];
 }
