@@ -99,7 +99,7 @@ export function Sidebar() {
                                 className="min-w-60 rounded-lg"
                             >
                                 <DropdownMenuItem asChild>
-                                    <Link to="/profile" className="flex items-center gap-2">
+                                    <Link to="/settings/account" className="flex items-center gap-2">
                                         <span>Profile</span>
                                     </Link>
                                 </DropdownMenuItem>

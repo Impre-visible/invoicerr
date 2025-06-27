@@ -10,11 +10,11 @@ export type Path =
   | `/invoices`
   | `/login`
   | `/quotes`
-  | `/settings`
+  | `/settings/:tab?`
   | `/signup`
 
 export type Params = {
-  
+  '/settings/:tab?': { tab?: string }
 }
 
 export type ModalPath = never
