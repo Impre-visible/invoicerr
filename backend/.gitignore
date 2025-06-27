@@ -5,6 +5,8 @@
 
 prisma/*.sqlite
 
+prisma/migrations
+
 # Logs
 logs
 *.log
