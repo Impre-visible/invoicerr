@@ -6,8 +6,22 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ClientsService {
     constructor(private readonly prisma: PrismaService) { }
 
-    getClients() {
-        return this.prisma.client.findMany();
+    async getClients(page: string) {
+        const pageNumber = parseInt(page, 10) || 1;
+        const pageSize = 10;
+        const skip = (pageNumber - 1) * pageSize;
+
+        const clients = await this.prisma.client.findMany({
+            skip,
+            take: pageSize,
+            orderBy: {
+                name: 'asc',
+            },
+        });
+
+        const totalClients = await this.prisma.client.count();
+
+        return { pageCount: Math.ceil(totalClients / pageSize), clients };
     }
 
     async createClient(editClientsDto: EditClientsDto) {

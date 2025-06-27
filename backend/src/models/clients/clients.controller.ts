@@ -11,8 +11,8 @@ export class ClientsController {
 
     @Get()
     @LoginRequired()
-    getClientsInfo() {
-        return this.clientsService.getClients();
+    async getClientsInfo(@Param('page') page: string) {
+        return await this.clientsService.getClients(page);
     }
 
     @Post()
