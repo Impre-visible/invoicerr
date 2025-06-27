@@ -8,6 +8,6 @@ import { createRoot } from 'react-dom/client'
 createRoot(document.getElementById('root')!).render(
     <AuthProvider>
         <Routes />
-        <Toaster />
+        <Toaster richColors position='top-right' />
     </AuthProvider>
 )
