@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import Loading from "@/pages/_loading/loading";
 import { authenticatedFetch } from "@/lib/utils";
-import { useNavigate } from "react-router";
 
 interface User {
     id: string;
