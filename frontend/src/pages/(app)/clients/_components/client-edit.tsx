@@ -11,15 +11,37 @@ import {
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
 import { Input } from "@/components/ui/input"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { usePatch } from "@/lib/utils"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 interface ClientEditDialogProps {
     client: Client | null
     onOpenChange: (open: boolean) => void
 }
 
+const clientSchema = z.object({
+    name: z.string().min(1, "Company name is required"),
+
+    contactFirstname: z.string().min(1, "First name is required"),
+    contactLastname: z.string().min(1, "Last name is required"),
+    contactPhone: z.string().min(8, "Phone number must be at least 8 characters").refine((val) => { return /^[+]?[0-9\s\-()]{8,20}$/.test(val) }, "Invalid phone number format"),
+    contactEmail: z.string().email().min(1, "Email is required").refine((val) => { return z.string().email().safeParse(val).success }, "Invalid email format"),
+
+    address: z.string().min(1, "Address cannot be empty"),
+    postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
+    city: z.string().min(1, "City cannot be empty"),
+    country: z.string().min(1, "Country cannot be empty"),
+
+})
+
 export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
-    const form = useForm<Client>({
+    const { trigger } = usePatch(`/api/clients/${client?.id}`)
+
+    const form = useForm<z.infer<typeof clientSchema>>({
+        resolver: zodResolver(clientSchema),
         defaultValues: {
             name: "",
             contactFirstname: "",
@@ -29,20 +51,32 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
             address: "",
             postalCode: "",
             city: "",
-            country: "",
-            isActive: true,
+            country: ""
         },
     })
 
-    const handleSubmit = () => {
+    useEffect(() => {
+        if (client) {
+            form.reset(client)
+        }
+    }, [client, form])
 
+    const handleSubmit = (data: z.infer<typeof clientSchema>) => {
+        trigger(data)
+            .then(() => {
+                onOpenChange(false)
+                form.reset()
+            })
+            .catch((error) => {
+                console.error("Failed to edit client:", error)
+            })
     }
 
     return (
-        <Dialog open={client != null} onOpenChange={onOpenChange}>
+        <Dialog open={!!client} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg">
                 <DialogHeader>
-                    <DialogTitle>Create or Edit Client</DialogTitle>
+                    <DialogTitle>Edit Client</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

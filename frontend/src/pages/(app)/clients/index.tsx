@@ -12,7 +12,7 @@ import { useGet } from "@/lib/utils"
 import { useState } from "react"
 
 export default function Clients() {
-    const { data: clients } = useGet<Client[]>("/api/clients")
+    const { data: clients, mutate, loading } = useGet<Client[]>("/api/clients")
 
     const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
     const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
@@ -145,7 +145,12 @@ export default function Clients() {
                     <CardDescription>Manage your clients, view details, edit or delete them.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {filteredClients.length === 0 ? (
+                    {loading && (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                        </div>
+                    )}
+                    {!loading && filteredClients.length === 0 ? (
                         <div className="text-center py-12">
                             <Users className="mx-auto h-12 w-12 text-gray-400" />
                             <h3 className="mt-2 text-sm font-medium text-foreground">
@@ -169,7 +174,7 @@ export default function Clients() {
                     ) : (
                         <div className="divide-y divide-gray-100">
                             {filteredClients.map((client, index) => (
-                                <div key={index} className="p-6 hover:bg-gray-50/50 transition-colors">
+                                <div key={index} className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4">
                                             <div className="p-2 bg-blue-100 rounded-lg">
@@ -202,9 +207,6 @@ export default function Clients() {
                                                             <span>{client.city}</span>
                                                         </div>
                                                     )}
-                                                </div>
-                                                <div className="mt-1 text-sm text-gray-600">
-                                                    Contact: {client.contactFirstname} {client.contactLastname}
                                                 </div>
                                             </div>
                                         </div>
@@ -245,12 +247,12 @@ export default function Clients() {
 
             <ClientCreate
                 open={createClientDialog}
-                onOpenChange={(open) => { setCreateClientDialog(open) }}
+                onOpenChange={(open) => { setCreateClientDialog(open); mutate() }}
             />
 
             <ClientEdit
                 client={editClientDialog}
-                onOpenChange={(open) => { if (!open) setEditClientDialog(null) }}
+                onOpenChange={(open) => { if (!open) setEditClientDialog(null); mutate() }}
             />
 
             <ClientViewDialog
@@ -260,7 +262,7 @@ export default function Clients() {
 
             <ClientDeleteDialog
                 client={deleteClientDialog}
-                onOpenChange={(open) => { if (!open) setDeleteClientDialog(null) }}
+                onOpenChange={(open) => { if (!open) setDeleteClientDialog(null); mutate() }}
             />
 
         </div>

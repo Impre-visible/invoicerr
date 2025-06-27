@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
+import { useDelete } from "@/lib/utils"
 
 interface ClientDeleteDialogProps {
     client: Client | null
@@ -17,7 +18,19 @@ interface ClientDeleteDialogProps {
 
 export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogProps) {
 
-    const handleDelete = () => { }
+    const { trigger } = useDelete(`/api/clients/${client?.id}`)
+
+    const handleDelete = () => {
+        if (!client) return;
+
+        trigger()
+            .then(() => {
+                onOpenChange(false);
+            })
+            .catch((error) => {
+                console.error("Failed to delete client:", error);
+            });
+    }
 
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>

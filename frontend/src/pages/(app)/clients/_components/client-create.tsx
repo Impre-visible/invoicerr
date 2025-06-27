@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form"
+import { usePost } from "@/lib/utils"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -35,6 +36,8 @@ const clientSchema = z.object({
 })
 
 export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
+    const { trigger } = usePost("/api/clients")
+
     const form = useForm<z.infer<typeof clientSchema>>({
         resolver: zodResolver(clientSchema),
         defaultValues: {
@@ -50,10 +53,15 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
         },
     })
 
-    const handleSubmit = () => {
-        if (!form.formState.isValid) {
-            return
-        }
+    const handleSubmit = (data: z.infer<typeof clientSchema>) => {
+        trigger(data)
+            .then(() => {
+                onOpenChange(false)
+                form.reset()
+            })
+            .catch((error) => {
+                console.error("Failed to create client:", error)
+            })
     }
 
     return (
