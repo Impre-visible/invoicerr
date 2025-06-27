@@ -5,25 +5,12 @@ import { useEffect, useState } from "react"
 import { useGet, usePost } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
+import type { Company } from "@/types"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-
-interface Company {
-    id: string
-    name: string
-    language: string
-    currency: string
-    VAT: string
-    address: string
-    postalCode: string
-    city: string
-    country: string
-    phone: string
-    email: string
-}
 
 const companySchema = z.object({
     name: z.string({ required_error: "Company name is required" }).min(1, "Company name cannot be empty").max(100, "Name cannot exceed 100 characters"),
