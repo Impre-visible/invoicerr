@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 
@@ -30,14 +29,12 @@ type SignupFormData = z.infer<typeof SignupSchema>
 export default function SignupPage() {
     const navigate = useNavigate()
     const [errors, setErrors] = useState<Partial<Record<keyof SignupFormData, string[]>>>({})
-    const [message, setMessage] = useState("")
 
     const { trigger: post, loading, data, error } = usePost("/api/auth/signup")
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         setErrors({})
-        setMessage("")
 
         const formData = new FormData(event.currentTarget)
         const data: SignupFormData = {
@@ -117,27 +114,6 @@ export default function SignupPage() {
                                 </div>
                             )}
                         </div>
-
-                        {message && (
-                            <Alert
-                                className={
-                                    message.includes("successfully")
-                                        ? "border-green-200 bg-green-50"
-                                        : "border-red-200 bg-red-50"
-                                }
-                            >
-                                <AlertDescription
-                                    className={
-                                        message.includes("successfully")
-                                            ? "text-green-800"
-                                            : "text-red-800"
-                                    }
-                                >
-                                    {message}
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? "Creating Account..." : "Create Account"}
                         </Button>
