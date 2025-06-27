@@ -1,4 +1,4 @@
-import { ChevronUp, FileSignature, FileText, LayoutDashboard, Settings, User, Users } from "lucide-react"
+import { ChevronUp, FileSignature, FileText, LayoutDashboard, Moon, Settings, Sun, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,8 +18,10 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+import { Button } from "./ui/button"
 import { useAuth } from "@/contexts/auth"
 import { useEffect } from "react"
+import { useTheme } from "./theme-provider"
 
 const items: { title: string, icon: React.ReactNode, url: string }[] = [
     {
@@ -52,6 +54,15 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
 export function Sidebar() {
     const location = useLocation()
     const { user } = useAuth()
+    const { theme, setTheme } = useTheme()
+
+    useEffect(() => {
+        console.log(user)
+    }, [user])
+
+    const toggleTheme = () => {
+        setTheme(theme === "light" ? "dark" : "light")
+    }
 
     useEffect(() => {
         console.log(user)
@@ -94,6 +105,28 @@ export function Sidebar() {
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                                    <span className="sr-only">Toggle theme</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setTheme("light")}>
+                                    Light
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                                    Dark
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("system")}>
+                                    System
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton>
                                     <User /> {user?.firstname} {user?.lastname}
                                     <ChevronUp className="ml-auto" />
@@ -103,7 +136,7 @@ export function Sidebar() {
                                 side="top"
                                 className="min-w-60 rounded-lg"
                             >
-                                <DropdownMenuItem asChild>
+                                <DropdownMenuItem asChild >
                                     <Link to="/settings/account" className="flex items-center gap-2">
                                         <span>Profile</span>
                                     </Link>

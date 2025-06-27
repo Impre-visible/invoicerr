@@ -10,7 +10,7 @@ const Layout = () => {
                 <main className="flex flex-1 h-full w-full max-w-screen overflow-y-auto overflow-x-hidden">
                     <Sidebar />
                     <section className="flex flex-col flex-1 h-full w-full max-w-screen overflow-hidden">
-                        <header className="p-4 bg-gray-100 border-b">
+                        <header className="p-4 bg-header border-b">
                             <SidebarTrigger />
                         </header>
                         <section className="verflow-y-auto overflow-x-hidden">
