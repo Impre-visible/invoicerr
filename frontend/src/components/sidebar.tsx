@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { useAuth } from "@/contexts/auth"
+import { useEffect } from "react"
 
 const items: { title: string, icon: React.ReactNode, url: string }[] = [
     {
@@ -51,6 +52,10 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
 export function Sidebar() {
     const location = useLocation()
     const { user } = useAuth()
+
+    useEffect(() => {
+        console.log(user)
+    }, [user])
 
     return (
         <RootSidebar collapsible="icon">

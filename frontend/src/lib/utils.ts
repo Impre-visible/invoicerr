@@ -28,13 +28,18 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
   const isExpired = res.headers.get("Www-Authenticate") === "expired_token";
 
   if (isExpired && retry) {
-    const refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
+    let refreshRes: Response;
+    refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
       body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }),
       headers: {
         "Content-Type": "application/json",
       },
       method: "POST"
     });
+
+    if (refreshRes.status >= 400) {
+      window.location.href = "/logout";
+    }
 
     if (refreshRes.ok) {
       const { access_token } = await refreshRes.json();
@@ -44,12 +49,7 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
     } else {
       throw new Error("Token refresh failed");
     }
-  } else if (isExpired && !retry) {
-    console.error("Token expired and no retry attempted. Please log in again.");
-    console.log("Headers:", res.headers);
-    console.log("Token:", token);
   }
-
   return res;
 }
 

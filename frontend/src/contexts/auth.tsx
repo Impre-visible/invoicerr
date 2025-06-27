@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import Loading from "@/pages/_loading/loading";
 import { authenticatedFetch } from "@/lib/utils";
+import { useNavigate } from "react-router";
 
 interface User {
     id: string;
@@ -15,6 +16,7 @@ const AuthContext = createContext<{
     refreshToken: string | null;
     user: User | null;
     loading: boolean;
+    logout: () => void;
     setAccessToken: (t: string | null) => void;
     setRefreshToken: (t: string | null) => void;
 }>({
@@ -22,6 +24,7 @@ const AuthContext = createContext<{
     refreshToken: null,
     user: null,
     loading: true,
+    logout: () => { },
     setAccessToken: () => { },
     setRefreshToken: () => { },
 });
@@ -31,6 +34,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [refreshToken, setRefreshToken_] = useState(localStorage.getItem("refreshToken"));
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const logout = () => {
+        setAccessToken_(null);
+        setRefreshToken_(null);
+        setUser(null);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+    };
 
     const setAccessToken = (t: string | null) => setAccessToken_(t);
     const setRefreshToken = (t: string | null) => setRefreshToken_(t);
@@ -78,6 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             refreshToken,
             user,
             loading,
+            logout,
             setAccessToken,
             setRefreshToken,
         }),

@@ -9,6 +9,7 @@ export type Path =
   | `/dashboard`
   | `/invoices`
   | `/login`
+  | `/logout`
   | `/quotes`
   | `/settings/:tab?`
   | `/signup`
