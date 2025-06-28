@@ -149,7 +149,7 @@ export default function SearchSelect({
                         />
                     </div>
 
-                    <div className="max-h-60 overflow-auto p-1">
+                    <div className="max-h-60 overflow-auto p-1 flex flex-col gap-1">
                         {options.length === 0 ? (
                             <div className="py-2 px-3 text-sm text-muted-foreground">Aucune option disponible</div>
                         ) : (
