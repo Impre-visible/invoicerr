@@ -281,14 +281,16 @@ export default function Quotes() {
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleMarkAsSigned(quote.id)}
-                                                className="text-gray-600 hover:text-blue-600"
-                                            >
-                                                <Signature className="h-4 w-4" />
-                                            </Button>
+                                            {quote.status !== 'SIGNED' && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleMarkAsSigned(quote.id)}
+                                                    className="text-gray-600 hover:text-blue-600"
+                                                >
+                                                    <Signature className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
