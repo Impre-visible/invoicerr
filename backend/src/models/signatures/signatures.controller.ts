@@ -7,9 +7,9 @@ import { SignaturesService } from './signatures.service';
 export class SignaturesController {
     constructor(private readonly signaturesService: SignaturesService) { }
 
-    @Post('/:id')
+    @Post('/')
     @LoginRequired()
-    async createSignature(@Param('id') quoteId: string) {
+    async createSignature(@Body('quoteId') quoteId: string) {
         return this.signaturesService.createSignature(quoteId);
     }
 
