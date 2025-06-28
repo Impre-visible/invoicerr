@@ -239,14 +239,19 @@ export default function Invoices() {
                                                         {invoice.status}
                                                     </span>
                                                 </div>
-                                                <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
-                                                    <div className="flex items-center space-x-1">
-                                                        <span className="break-all">Client: {invoice.client.name}</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-1">
-                                                        <span className="break-all">Total: {invoice.totalHT}{invoice.company.currency}</span>
+                                                <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                                                        <span><span className="font-medium text-foreground">Client:</span> {invoice.client.name}</span>
+                                                        <span><span className="font-medium text-foreground">Issued:</span> {new Date(invoice.createdAt).toLocaleDateString()}</span>
+                                                        <span><span className="font-medium text-foreground">Due:</span> {new Date(invoice.dueDate).toLocaleDateString()}</span>
+                                                        {invoice.paymentMethod && (
+                                                            <span><span className="font-medium text-foreground">Payment:</span> {invoice.paymentMethod}</span>
+                                                        )}
+                                                        <span><span className="font-medium text-foreground">Total HT:</span> {invoice.totalHT.toFixed(2)} €</span>
+                                                        <span><span className="font-medium text-foreground">Total TTC:</span> {invoice.totalTTC.toFixed(2)} €</span>
                                                     </div>
                                                 </div>
+
                                             </div>
                                         </div>
 
