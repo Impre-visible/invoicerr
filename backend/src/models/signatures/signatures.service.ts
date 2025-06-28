@@ -19,6 +19,32 @@ export class SignaturesService {
         });
     }
 
+    async getSignature(signatureId: string) {
+        const signature = await this.prisma.signature.findUnique({
+            where: { id: signatureId },
+            select: {
+                id: true,
+                isActive: true,
+                quoteId: true,
+                signedAt: true,
+                expiresAt: true,
+                quote: {
+                    select: {
+                        id: true,
+                        number: true,
+                        client: {
+                            select: {
+                                contactEmail: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return signature;
+    }
+
     async createSignature(quoteId: string) {
         const quote = await this.prisma.quote.findUnique({
             where: { id: quoteId },
@@ -57,7 +83,7 @@ export class SignaturesService {
 
     async generateOTPCode(signatureId: string) {
         const signature = await this.prisma.signature.findUnique({
-            where: { id: signatureId },
+            where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
                 quote: {
@@ -94,7 +120,7 @@ export class SignaturesService {
 
     async sendSignatureEmail(signatureId: string) {
         const signature = await this.prisma.signature.findUnique({
-            where: { id: signatureId },
+            where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
                 quote: {
@@ -161,6 +187,7 @@ export class SignaturesService {
                 id: signatureId,
                 otpCode,
                 otpUsed: false,
+                isActive: true,
                 expiresAt: {
                     gte: new Date(),
                 },

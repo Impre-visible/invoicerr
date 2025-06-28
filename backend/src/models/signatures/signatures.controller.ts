@@ -2,10 +2,17 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@
 
 import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { SignaturesService } from './signatures.service';
+import { sign } from 'crypto';
 
 @Controller('signatures')
 export class SignaturesController {
     constructor(private readonly signaturesService: SignaturesService) { }
+
+    @Get('/:id')
+    @LoginRequired()
+    async getSignatures(@Query('id') signatureId: string) {
+        return this.signaturesService.getSignature(signatureId);
+    }
 
     @Post('/')
     @LoginRequired()
