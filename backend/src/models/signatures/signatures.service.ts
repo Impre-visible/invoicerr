@@ -95,7 +95,7 @@ export class SignaturesService {
             throw new Error('Quote not found or client information is missing.');
         }
 
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpCode = Math.floor(10000000 + Math.random() * 90000000).toString();
 
         await this.prisma.signature.update({
             where: { id: signatureId },
@@ -161,7 +161,7 @@ export class SignaturesService {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: email,
             subject: 'Your OTP Code for Quote Signing',
-            text: `Your OTP code is: ${otpCode}. It is valid for 15 minutes.`,
+            text: `Your OTP code is: \n${otpCode.slice(0, 4)}-${otpCode.slice(4, 8)}\nIt is valid for 15 minutes.`,
         };
 
         await this.transporter.sendMail(mailOptions)
