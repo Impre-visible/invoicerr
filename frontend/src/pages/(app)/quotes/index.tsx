@@ -91,11 +91,11 @@ export default function Quotes() {
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center gap-4 lg:gap-6 lg:justify-between">
-                    <div className="relative">
+                <div className="flex flex-row items-center gap-4 w-full lg:w-fit lg:gap-6 lg:justify-between">
+                    <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Search quotes..."
+                            placeholder="Search clients..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-full"
@@ -107,7 +107,7 @@ export default function Quotes() {
                     >
                         <Plus className="h-4 w-4 mr-0 md:mr-2" />
                         <span className="hidden md:inline-flex">
-                            Add New Quote
+                            Add New Client
                         </span>
                     </Button>
                 </div>
@@ -204,17 +204,20 @@ export default function Quotes() {
                     ) : (
                         <div className="divide-y">
                             {filteredQuotes.map((quote, index) => (
-                                <div key={index} className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <div key={index} className="p-4 sm:p-6">
+                                    <div className="flex flex-row sm:items-center sm:justify-between gap-4">
+                                        {/* Bloc gauche */}
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-4 w-full">
+                                            <div className="self-start sm:self-auto p-2 bg-blue-100 rounded-lg">
                                                 <FileSignature className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="flex items-center space-x-2">
-                                                    <h3 className="font-medium text-foreground">{quote.title || `Quote #${quote.number}`}</h3>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="font-medium text-foreground break-words">
+                                                        {quote.title || `Quote #${quote.number}`}
+                                                    </h3>
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                                                        ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
                                                             quote.status === 'SIGNED' ? 'bg-blue-100 text-blue-800' :
                                                                 quote.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
                                                                     quote.status === 'SENT' ? 'bg-green-100 text-green-800' :
@@ -223,10 +226,10 @@ export default function Quotes() {
                                                         {quote.status}
                                                     </span>
                                                 </div>
-                                                <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
+                                                <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
-                                                        <span>{quote.client.contactEmail}</span>
+                                                        <span className="break-all">{quote.client.contactEmail}</span>
                                                     </div>
                                                     {quote.client.contactPhone && (
                                                         <div className="flex items-center space-x-1">
@@ -238,7 +241,8 @@ export default function Quotes() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-2">
+                                        {/* Boutons */}
+                                        <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -275,7 +279,7 @@ export default function Quotes() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(quote)}
-                                                className="text-gray-600 hover:text-red-600"
+                                                className="text-gray-600 hover:text-red-600 col-span-2 sm:col-auto"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -284,6 +288,7 @@ export default function Quotes() {
                                 </div>
                             ))}
                         </div>
+
                     )}
                 </CardContent>
                 <CardFooter>
