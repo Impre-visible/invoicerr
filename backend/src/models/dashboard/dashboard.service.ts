@@ -1,28 +1,39 @@
-import { Invoice, Quote } from '@prisma/client';
+import { Company, Invoice, Quote } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 interface DashboardData {
+    company: Company | null,
     quotes: {
-        total: number;
-        draft: number;
-        sent: number;
-        signed: number;
-        expired: number;
-        latests: Quote[];
-    };
+        total: number
+        draft: number
+        sent: number
+        signed: number
+        expired: number
+        latests: Quote[]
+    }
     invoices: {
-        total: number;
-        unpaid: number;
-        sent: number;
-        paid: number;
-        overdue: number;
-        latests: Invoice[];
-    };
+        total: number
+        unpaid: number
+        sent: number
+        paid: number
+        overdue: number
+        latests: Invoice[]
+    }
     clients: {
-        total: number;
-    };
+        total: number
+    }
+    revenue: {
+        currentMonth: number
+        previousMonth: number
+        monthlyChange: number
+        monthlyChangePercent: number
+        currentYear: number
+        previousYear: number
+        yearlyChange: number
+        yearlyChangePercent: number
+    }
 }
 
 @Injectable()
@@ -43,6 +54,7 @@ export class DashboardService {
         const clientsCount = await this.prisma.client.count();
 
         return {
+            company: await this.prisma.company.findFirst(),
             quotes: {
                 total: quotes.reduce((acc, q) => acc + q._count, 0),
                 draft: quotes.find(q => q.status === 'DRAFT')?._count || 0,
@@ -70,6 +82,62 @@ export class DashboardService {
             clients: {
                 total: clientsCount,
             },
+            revenue: {
+                currentMonth: await this.getMonthlyRevenue(new Date()),
+                previousMonth: await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
+                monthlyChange: await this.getMonthlyRevenue(new Date()) - await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
+                monthlyChangePercent: this.calculateChangePercent(
+                    await this.getMonthlyRevenue(new Date()),
+                    await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1)))
+                    ,
+                ),
+                currentYear: await this.getYearlyRevenue(new Date()),
+                previousYear: await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
+                yearlyChange: await this.getYearlyRevenue(new Date()) - await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
+                yearlyChangePercent: this.calculateChangePercent(
+                    await this.getYearlyRevenue(new Date()),
+                    await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1)))
+                ),
+            },
         };
+    }
+
+    async getMonthlyRevenue(date: Date): Promise<number> {
+        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+        const invoices = await this.prisma.invoice.findMany({
+            where: {
+                createdAt: {
+                    gte: startOfMonth,
+                    lte: endOfMonth,
+                },
+                status: 'PAID',
+            },
+        });
+
+        return invoices.reduce((total, invoice) => total + invoice.totalTTC, 0);
+    }
+
+    async getYearlyRevenue(date: Date): Promise<number> {
+        const startOfYear = new Date(date.getFullYear(), 0, 1);
+        const endOfYear = new Date(date.getFullYear() + 1, 0, 0);
+
+        const invoices = await this.prisma.invoice.findMany({
+            where: {
+                createdAt: {
+                    gte: startOfYear,
+                    lte: endOfYear,
+                },
+                status: 'PAID',
+            },
+        });
+
+        return invoices.reduce((total, invoice) => total + invoice.totalTTC, 0);
+    }
+
+    calculateChangePercent(current: number, previous: number): number {
+        if (previous === 0) return current > 0 ? 100 : -100; // Avoid division by zero
+        return ((current - previous) / previous) * 100;
     }
 }
