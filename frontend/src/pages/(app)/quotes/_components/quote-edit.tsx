@@ -334,7 +334,6 @@ function SortableItem({ id, children, dragHandle }: { id: string; children: Reac
     return (
         <div ref={setNodeRef} style={style} className="flex items-center gap-2">
             {children}
-            {/* dragHandle is rendered outside children */}
             <div {...attributes} {...listeners}>
                 {dragHandle}
             </div>

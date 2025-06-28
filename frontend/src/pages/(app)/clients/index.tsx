@@ -86,7 +86,6 @@ export default function Clients() {
                 </div>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="p-6">
@@ -217,7 +216,7 @@ export default function Clients() {
                                         <div className="mt-0 w-fit flex flex-col lg:flex-row space-x-2 justify-center items-center lg:justify-end">
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleView(client)}
                                                 className="text-gray-600 hover:text-blue-600 mr-2"
                                             >
@@ -225,7 +224,7 @@ export default function Clients() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleEdit(client)}
                                                 className="text-gray-600 hover:text-green-600 mr-2"
                                             >
@@ -233,7 +232,7 @@ export default function Clients() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleDelete(client)}
                                                 className="text-gray-600 hover:text-red-600 mr-2"
                                             >

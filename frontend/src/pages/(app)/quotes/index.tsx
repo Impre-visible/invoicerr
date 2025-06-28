@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
+import { Download, Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Signature, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useGet, useGetRaw } from "@/lib/utils"
+import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import { QuotePdfModal } from "./_components/quote-pdf-view"
 import { QuoteViewDialog } from "./_components/quote-view"
 
 export default function Quotes() {
+    const { trigger } = usePost(`/api/quotes/mark-as-signed`)
     const [page, setPage] = useState(1)
 
     const { data: quotes, mutate, loading } = useGet<{ pageCount: number, quotes: Quote[] }>(`/api/quotes?page=${page}`)
@@ -75,6 +76,14 @@ export default function Quotes() {
         setDeleteQuoteDialog(quote)
     }
 
+    function handleMarkAsSigned(quoteId: string) {
+        trigger({ id: quoteId }).then(() => {
+            mutate();
+        }).catch((error) => {
+            console.error("Error marking quote as signed:", error);
+        });
+    }
+
     return (
         <div className="max-w-6xl mx-auto space-y-6 p-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
@@ -113,7 +122,6 @@ export default function Quotes() {
                 </div>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="p-6">
@@ -240,11 +248,10 @@ export default function Quotes() {
                                             </div>
                                         </div>
 
-                                        {/* Boutons */}
                                         <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleView(quote)}
                                                 className="text-gray-600 hover:text-blue-600"
                                             >
@@ -252,7 +259,7 @@ export default function Quotes() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleViewPdf(quote)}
                                                 className="text-gray-600 hover:text-pink-600"
                                             >
@@ -260,7 +267,7 @@ export default function Quotes() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleDownloadPdf(quote)}
                                                 className="text-gray-600 hover:text-amber-600"
                                             >
@@ -268,7 +275,7 @@ export default function Quotes() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleEdit(quote)}
                                                 className="text-gray-600 hover:text-green-600"
                                             >
@@ -276,7 +283,15 @@ export default function Quotes() {
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
+                                                onClick={() => handleMarkAsSigned(quote.id)}
+                                                className="text-gray-600 hover:text-blue-600"
+                                            >
+                                                <Signature className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleDelete(quote)}
                                                 className="text-gray-600 hover:text-red-600"
                                             >
