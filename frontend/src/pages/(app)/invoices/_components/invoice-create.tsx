@@ -1,3 +1,4 @@
+import type { Client, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
     DndContext,
@@ -29,7 +30,6 @@ import { useGet, usePost } from "@/lib/utils"
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
-import type { Client } from "@/types"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import SearchSelect from "@/components/search-input"
@@ -42,7 +42,7 @@ interface InvoiceCreateDialogProps {
 }
 
 const invoiceSchema = z.object({
-    title: z.string().optional(),
+    quoteId: z.string().min(1, "Quote ID is required").optional(),
     clientId: z.string().min(1, "Client is required").refine(val => val !== "", {
         message: "Client is required",
     }),
@@ -65,14 +65,18 @@ const invoiceSchema = z.object({
 })
 
 export function InvoiceCreate({ open, onOpenChange }: InvoiceCreateDialogProps) {
-    const [searchTerm, setSearchTerm] = useState("")
-    const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${searchTerm}`)
+    const [clientSearchTerm, setClientsSearchTerm] = useState("")
+    const [quoteSearchTerm, setQuoteSearchTerm] = useState("")
+
+    const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
+    const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
+
     const { trigger } = usePost("/api/invoices")
 
     const form = useForm<z.infer<typeof invoiceSchema>>({
         resolver: zodResolver(invoiceSchema),
         defaultValues: {
-            title: "",
+            quoteId: undefined,
             clientId: "",
             dueDate: undefined,
             items: [],
@@ -130,12 +134,17 @@ export function InvoiceCreate({ open, onOpenChange }: InvoiceCreateDialogProps) 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={control}
-                            name="title"
+                            name="quoteId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Title</FormLabel>
+                                    <FormLabel>Quote</FormLabel>
                                     <FormControl>
-                                        <Input {...field} placeholder="Title" />
+                                        <SearchSelect
+                                            options={(quotes || []).map((c) => ({ label: `${c.number}${c.title ? ` (${c.title})` : ''}`, value: c.id }))}
+                                            value={field.value ?? ""}
+                                            onValueChange={val => field.onChange(val || null)}
+                                            onSearchChange={setQuoteSearchTerm}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -153,7 +162,7 @@ export function InvoiceCreate({ open, onOpenChange }: InvoiceCreateDialogProps) 
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={val => field.onChange(val || null)}
-                                            onSearchChange={setSearchTerm}
+                                            onSearchChange={setClientsSearchTerm}
                                         />
                                     </FormControl>
                                     <FormMessage />
