@@ -1,5 +1,5 @@
+import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Search, Signature, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, FileSignature, FileText, Plus, Search, Signature, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
@@ -241,7 +241,10 @@ export default function Invoices() {
                                                 </div>
                                                 <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
-                                                        <span className="break-all">Client ID: {invoice.clientId}</span>
+                                                        <span className="break-all">Client: {invoice.client.name}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1">
+                                                        <span className="break-all">Total: {invoice.totalHT}{invoice.company.currency}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -292,7 +295,7 @@ export default function Invoices() {
                                                     onClick={() => handleMarkAsSigned(invoice.id)}
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
-                                                    <Signature className="h-4 w-4" />
+                                                    <Banknote className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             {invoice.status === 'SENT' && (
