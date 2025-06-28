@@ -3,6 +3,7 @@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, Clock, Download, FileText, Mail, RefreshCw, ZoomIn, ZoomOut } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
 import { useEffect, useState } from "react"
 import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
@@ -126,6 +127,18 @@ export default function Signature() {
         window.location.reload()
     }
 
+    const handleOtpPaste = (e: React.ClipboardEvent) => {
+        e.preventDefault()
+        const pastedText = e.clipboardData.getData("text")
+        const cleanedText = pastedText.replace(/[^0-9]/g, "").slice(0, 8)
+        setOtpCode(cleanedText)
+    }
+
+    const handleOtpChange = (value: string) => {
+        const cleanedValue = value.replace(/[^0-9]/g, "").slice(0, 8)
+        setOtpCode(cleanedValue)
+    }
+
     const renderSignatureStatus = () => {
         switch (state) {
             case "loading":
@@ -209,18 +222,23 @@ export default function Signature() {
                             </Alert>
 
                             <form onSubmit={handleSignWithOtp} className="space-y-4">
-                                <div>
+                                <div className="space-y-2">
                                     <Label htmlFor="otp">Verification code</Label>
-                                    <Input
-                                        id="otp"
-                                        type="text"
-                                        value={otpCode}
-                                        onChange={(e) => setOtpCode(e.target.value)}
-                                        placeholder="Enter the code received by email"
-                                        maxLength={6}
-                                        className="text-center text-lg tracking-widest"
-                                        required
-                                    />
+                                    <section className="flex flex-col items-center">
+                                        <InputOTP maxLength={8} minLength={8} value={otpCode} onChange={handleOtpChange} onPaste={handleOtpPaste} className="w-full">
+                                            <InputOTPGroup>
+                                                {[...Array(4)].map((_, index) => (
+                                                    <InputOTPSlot index={index} />
+                                                ))}
+                                            </InputOTPGroup>
+                                            <InputOTPSeparator />
+                                            <InputOTPGroup>
+                                                {[...Array(4)].map((_, index) => (
+                                                    <InputOTPSlot index={index + 4} />
+                                                ))}
+                                            </InputOTPGroup>
+                                        </InputOTP>
+                                    </section>
                                 </div>
 
                                 <div className="flex gap-2">
