@@ -35,7 +35,7 @@ export default function Settings() {
 
 
     return (
-        <div className="flex items-center justify-center min-h-fit h-full w-full">
+        <div className="max-w-6xl mx-auto space-y-6 px-6">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit p-8">
                 <TabsList className="w-full h-12">
                     <TabsTrigger value="company">Company</TabsTrigger>
