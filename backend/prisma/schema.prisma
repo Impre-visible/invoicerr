@@ -134,7 +134,7 @@ model InvoiceItem {
 model Signature {
   id        String    @id @default(uuid())
   quoteId   String
-  signedAt  DateTime  @default(now())
+  signedAt  DateTime?
   expiresAt DateTime?
   otpCode   String?
   otpUsed   Boolean   @default(false)
