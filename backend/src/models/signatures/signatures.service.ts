@@ -1,10 +1,23 @@
+import * as nodemailer from 'nodemailer';
+
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import nodemailer from 'nodemailer';
 
 @Injectable()
 export class SignaturesService {
-    constructor(private readonly prisma: PrismaService) { }
+    private transporter: nodemailer.Transporter;
+
+    constructor(private readonly prisma: PrismaService) {
+        this.transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: 587,
+            secure: false, // true si port 465
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASSWORD,
+            },
+        });
+    }
 
     async createSignature(quoteId: string) {
         const quote = await this.prisma.quote.findUnique({
@@ -30,7 +43,16 @@ export class SignaturesService {
             },
         });
 
-        return { message: 'Signature created successfully.', signature };
+        await this.sendSignatureEmail(signature.id);
+
+        await this.prisma.quote.update({
+            where: { id: quoteId },
+            data: {
+                status: 'SENT',
+            },
+        });
+
+        return { message: 'Signature successfully created and email sent.', signature };
     }
 
     async generateOTPCode(signatureId: string) {
@@ -70,24 +92,55 @@ export class SignaturesService {
         return { message: 'OTP code generated successfully.' };
     }
 
-    async sendOtpToUser(email: string, otpCode: string) {
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: 587,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
+    async sendSignatureEmail(signatureId: string) {
+        const signature = await this.prisma.signature.findUnique({
+            where: { id: signatureId },
+            select: {
+                quoteId: true,
+                quote: {
+                    select: {
+                        number: true,
+                        client: {
+                            select: {
+                                contactEmail: true
+                            }
+                        }
+                    }
+                }
+            }
         });
 
+        if (!signature || !signature.quote || !signature.quote.client || !signature.quote.client.contactEmail) {
+            throw new Error('Quote not found or client information is missing.');
+        }
+
         const mailOptions = {
-            from: process.env.SMTP_USER,
+            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            to: signature.quote.client.contactEmail,
+            subject: 'Signature Request for Quote',
+            text: `Please sign the quote by clicking on the following link: ${process.env.APP_URL}/signatures/${signatureId}`,
+            html: `<p>Please sign the quote: <a href="${process.env.APP_URL}/signatures/${signatureId}">#${signature.quote.number}</a>.</p>`,
+        };
+
+        await this.transporter.sendMail(mailOptions)
+            .then(() => console.log('Signature email sent successfully'))
+            .catch(error => {
+                console.error('Error sending signature email:', error);
+                throw new Error('Failed to send signature email.');
+            });
+
+        return { message: 'Signature email sent successfully.' };
+    }
+
+    async sendOtpToUser(email: string, otpCode: string) {
+        const mailOptions = {
+            from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: email,
             subject: 'Your OTP Code for Quote Signing',
             text: `Your OTP code is: ${otpCode}. It is valid for 15 minutes.`,
         };
 
-        await transporter.sendMail(mailOptions)
+        await this.transporter.sendMail(mailOptions)
             .then(() => console.log('OTP sent successfully'))
             .catch(error => {
                 console.error('Error sending OTP:', error);
