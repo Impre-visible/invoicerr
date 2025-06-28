@@ -88,7 +88,7 @@ export default function Clients() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <Users className="h-6 w-6 text-blue-600" />
@@ -102,7 +102,7 @@ export default function Clients() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-green-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -120,7 +120,7 @@ export default function Clients() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-gray-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -215,6 +215,7 @@ export default function Clients() {
 
                                         <div className="mt-0 w-fit flex flex-col lg:flex-row space-x-2 justify-center items-center lg:justify-end">
                                             <Button
+                                                tooltip="View Client"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleView(client)}
@@ -223,6 +224,7 @@ export default function Clients() {
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Edit Client"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleEdit(client)}
@@ -231,6 +233,7 @@ export default function Clients() {
                                                 <Edit className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Delete Client"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(client)}

@@ -14,7 +14,9 @@ import { QuotePdfModal } from "./_components/quote-pdf-view"
 import { QuoteViewDialog } from "./_components/quote-view"
 
 export default function Quotes() {
-    const { trigger } = usePost(`/api/quotes/mark-as-signed`)
+    const { trigger: triggerMarkAsSigned } = usePost(`/api/quotes/mark-as-signed`)
+    const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-quote`)
+
     const [page, setPage] = useState(1)
 
     const { data: quotes, mutate, loading } = useGet<{ pageCount: number, quotes: Quote[] }>(`/api/quotes?page=${page}`)
@@ -77,11 +79,15 @@ export default function Quotes() {
     }
 
     function handleMarkAsSigned(quoteId: string) {
-        trigger({ id: quoteId }).then(() => {
+        triggerMarkAsSigned({ id: quoteId }).then(() => {
             mutate();
         }).catch((error) => {
             console.error("Error marking quote as signed:", error);
         });
+    }
+
+    function handleCreateInvoice(quoteId: string) {
+        triggerCreateInvoice({ quoteId })
     }
 
     return (
@@ -124,7 +130,7 @@ export default function Quotes() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <FileSignature className="h-6 w-6 text-blue-600" />
@@ -138,7 +144,7 @@ export default function Quotes() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-yellow-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -156,7 +162,7 @@ export default function Quotes() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -250,6 +256,7 @@ export default function Quotes() {
 
                                         <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
                                             <Button
+                                                tooltip="View Quote"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleView(quote)}
@@ -258,6 +265,7 @@ export default function Quotes() {
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="View PDF"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleViewPdf(quote)}
@@ -266,6 +274,7 @@ export default function Quotes() {
                                                 <FileText className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Download PDF"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDownloadPdf(quote)}
@@ -274,6 +283,7 @@ export default function Quotes() {
                                                 <Download className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Edit Quote"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleEdit(quote)}
@@ -283,6 +293,7 @@ export default function Quotes() {
                                             </Button>
                                             {quote.status !== 'SIGNED' && (
                                                 <Button
+                                                    tooltip="Mark as Signed"
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => handleMarkAsSigned(quote.id)}
@@ -291,7 +302,19 @@ export default function Quotes() {
                                                     <Signature className="h-4 w-4" />
                                                 </Button>
                                             )}
+                                            {quote.status === 'SIGNED' && (
+                                                <Button
+                                                    tooltip="Create Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleCreateInvoice(quote.id)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <FileText className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             <Button
+                                                tooltip="Delete Quote"
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(quote)}
