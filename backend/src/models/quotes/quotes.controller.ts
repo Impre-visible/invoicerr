@@ -32,6 +32,15 @@ export class QuotesController {
         res.send(pdfBuffer);
     }
 
+    @Post('/mark-as-signed')
+    @LoginRequired()
+    async markQuoteAsSigned(@Body('id') id: string) {
+        if (!id) {
+            throw new Error('Quote ID is required');
+        }
+        return await this.quotesService.markQuoteAsSigned(id);
+    }
+
     @Post()
     @LoginRequired()
     postQuotesInfo(@Body() body: CreateQuoteDto) {

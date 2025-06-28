@@ -212,4 +212,21 @@ export class QuotesService {
         return pdfBuffer;
     }
 
+    async markQuoteAsSigned(id: string) {
+        if (!id) {
+            throw new Error('Quote ID is required');
+        }
+
+        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+
+        if (!existingQuote) {
+            throw new Error('Quote not found');
+        }
+
+        return this.prisma.quote.update({
+            where: { id },
+            data: { signedAt: new Date(), status: "SIGNED" },
+        });
+    }
+
 }
