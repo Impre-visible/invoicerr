@@ -10,7 +10,7 @@ export class SignaturesController {
 
     @Get('/:id')
     @LoginRequired()
-    async getSignatures(@Query('id') signatureId: string) {
+    async getSignatures(@Param('id') signatureId: string) {
         return this.signaturesService.getSignature(signatureId);
     }
 

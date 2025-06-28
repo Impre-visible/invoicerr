@@ -29,14 +29,8 @@ export class SignaturesService {
                 signedAt: true,
                 expiresAt: true,
                 quote: {
-                    select: {
-                        id: true,
-                        number: true,
-                        client: {
-                            select: {
-                                contactEmail: true
-                            }
-                        }
+                    include: {
+                        client: true,
                     }
                 }
             }
