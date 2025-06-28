@@ -95,7 +95,7 @@ export class SignaturesService {
             throw new Error('Quote not found or client information is missing.');
         }
 
-        const otpCode = (await crypto.randomInt(10000000, 100000000)).toString();
+        const otpCode = Math.floor(10000000 + Math.random() * 90000000).toString();
 
         await this.prisma.signature.update({
             where: { id: signatureId },
