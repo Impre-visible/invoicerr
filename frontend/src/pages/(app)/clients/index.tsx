@@ -64,8 +64,8 @@ export default function Clients() {
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center gap-4 lg:gap-6 lg:justify-between">
-                    <div className="relative">
+                <div className="flex flex-row items-center gap-4 w-full lg:w-fit lg:gap-6 lg:justify-between">
+                    <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search clients..."
@@ -178,22 +178,22 @@ export default function Clients() {
                         <div className="divide-y">
                             {filteredClients.map((client, index) => (
                                 <div key={index} className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                    <div className="flex flex-row md:flex-row md:items-center md:justify-between">
+                                        <div className="flex flex-col md:flex-row md:items-center md:space-x-4 w-full">
+                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit">
                                                 <Building2 className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="flex items-center space-x-2">
+                                                <div className="flex flex-row items-center gap-x-2">
                                                     <h3 className="font-medium text-foreground">{client.name}</h3>
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
-                                                        }`}>
+                                                    <span
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                            } w-fit`}
+                                                    >
                                                         {client.isActive ? 'Actif' : 'Inactif'}
                                                     </span>
                                                 </div>
-                                                <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
+                                                <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:space-x-6 text-sm text-primary space-y-2 sm:space-y-0">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
                                                         <span>{client.contactEmail}</span>
@@ -214,12 +214,12 @@ export default function Clients() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-2">
+                                        <div className="mt-0 w-fit flex flex-col lg:flex-row space-x-2 justify-center items-center lg:justify-end">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleView(client)}
-                                                className="text-gray-600 hover:text-blue-600"
+                                                className="text-gray-600 hover:text-blue-600 mr-2"
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
@@ -227,7 +227,7 @@ export default function Clients() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleEdit(client)}
-                                                className="text-gray-600 hover:text-green-600"
+                                                className="text-gray-600 hover:text-green-600 mr-2"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
@@ -235,7 +235,7 @@ export default function Clients() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(client)}
-                                                className="text-gray-600 hover:text-red-600"
+                                                className="text-gray-600 hover:text-red-600 mr-2"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -244,6 +244,7 @@ export default function Clients() {
                                 </div>
                             ))}
                         </div>
+
                     )}
                 </CardContent>
                 <CardFooter>
