@@ -1,4 +1,5 @@
 import type { Client } from "./client";
+import type { Company } from "./company";
 
 export enum QuoteStatus {
     DRAFT = "DRAFT",
@@ -15,6 +16,7 @@ export interface Quote {
     clientId: string;
     client: Client;
     companyId: string;
+    company: Company;
     items: QuoteItem[];
     status: QuoteStatus;
     createdAt: Date;

@@ -56,7 +56,6 @@ export default function CompanySettings() {
         setIsLoading(true)
 
         try {
-            //TODO: Replace with actual API call to save company settings
             trigger(values).then((response) => {
                 if (response) {
                     form.reset(response)

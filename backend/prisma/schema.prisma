@@ -76,7 +76,6 @@ model Quote {
   totalVAT     Float
   totalTTC     Float
   isActive     Boolean     @default(true)
-  //invoice      Invoice?       // TODO: Uncomment when the invoice model is created
   Invoice      Invoice[]
 }
 
