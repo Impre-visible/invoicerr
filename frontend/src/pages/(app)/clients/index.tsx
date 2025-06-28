@@ -50,7 +50,7 @@ export default function Clients() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
                         <Users className="h-5 w-5 text-blue-600" />
@@ -64,28 +64,30 @@ export default function Clients() {
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-row items-center gap-4 lg:gap-6 lg:justify-between">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search clients..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 w-64"
+                            className="pl-10 w-full"
                         />
                     </div>
 
                     <Button
                         onClick={handleAddClick}
                     >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Client
+                        <Plus className="h-4 w-4 mr-0 md:mr-2" />
+                        <span className="hidden md:inline-flex">
+                            Add New Client
+                        </span>
                     </Button>
                 </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
