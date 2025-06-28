@@ -41,7 +41,7 @@ export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogP
                         Are you sure you want to delete this client? This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="flex justify-end space-x-2">
+                <DialogFooter className="flex !flex-col-reverse gap-2 justify-end">
                     <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
