@@ -1,12 +1,13 @@
-import * as PDFDocument from "pdfkit";
-import * as streamBuffers from 'stream-buffers';
+import * as Handlebars from 'handlebars';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as puppeteer from 'puppeteer';
 
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Response } from 'express';
-import { buffer } from 'stream/consumers';
+import { lightTemplate } from './templates/light.template';
 
 @Injectable()
 export class QuotesService {
@@ -164,7 +165,7 @@ export class QuotesService {
         });
     }
 
-    async getQuotePdf(id: string) {
+    async getQuotePdf(id: string): Promise<Uint8Array> {
         const quote = await this.prisma.quote.findUnique({
             where: { id },
             include: {
@@ -178,50 +179,38 @@ export class QuotesService {
             throw new Error('Quote not found');
         }
 
-        const doc = new PDFDocument({ size: 'A4', margin: 50 });
-        const stream = new streamBuffers.WritableStreamBuffer({
-            initialSize: 100 * 1024, // Start with 100KB buffer
-            incrementAmount: 10 * 1024, // Increase by 10KB when needed
-        });
-        doc.pipe(stream);
+        // Charger et compiler le template HTML
+        const templateHtml = lightTemplate;
+        const template = Handlebars.compile(templateHtml);
 
-        doc.fontSize(20).text(`Quote #${quote.number}`, { align: 'right' });
-        doc.fontSize(12).text(`Date: ${new Date(quote.createdAt).toLocaleDateString()}`, { align: 'right' });
-        doc.moveDown();
-
-        doc.text(`From: ${quote.company.name}`, { align: 'left' });
-        doc.text(`${quote.company.address}`, { align: 'left' });
-        doc.text(`${quote.company.city}, ${quote.company.postalCode}`, { align: 'left' });
-        doc.text(`${quote.company.country}`, { align: 'left' });
-        doc.moveDown();
-
-        doc.text(`To: ${quote.client.name}`, { align: 'left' });
-        doc.text(`${quote.client.address}`, { align: 'left' });
-        doc.text(`${quote.client.city}, ${quote.client.postalCode}`, { align: 'left' });
-        doc.text(`${quote.client.country}`, { align: 'left' });
-        doc.moveDown();
-
-        doc.text(`Valid Until: ${quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A'}`, { align: 'left' });
-        doc.moveDown();
-
-        doc.text('Items:', { underline: true });
-        doc.moveDown();
-
-        quote.items.forEach(item => {
-            doc.text(`${item.description} - ${item.quantity} x ${item.unitPrice.toFixed(2)}€ (VAT: ${item.vatRate}%)`, {
-                align: 'left',
-            });
+        const html = template({
+            number: quote.number,
+            date: new Date(quote.createdAt).toLocaleDateString(),
+            validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
+            company: quote.company,
+            client: quote.client,
+            currency: quote.company.currency,
+            items: quote.items.map(i => ({
+                description: i.description,
+                quantity: i.quantity,
+                unitPrice: i.unitPrice.toFixed(2),
+                vatRate: i.vatRate,
+                totalPrice: (i.quantity * i.unitPrice * (1 + (i.vatRate || 0) / 100)).toFixed(2),
+            })),
+            totalHT: quote.totalHT.toFixed(2),
+            totalVAT: quote.totalVAT.toFixed(2),
+            totalTTC: quote.totalTTC.toFixed(2),
         });
 
-        doc.moveDown();
-        doc.text(`Total HT: ${quote.totalHT.toFixed(2)}€`, { align: 'right' });
-        doc.text(`Total VAT: ${quote.totalVAT.toFixed(2)}€`, { align: 'right' });
-        doc.text(`Total TTC: ${quote.totalTTC.toFixed(2)}€`, { align: 'right' });
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: 'networkidle0' });
 
-        doc.end();
+        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
 
-        await new Promise(resolve => stream.on('finish', resolve));
+        await browser.close();
 
-        return stream.getContents();
+        return pdfBuffer;
     }
+
 }

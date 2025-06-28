@@ -18,6 +18,7 @@ export class QuotesController {
     @Get(':id/pdf')
     @LoginRequired()
     async getQuotePdf(@Param('id') id: string, @Res() res: Response) {
+        if (id === 'undefined') return res.status(400).send('Invalid quote ID');
         const pdfBuffer = await this.quotesService.getQuotePdf(id);
         if (!pdfBuffer) {
             res.status(404).send('Quote not found or PDF generation failed');
