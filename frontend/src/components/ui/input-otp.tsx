@@ -1,7 +1,8 @@
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
-import { MinusIcon } from "lucide-react"
 
+import { OTPInput, OTPInputContext } from "input-otp"
+
+import { MinusIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 function InputOTP({
@@ -13,6 +14,7 @@ function InputOTP({
 }) {
   return (
     <OTPInput
+      data-bwignore data-1p-ignore data-lpignore data-form-type="other"
       data-slot="input-otp"
       containerClassName={cn(
         "flex items-center gap-2 has-disabled:opacity-50",
