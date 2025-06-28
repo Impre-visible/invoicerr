@@ -1,7 +1,12 @@
+import * as streamBuffers from 'stream-buffers';
+
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { Injectable } from '@nestjs/common';
+import PDFDocument from 'pdfkit';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Response } from 'express';
+import { buffer } from 'stream/consumers';
 
 @Injectable()
 export class QuotesService {
@@ -157,5 +162,66 @@ export class QuotesService {
             where: { id },
             data: { isActive: false },
         });
+    }
+
+    async getQuotePdf(id: string) {
+        const quote = await this.prisma.quote.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
+        });
+
+        if (!quote) {
+            throw new Error('Quote not found');
+        }
+
+        const doc = new PDFDocument({ size: 'A4', margin: 50 });
+        const stream = new streamBuffers.WritableStreamBuffer({
+            initialSize: 100 * 1024, // Start with 100KB buffer
+            incrementAmount: 10 * 1024, // Increase by 10KB when needed
+        });
+        doc.pipe(stream);
+
+        doc.fontSize(20).text(`Quote #${quote.number}`, { align: 'right' });
+        doc.fontSize(12).text(`Date: ${new Date(quote.createdAt).toLocaleDateString()}`, { align: 'right' });
+        doc.moveDown();
+
+        doc.text(`From: ${quote.company.name}`, { align: 'left' });
+        doc.text(`${quote.company.address}`, { align: 'left' });
+        doc.text(`${quote.company.city}, ${quote.company.postalCode}`, { align: 'left' });
+        doc.text(`${quote.company.country}`, { align: 'left' });
+        doc.moveDown();
+
+        doc.text(`To: ${quote.client.name}`, { align: 'left' });
+        doc.text(`${quote.client.address}`, { align: 'left' });
+        doc.text(`${quote.client.city}, ${quote.client.postalCode}`, { align: 'left' });
+        doc.text(`${quote.client.country}`, { align: 'left' });
+        doc.moveDown();
+
+        doc.text(`Valid Until: ${quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A'}`, { align: 'left' });
+        doc.moveDown();
+
+        doc.text('Items:', { underline: true });
+        doc.moveDown();
+
+        quote.items.forEach(item => {
+            doc.text(`${item.description} - ${item.quantity} x ${item.unitPrice.toFixed(2)}€ (VAT: ${item.vatRate}%)`, {
+                align: 'left',
+            });
+        });
+
+        doc.moveDown();
+        doc.text(`Total HT: ${quote.totalHT.toFixed(2)}€`, { align: 'right' });
+        doc.text(`Total VAT: ${quote.totalVAT.toFixed(2)}€`, { align: 'right' });
+        doc.text(`Total TTC: ${quote.totalTTC.toFixed(2)}€`, { align: 'right' });
+
+        doc.end();
+
+        await new Promise(resolve => stream.on('finish', resolve));
+
+        return stream.getContents();
     }
 }

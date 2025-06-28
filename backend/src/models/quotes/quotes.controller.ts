@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
 
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { QuotesService } from './quotes.service';
+import { Response } from 'express';
 
 @Controller('quotes')
 export class QuotesController {
@@ -12,6 +13,22 @@ export class QuotesController {
     @LoginRequired()
     async getQuotesInfo(@Param('page') page: string) {
         return await this.quotesService.getQuotes(page);
+    }
+
+    @Get(':id/pdf')
+    @LoginRequired()
+    async getQuotePdf(@Param('id') id: string, @Res() res: Response) {
+        const pdfBuffer = await this.quotesService.getQuotePdf(id);
+        if (!pdfBuffer) {
+            res.status(404).send('Quote not found or PDF generation failed');
+            return;
+        }
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="quote-${id}.pdf"`,
+            'Content-Length': pdfBuffer.length.toString(),
+        });
+        res.send(pdfBuffer);
     }
 
     @Post()
