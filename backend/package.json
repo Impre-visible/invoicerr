@@ -25,9 +25,15 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.10.1",
+    "@types/pdfkit": "^0.14.0",
+    "@types/stream-buffers": "^3.0.7",
     "bcrypt": "^6.0.0",
+    "handlebars": "^4.7.8",
+    "pdfkit": "^0.17.1",
+    "puppeteer": "^24.11.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "stream-buffers": "^3.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -39,8 +45,10 @@
     "@swc/core": "^1.10.7",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
+    "@types/handlebars": "^4.0.40",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
+    "@types/puppeteer": "^5.4.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",

@@ -50,7 +50,7 @@ export default function Clients() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
                         <Users className="h-5 w-5 text-blue-600" />
@@ -64,30 +64,31 @@ export default function Clients() {
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    <div className="relative">
+                <div className="flex flex-row items-center gap-4 w-full lg:w-fit lg:gap-6 lg:justify-between">
+                    <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search clients..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 w-64"
+                            className="pl-10 w-full"
                         />
                     </div>
 
                     <Button
                         onClick={handleAddClick}
                     >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Client
+                        <Plus className="h-4 w-4 mr-0 md:mr-2" />
+                        <span className="hidden md:inline-flex">
+                            Add New Client
+                        </span>
                     </Button>
                 </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <Users className="h-6 w-6 text-blue-600" />
@@ -101,7 +102,7 @@ export default function Clients() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-green-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -119,7 +120,7 @@ export default function Clients() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-gray-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -148,7 +149,7 @@ export default function Clients() {
                 <CardContent className="p-0">
                     {loading && (
                         <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                         </div>
                     )}
                     {!loading && filteredClients.length === 0 ? (
@@ -175,23 +176,23 @@ export default function Clients() {
                     ) : (
                         <div className="divide-y">
                             {filteredClients.map((client, index) => (
-                                <div key={index} className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <div key={index} className="p-4 sm:p-6">
+                                    <div className="flex flex-row sm:items-center sm:justify-between gap-4">
+                                        <div className="flex flex-row items-center gap-4 w-full">
+                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
                                                 <Building2 className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="flex items-center space-x-2">
-                                                    <h3 className="font-medium text-foreground">{client.name}</h3>
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
-                                                        }`}>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="font-medium text-foreground break-words">{client.name}</h3>
+                                                    <span
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                            } w-fit`}
+                                                    >
                                                         {client.isActive ? 'Actif' : 'Inactif'}
                                                     </span>
                                                 </div>
-                                                <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
+                                                <div className="mt-2 flex flex-col lg:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
                                                         <span>{client.contactEmail}</span>
@@ -212,28 +213,31 @@ export default function Clients() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-2">
+                                        <div className="mt-0 w-fit flex flex-col lg:flex-row space-x-2 justify-center items-center lg:justify-end">
                                             <Button
+                                                tooltip="View Client"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleView(client)}
-                                                className="text-gray-600 hover:text-blue-600"
+                                                className="text-gray-600 hover:text-blue-600 mr-2"
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Edit Client"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleEdit(client)}
-                                                className="text-gray-600 hover:text-green-600"
+                                                className="text-gray-600 hover:text-green-600 mr-2"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="Delete Client"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleDelete(client)}
-                                                className="text-gray-600 hover:text-red-600"
+                                                className="text-gray-600 hover:text-red-600 mr-2"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -242,6 +246,7 @@ export default function Clients() {
                                 </div>
                             ))}
                         </div>
+
                     )}
                 </CardContent>
                 <CardFooter>

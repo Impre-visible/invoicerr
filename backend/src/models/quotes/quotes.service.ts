@@ -1,7 +1,13 @@
+import * as Handlebars from 'handlebars';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as puppeteer from 'puppeteer';
+
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { lightTemplate } from './templates/light.template';
 
 @Injectable()
 export class QuotesService {
@@ -158,4 +164,69 @@ export class QuotesService {
             data: { isActive: false },
         });
     }
+
+    async getQuotePdf(id: string): Promise<Uint8Array> {
+        const quote = await this.prisma.quote.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
+        });
+
+        if (!quote) {
+            throw new Error('Quote not found');
+        }
+
+        const templateHtml = lightTemplate;
+        const template = Handlebars.compile(templateHtml);
+
+        const html = template({
+            number: quote.number,
+            date: new Date(quote.createdAt).toLocaleDateString(),
+            validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
+            company: quote.company,
+            client: quote.client,
+            currency: quote.company.currency,
+            items: quote.items.map(i => ({
+                description: i.description,
+                quantity: i.quantity,
+                unitPrice: i.unitPrice.toFixed(2),
+                vatRate: i.vatRate,
+                totalPrice: (i.quantity * i.unitPrice * (1 + (i.vatRate || 0) / 100)).toFixed(2),
+            })),
+            totalHT: quote.totalHT.toFixed(2),
+            totalVAT: quote.totalVAT.toFixed(2),
+            totalTTC: quote.totalTTC.toFixed(2),
+        });
+
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+
+        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+
+        await browser.close();
+
+        return pdfBuffer;
+    }
+
+    async markQuoteAsSigned(id: string) {
+        if (!id) {
+            throw new Error('Quote ID is required');
+        }
+
+        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+
+        if (!existingQuote) {
+            throw new Error('Quote not found');
+        }
+
+        return this.prisma.quote.update({
+            where: { id },
+            data: { signedAt: new Date(), status: "SIGNED" },
+        });
+    }
+
 }

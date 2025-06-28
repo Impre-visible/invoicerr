@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Eye, FileSignature, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
+import { Download, Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Signature, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -8,11 +10,13 @@ import type { Quote } from "@/types"
 import { QuoteCreate } from "./_components/quote-create"
 import { QuoteDeleteDialog } from "./_components/quote-delete"
 import { QuoteEdit } from "./_components/quote-edit"
+import { QuotePdfModal } from "./_components/quote-pdf-view"
 import { QuoteViewDialog } from "./_components/quote-view"
-import { useGet } from "@/lib/utils"
-import { useState } from "react"
 
 export default function Quotes() {
+    const { trigger: triggerMarkAsSigned } = usePost(`/api/quotes/mark-as-signed`)
+    const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-quote`)
+
     const [page, setPage] = useState(1)
 
     const { data: quotes, mutate, loading } = useGet<{ pageCount: number, quotes: Quote[] }>(`/api/quotes?page=${page}`)
@@ -20,7 +24,28 @@ export default function Quotes() {
     const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
     const [editQuoteDialog, setEditQuoteDialog] = useState<Quote | null>(null)
     const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
+    const [viewQuotePdfDialog, setViewQuotePdfDialog] = useState<Quote | null>(null)
     const [deleteQuoteDialog, setDeleteQuoteDialog] = useState<Quote | null>(null)
+    const [downloadQuotePdf, setDownloadQuotePdf] = useState<Quote | null>(null)
+
+    const { data: pdf } = useGetRaw<Response>(`/api/quotes/${downloadQuotePdf?.id}/pdf`)
+
+    useEffect(() => {
+        if (downloadQuotePdf && pdf) {
+            pdf.arrayBuffer().then((buffer) => {
+                const blob = new Blob([buffer], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `quote-${downloadQuotePdf.number}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setDownloadQuotePdf(null); // Reset after download
+            });
+        }
+    }, [downloadQuotePdf, pdf]);
 
     const [searchTerm, setSearchTerm] = useState("")
 
@@ -41,13 +66,33 @@ export default function Quotes() {
         setViewQuoteDialog(quote)
     }
 
+    function handleViewPdf(quote: Quote) {
+        setViewQuotePdfDialog(quote)
+    }
+
+    function handleDownloadPdf(quote: Quote) {
+        setDownloadQuotePdf(quote)
+    }
+
     function handleDelete(quote: Quote) {
         setDeleteQuoteDialog(quote)
     }
 
+    function handleMarkAsSigned(quoteId: string) {
+        triggerMarkAsSigned({ id: quoteId }).then(() => {
+            mutate();
+        }).catch((error) => {
+            console.error("Error marking quote as signed:", error);
+        });
+    }
+
+    function handleCreateInvoice(quoteId: string) {
+        triggerCreateInvoice({ quoteId })
+    }
+
     return (
         <div className="max-w-6xl mx-auto space-y-6 p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
                         <FileSignature className="h-5 w-5 text-blue-600" />
@@ -61,30 +106,31 @@ export default function Quotes() {
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    <div className="relative">
+                <div className="flex flex-row items-center gap-4 w-full lg:w-fit lg:gap-6 lg:justify-between">
+                    <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search quotes..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 w-64"
+                            className="pl-10 w-full"
                         />
                     </div>
 
                     <Button
                         onClick={handleAddClick}
                     >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Quote
+                        <Plus className="h-4 w-4 mr-0 md:mr-2" />
+                        <span className="hidden md:inline-flex">
+                            Add New Client
+                        </span>
                     </Button>
                 </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <FileSignature className="h-6 w-6 text-blue-600" />
@@ -98,7 +144,7 @@ export default function Quotes() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-yellow-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -116,7 +162,7 @@ export default function Quotes() {
                 </Card>
 
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
@@ -145,7 +191,7 @@ export default function Quotes() {
                 <CardContent className="p-0">
                     {loading && (
                         <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                         </div>
                     )}
                     {!loading && filteredQuotes.length === 0 ? (
@@ -172,17 +218,19 @@ export default function Quotes() {
                     ) : (
                         <div className="divide-y">
                             {filteredQuotes.map((quote, index) => (
-                                <div key={index} className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <div key={index} className="p-4 sm:p-6">
+                                    <div className="flex flex-row sm:items-center sm:justify-between gap-4">
+                                        <div className="flex flex-row items-center gap-4 w-full">
+                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
                                                 <FileSignature className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="flex items-center space-x-2">
-                                                    <h3 className="font-medium text-foreground">{quote.title || `Quote #${quote.number}`}</h3>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="font-medium text-foreground break-words">
+                                                        {quote.title || `Quote #${quote.number}`}
+                                                    </h3>
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                                                        ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
                                                             quote.status === 'SIGNED' ? 'bg-blue-100 text-blue-800' :
                                                                 quote.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
                                                                     quote.status === 'SENT' ? 'bg-green-100 text-green-800' :
@@ -191,10 +239,10 @@ export default function Quotes() {
                                                         {quote.status}
                                                     </span>
                                                 </div>
-                                                <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
+                                                <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
-                                                        <span>{quote.client.contactEmail}</span>
+                                                        <span className="break-all">{quote.client.contactEmail}</span>
                                                     </div>
                                                     {quote.client.contactPhone && (
                                                         <div className="flex items-center space-x-1">
@@ -206,26 +254,69 @@ export default function Quotes() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-2">
+                                        <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
                                             <Button
+                                                tooltip="View Quote"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleView(quote)}
                                                 className="text-gray-600 hover:text-blue-600"
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
+                                                tooltip="View PDF"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
+                                                onClick={() => handleViewPdf(quote)}
+                                                className="text-gray-600 hover:text-pink-600"
+                                            >
+                                                <FileText className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                tooltip="Download PDF"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDownloadPdf(quote)}
+                                                className="text-gray-600 hover:text-amber-600"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                tooltip="Edit Quote"
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleEdit(quote)}
                                                 className="text-gray-600 hover:text-green-600"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
+                                            {quote.status !== 'SIGNED' && (
+                                                <Button
+                                                    tooltip="Mark as Signed"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleMarkAsSigned(quote.id)}
+                                                    className="text-gray-600 hover:text-blue-600"
+                                                >
+                                                    <Signature className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                            {quote.status === 'SIGNED' && (
+                                                <Button
+                                                    tooltip="Create Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleCreateInvoice(quote.id)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <FileText className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             <Button
+                                                tooltip="Delete Quote"
                                                 variant="ghost"
-                                                size="sm"
+                                                size="icon"
                                                 onClick={() => handleDelete(quote)}
                                                 className="text-gray-600 hover:text-red-600"
                                             >
@@ -236,6 +327,7 @@ export default function Quotes() {
                                 </div>
                             ))}
                         </div>
+
                     )}
                 </CardContent>
                 <CardFooter>
@@ -258,6 +350,11 @@ export default function Quotes() {
             <QuoteViewDialog
                 quote={viewQuoteDialog}
                 onOpenChange={(open) => { if (!open) setViewQuoteDialog(null) }}
+            />
+
+            <QuotePdfModal
+                quote={viewQuotePdfDialog}
+                onOpenChange={(open) => { if (!open) setViewQuotePdfDialog(null) }}
             />
 
             <QuoteDeleteDialog

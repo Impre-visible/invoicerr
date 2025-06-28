@@ -25,7 +25,6 @@ export class ClientsService {
     }
 
     async searchClients(query: string) {
-        console.debug(`Searching clients with query: ${query}`);
         if (!query) {
             return this.prisma.client.findMany({
                 take: 10,
