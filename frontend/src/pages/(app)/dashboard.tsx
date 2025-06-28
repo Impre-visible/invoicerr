@@ -1,7 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card"
 import type { Invoice, Quote } from "@/types"
 
+import { InvoiceList } from "@/components/invoice-list"
 import { LayoutDashboard } from "lucide-react"
+import { QuoteList } from "@/components/quote-list"
 import { useGet } from "@/lib/utils"
 
 interface DashboardData {
@@ -31,7 +33,6 @@ export default function Dashboard() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 p-6">
-            {/* Header */}
             <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                     <LayoutDashboard className="h-5 w-5 text-blue-600" />
@@ -42,22 +43,28 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Quotes */}
             <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-foreground">Quotes</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <DashboardStat count={dashboardData?.quotes.total} label="Total Quotes" color="green" />
-                    <DashboardStat count={dashboardData?.quotes.draft} label="Draft Quotes" color="yellow" />
-                    <DashboardStat count={dashboardData?.quotes.sent} label="Sent Quotes" color="purple" />
-                    <DashboardStat count={dashboardData?.quotes.signed} label="Signed Quotes" color="blue" />
-                    <DashboardStat count={dashboardData?.quotes.expired} label="Expired Quotes" color="neutral" />
+                    <DashboardStat count={dashboardData?.quotes.total} label="Total Quotes" color="green" className="md:col-span-2" />
+                    <DashboardStat count={dashboardData?.quotes.draft} label="Draft Quotes" color="yellow" className="md:col-span-2" />
+                    <DashboardStat count={dashboardData?.quotes.sent} label="Sent Quotes" color="purple" className="md:col-span-2" />
+                    <DashboardStat count={dashboardData?.quotes.signed} label="Signed Quotes" color="blue" className="md:col-span-3" />
+                    <DashboardStat count={dashboardData?.quotes.expired} label="Expired Quotes" color="neutral" className="md:col-span-3" />
                 </div>
                 {dashboardData?.quotes.latests?.length ? (
-                    <></>
+                    <QuoteList
+                        quotes={dashboardData.quotes.latests}
+                        loading={!dashboardData}
+                        title="Latest Quotes"
+                        description="Here are your most recent quotes."
+                        mutate={() => { }}
+                        emptyState={<div className="text-center py-6 text-primary">No recent quotes.</div>}
+                        showCreateButton={false}
+                    />
                 ) : null}
             </section>
 
-            {/* Invoices */}
             <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-foreground">Invoices</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -68,14 +75,21 @@ export default function Dashboard() {
                     <DashboardStat count={dashboardData?.invoices.overdue} label="Overdue Invoices" color="neutral" className="md:col-span-3" />
                 </div>
                 {dashboardData?.invoices.latests?.length ? (
-                    <></>
+                    <InvoiceList
+                        invoices={dashboardData.invoices.latests}
+                        loading={!dashboardData}
+                        title="Latest Invoices"
+                        description="Here are your most recent invoices."
+                        mutate={() => { }}
+                        emptyState={<div className="text-center py-6 text-primary">No recent invoices.</div>}
+                        showCreateButton={false}
+                    />
                 ) : null}
             </section>
 
-            {/* Clients */}
             <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-foreground">Clients</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
                     <DashboardStat count={dashboardData?.clients.total} label="Total Clients" color="green" />
                 </div>
             </section>
