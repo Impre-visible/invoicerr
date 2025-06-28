@@ -217,7 +217,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                             </Button>
                                             {quote.status !== 'SIGNED' && (
                                                 <Button
-                                                    tooltip="Send for Signature"
+                                                    tooltip={quote.status !== "SENT" ? "Send for Signature" : "Resend Signature Request"}
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => handleSendForSignature(quote.id)}
