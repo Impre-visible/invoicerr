@@ -8,9 +8,10 @@ import { InvoicesModule } from './models/invoices/invoices.module';
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { QuotesModule } from './models/quotes/quotes.module';
+import { SignaturesModule } from './models/signatures/signatures.module';
 
 @Module({
-  imports: [AuthModule, CompanyModule, ClientsModule, QuotesModule, InvoicesModule, DashboardModule],
+  imports: [AuthModule, CompanyModule, ClientsModule, QuotesModule, InvoicesModule, DashboardModule, SignaturesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
