@@ -94,7 +94,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             const newIndex = fields.findIndex(f => f.id === over.id)
             move(oldIndex, newIndex)
             const reordered = arrayMove(fields, oldIndex, newIndex)
-            reordered.forEach((item, index) => {
+            reordered.forEach((_item, index) => {
                 setValue(`items.${index}.order`, index)
             })
         }
