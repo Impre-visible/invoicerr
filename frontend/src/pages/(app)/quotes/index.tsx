@@ -206,9 +206,8 @@ export default function Quotes() {
                             {filteredQuotes.map((quote, index) => (
                                 <div key={index} className="p-4 sm:p-6">
                                     <div className="flex flex-row sm:items-center sm:justify-between gap-4">
-                                        {/* Bloc gauche */}
-                                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-4 w-full">
-                                            <div className="self-start sm:self-auto p-2 bg-blue-100 rounded-lg">
+                                        <div className="flex flex-row items-center gap-4 w-full">
+                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
                                                 <FileSignature className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
@@ -279,7 +278,7 @@ export default function Quotes() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(quote)}
-                                                className="text-gray-600 hover:text-red-600 col-span-2 sm:col-auto"
+                                                className="text-gray-600 hover:text-red-600"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

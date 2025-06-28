@@ -177,15 +177,15 @@ export default function Clients() {
                     ) : (
                         <div className="divide-y">
                             {filteredClients.map((client, index) => (
-                                <div key={index} className="p-6">
-                                    <div className="flex flex-row md:flex-row md:items-center md:justify-between">
-                                        <div className="flex flex-col md:flex-row md:items-center md:space-x-4 w-full">
-                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit">
+                                <div key={index} className="p-4 sm:p-6">
+                                    <div className="flex flex-row sm:items-center sm:justify-between gap-4">
+                                        <div className="flex flex-row items-center gap-4 w-full">
+                                            <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
                                                 <Building2 className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="flex flex-row items-center gap-x-2">
-                                                    <h3 className="font-medium text-foreground">{client.name}</h3>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="font-medium text-foreground break-words">{client.name}</h3>
                                                     <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                                                             } w-fit`}
@@ -193,7 +193,7 @@ export default function Clients() {
                                                         {client.isActive ? 'Actif' : 'Inactif'}
                                                     </span>
                                                 </div>
-                                                <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:space-x-6 text-sm text-primary space-y-2 sm:space-y-0">
+                                                <div className="mt-2 flex flex-col lg:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
                                                         <span>{client.contactEmail}</span>
