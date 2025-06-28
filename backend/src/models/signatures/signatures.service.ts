@@ -112,7 +112,7 @@ export class SignaturesService {
     }
 
     async sendSignatureEmail(signatureId: string) {
-        const signature = await this.prisma.signature.findUnique({
+        const signature = await this.prisma.signature.findFirst({
             where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
