@@ -1,0 +1,37 @@
+export enum InvoiceStatus {
+    PAID = 'PAID',
+    UNPAID = 'UNPAID',
+    OVERDUE = 'OVERDUE',
+    SENT = 'SENT'
+}
+
+export interface InvoiceItem {
+    id: string;
+    invoiceId: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    vatRate: number; // 20 for 20%
+    order: number;
+}
+
+export interface Invoice {
+    id: string;
+    number: string; // Ex: "INV-2025-0001"
+    title?: string; // Optional title from DTOs
+    quoteId?: string;
+    clientId: string;
+    companyId: string;
+    items: InvoiceItem[];
+    status: InvoiceStatus;
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    dueDate: string; // ISO date string
+    paidAt?: string; // ISO date string
+    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
+    notes?: string;
+    totalHT: number;
+    totalVAT: number;
+    totalTTC: number;
+    isActive: boolean;
+}

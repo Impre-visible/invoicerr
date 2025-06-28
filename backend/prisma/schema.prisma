@@ -118,6 +118,7 @@ model Invoice {
   totalHT       Float
   totalVAT      Float
   totalTTC      Float
+  isActive      Boolean       @default(true)
 }
 
 model InvoiceItem {
