@@ -175,7 +175,7 @@ export default function Quotes() {
                 <CardContent className="p-0">
                     {loading && (
                         <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                         </div>
                     )}
                     {!loading && filteredQuotes.length === 0 ? (
