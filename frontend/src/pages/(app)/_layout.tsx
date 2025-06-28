@@ -1,9 +1,15 @@
+import { Navigate, Outlet } from "react-router";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
-import { Outlet } from "react-router";
 import { Sidebar } from "@/components/sidebar";
+import { useAuth } from "@/contexts/auth";
 
 const Layout = () => {
+    const { accessToken } = useAuth()
+    if (!accessToken) {
+        return <Navigate to="/login" />
+    }
+
     return (
         <SidebarProvider>
             <section className="flex flex-col min-h-screen h-screen max-h-screen w-full max-w-screen overflow-y-auto overflow-x-hidden">
