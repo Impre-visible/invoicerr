@@ -227,13 +227,13 @@ export default function Signature() {
                                         <InputOTP autoComplete={"one-time-code"} maxLength={8} minLength={8} value={otpCode} onChange={handleOtpChange} onPaste={handleOtpPaste} className="w-full">
                                             <InputOTPGroup>
                                                 {[...Array(4)].map((_, index) => (
-                                                    <InputOTPSlot index={index} />
+                                                    <InputOTPSlot key={index} index={index} />
                                                 ))}
                                             </InputOTPGroup>
                                             <InputOTPSeparator />
                                             <InputOTPGroup>
                                                 {[...Array(4)].map((_, index) => (
-                                                    <InputOTPSlot index={index + 4} />
+                                                    <InputOTPSlot key={index + 4} index={index + 4} />
                                                 ))}
                                             </InputOTPGroup>
                                         </InputOTP>
