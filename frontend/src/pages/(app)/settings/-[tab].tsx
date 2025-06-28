@@ -1,19 +1,15 @@
-import { Navigate, useNavigate, useParams } from "react-router"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useNavigate, useParams } from "react-router"
 
 import AccountSettings from "./_components/account.settings"
 import CompanySettings from "./_components/company.settings"
 import DangerZoneSettings from "./_components/danger.settings"
 import EmailTemplatesSettings from "./_components/templates.settings"
 import SignatureSettings from "./_components/signature.settings"
-import { useAuth } from "@/contexts/auth"
 
 export default function Settings() {
-    const { accessToken } = useAuth()
     const { tab } = useParams()
     const navigate = useNavigate()
-
-    if (!accessToken) return <Navigate to="/login" />
 
     const validTabs = ["company", "signature", "email", "account", "danger"]
     const currentTab = validTabs.includes(tab!) ? tab! : "company"
