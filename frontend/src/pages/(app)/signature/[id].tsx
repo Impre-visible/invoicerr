@@ -8,7 +8,6 @@ import { useEffect, useState } from "react"
 import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { Quote } from "@/types"
 import type React from "react"
@@ -225,7 +224,7 @@ export default function Signature() {
                                 <div className="space-y-2">
                                     <Label htmlFor="otp">Verification code</Label>
                                     <section className="flex flex-col items-center">
-                                        <InputOTP maxLength={8} minLength={8} value={otpCode} onChange={handleOtpChange} onPaste={handleOtpPaste} className="w-full">
+                                        <InputOTP autoComplete={"one-time-code"} maxLength={8} minLength={8} value={otpCode} onChange={handleOtpChange} onPaste={handleOtpPaste} className="w-full">
                                             <InputOTPGroup>
                                                 {[...Array(4)].map((_, index) => (
                                                     <InputOTPSlot index={index} />
