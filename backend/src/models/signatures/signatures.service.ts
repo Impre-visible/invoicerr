@@ -75,7 +75,7 @@ export class SignaturesService {
     }
 
     async generateOTPCode(signatureId: string) {
-        const signature = await this.prisma.signature.findUnique({
+        const signature = await this.prisma.signature.findFirst({
             where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
