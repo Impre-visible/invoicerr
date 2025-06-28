@@ -16,10 +16,10 @@ model User {
 }
 
 model Company {
-  id         String  @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String
-  language   String  @default("en")
-  currency   String  @default("EUR")
+  language   String    @default("en")
+  currency   String    @default("EUR")
   VAT        String?
   address    String?
   postalCode String?
@@ -28,21 +28,23 @@ model Company {
   phone      String?
   email      String?
   Quote      Quote[]
+  Invoice    Invoice[]
 }
 
 model Client {
-  id               String  @id @default(cuid())
+  id               String    @id @default(cuid())
   name             String
   contactFirstname String
   contactLastname  String
-  contactEmail     String  @unique
+  contactEmail     String    @unique
   contactPhone     String?
   address          String?
   postalCode       String?
   city             String?
   country          String?
-  isActive         Boolean @default(true)
+  isActive         Boolean   @default(true)
   Quote            Quote[]
+  Invoice          Invoice[]
 }
 
 enum QuoteStatus {
@@ -75,6 +77,7 @@ model Quote {
   totalTTC     Float
   isActive     Boolean     @default(true)
   //invoice      Invoice?       // TODO: Uncomment when the invoice model is created
+  Invoice      Invoice[]
 }
 
 model QuoteItem {
@@ -86,4 +89,45 @@ model QuoteItem {
   unitPrice   Float
   vatRate     Float // 20 for 20%
   order       Int // For sorting items in the quote pdf
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  OVERDUE
+  SENT
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  number        String        @unique // Ex: "INV-2025-0001"
+  quote         Quote?        @relation(fields: [quoteId], references: [id])
+  quoteId       String?
+  client        Client        @relation(fields: [clientId], references: [id])
+  clientId      String
+  company       Company       @relation(fields: [companyId], references: [id])
+  companyId     String
+  items         InvoiceItem[]
+  status        InvoiceStatus @default(UNPAID)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  dueDate       DateTime
+  paidAt        DateTime?
+  paymentMethod String? // Ex: "Bank Transfer", "PayPal"
+  notes         String?
+  totalHT       Float
+  totalVAT      Float
+  totalTTC      Float
+  isActive      Boolean       @default(true)
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId   String
+  description String
+  quantity    Int
+  unitPrice   Float
+  vatRate     Float // 20 for 20%
+  order       Int
 }

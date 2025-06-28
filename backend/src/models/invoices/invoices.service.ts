@@ -1,22 +1,20 @@
 import * as Handlebars from 'handlebars';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 
-import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
+import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { lightTemplate } from './templates/light.template';
 
 @Injectable()
-export class QuotesService {
+export class InvoicesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private async getNextQuoteNumber() {
+    private async getNextInvoiceNumber() {
         const currentYear = new Date().getFullYear();
 
-        const lastQuote = await this.prisma.quote.findFirst({
+        const lastInvoice = await this.prisma.invoice.findFirst({
             where: {
                 createdAt: {
                     gte: new Date(`${currentYear}-01-01T00:00:00Z`),
@@ -29,20 +27,20 @@ export class QuotesService {
         });
 
         let nextIndex = 1;
-        if (lastQuote) {
-            const parts = lastQuote.number.split('-');
+        if (lastInvoice) {
+            const parts = lastInvoice.number.split('-');
             nextIndex = parseInt(parts[2]) + 1;
         }
         const paddedIndex = String(nextIndex).padStart(4, '0');
-        return `Q-${currentYear}-${paddedIndex}`;
+        return `INV-${currentYear}-${paddedIndex}`;
     }
 
-    async getQuotes(page: string) {
+    async getInvoices(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
         const pageSize = 10;
         const skip = (pageNumber - 1) * pageSize;
 
-        const quotes = await this.prisma.quote.findMany({
+        const invoices = await this.prisma.invoice.findMany({
             skip,
             take: pageSize,
             where: {
@@ -53,51 +51,23 @@ export class QuotesService {
             },
             include: {
                 items: true,
-                client: true
-            },
-        });
-
-        const totalQuotes = await this.prisma.quote.count();
-
-        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
-    }
-
-    async searchQuotes(query: string) {
-        if (!query) {
-            return this.prisma.quote.findMany({
-                take: 10,
-                orderBy: {
-                    number: 'asc',
-                },
-            });
-        }
-
-        return this.prisma.quote.findMany({
-            where: {
-                isActive: true,
-                OR: [
-                    { number: { contains: query } },
-                    { title: { contains: query } },
-                    { client: { name: { contains: query } } },
-                ],
-            },
-            take: 10,
-            orderBy: {
-                number: 'asc',
-            },
-            include: {
                 client: true,
+                company: true
             },
         });
+
+        const totalInvoices = await this.prisma.invoice.count();
+
+        return { pageCount: Math.ceil(totalInvoices / pageSize), invoices };
     }
 
-    async createQuote(body: CreateQuoteDto) {
+    async createInvoice(body: CreateInvoiceDto) {
         const { items, ...data } = body;
 
-        return this.prisma.quote.create({
+        return this.prisma.invoice.create({
             data: {
                 ...data,
-                number: await this.getNextQuoteNumber(),
+                number: await this.getNextInvoiceNumber(),
                 companyId: (await this.prisma.company.findFirst())?.id || '',
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
@@ -106,33 +76,35 @@ export class QuotesService {
                     (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0),
                 items: {
                     create: items.map(item => ({
-                        ...item,
+                        description: item.description,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
                         vatRate: item.vatRate || 0,
                         order: item.order || 0,
                     })),
                 },
-                validUntil: body.validUntil ? new Date(body.validUntil) : null,
+                dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             }
         });
     }
 
-    async editQuote(body: EditQuotesDto) {
+    async editInvoice(body: EditInvoicesDto) {
         const { items, id, ...data } = body;
 
         if (!id) {
-            throw new Error('Quote ID is required for editing');
+            throw new Error('Invoice ID is required for editing');
         }
 
-        const existingQuote = await this.prisma.quote.findUnique({
+        const existingInvoice = await this.prisma.invoice.findUnique({
             where: { id },
             include: { items: true }
         });
 
-        if (!existingQuote) {
-            throw new Error('Quote not found');
+        if (!existingInvoice) {
+            throw new Error('Invoice not found');
         }
 
-        const existingItemIds = existingQuote.items.map(i => i.id);
+        const existingItemIds = existingInvoice.items.map(i => i.id);
         const incomingItemIds = items.filter(i => i.id).map(i => i.id!);
 
         const itemIdsToDelete = existingItemIds.filter(id => !incomingItemIds.includes(id));
@@ -141,11 +113,11 @@ export class QuotesService {
         const totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         const totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
 
-        const updateQuote = await this.prisma.quote.update({
+        const updateInvoice = await this.prisma.invoice.update({
             where: { id },
             data: {
                 ...data,
-                validUntil: body.validUntil ? new Date(body.validUntil) : null,
+                dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 totalHT,
                 totalVAT,
                 totalTTC,
@@ -178,24 +150,24 @@ export class QuotesService {
             },
         });
 
-        return updateQuote;
+        return updateInvoice;
     }
 
-    async deleteQuote(id: string) {
-        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+    async deleteInvoice(id: string) {
+        const existingInvoice = await this.prisma.invoice.findUnique({ where: { id } });
 
-        if (!existingQuote) {
-            throw new Error('Quote not found');
+        if (!existingInvoice) {
+            throw new Error('Invoice not found');
         }
 
-        return this.prisma.quote.update({
+        return this.prisma.invoice.update({
             where: { id },
             data: { isActive: false },
         });
     }
 
-    async getQuotePdf(id: string): Promise<Uint8Array> {
-        const quote = await this.prisma.quote.findUnique({
+    async getInvoicePdf(id: string): Promise<Uint8Array> {
+        const invoice = await this.prisma.invoice.findUnique({
             where: { id },
             include: {
                 items: true,
@@ -204,31 +176,35 @@ export class QuotesService {
             },
         });
 
-        if (!quote) {
-            throw new Error('Quote not found');
+        if (!invoice) {
+            throw new Error('Invoice not found');
         }
 
         const templateHtml = lightTemplate;
         const template = Handlebars.compile(templateHtml);
 
         const html = template({
-            number: quote.number,
-            date: new Date(quote.createdAt).toLocaleDateString(),
-            validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
-            company: quote.company,
-            client: quote.client,
-            currency: quote.company.currency,
-            items: quote.items.map(i => ({
+            number: invoice.number,
+            date: new Date(invoice.createdAt).toLocaleDateString('en-GB'),
+            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-GB') : 'N/A',
+            company: {
+                ...invoice.company,
+                currency: invoice.company.currency || '€',
+            },
+            client: invoice.client,
+            currency: invoice.company.currency || '€',
+            items: invoice.items.map(i => ({
                 description: i.description,
                 quantity: i.quantity,
                 unitPrice: i.unitPrice.toFixed(2),
-                vatRate: i.vatRate,
+                vatRate: i.vatRate ? i.vatRate.toFixed(2) : '0.00',
                 totalPrice: (i.quantity * i.unitPrice * (1 + (i.vatRate || 0) / 100)).toFixed(2),
             })),
-            totalHT: quote.totalHT.toFixed(2),
-            totalVAT: quote.totalVAT.toFixed(2),
-            totalTTC: quote.totalTTC.toFixed(2),
+            totalHT: invoice.totalHT.toFixed(2),
+            totalVAT: invoice.totalVAT.toFixed(2),
+            totalTTC: invoice.totalTTC.toFixed(2),
         });
+
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
@@ -241,21 +217,30 @@ export class QuotesService {
         return pdfBuffer;
     }
 
-    async markQuoteAsSigned(id: string) {
-        if (!id) {
-            throw new Error('Quote ID is required');
-        }
+    async createInvoiceFromQuote(quoteId: string) {
+        const quote = await this.prisma.quote.findUnique({ where: { id: quoteId }, include: { items: true } });
 
-        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
-
-        if (!existingQuote) {
+        if (!quote) {
             throw new Error('Quote not found');
         }
 
-        return this.prisma.quote.update({
-            where: { id },
-            data: { signedAt: new Date(), status: "SIGNED" },
+        return this.createInvoice({
+            clientId: quote.clientId,
+            dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            items: quote.items,
         });
     }
 
+    async markInvoiceAsPaid(invoiceId: string) {
+        const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
+
+        if (!invoice) {
+            throw new Error('Invoice not found');
+        }
+
+        return this.prisma.invoice.update({
+            where: { id: invoiceId },
+            data: { status: 'PAID', paidAt: new Date() }
+        });
+    }
 }
