@@ -62,6 +62,35 @@ export class QuotesService {
         return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
     }
 
+    async searchQuotes(query: string) {
+        if (!query) {
+            return this.prisma.quote.findMany({
+                take: 10,
+                orderBy: {
+                    number: 'asc',
+                },
+            });
+        }
+
+        return this.prisma.quote.findMany({
+            where: {
+                isActive: true,
+                OR: [
+                    { number: { contains: query } },
+                    { title: { contains: query } },
+                    { client: { name: { contains: query } } },
+                ],
+            },
+            take: 10,
+            orderBy: {
+                number: 'asc',
+            },
+            include: {
+                client: true,
+            },
+        });
+    }
+
     async createQuote(body: CreateQuoteDto) {
         const { items, ...data } = body;
 

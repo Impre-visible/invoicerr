@@ -1,5 +1,6 @@
 export class CreateInvoiceDto {
     clientId: string;
+    quoteId?: string;
     dueDate?: Date;
     items: {
         description: string;

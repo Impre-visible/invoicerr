@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
@@ -13,6 +13,11 @@ export class QuotesController {
     @LoginRequired()
     async getQuotesInfo(@Param('page') page: string) {
         return await this.quotesService.getQuotes(page);
+    }
+    @Get('search')
+    @LoginRequired()
+    async searchClients(@Query('query') query: string) {
+        return await this.quotesService.searchQuotes(query);
     }
 
     @Get(':id/pdf')
