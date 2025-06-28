@@ -1,51 +1,48 @@
-import { Building2, Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, Users } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Edit, Eye, FileSignature, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
-import type { Client } from "@/types"
-import { ClientCreate } from "./_components/client-create"
-import { ClientDeleteDialog } from "./_components/client-delete"
-import { ClientEdit } from "./_components/client-edit"
-import { ClientViewDialog } from "./_components/client-view"
 import { Input } from "@/components/ui/input"
+import type { Quote } from "@/types"
+import { QuoteCreate } from "./_components/quote-create"
+import { QuoteDeleteDialog } from "./_components/quote-delete"
+import { QuoteEdit } from "./_components/quote-edit"
+import { QuoteViewDialog } from "./_components/quote-view"
 import { useGet } from "@/lib/utils"
 import { useState } from "react"
 
-export default function Clients() {
+export default function Quotes() {
     const [page, setPage] = useState(1)
 
-    const { data: clients, mutate, loading } = useGet<{ pageCount: number, clients: Client[] }>(`/api/clients?page=${page}`)
+    const { data: quotes, mutate, loading } = useGet<{ pageCount: number, quotes: Quote[] }>(`/api/quotes?page=${page}`)
 
-    const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
-    const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
-    const [viewClientDialog, setViewClientDialog] = useState<Client | null>(null)
-    const [deleteClientDialog, setDeleteClientDialog] = useState<Client | null>(null)
-
+    const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
+    const [editQuoteDialog, setEditQuoteDialog] = useState<Quote | null>(null)
+    const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
+    const [deleteQuoteDialog, setDeleteQuoteDialog] = useState<Quote | null>(null)
 
     const [searchTerm, setSearchTerm] = useState("")
 
-    const filteredClients = clients?.clients.filter(client =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactEmail.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredQuotes = quotes?.quotes.filter(quote =>
+        quote.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        quote.status.toLowerCase().includes(searchTerm.toLowerCase())
     ) || []
 
     function handleAddClick() {
-        setCreateClientDialog(true)
+        setCreateQuoteDialog(true)
     }
 
-    function handleEdit(client: Client) {
-        setEditClientDialog(client)
+    function handleEdit(quote: Quote) {
+        setEditQuoteDialog(quote)
     }
 
-    function handleView(client: Client) {
-        setViewClientDialog(client)
+    function handleView(quote: Quote) {
+        setViewQuoteDialog(quote)
     }
 
-    function handleDelete(client: Client) {
-        setDeleteClientDialog(client)
+    function handleDelete(quote: Quote) {
+        setDeleteQuoteDialog(quote)
     }
 
     return (
@@ -53,13 +50,13 @@ export default function Clients() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
-                        <Users className="h-5 w-5 text-blue-600" />
+                        <FileSignature className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                        <div className="text-sm text-primary">Manage your clients</div>
+                        <div className="text-sm text-primary">Manage your quotes</div>
                         <div className="font-medium text-foreground">
-                            {filteredClients.length} client{filteredClients.length > 1 ? 's' : ''}
-                            {searchTerm && ` trouvé${filteredClients.length > 1 ? 's' : ''}`}
+                            {filteredQuotes.length} quote{filteredQuotes.length > 1 ? 's' : ''}
+                            {searchTerm && ` trouvé${filteredQuotes.length > 1 ? 's' : ''}`}
                         </div>
                     </div>
                 </div>
@@ -68,7 +65,7 @@ export default function Clients() {
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Search clients..."
+                            placeholder="Search quotes..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-64"
@@ -79,7 +76,7 @@ export default function Clients() {
                         onClick={handleAddClick}
                     >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add New Client
+                        Add New Quote
                     </Button>
                 </div>
             </div>
@@ -90,11 +87,11 @@ export default function Clients() {
                     <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
-                                <Users className="h-6 w-6 text-blue-600" />
+                                <FileSignature className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-2xl font-semibold text-foreground">{clients?.clients.length || 0}</p>
-                                <p className="text-sm text-primary">Total Clients</p>
+                                <p className="text-2xl font-semibold text-foreground">{quotes?.quotes.length || 0}</p>
+                                <p className="text-sm text-primary">Total Quotes</p>
                             </div>
                         </div>
                     </CardContent>
@@ -103,16 +100,16 @@ export default function Clients() {
                 <Card>
                     <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-green-100 rounded-lg">
+                            <div className="p-3 bg-yellow-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                                 </div>
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.clients.filter(c => c.isActive).length || 0}
+                                    {quotes?.quotes.filter(c => c.status === "DRAFT").length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Active Clients</p>
+                                <p className="text-sm text-primary">Draft Quotes</p>
                             </div>
                         </div>
                     </CardContent>
@@ -121,16 +118,16 @@ export default function Clients() {
                 <Card>
                     <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-gray-100 rounded-lg">
+                            <div className="p-3 bg-blue-100 rounded-lg">
                                 <div className="w-6 h-6 flex items-center justify-center">
-                                    <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                                 </div>
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.clients.filter(c => !c.isActive).length || 0}
+                                    {quotes?.quotes.filter(c => c.status === "SIGNED").length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Inactive Clients</p>
+                                <p className="text-sm text-primary">Signed Quotes</p>
                             </div>
                         </div>
                     </CardContent>
@@ -140,10 +137,10 @@ export default function Clients() {
             <Card className="gap-0">
                 <CardHeader className="border-b">
                     <CardTitle className="flex items-center space-x-2">
-                        <Building2 className="h-5 w-5 " />
-                        <span>Clients</span>
+                        <FileSignature className="h-5 w-5 " />
+                        <span>Quotes</span>
                     </CardTitle>
-                    <CardDescription>Manage your clients, view details, edit or delete them.</CardDescription>
+                    <CardDescription>Manage your quotes, view details, edit or delete them.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                     {loading && (
@@ -151,61 +148,58 @@ export default function Clients() {
                             <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
                         </div>
                     )}
-                    {!loading && filteredClients.length === 0 ? (
+                    {!loading && filteredQuotes.length === 0 ? (
                         <div className="text-center py-12">
-                            <Users className="mx-auto h-12 w-12 text-gray-400" />
+                            <FileSignature className="mx-auto h-12 w-12 text-gray-400" />
                             <h3 className="mt-2 text-sm font-medium text-foreground">
-                                {searchTerm ? 'No clients found' : 'No clients added yet'}
+                                {searchTerm ? 'No quotes found' : 'No quotes added yet'}
                             </h3>
                             <p className="mt-1 text-sm text-primary">
                                 {searchTerm
                                     ? 'Try a different search term'
-                                    : 'Start adding clients to manage your business effectively.'
+                                    : 'Start adding quotes to manage your business effectively.'
                                 }
                             </p>
                             {!searchTerm && (
                                 <div className="mt-6">
                                     <Button onClick={handleAddClick}>
                                         <Plus className="h-4 w-4 mr-2" />
-                                        Add New Client
+                                        Add New Quote
                                     </Button>
                                 </div>
                             )}
                         </div>
                     ) : (
                         <div className="divide-y">
-                            {filteredClients.map((client, index) => (
+                            {filteredQuotes.map((quote, index) => (
                                 <div key={index} className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4">
                                             <div className="p-2 bg-blue-100 rounded-lg">
-                                                <Building2 className="h-5 w-5 text-blue-600" />
+                                                <FileSignature className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center space-x-2">
-                                                    <h3 className="font-medium text-foreground">{client.name}</h3>
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                    <h3 className="font-medium text-foreground">{quote.title || `Quote #${quote.number}`}</h3>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                                        ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                                                            quote.status === 'SIGNED' ? 'bg-blue-100 text-blue-800' :
+                                                                quote.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
+                                                                    quote.status === 'SENT' ? 'bg-green-100 text-green-800' :
+                                                                        'bg-gray-100 text-gray-800'
                                                         }`}>
-                                                        {client.isActive ? 'Actif' : 'Inactif'}
+                                                        {quote.status}
                                                     </span>
                                                 </div>
                                                 <div className="mt-1 flex items-center space-x-4 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
-                                                        <span>{client.contactEmail}</span>
+                                                        <span>{quote.client.contactEmail}</span>
                                                     </div>
-                                                    {client.contactPhone && (
+                                                    {quote.client.contactPhone && (
                                                         <div className="flex items-center space-x-1">
                                                             <Phone className="h-4 w-4" />
-                                                            <span>{client.contactPhone}</span>
-                                                        </div>
-                                                    )}
-                                                    {client.city && (
-                                                        <div className="flex items-center space-x-1">
-                                                            <MapPin className="h-4 w-4" />
-                                                            <span>{client.city}</span>
+                                                            <span>{quote.client.contactPhone}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -216,7 +210,7 @@ export default function Clients() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleView(client)}
+                                                onClick={() => handleView(quote)}
                                                 className="text-gray-600 hover:text-blue-600"
                                             >
                                                 <Eye className="h-4 w-4" />
@@ -224,7 +218,7 @@ export default function Clients() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleEdit(client)}
+                                                onClick={() => handleEdit(quote)}
                                                 className="text-gray-600 hover:text-green-600"
                                             >
                                                 <Edit className="h-4 w-4" />
@@ -232,7 +226,7 @@ export default function Clients() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleDelete(client)}
+                                                onClick={() => handleDelete(quote)}
                                                 className="text-gray-600 hover:text-red-600"
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -245,30 +239,30 @@ export default function Clients() {
                     )}
                 </CardContent>
                 <CardFooter>
-                    {!loading && filteredClients.length > 0 && (
-                        <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
+                    {!loading && filteredQuotes.length > 0 && (
+                        <BetterPagination pageCount={quotes?.pageCount || 1} page={page} setPage={setPage} />
                     )}
                 </CardFooter>
             </Card>
 
-            <ClientCreate
-                open={createClientDialog}
-                onOpenChange={(open) => { setCreateClientDialog(open); mutate() }}
+            <QuoteCreate
+                open={createQuoteDialog}
+                onOpenChange={(open) => { setCreateQuoteDialog(open); mutate() }}
             />
 
-            <ClientEdit
-                client={editClientDialog}
-                onOpenChange={(open) => { if (!open) setEditClientDialog(null); mutate() }}
+            <QuoteEdit
+                quote={editQuoteDialog}
+                onOpenChange={(open) => { if (!open) setEditQuoteDialog(null); mutate() }}
             />
 
-            <ClientViewDialog
-                client={viewClientDialog}
-                onOpenChange={(open) => { if (!open) setViewClientDialog(null) }}
+            <QuoteViewDialog
+                quote={viewQuoteDialog}
+                onOpenChange={(open) => { if (!open) setViewQuoteDialog(null) }}
             />
 
-            <ClientDeleteDialog
-                client={deleteClientDialog}
-                onOpenChange={(open) => { if (!open) setDeleteClientDialog(null); mutate() }}
+            <QuoteDeleteDialog
+                quote={deleteQuoteDialog}
+                onOpenChange={(open) => { if (!open) setDeleteQuoteDialog(null); mutate() }}
             />
 
         </div>

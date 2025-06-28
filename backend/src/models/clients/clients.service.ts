@@ -24,6 +24,39 @@ export class ClientsService {
         return { pageCount: Math.ceil(totalClients / pageSize), clients };
     }
 
+    async searchClients(query: string) {
+        console.debug(`Searching clients with query: ${query}`);
+        if (!query) {
+            return this.prisma.client.findMany({
+                take: 10,
+                orderBy: {
+                    name: 'asc',
+                },
+            });
+        }
+
+        return this.prisma.client.findMany({
+            where: {
+                isActive: true,
+                OR: [
+                    { name: { contains: query } },
+                    { contactFirstname: { contains: query } },
+                    { contactLastname: { contains: query } },
+                    { contactEmail: { contains: query } },
+                    { contactPhone: { contains: query } },
+                    { address: { contains: query } },
+                    { postalCode: { contains: query } },
+                    { city: { contains: query } },
+                    { country: { contains: query } },
+                ],
+            },
+            take: 10,
+            orderBy: {
+                name: 'asc',
+            },
+        });
+    }
+
     async createClient(editClientsDto: EditClientsDto) {
         const { id, ...data } = editClientsDto;
         return this.prisma.client.create({ data });
