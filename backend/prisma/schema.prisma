@@ -56,27 +56,27 @@ enum QuoteStatus {
 }
 
 model Quote {
-  id           String      @id @default(uuid())
-  number       String      @unique // Ex: "Q-2025-0001"
-  title        String?
-  client       Client      @relation(fields: [clientId], references: [id])
-  clientId     String
-  company      Company     @relation(fields: [companyId], references: [id])
-  companyId    String
-  items        QuoteItem[]
-  status       QuoteStatus @default(DRAFT)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  validUntil   DateTime?
-  signedAt     DateTime?
-  viewedAt     DateTime?
-  signedBy     String?
-  signatureSvg String?
-  totalHT      Float
-  totalVAT     Float
-  totalTTC     Float
-  isActive     Boolean     @default(true)
-  Invoice      Invoice[]
+  id         String      @id @default(uuid())
+  number     String      @unique // Ex: "Q-2025-0001"
+  title      String?
+  client     Client      @relation(fields: [clientId], references: [id])
+  clientId   String
+  company    Company     @relation(fields: [companyId], references: [id])
+  companyId  String
+  items      QuoteItem[]
+  status     QuoteStatus @default(DRAFT)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  validUntil DateTime?
+  signedAt   DateTime?
+  viewedAt   DateTime?
+  signedBy   String?
+  totalHT    Float
+  totalVAT   Float
+  totalTTC   Float
+  isActive   Boolean     @default(true)
+  Invoice    Invoice[]
+  signatures Signature[]
 }
 
 model QuoteItem {
@@ -129,4 +129,14 @@ model InvoiceItem {
   unitPrice   Float
   vatRate     Float // 20 for 20%
   order       Int
+}
+
+model Signature {
+  id        String    @id @default(uuid())
+  quoteId   String
+  signedAt  DateTime  @default(now())
+  expiresAt DateTime?
+  otpCode   String?
+  otpUsed   Boolean   @default(false)
+  quote     Quote     @relation(fields: [quoteId], references: [id])
 }
