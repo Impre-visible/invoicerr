@@ -149,8 +149,8 @@ export class SignaturesService {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: signature.quote.client.contactEmail,
             subject: 'Signature Request for Quote',
-            text: `Please sign the quote by clicking on the following link: ${process.env.APP_URL}/signatures/${signatureId}`,
-            html: `<p>Please sign the quote: <a href="${process.env.APP_URL}/signatures/${signatureId}">#${signature.quote.number}</a>.</p>`,
+            text: `Please sign the quote by clicking on the following link: ${process.env.APP_URL}/signature/${signatureId}`,
+            html: `<p>Please sign the quote: <a href="${process.env.APP_URL}/signature/${signatureId}">#${signature.quote.number}</a>.</p>`,
         };
 
         await this.transporter.sendMail(mailOptions)
