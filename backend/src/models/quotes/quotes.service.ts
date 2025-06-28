@@ -1,9 +1,9 @@
+import * as PDFDocument from "pdfkit";
 import * as streamBuffers from 'stream-buffers';
 
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { Injectable } from '@nestjs/common';
-import PDFDocument from 'pdfkit';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 import { buffer } from 'stream/consumers';
