@@ -16,7 +16,8 @@ type QuotePdfModalProps = {
 };
 
 export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
-  const { data } = useGetRaw<Response>(`/api/quotes/${quote?.id}/pdf`)
+  if (!quote) return null;
+  const { data } = useGetRaw<Response>(`/api/quotes/${quote.id}/pdf`)
   const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
 
   useEffect(() => {
@@ -34,16 +35,18 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
       }
       onOpenChange(open);
     }}>
-      <DialogContent className="!max-w-none w-fit h-[90dvh] overflow-hidden">
+      <DialogContent className="!max-w-none w-fit min-w-[90vw] md:min-w-128 h-[90dvh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Quote #{quote?.number}</DialogTitle>
         </DialogHeader>
         <section className='h-full overflow-auto'>
-          {!pdfData && <p>Loading...</p>}
           {pdfData && (
-            <div className="flex justify-center h-full">
-              <Document file={{ data: pdfData }}>
-                <Page pageNumber={1} width={700} />
+            <div className="flex justify-center h-full overflow-auto">
+              <Document file={{ data: pdfData }} loading={
+                <div className="flex items-center justify-center h-full w-full">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+                </div>}>
+                <Page pageNumber={1} className="rounded-md" />
               </Document>
             </div>
           )}
