@@ -19,7 +19,7 @@ const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <FormControl>
+        <FormControl className="w-full">
           <Button
             variant={"outline"}
             className={cn(
@@ -37,7 +37,7 @@ const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="z-500 w-full p-0 mt-2 rounded-lg outline-1" align="start">
         <Calendar
           required
           mode="single"

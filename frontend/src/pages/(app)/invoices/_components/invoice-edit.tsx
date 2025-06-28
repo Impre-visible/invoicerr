@@ -1,4 +1,4 @@
-import type { Client, Invoice } from "@/types"
+import type { Client, Invoice, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
     DndContext,
@@ -42,7 +42,7 @@ interface InvoiceEditDialogProps {
 }
 
 const invoiceSchema = z.object({
-    title: z.string().optional(),
+    quoteId: z.string().min(1, "Quote ID is required").optional(),
     clientId: z.string().min(1, "Client is required").refine(val => val !== "", {
         message: "Client is required",
     }),
@@ -66,14 +66,18 @@ const invoiceSchema = z.object({
 })
 
 export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
-    const [searchTerm, setSearchTerm] = useState("")
-    const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${searchTerm}`)
+    const [clientSearchTerm, setClientsSearchTerm] = useState("")
+    const [quoteSearchTerm, setQuoteSearchTerm] = useState("")
+
+    const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
+    const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
+
     const { trigger } = usePatch(`/api/invoices/${invoice?.id}`)
 
     const form = useForm<z.infer<typeof invoiceSchema>>({
         resolver: zodResolver(invoiceSchema),
         defaultValues: {
-            title: "",
+            quoteId: undefined,
             clientId: "",
             dueDate: undefined,
             items: [],
@@ -84,7 +88,7 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
         if (invoice) {
             console.log(invoice.items[0])
             form.reset({
-                title: invoice.title || "",
+                quoteId: invoice.quoteId || "",
                 clientId: invoice.clientId || "",
                 dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
                 items: invoice.items.sort((a, b) => a.order - b.order).map(item => ({
@@ -150,17 +154,23 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={control}
-                            name="title"
+                            name="quoteId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Title</FormLabel>
+                                    <FormLabel>Quote</FormLabel>
                                     <FormControl>
-                                        <Input {...field} placeholder="Title" />
+                                        <SearchSelect
+                                            options={(quotes || []).map((c) => ({ label: `${c.number}${c.title ? ` (${c.title})` : ''}`, value: c.id }))}
+                                            value={field.value ?? ""}
+                                            onValueChange={val => { field.onChange(val || null); if (val) form.setValue("clientId", quotes?.find(q => q.id === val)?.clientId || "") }}
+                                            onSearchChange={setQuoteSearchTerm}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
 
                         <FormField
                             control={control}
@@ -173,7 +183,7 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={val => field.onChange(val || null)}
-                                            onSearchChange={setSearchTerm}
+                                            onSearchChange={setClientsSearchTerm}
                                         />
                                     </FormControl>
                                     <FormMessage />
