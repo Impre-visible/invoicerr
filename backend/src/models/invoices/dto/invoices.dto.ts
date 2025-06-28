@@ -1,6 +1,4 @@
 export class CreateInvoiceDto {
-    // number is auto generated
-    title?: string;
     clientId: string;
     dueDate?: Date;
     items: {
@@ -14,7 +12,6 @@ export class CreateInvoiceDto {
 
 export class EditInvoicesDto {
     id: string;
-    title?: string;
     clientId: string;
     dueDate?: Date;
     items: {

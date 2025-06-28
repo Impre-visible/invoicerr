@@ -75,7 +75,9 @@ export class InvoicesService {
                     (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0),
                 items: {
                     create: items.map(item => ({
-                        ...item,
+                        description: item.description,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
                         vatRate: item.vatRate || 0,
                         order: item.order || 0,
                     })),
@@ -222,7 +224,6 @@ export class InvoicesService {
         }
 
         return this.createInvoice({
-            title: quote.title || '',
             clientId: quote.clientId,
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             items: quote.items,
