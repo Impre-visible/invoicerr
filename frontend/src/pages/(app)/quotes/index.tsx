@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Eye, FileSignature, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
+import { Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import type { Quote } from "@/types"
 import { QuoteCreate } from "./_components/quote-create"
 import { QuoteDeleteDialog } from "./_components/quote-delete"
 import { QuoteEdit } from "./_components/quote-edit"
+import { QuotePdfModal } from "./_components/quote-pdf-view"
 import { QuoteViewDialog } from "./_components/quote-view"
 import { useGet } from "@/lib/utils"
 import { useState } from "react"
@@ -20,6 +21,7 @@ export default function Quotes() {
     const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
     const [editQuoteDialog, setEditQuoteDialog] = useState<Quote | null>(null)
     const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
+    const [viewQuotePdfDialog, setViewQuotePdfDialog] = useState<Quote | null>(null)
     const [deleteQuoteDialog, setDeleteQuoteDialog] = useState<Quote | null>(null)
 
     const [searchTerm, setSearchTerm] = useState("")
@@ -39,6 +41,10 @@ export default function Quotes() {
 
     function handleView(quote: Quote) {
         setViewQuoteDialog(quote)
+    }
+
+    function handleViewPdf(quote: Quote) {
+        setViewQuotePdfDialog(quote)
     }
 
     function handleDelete(quote: Quote) {
@@ -218,6 +224,14 @@ export default function Quotes() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                onClick={() => handleViewPdf(quote)}
+                                                className="text-gray-600 hover:text-blue-600"
+                                            >
+                                                <FileText className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => handleEdit(quote)}
                                                 className="text-gray-600 hover:text-green-600"
                                             >
@@ -258,6 +272,11 @@ export default function Quotes() {
             <QuoteViewDialog
                 quote={viewQuoteDialog}
                 onOpenChange={(open) => { if (!open) setViewQuoteDialog(null) }}
+            />
+
+            <QuotePdfModal
+                quote={viewQuotePdfDialog}
+                onOpenChange={(open) => { if (!open) setViewQuotePdfDialog(null) }}
             />
 
             <QuoteDeleteDialog

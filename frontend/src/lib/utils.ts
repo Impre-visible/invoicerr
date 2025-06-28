@@ -52,6 +52,45 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
   }
   return res;
 }
+export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL}${url}`, {
+      ...options,
+      method: "GET",
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`GET ${url} failed`);
+        if (!cancelled) {
+          setData(res as unknown as T);
+          setError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  return {
+    data,
+    loading,
+    error,
+    mutate: () => { },
+  };
+}
 
 export function useGet<T = any>(url: string, options?: RequestInit): UseGetResult<T> {
   const [data, setData] = useState<T | null>(null);
