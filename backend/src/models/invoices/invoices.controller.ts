@@ -38,6 +38,12 @@ export class InvoicesController {
         return this.invoicesService.createInvoiceFromQuote(quoteId);
     }
 
+    @Post('mark-as-paid')
+    @LoginRequired()
+    markInvoiceAsPaid(@Body('invoiceId') invoiceId: string) {
+        return this.invoicesService.markInvoiceAsPaid(invoiceId);
+    }
+
     @Post()
     @LoginRequired()
     postInvoicesInfo(@Body() body: CreateInvoiceDto) {

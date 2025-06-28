@@ -230,4 +230,17 @@ export class InvoicesService {
             items: quote.items,
         });
     }
+
+    async markInvoiceAsPaid(invoiceId: string) {
+        const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
+
+        if (!invoice) {
+            throw new Error('Invoice not found');
+        }
+
+        return this.prisma.invoice.update({
+            where: { id: invoiceId },
+            data: { status: 'PAID', paidAt: new Date() }
+        });
+    }
 }

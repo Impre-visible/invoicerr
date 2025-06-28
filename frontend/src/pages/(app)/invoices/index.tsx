@@ -1,4 +1,4 @@
-import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Search, Signature, Trash2 } from "lucide-react"
+import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Search, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
 import { useGet, useGetRaw, usePost } from "@/lib/utils"
@@ -14,7 +14,7 @@ import { InvoicePdfModal } from "./_components/invoice-pdf-view"
 import { InvoiceViewDialog } from "./_components/invoice-view"
 
 export default function Invoices() {
-    const { trigger: triggerMarkAsSigned } = usePost(`/api/invoices/mark-as-signed`)
+    const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
     const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-invoice`)
 
     const [page, setPage] = useState(1)
@@ -78,11 +78,11 @@ export default function Invoices() {
         setDeleteInvoiceDialog(invoice)
     }
 
-    function handleMarkAsSigned(invoiceId: string) {
-        triggerMarkAsSigned({ id: invoiceId }).then(() => {
+    function handleMarkAsPaid(invoiceId: string) {
+        triggerMarkAsPaid({ invoiceId }).then(() => {
             mutate();
         }).catch((error) => {
-            console.error("Error marking invoice as signed:", error);
+            console.error("Error marking invoice as paid:", error);
         });
     }
 
@@ -292,7 +292,7 @@ export default function Invoices() {
                                                     tooltip="Mark as Paid"
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleMarkAsSigned(invoice.id)}
+                                                    onClick={() => handleMarkAsPaid(invoice.id)}
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
                                                     <Banknote className="h-4 w-4" />
