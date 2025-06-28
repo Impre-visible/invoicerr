@@ -142,7 +142,7 @@ export function InvoiceCreate({ open, onOpenChange }: InvoiceCreateDialogProps) 
                                         <SearchSelect
                                             options={(quotes || []).map((c) => ({ label: `${c.number}${c.title ? ` (${c.title})` : ''}`, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={val => field.onChange(val || null)}
+                                            onValueChange={val => { field.onChange(val || null); if (val) form.setValue("clientId", quotes?.find(q => q.id === val)?.clientId || "") }}
                                             onSearchChange={setQuoteSearchTerm}
                                         />
                                     </FormControl>
