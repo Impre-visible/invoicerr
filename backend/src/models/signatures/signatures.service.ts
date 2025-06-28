@@ -114,6 +114,11 @@ export class SignaturesService {
             throw new Error('Quote not found or client information is missing.');
         }
 
+        await this.prisma.signature.updateMany({
+            where: { quoteId: signature.quoteId, isActive: true, id: { not: signatureId } },
+            data: { isActive: false },
+        });
+
         const mailOptions = {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: signature.quote.client.contactEmail,

@@ -139,4 +139,5 @@ model Signature {
   otpCode   String?
   otpUsed   Boolean   @default(false)
   quote     Quote     @relation(fields: [quoteId], references: [id])
+  isActive  Boolean   @default(true)
 }
