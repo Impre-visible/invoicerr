@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
+import { Download, Edit, Eye, FileSignature, FileText, Mail, Phone, Plus, Search, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useGet, useGetRaw } from "@/lib/utils"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -10,8 +12,6 @@ import { QuoteDeleteDialog } from "./_components/quote-delete"
 import { QuoteEdit } from "./_components/quote-edit"
 import { QuotePdfModal } from "./_components/quote-pdf-view"
 import { QuoteViewDialog } from "./_components/quote-view"
-import { useGet } from "@/lib/utils"
-import { useState } from "react"
 
 export default function Quotes() {
     const [page, setPage] = useState(1)
@@ -23,6 +23,26 @@ export default function Quotes() {
     const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
     const [viewQuotePdfDialog, setViewQuotePdfDialog] = useState<Quote | null>(null)
     const [deleteQuoteDialog, setDeleteQuoteDialog] = useState<Quote | null>(null)
+    const [downloadQuotePdf, setDownloadQuotePdf] = useState<Quote | null>(null)
+
+    const { data: pdf } = useGetRaw<Response>(`/api/quotes/${downloadQuotePdf?.id}/pdf`)
+
+    useEffect(() => {
+        if (downloadQuotePdf && pdf) {
+            pdf.arrayBuffer().then((buffer) => {
+                const blob = new Blob([buffer], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `quote-${downloadQuotePdf.number}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setDownloadQuotePdf(null); // Reset after download
+            });
+        }
+    }, [downloadQuotePdf, pdf]);
 
     const [searchTerm, setSearchTerm] = useState("")
 
@@ -45,6 +65,10 @@ export default function Quotes() {
 
     function handleViewPdf(quote: Quote) {
         setViewQuotePdfDialog(quote)
+    }
+
+    function handleDownloadPdf(quote: Quote) {
+        setDownloadQuotePdf(quote)
     }
 
     function handleDelete(quote: Quote) {
@@ -225,9 +249,17 @@ export default function Quotes() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleViewPdf(quote)}
-                                                className="text-gray-600 hover:text-blue-600"
+                                                className="text-gray-600 hover:text-pink-600"
                                             >
                                                 <FileText className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleDownloadPdf(quote)}
+                                                className="text-gray-600 hover:text-amber-600"
+                                            >
+                                                <Download className="h-4 w-4" />
                                             </Button>
                                             <Button
                                                 variant="ghost"
