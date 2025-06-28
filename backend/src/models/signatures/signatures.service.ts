@@ -58,7 +58,6 @@ export class SignaturesService {
         const signature = await this.prisma.signature.create({
             data: {
                 quoteId,
-                signedAt: new Date(),
                 expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
             },
         });
@@ -98,9 +97,9 @@ export class SignaturesService {
 
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        await this.prisma.signature.create({
+        await this.prisma.signature.update({
+            where: { id: signatureId },
             data: {
-                quoteId: signature.quoteId,
                 otpCode,
                 otpUsed: false,
                 expiresAt: new Date(Date.now() + 15 * 60 * 1000), // OTP valid for 15 minutes
@@ -148,7 +147,7 @@ export class SignaturesService {
         };
 
         await this.transporter.sendMail(mailOptions)
-            .then(() => console.log('Signature email sent successfully'))
+            .then(() => { })
             .catch(error => {
                 console.error('Error sending signature email:', error);
                 throw new Error('Failed to send signature email.');
@@ -197,6 +196,13 @@ export class SignaturesService {
             data: {
                 otpUsed: true,
                 signedAt: new Date(),
+            },
+        });
+
+        await this.prisma.quote.update({
+            where: { id: signature.quoteId },
+            data: {
+                status: 'SIGNED',
             },
         });
 
