@@ -11,6 +11,7 @@ import { QuoteDeleteDialog } from "@/pages/(app)/quotes/_components/quote-delete
 import { QuoteEdit } from "@/pages/(app)/quotes/_components/quote-edit"
 import { QuotePdfModal } from "@/pages/(app)/quotes/_components/quote-pdf-view"
 import { QuoteViewDialog } from "@/pages/(app)/quotes/_components/quote-view"
+import { toast } from "sonner"
 
 interface QuoteListProps {
     quotes: Quote[]
@@ -41,7 +42,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
     emptyState,
     showCreateButton = false
 }, ref) => {
-    const { trigger: triggerMarkAsSigned } = usePost(`/api/quotes/mark-as-signed`)
+    const { trigger: triggerSendForSignature } = usePost<{ message: string, signature: { id: string } }>(`/api/signatures`)
     const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-quote`)
 
     const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
@@ -100,11 +101,18 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
         setDeleteQuoteDialog(quote)
     }
 
-    function handleMarkAsSigned(quoteId: string) {
-        triggerMarkAsSigned({ id: quoteId }).then(() => {
+    function handleSendForSignature(quoteId: string) {
+        triggerSendForSignature({ quoteId: quoteId }).then((data) => {
+            if (!data || !data.signature) {
+                toast.error("Failed to send quote for signature.");
+                return;
+            }
+
+            toast.success(data.message);
+
             mutate();
         }).catch((error) => {
-            console.error("Error marking quote as signed:", error);
+            console.error("Error sending quote for signature:", error);
         });
     }
 
@@ -209,10 +217,10 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                             </Button>
                                             {quote.status !== 'SIGNED' && (
                                                 <Button
-                                                    tooltip="Mark as Signed"
+                                                    tooltip={quote.status !== "SENT" ? "Send for Signature" : "Resend Signature Request"}
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleMarkAsSigned(quote.id)}
+                                                    onClick={() => handleSendForSignature(quote.id)}
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
                                                     <FileSignature className="h-4 w-4" />

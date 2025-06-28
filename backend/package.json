@@ -29,6 +29,7 @@
     "@types/stream-buffers": "^3.0.7",
     "bcrypt": "^6.0.0",
     "handlebars": "^4.7.8",
+    "nodemailer": "^7.0.3",
     "pdfkit": "^0.17.1",
     "puppeteer": "^24.11.0",
     "reflect-metadata": "^0.2.2",

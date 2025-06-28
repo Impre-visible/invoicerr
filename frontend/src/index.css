@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@plugin 'tailwind-scrollbar';
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -112,7 +114,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 scrollbar scrollbar-thin scrollbar-thumb-neutral-300 scrollbar-track-neutral-100 dark:scrollbar-thumb-neutral-700 dark:scrollbar-track-neutral-900;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-xl;
   }
   body {
     @apply bg-background text-foreground;
