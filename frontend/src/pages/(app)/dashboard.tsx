@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card"
 import type { Invoice, Quote } from "@/types"
 
-import { InvoiceList } from "@/components/invoice-list"
+import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { LayoutDashboard } from "lucide-react"
-import { QuoteList } from "@/components/quote-list"
+import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import { useGet } from "@/lib/utils"
 
 interface DashboardData {

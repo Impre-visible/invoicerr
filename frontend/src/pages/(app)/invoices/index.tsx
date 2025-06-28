@@ -1,6 +1,6 @@
 import { FileSignature, Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { InvoiceList, type InvoiceListHandle } from "@/components/invoice-list"
+import { InvoiceList, type InvoiceListHandle } from "@/pages/(app)/invoices/_components/invoice-list"
 import { useEffect, useRef, useState } from "react"
 import { useGet, useGetRaw, } from "@/lib/utils"
 

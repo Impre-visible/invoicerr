@@ -1,19 +1,19 @@
+import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, FileSignature, FileText, Plus, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
-import BetterPagination from "./pagination"
-import { Button } from "./ui/button"
-import type { Quote } from "@/types"
-import { QuoteCreate } from "@/pages/(app)/quotes/_components/quote-create"
-import { QuoteDeleteDialog } from "@/pages/(app)/quotes/_components/quote-delete"
-import { QuoteEdit } from "@/pages/(app)/quotes/_components/quote-edit"
-import { QuotePdfModal } from "@/pages/(app)/quotes/_components/quote-pdf-view"
-import { QuoteViewDialog } from "@/pages/(app)/quotes/_components/quote-view"
+import BetterPagination from "../../../../components/pagination"
+import { Button } from "@/components/ui/button"
+import type { Invoice } from "@/types"
+import { InvoiceCreate } from "./invoice-create"
+import { InvoiceDeleteDialog } from "./invoice-delete"
+import { InvoiceEdit } from "./invoice-edit"
+import { InvoicePdfModal } from "./invoice-pdf-view"
+import { InvoiceViewDialog } from "./invoice-view"
 
-interface QuoteListProps {
-    quotes: Quote[]
+interface InvoiceListProps {
+    invoices: Invoice[]
     loading: boolean
     title: string
     description: string
@@ -25,12 +25,12 @@ interface QuoteListProps {
     showCreateButton?: boolean
 }
 
-export interface QuoteListHandle {
+export interface InvoiceListHandle {
     handleAddClick: () => void;
 }
 
-export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
-    quotes,
+export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
+    invoices,
     loading,
     title,
     description,
@@ -41,75 +41,71 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
     emptyState,
     showCreateButton = false
 }, ref) => {
-    const { trigger: triggerMarkAsSigned } = usePost(`/api/quotes/mark-as-signed`)
-    const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-quote`)
+    const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
+    const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-invoice`)
 
-    const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
-    const [editQuoteDialog, setEditQuoteDialog] = useState<Quote | null>(null)
-    const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
-    const [viewQuotePdfDialog, setViewQuotePdfDialog] = useState<Quote | null>(null)
-    const [deleteQuoteDialog, setDeleteQuoteDialog] = useState<Quote | null>(null)
-    const [downloadQuotePdf, setDownloadQuotePdf] = useState<Quote | null>(null)
+    const [createInvoiceDialog, setCreateInvoiceDialog] = useState<boolean>(false)
+    const [editInvoiceDialog, setEditInvoiceDialog] = useState<Invoice | null>(null)
+    const [viewInvoiceDialog, setViewInvoiceDialog] = useState<Invoice | null>(null)
+    const [viewInvoicePdfDialog, setViewInvoicePdfDialog] = useState<Invoice | null>(null)
+    const [deleteInvoiceDialog, setDeleteInvoiceDialog] = useState<Invoice | null>(null)
+    const [downloadInvoicePdf, setDownloadInvoicePdf] = useState<Invoice | null>(null)
 
-    const { data: pdf } = useGetRaw<Response>(`/api/quotes/${downloadQuotePdf?.id}/pdf`)
+    const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
 
     useImperativeHandle(ref, () => ({
         handleAddClick() {
-            setCreateQuoteDialog(true)
+            setCreateInvoiceDialog(true)
         }
     }));
 
     useEffect(() => {
-        if (downloadQuotePdf && pdf) {
+        if (downloadInvoicePdf && pdf) {
             pdf.arrayBuffer().then((buffer) => {
                 const blob = new Blob([buffer], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `quote-${downloadQuotePdf.number}.pdf`;
+                link.download = `invoice-${downloadInvoicePdf.number}.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-                setDownloadQuotePdf(null); // Reset after download
+                setDownloadInvoicePdf(null); // Reset after download
             });
         }
-    }, [downloadQuotePdf, pdf]);
+    }, [downloadInvoicePdf, pdf]);
 
-    function handleAddClick() {
-        setCreateQuoteDialog(true)
+    function handleEdit(invoice: Invoice) {
+        setEditInvoiceDialog(invoice)
     }
 
-    function handleEdit(quote: Quote) {
-        setEditQuoteDialog(quote)
+    function handleView(invoice: Invoice) {
+        setViewInvoiceDialog(invoice)
     }
 
-    function handleView(quote: Quote) {
-        setViewQuoteDialog(quote)
+    function handleViewPdf(invoice: Invoice) {
+        setViewInvoicePdfDialog(invoice)
     }
 
-    function handleViewPdf(quote: Quote) {
-        setViewQuotePdfDialog(quote)
+    function handleDownloadPdf(invoice: Invoice) {
+        setDownloadInvoicePdf(invoice)
     }
 
-    function handleDownloadPdf(quote: Quote) {
-        setDownloadQuotePdf(quote)
+    function handleDelete(invoice: Invoice) {
+        setDeleteInvoiceDialog(invoice)
     }
 
-    function handleDelete(quote: Quote) {
-        setDeleteQuoteDialog(quote)
-    }
-
-    function handleMarkAsSigned(quoteId: string) {
-        triggerMarkAsSigned({ id: quoteId }).then(() => {
+    function handleMarkAsPaid(invoiceId: string) {
+        triggerMarkAsPaid({ invoiceId }).then(() => {
             mutate();
         }).catch((error) => {
-            console.error("Error marking quote as signed:", error);
+            console.error("Error marking invoice as paid:", error);
         });
     }
 
-    function handleCreateInvoice(quoteId: string) {
-        triggerCreateInvoice({ quoteId })
+    function handleCreateInvoice(invoiceId: string) {
+        triggerCreateInvoice({ invoiceId })
     }
 
     return (
@@ -125,11 +121,11 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                     </div>
                     {showCreateButton && (
                         <Button
-                            onClick={handleAddClick}
+                            onClick={() => setCreateInvoiceDialog(true)}
                         >
                             <Plus className="h-4 w-4 mr-0 md:mr-2" />
                             <span className="hidden md:inline-flex">
-                                Add New Quote
+                                Add New Invoice
                             </span>
                         </Button>
                     )}
@@ -140,11 +136,11 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                         </div>
                     )}
-                    {!loading && quotes.length === 0 ? (
+                    {!loading && invoices.length === 0 ? (
                         emptyState
                     ) : (
                         <div className="divide-y">
-                            {quotes.map((quote, index) => (
+                            {invoices.map((invoice, index) => (
                                 <div key={index} className="p-4 sm:p-6">
                                     <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                         <div className="flex flex-row items-center gap-4 w-full">
@@ -153,29 +149,40 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="font-medium text-foreground">{quote.number}{quote.title ? ` - ${quote.title}` : ''}</span>
-                                                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">{quote.status}</span>
+                                                    <h3 className="font-medium text-foreground break-words">
+                                                        {invoice.title || `Invoice #${invoice.number}`}
+                                                    </h3>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                                        ${invoice.status === 'SENT' ? 'bg-yellow-100 text-yellow-800' :
+                                                            invoice.status === 'UNPAID' ? 'bg-blue-100 text-blue-800' :
+                                                                invoice.status === 'OVERDUE' ? 'bg-red-100 text-red-800' :
+                                                                    invoice.status === 'PAID' ? 'bg-green-100 text-green-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {invoice.status}
+                                                    </span>
                                                 </div>
-                                                <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
-                                                    <span>#{quote.number}</span>
-                                                    <span>•</span>
-                                                    <span>{quote.client.name}</span>
-                                                    {quote.validUntil && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>Expires on: {new Date(quote.validUntil).toLocaleDateString()}</span>
-                                                        </>
-                                                    )}
+                                                <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                                                        <span><span className="font-medium text-foreground">Client:</span> {invoice.client.name}</span>
+                                                        <span><span className="font-medium text-foreground">Issued:</span> {new Date(invoice.createdAt).toLocaleDateString()}</span>
+                                                        <span><span className="font-medium text-foreground">Due:</span> {new Date(invoice.dueDate).toLocaleDateString()}</span>
+                                                        {invoice.paymentMethod && (
+                                                            <span><span className="font-medium text-foreground">Payment:</span> {invoice.paymentMethod}</span>
+                                                        )}
+                                                        <span><span className="font-medium text-foreground">Total HT:</span> {invoice.totalHT.toFixed(2)} €</span>
+                                                        <span><span className="font-medium text-foreground">Total TTC:</span> {invoice.totalTTC.toFixed(2)} €</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
                                             <Button
-                                                tooltip="View Quote"
+                                                tooltip="View Invoice"
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleView(quote)}
+                                                onClick={() => handleView(invoice)}
                                                 className="text-gray-600 hover:text-blue-600"
                                             >
                                                 <Eye className="h-4 w-4" />
@@ -184,7 +191,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                                 tooltip="View PDF"
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleViewPdf(quote)}
+                                                onClick={() => handleViewPdf(invoice)}
                                                 className="text-gray-600 hover:text-pink-600"
                                             >
                                                 <FileText className="h-4 w-4" />
@@ -193,47 +200,47 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                                 tooltip="Download PDF"
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleDownloadPdf(quote)}
+                                                onClick={() => handleDownloadPdf(invoice)}
                                                 className="text-gray-600 hover:text-amber-600"
                                             >
                                                 <Download className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                                tooltip="Edit Quote"
+                                                tooltip="Edit Invoice"
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleEdit(quote)}
+                                                onClick={() => handleEdit(invoice)}
                                                 className="text-gray-600 hover:text-green-600"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            {quote.status !== 'SIGNED' && (
+                                            {invoice.status !== 'PAID' && (
                                                 <Button
-                                                    tooltip="Mark as Signed"
+                                                    tooltip="Mark as Paid"
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleMarkAsSigned(quote.id)}
+                                                    onClick={() => handleMarkAsPaid(invoice.id)}
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
-                                                    <FileSignature className="h-4 w-4" />
+                                                    <Banknote className="h-4 w-4" />
                                                 </Button>
                                             )}
-                                            {quote.status === 'SIGNED' && (
+                                            {invoice.status === 'SENT' && (
                                                 <Button
                                                     tooltip="Create Invoice"
                                                     variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleCreateInvoice(quote.id)}
+                                                    onClick={() => handleCreateInvoice(invoice.id)}
                                                     className="text-gray-600 hover:text-green-600"
                                                 >
-                                                    <Plus className="h-4 w-4" />
+                                                    <FileText className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             <Button
-                                                tooltip="Delete Quote"
+                                                tooltip="Delete Invoice"
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => handleDelete(quote)}
+                                                onClick={() => handleDelete(invoice)}
                                                 className="text-gray-600 hover:text-red-600"
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -247,36 +254,36 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                 </CardContent>
                 {page && pageCount && setPage && (
                     <CardFooter>
-                        {!loading && quotes.length > 0 && (
+                        {!loading && invoices.length > 0 && (
                             <BetterPagination pageCount={pageCount} page={page} setPage={setPage} />
                         )}
                     </CardFooter>
                 )}
             </Card>
 
-            <QuoteCreate
-                open={createQuoteDialog}
-                onOpenChange={(open) => { setCreateQuoteDialog(open); if (!open) mutate() }}
+            <InvoiceCreate
+                open={createInvoiceDialog}
+                onOpenChange={(open: boolean) => { setCreateInvoiceDialog(open); if (!open) mutate() }}
             />
 
-            <QuoteEdit
-                quote={editQuoteDialog}
-                onOpenChange={(open) => { if (!open) setEditQuoteDialog(null); mutate() }}
+            <InvoiceEdit
+                invoice={editInvoiceDialog}
+                onOpenChange={(open: boolean) => { if (!open) setEditInvoiceDialog(null); mutate() }}
             />
 
-            <QuoteViewDialog
-                quote={viewQuoteDialog}
-                onOpenChange={(open) => { if (!open) setViewQuoteDialog(null) }}
+            <InvoiceViewDialog
+                invoice={viewInvoiceDialog}
+                onOpenChange={(open: boolean) => { if (!open) setViewInvoiceDialog(null) }}
             />
 
-            <QuotePdfModal
-                quote={viewQuotePdfDialog}
-                onOpenChange={(open) => { if (!open) setViewQuotePdfDialog(null) }}
+            <InvoicePdfModal
+                invoice={viewInvoicePdfDialog}
+                onOpenChange={(open: boolean) => { if (!open) setViewInvoicePdfDialog(null) }}
             />
 
-            <QuoteDeleteDialog
-                quote={deleteQuoteDialog}
-                onOpenChange={(open: boolean) => { if (!open) setDeleteQuoteDialog(null); mutate() }}
+            <InvoiceDeleteDialog
+                invoice={deleteInvoiceDialog}
+                onOpenChange={(open: boolean) => { if (!open) setDeleteInvoiceDialog(null); mutate() }}
             />
         </>
     )

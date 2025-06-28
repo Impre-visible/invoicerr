@@ -6,8 +6,8 @@ import { useGet, useGetRaw } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Quote } from "@/types"
-import { QuoteList } from "@/components/quote-list"
-import type { QuoteListHandle } from "@/components/quote-list"
+import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
+import type { QuoteListHandle } from "@/pages/(app)/quotes/_components/quote-list"
 
 export default function Quotes() {
     const quoteListRef = useRef<QuoteListHandle>(null)
