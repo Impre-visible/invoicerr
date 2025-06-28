@@ -179,7 +179,6 @@ export class QuotesService {
             throw new Error('Quote not found');
         }
 
-        // Charger et compiler le template HTML
         const templateHtml = lightTemplate;
         const template = Handlebars.compile(templateHtml);
 
