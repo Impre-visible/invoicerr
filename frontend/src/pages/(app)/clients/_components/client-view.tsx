@@ -16,7 +16,7 @@ interface ClientViewDialogProps {
 export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps) {
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>
-            <DialogContent className="!max-w-none w-fit p-6">
+            <DialogContent className="max-w-[95vw] lg:max-w-lg max-h-[90dvh] w-fit p-6">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">Client Details</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
@@ -25,7 +25,7 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4 w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 bg-muted/50 p-4 rounded-lg w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                         <div className="w-fit">
                             <p className="text-sm text-muted-foreground">Company Name</p>
                             <p className="font-medium">{client?.name || "—"}</p>
@@ -38,7 +38,7 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 bg-muted/50 p-4 rounded-lg w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                         <div className="w-fit">
                             <p className="text-sm text-muted-foreground">Email</p>
                             <p className="font-medium">{client?.contactEmail || "—"}</p>

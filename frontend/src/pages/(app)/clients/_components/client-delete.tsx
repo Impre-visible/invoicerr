@@ -42,10 +42,10 @@ export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogP
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-                    <Button variant="destructive" onClick={handleDelete}>
+                    <Button variant="destructive" className="w-full" onClick={handleDelete}>
                         Delete
                     </Button>
                 </DialogFooter>
