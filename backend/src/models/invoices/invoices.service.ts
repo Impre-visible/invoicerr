@@ -51,7 +51,8 @@ export class InvoicesService {
             },
             include: {
                 items: true,
-                client: true
+                client: true,
+                company: true
             },
         });
 
