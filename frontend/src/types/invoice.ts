@@ -1,3 +1,6 @@
+import type { Client } from "./client";
+import type { Company } from "./company";
+
 export enum InvoiceStatus {
     PAID = 'PAID',
     UNPAID = 'UNPAID',
@@ -22,6 +25,8 @@ export interface Invoice {
     quoteId?: string;
     clientId: string;
     companyId: string;
+    client: Client
+    company: Company
     items: InvoiceItem[];
     status: InvoiceStatus;
     createdAt: string; // ISO date string
