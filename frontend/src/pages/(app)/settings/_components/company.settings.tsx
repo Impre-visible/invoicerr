@@ -6,6 +6,7 @@ import { useGet, usePost } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import type { Company } from "@/types"
+import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import SearchSelect from "@/components/search-input"
 import { currencies } from "@/lib/constants/currencies"
@@ -161,6 +162,26 @@ export default function CompanySettings() {
                                                 <Input placeholder="Brief description of your company" {...field} />
                                             </FormControl>
                                             <FormDescription>Optional description for your company.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="foundedAt"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>Founded Date</FormLabel>
+                                            <FormControl>
+                                                <DatePicker
+                                                    className="w-full bg-opacity-100"
+                                                    value={field.value || null}
+                                                    onChange={field.onChange}
+                                                    placeholder="Select a date"
+                                                />
+                                            </FormControl>
+                                            <FormDescription>Date your company was founded.</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
