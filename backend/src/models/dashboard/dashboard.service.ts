@@ -62,6 +62,7 @@ export class DashboardService {
                 signed: quotes.find(q => q.status === 'SIGNED')?._count || 0,
                 expired: quotes.find(q => q.status === 'EXPIRED')?._count || 0,
                 latests: await this.prisma.quote.findMany({
+                    where: { isActive: true },
                     orderBy: { updatedAt: 'desc' },
                     include: { company: true, client: true },
                     take: 5,
@@ -74,6 +75,7 @@ export class DashboardService {
                 paid: invoices.find(i => i.status === 'PAID')?._count || 0,
                 overdue: invoices.find(i => i.status === 'OVERDUE')?._count || 0,
                 latests: await this.prisma.invoice.findMany({
+                    where: { isActive: true },
                     orderBy: { updatedAt: 'desc' },
                     include: { company: true, client: true },
                     take: 5,
