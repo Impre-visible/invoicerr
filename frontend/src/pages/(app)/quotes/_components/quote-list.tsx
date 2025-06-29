@@ -117,7 +117,19 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
     }
 
     function handleCreateInvoice(quoteId: string) {
-        triggerCreateInvoice({ quoteId })
+        triggerCreateInvoice({ quoteId }).then((data) => {
+            if (!data || !data.invoice) {
+                toast.error("Failed to create invoice from quote.");
+                return;
+            }
+
+            toast.success("Invoice created successfully!");
+
+            mutate();
+        }).catch((error) => {
+            console.error("Error creating invoice from quote:", error);
+            toast.error("Failed to create invoice from quote.");
+        });
     }
 
     return (
