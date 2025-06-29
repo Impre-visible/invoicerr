@@ -1,5 +1,6 @@
 import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
@@ -49,9 +50,10 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
     const [viewInvoiceDialog, setViewInvoiceDialog] = useState<Invoice | null>(null)
     const [viewInvoicePdfDialog, setViewInvoicePdfDialog] = useState<Invoice | null>(null)
     const [deleteInvoiceDialog, setDeleteInvoiceDialog] = useState<Invoice | null>(null)
-    const [downloadInvoicePdf, setDownloadInvoicePdf] = useState<Invoice | null>(null)
 
-    const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
+    const [downloadTrigger, setDownloadTrigger] = useState<{ invoice: Invoice, format: string, id: number } | null>(null);
+
+    const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadTrigger?.invoice?.id}/pdf?format=${downloadTrigger?.format}`)
 
     useImperativeHandle(ref, () => ({
         handleAddClick() {
@@ -60,21 +62,21 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
     }));
 
     useEffect(() => {
-        if (downloadInvoicePdf && pdf) {
+        if (downloadTrigger && pdf) {
             pdf.arrayBuffer().then((buffer) => {
                 const blob = new Blob([buffer], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `invoice-${downloadInvoicePdf.number}.pdf`;
+                link.download = `invoice-${downloadTrigger.invoice.number}-${downloadTrigger.format || 'default'}.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-                setDownloadInvoicePdf(null); // Reset after download
+                setDownloadTrigger(null); // Reset
             });
         }
-    }, [downloadInvoicePdf, pdf]);
+    }, [downloadTrigger, pdf]);
 
     function handleEdit(invoice: Invoice) {
         setEditInvoiceDialog(invoice)
@@ -86,10 +88,6 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
 
     function handleViewPdf(invoice: Invoice) {
         setViewInvoicePdfDialog(invoice)
-    }
-
-    function handleDownloadPdf(invoice: Invoice) {
-        setDownloadInvoicePdf(invoice)
     }
 
     function handleDelete(invoice: Invoice) {
@@ -106,6 +104,11 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
 
     function handleCreateInvoice(invoiceId: string) {
         triggerCreateInvoice({ invoiceId })
+    }
+
+
+    function handleDownloadPdf({ invoice, format }: { invoice: Invoice, format: string }) {
+        setDownloadTrigger({ invoice, format, id: Date.now() });
     }
 
     return (
@@ -196,15 +199,27 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                             >
                                                 <FileText className="h-4 w-4" />
                                             </Button>
-                                            <Button
-                                                tooltip="Download PDF"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDownloadPdf(invoice)}
-                                                className="text-gray-600 hover:text-amber-600"
-                                            >
-                                                <Download className="h-4 w-4" />
-                                            </Button>
+
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild >
+                                                    <Button
+                                                        tooltip="Download PDF"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="text-gray-600 hover:text-amber-600"
+                                                    >
+                                                        <Download className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="center" className="[&>*]:cursor-pointer">
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: '' })}>PDF</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'facturx' })}>Factur-X</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'zugferd' })}>ZUGFeRD</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'xrechnung' })}>XRechnung</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'ubl' })}>UBL</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'cii' })}>CII</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                             <Button
                                                 tooltip="Edit Invoice"
                                                 variant="ghost"
