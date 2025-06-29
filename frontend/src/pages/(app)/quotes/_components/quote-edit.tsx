@@ -82,7 +82,6 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
 
     useEffect(() => {
         if (quote) {
-            console.log(quote.items[0])
             form.reset({
                 title: quote.title || "",
                 clientId: quote.clientId || "",

@@ -43,7 +43,6 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
     showCreateButton = false
 }, ref) => {
     const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
-    const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-invoice`)
 
     const [createInvoiceDialog, setCreateInvoiceDialog] = useState<boolean>(false)
     const [editInvoiceDialog, setEditInvoiceDialog] = useState<Invoice | null>(null)
@@ -101,11 +100,6 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
             console.error("Error marking invoice as paid:", error);
         });
     }
-
-    function handleCreateInvoice(invoiceId: string) {
-        triggerCreateInvoice({ invoiceId })
-    }
-
 
     function handleDownloadPdf({ invoice, format }: { invoice: Invoice, format: string }) {
         setDownloadTrigger({ invoice, format, id: Date.now() });
@@ -238,17 +232,6 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
                                                     <Banknote className="h-4 w-4" />
-                                                </Button>
-                                            )}
-                                            {invoice.status === 'SENT' && (
-                                                <Button
-                                                    tooltip="Create Invoice"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleCreateInvoice(invoice.id)}
-                                                    className="text-gray-600 hover:text-green-600"
-                                                >
-                                                    <FileText className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             <Button
