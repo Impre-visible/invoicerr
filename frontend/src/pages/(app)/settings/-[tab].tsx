@@ -5,13 +5,13 @@ import AccountSettings from "./_components/account.settings"
 import CompanySettings from "./_components/company.settings"
 import DangerZoneSettings from "./_components/danger.settings"
 import EmailTemplatesSettings from "./_components/templates.settings"
-import SignatureSettings from "./_components/signature.settings"
+import PDFTemplatesSettings from "./_components/pdf.settings"
 
 export default function Settings() {
     const { tab } = useParams()
     const navigate = useNavigate()
 
-    const validTabs = ["company", "signature", "email", "account", "danger"]
+    const validTabs = ["company", "template", "email", "account", "danger"]
     const currentTab = validTabs.includes(tab!) ? tab! : "company"
 
     const handleTabChange = (newTab: string) => {
@@ -22,7 +22,7 @@ export default function Settings() {
         Page content:
 
         - Company info (name, address, phone, email, logo, IBAN, VAT, etc.)
-        - Signature settings (content, font, size) with preview for invoices/quotes
+        - Quote/Invoice template settings (pdf design, with preview)
         - Email Template settings (for invoices/quotes)
 
         - Account settings (email, password, firstname, lastname)
@@ -35,14 +35,14 @@ export default function Settings() {
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit">
                 <TabsList className="w-full h-12">
                     <TabsTrigger value="company">Company</TabsTrigger>
-                    <TabsTrigger value="signature">Signature</TabsTrigger>
+                    <TabsTrigger value="template">PDF Templates</TabsTrigger>
                     <TabsTrigger value="email">Email Templates</TabsTrigger>
                     <TabsTrigger value="account">Account</TabsTrigger>
                     <TabsTrigger value="danger">Danger Zone</TabsTrigger>
                 </TabsList>
                 <section className="h-full w-full rounded-lg pt-4">
                     <TabsContent value="company" className="h-full"><CompanySettings /></TabsContent>
-                    <TabsContent value="signature" className="h-full"><SignatureSettings /></TabsContent>
+                    <TabsContent value="template" className="h-full"><PDFTemplatesSettings /></TabsContent>
                     <TabsContent value="email" className="h-full"><EmailTemplatesSettings /></TabsContent>
                     <TabsContent value="account" className="h-full"><AccountSettings /></TabsContent>
                     <TabsContent value="danger" className="h-full"><DangerZoneSettings /></TabsContent>
