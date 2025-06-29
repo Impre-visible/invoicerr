@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button"
 import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
+import { useAuth } from "@/contexts/auth"
 import { useGet } from "@/lib/utils"
 import { useNavigate } from "react-router"
 
@@ -43,6 +44,7 @@ interface DashboardData {
 }
 
 export default function Dashboard() {
+    const { user } = useAuth()
     const { data: dashboardData } = useGet<DashboardData>("/api/dashboard")
 
     const navigate = useNavigate()
@@ -82,7 +84,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome back! Here's your business overview</p>
+                    <p className="text-muted-foreground">Welcome back {user?.firstname}! Here's your business overview</p>
                 </div>
             </div>
 
