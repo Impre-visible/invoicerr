@@ -173,19 +173,27 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="font-medium text-foreground">{quote.number}{quote.title ? ` - ${quote.title}` : ''}</span>
-                                                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">{quote.status}</span>
+                                                    <h3 className="font-medium text-foreground break-words">
+                                                        Quote #{quote.number} - {quote.title}
+                                                    </h3>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                                        ${quote.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                                                            quote.status === 'SENT' ? 'bg-blue-100 text-blue-800' :
+                                                                quote.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
+                                                                    quote.status === 'SIGNED' ? 'bg-green-100 text-green-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {quote.status}
+                                                    </span>
                                                 </div>
-                                                <div className="mt-2 flex flex-col sm:flex-row flex-wrap gap-2 text-sm text-primary">
-                                                    <span>#{quote.number}</span>
-                                                    <span>•</span>
-                                                    <span>{quote.client.name}</span>
-                                                    {quote.validUntil && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>Expires on: {new Date(quote.validUntil).toLocaleDateString()}</span>
-                                                        </>
-                                                    )}
+                                                <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                                                        <span><span className="font-medium text-foreground">Client:</span> {quote.client.name}</span>
+                                                        <span><span className="font-medium text-foreground">Issued:</span> {new Date(quote.createdAt).toLocaleDateString()}</span>
+                                                        {quote.validUntil && <span><span className="font-medium text-foreground">Valid until:</span> {new Date(quote.validUntil).toLocaleDateString()}</span>}
+                                                        <span><span className="font-medium text-foreground">Total HT:</span> {quote.totalHT.toFixed(2)} €</span>
+                                                        <span><span className="font-medium text-foreground">Total TTC:</span> {quote.totalTTC.toFixed(2)} €</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -218,15 +226,17 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                             >
                                                 <Download className="h-4 w-4" />
                                             </Button>
-                                            <Button
-                                                tooltip="Edit Quote"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleEdit(quote)}
-                                                className="text-gray-600 hover:text-green-600"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
+                                            {quote.status !== 'SIGNED' && (
+                                                <Button
+                                                    tooltip="Edit Quote"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleEdit(quote)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             {quote.status !== 'SIGNED' && (
                                                 <Button
                                                     tooltip={quote.status !== "SENT" ? "Send for Signature" : "Resend Signature Request"}
@@ -249,15 +259,17 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                                     <Plus className="h-4 w-4" />
                                                 </Button>
                                             )}
-                                            <Button
-                                                tooltip="Delete Quote"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(quote)}
-                                                className="text-gray-600 hover:text-red-600"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            {quote.status !== 'SIGNED' && (
+                                                <Button
+                                                    tooltip="Delete Quote"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(quote)}
+                                                    className="text-gray-600 hover:text-red-600"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
