@@ -214,15 +214,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                     <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'cii' })}>CII</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                            <Button
-                                                tooltip="Edit Invoice"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleEdit(invoice)}
-                                                className="text-gray-600 hover:text-green-600"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
+
+                                            {invoice.status !== 'PAID' && (
+                                                <Button
+                                                    tooltip="Edit Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleEdit(invoice)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             {invoice.status !== 'PAID' && (
                                                 <Button
                                                     tooltip="Mark as Paid"
@@ -234,15 +237,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                     <Banknote className="h-4 w-4" />
                                                 </Button>
                                             )}
-                                            <Button
-                                                tooltip="Delete Invoice"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(invoice)}
-                                                className="text-gray-600 hover:text-red-600"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            {(invoice.status !== 'PAID' && invoice.status !== 'OVERDUE') && (
+                                                <Button
+                                                    tooltip="Delete Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(invoice)}
+                                                    className="text-gray-600 hover:text-red-600"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
