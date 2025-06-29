@@ -1,5 +1,7 @@
-import { AlertCircle, ArrowDownRight, ArrowUpRight, Calendar, CheckCircle, Clock, DollarSign, FileText, LayoutDashboard, Receipt, TrendingDown, TrendingUp, Users } from "lucide-react"
+import { AlertCircle, ArrowDownRight, ArrowUpRight, CheckCircle, Clock, DollarSign, FileText, LayoutDashboard, Receipt, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { Company, Invoice, Quote } from "@/types"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
@@ -32,10 +34,12 @@ interface DashboardData {
         total: number
     }
     revenue: {
+        last6Months: { createdAt: Date, total: number }[]
         currentMonth: number
         previousMonth: number
         monthlyChange: number
         monthlyChangePercent: number
+        last6Years: { createdAt: Date, total: number }[]
         currentYear: number
         previousYear: number
         yearlyChange: number
@@ -59,6 +63,13 @@ export default function Dashboard() {
     const formatChangePercent = (percent: number = 0) => {
         const sign = percent >= 0 ? "+" : ""
         return `${sign}${percent.toFixed(1)}%`
+    }
+
+    const chartConfig = {
+        revenue: {
+            label: "Revenue",
+            color: "hsl(var(--primary))",
+        },
     }
 
     return (
@@ -99,102 +110,128 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <Card>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="col-span-2">
                         <CardContent className="px-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">This Month</p>
-                                    <p className="text-2xl font-bold text-foreground">
-                                        {formatCurrency(dashboardData?.revenue.currentMonth)}
-                                    </p>
-                                    <div className="flex items-center mt-2">
-                                        {(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? (
-                                            <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-                                        ) : (
-                                            <ArrowDownRight className="h-4 w-4 text-red-600" />
-                                        )}
-                                        <span
-                                            className={`text-sm ml-1 ${(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
-                                                }`}
+                            <div className="flex items-start justify-between">
+                                <div className="w-full space-y-4">
+                                    <section className="flex flex-row justify-between items-start">
+                                        <section>
+                                            <p className="text-muted-foreground text-sm font-medium">This Month</p>
+                                            <section className="flex flex-row gap-4">
+                                                <p className="text-2xl font-bold text-foreground">
+                                                    {formatCurrency(dashboardData?.revenue.currentMonth)}
+                                                </p>
+                                                <div className="flex items-center mt-2">
+                                                    {(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? (
+                                                        <ArrowUpRight className="h-4 w-4 text-emerald-600" />
+                                                    ) : (
+                                                        <ArrowDownRight className="h-4 w-4 text-red-600" />
+                                                    )}
+                                                    <span
+                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
+                                                            }`}
+                                                    >
+                                                        {formatChangePercent(dashboardData?.revenue.monthlyChangePercent)}
+                                                    </span>
+                                                </div>
+                                            </section>
+                                        </section>
+                                        <div className="p-3 bg-emerald-500 rounded-full">
+                                            <DollarSign className="h-6 w-6 text-white" />
+                                        </div>
+                                    </section>
+                                    <ChartContainer config={chartConfig} className="h-32 w-full">
+                                        <LineChart
+                                            accessibilityLayer
+                                            data={(dashboardData?.revenue.last6Months || []).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map(item => ({
+                                                createdAt: new Date(item.createdAt),
+                                                revenue: item.total,
+                                            }))}
+                                            margin={{
+                                                top: 5,
+                                                right: 10,
+                                                left: 10,
+                                                bottom: 5,
+                                            }}
                                         >
-                                            {formatChangePercent(dashboardData?.revenue.monthlyChangePercent)}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-3 bg-emerald-500 rounded-full">
-                                    <DollarSign className="h-6 w-6 text-white" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="px-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">Last Month</p>
-                                    <p className="text-2xl font-bold text-foreground">
-                                        {formatCurrency(dashboardData?.revenue.previousMonth || 0)}
-                                    </p>
-                                    <div className="flex items-center mt-2">
-                                        <span className="text-sm text-muted-foreground">
-                                            {formatCurrency(Math.abs(dashboardData?.revenue.monthlyChange || 0))} difference
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-3 bg-slate-500 rounded-full">
-                                    <Calendar className="h-6 w-6 text-white" />
+                                            <CartesianGrid />
+                                            <XAxis dataKey="createdAt" tickFormatter={(date) => new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(date))} />
+                                            <ChartTooltip content={<ChartTooltipContent />} />
+                                            <Line
+                                                type="bump"
+                                                strokeWidth={2}
+                                                dataKey="revenue"
+                                                stroke="var(--color-white)"
+                                                activeDot={{
+                                                    r: 6,
+                                                }}
+                                            />
+                                        </LineChart>
+                                    </ChartContainer>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="col-span-2">
                         <CardContent className="px-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">This Year</p>
-                                    <p className="text-2xl font-bold text-foreground">
-                                        {formatCurrency(dashboardData?.revenue.currentYear)}
-                                    </p>
-                                    <div className="flex items-center mt-2">
-                                        {(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? (
-                                            <TrendingUp className="h-4 w-4 text-emerald-600" />
-                                        ) : (
-                                            <TrendingDown className="h-4 w-4 text-red-600" />
-                                        )}
-                                        <span
-                                            className={`text-sm ml-1 ${(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
-                                                }`}
+                            <div className="flex items-start justify-between">
+                                <div className="w-full space-y-4">
+                                    <section className="flex flex-row justify-between items-start">
+                                        <section>
+                                            <p className="text-muted-foreground text-sm font-medium">This Year</p>
+                                            <section className="flex flex-row gap-4">
+                                                <p className="text-2xl font-bold text-foreground">
+                                                    {formatCurrency(dashboardData?.revenue.currentYear)}
+                                                </p>
+                                                <div className="flex items-center mt-2">
+                                                    {(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? (
+                                                        <ArrowUpRight className="h-4 w-4 text-emerald-600" />
+                                                    ) : (
+                                                        <ArrowDownRight className="h-4 w-4 text-red-600" />
+                                                    )}
+                                                    <span
+                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
+                                                            }`}
+                                                    >
+                                                        {formatChangePercent(dashboardData?.revenue.yearlyChangePercent)}
+                                                    </span>
+                                                </div>
+                                            </section>
+                                        </section>
+                                        <div className="p-3 bg-blue-500 rounded-full">
+                                            <TrendingUp className="h-6 w-6 text-white" />
+                                        </div>
+                                    </section>
+                                    <ChartContainer config={chartConfig} className="h-32 w-full">
+                                        <LineChart
+                                            accessibilityLayer
+                                            data={(dashboardData?.revenue.last6Years || []).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map(item => ({
+                                                createdAt: new Date(item.createdAt),
+                                                revenue: item.total,
+                                            }))}
+                                            margin={{
+                                                top: 5,
+                                                right: 10,
+                                                left: 10,
+                                                bottom: 5,
+                                            }}
                                         >
-                                            {formatChangePercent(dashboardData?.revenue.yearlyChangePercent || 0)}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-3 bg-blue-500 rounded-full">
-                                    <TrendingUp className="h-6 w-6 text-white" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="px-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">Active Projects</p>
-                                    <p className="text-2xl font-bold text-foreground">
-                                        {(dashboardData?.quotes.sent || 0) + (dashboardData?.invoices.unpaid || 0)}
-                                    </p>
-                                    <div className="flex items-center mt-2">
-                                        <span className="text-sm text-muted-foreground">
-                                            {dashboardData?.quotes.sent || 0} quotes, {dashboardData?.invoices.unpaid || 0} invoices
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="p-3 bg-purple-500 rounded-full">
-                                    <Users className="h-6 w-6 text-white" />
+                                            <CartesianGrid />
+                                            <XAxis dataKey="createdAt" tickFormatter={(date) => new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(date))} />
+                                            <ChartTooltip content={<ChartTooltipContent />} />
+                                            <Line
+                                                type="bump"
+                                                strokeWidth={2}
+                                                dataKey="revenue"
+                                                stroke="var(--color-white)"
+                                                activeDot={{
+                                                    r: 6,
+                                                }}
+                                            />
+                                        </LineChart>
+                                    </ChartContainer>
                                 </div>
                             </div>
                         </CardContent>

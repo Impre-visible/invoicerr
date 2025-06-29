@@ -1,4 +1,4 @@
-import { Building2, ChevronsUpDown, FileSignature, FileText, LayoutDashboard, LogOut, Moon, Receipt, Settings, Sun, User, Users } from "lucide-react"
+import { Building2, ChevronsUpDown, FileText, LayoutDashboard, LogOut, Moon, Receipt, Settings, Sun, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
