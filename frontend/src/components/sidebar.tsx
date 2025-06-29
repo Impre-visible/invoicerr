@@ -114,7 +114,7 @@ export function Sidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="">
+            <SidebarFooter>
                 <SidebarMenu className="flex flex-col gap-2">
                     <SidebarMenuItem>
                         <DropdownMenu>
