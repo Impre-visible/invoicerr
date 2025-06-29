@@ -29,7 +29,7 @@ export class ClientsController {
 
     @Patch(':id')
     @LoginRequired()
-    editClientsInfo(@Param('id') id: string, @Body() body: EditClientsDto) {
+    async editClientsInfo(@Param('id') id: string, @Body() body: EditClientsDto) {
         return this.clientsService.editClientsInfo({ ...body, id });
     }
 

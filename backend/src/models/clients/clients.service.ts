@@ -69,7 +69,7 @@ export class ClientsService {
             throw new Error('Client not found');
         }
 
-        this.prisma.client.update({
+        return await this.prisma.client.update({
             where: { id: editClientsDto.id },
             data: editClientsDto,
         })

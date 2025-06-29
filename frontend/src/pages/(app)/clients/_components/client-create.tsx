@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/form"
 
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form"
 import { usePost } from "@/lib/utils"
@@ -22,6 +23,11 @@ interface ClientCreateDialogProps {
 
 const clientSchema = z.object({
     name: z.string().min(1, "Company name is required"),
+    description: z.string().min(1, "Description is required").max(500, "Description cannot exceed 500 characters"),
+
+    legalId: z.string({ required_error: "Legal ID is required" }).min(1, "Legal ID cannot be empty").max(50, "Legal ID cannot exceed 50 characters"),
+    VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
+    foundedAt: z.date().refine((date) => date <= new Date(), "Founded date cannot be in the future"),
 
     contactFirstname: z.string().min(1, "First name is required"),
     contactLastname: z.string().min(1, "Last name is required"),
@@ -32,7 +38,6 @@ const clientSchema = z.object({
     postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
     city: z.string().min(1, "City cannot be empty"),
     country: z.string().min(1, "Country cannot be empty"),
-
 })
 
 export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
@@ -42,6 +47,10 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
         resolver: zodResolver(clientSchema),
         defaultValues: {
             name: "",
+            description: "",
+            legalId: "",
+            VAT: "",
+            foundedAt: new Date(),
             contactFirstname: "",
             contactLastname: "",
             contactEmail: "",
@@ -115,6 +124,69 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     </FormItem>
                                 )}
                             />
+
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel required>Description</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="A brief description of the company" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="legalId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>Legal ID</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder="123456789" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="VAT"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>VAT Number</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder="FR12345678901" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <FormField
+                                control={form.control}
+                                name="foundedAt"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel required>Founded Date</FormLabel>
+                                        <FormControl>
+                                            <DatePicker
+                                                value={field.value || null}
+                                                onChange={(date) => field.onChange(date || new Date())}
+                                                placeholder="Select founded date"
+                                                className="w-full"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField

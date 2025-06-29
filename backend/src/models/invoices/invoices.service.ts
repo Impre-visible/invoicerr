@@ -2,9 +2,11 @@ import * as Handlebars from 'handlebars';
 import * as puppeteer from 'puppeteer';
 
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
+import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 import { lightTemplate } from './templates/light.template';
 
 @Injectable()
@@ -68,7 +70,7 @@ export class InvoicesService {
             data: {
                 ...data,
                 number: await this.getNextInvoiceNumber(),
-                companyId: (await this.prisma.company.findFirst())?.id || '',
+                companyId: (await this.prisma.company.findFirst())?.id || '', // this should never append, as you cannot create an invoice without a company
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
                     (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0),
@@ -183,28 +185,34 @@ export class InvoicesService {
         const templateHtml = lightTemplate;
         const template = Handlebars.compile(templateHtml);
 
+        const formatDate = (date?: Date) =>
+            date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
+
         const html = template({
             number: invoice.number,
-            date: new Date(invoice.createdAt).toLocaleDateString('en-GB'),
-            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-GB') : 'N/A',
+            date: formatDate(invoice.createdAt),
+            dueDate: formatDate(invoice.dueDate),
             company: {
                 ...invoice.company,
-                currency: invoice.company.currency || '€',
+                currency: invoice.company.currency,
+                foundedAt: formatDate(invoice.company.foundedAt),
             },
-            client: invoice.client,
-            currency: invoice.company.currency || '€',
+            client: {
+                ...invoice.client,
+                foundedAt: formatDate(invoice.client.foundedAt),
+            },
+            currency: invoice.company.currency,
             items: invoice.items.map(i => ({
                 description: i.description,
                 quantity: i.quantity,
                 unitPrice: i.unitPrice.toFixed(2),
-                vatRate: i.vatRate ? i.vatRate.toFixed(2) : '0.00',
+                vatRate: i.vatRate.toFixed(2),
                 totalPrice: (i.quantity * i.unitPrice * (1 + (i.vatRate || 0) / 100)).toFixed(2),
             })),
             totalHT: invoice.totalHT.toFixed(2),
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
         });
-
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
@@ -215,6 +223,69 @@ export class InvoicesService {
         await browser.close();
 
         return pdfBuffer;
+    }
+
+    async getInvoicePDFFormat(invoiceId: string, format: ExportFormat): Promise<Uint8Array> {
+        const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
+        if (!invRec) throw new Error('Invoice not found');
+
+        const inv = new EInvoice();
+
+        const pdfBuffer = await this.getInvoicePdf(invoiceId);
+
+        const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
+        const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
+
+        inv.id = invRec.number;
+        inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
+        inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
+
+        inv.from = {
+            name: invRec.company.name,
+            description: invRec.company.description,
+            status: 'active',
+            foundedDate: { day: companyFoundedDate.getDay(), month: companyFoundedDate.getMonth() + 1, year: companyFoundedDate.getFullYear() },
+            type: 'company',
+            address: {
+                streetName: invRec.company.address,
+                houseNumber: '',
+                city: invRec.company.city,
+                postalCode: invRec.company.postalCode,
+                country: invRec.company.country,
+                countryCode: invRec.company.country
+            },
+            registrationDetails: { vatId: invRec.company.VAT, registrationId: invRec.company.legalId, registrationName: invRec.company.name }
+        };
+
+        inv.to = {
+            name: invRec.client.name,
+            description: invRec.client.description,
+            type: 'company',
+            foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
+            status: invRec.client.isActive ? 'active' : 'planned',
+            address: {
+                streetName: invRec.client.address,
+                houseNumber: '',
+                city: invRec.client.city,
+                postalCode: invRec.client.postalCode,
+                country: invRec.client.country || 'FR',
+                countryCode: invRec.client.country || 'FR'
+            },
+            registrationDetails: { vatId: invRec.client.VAT, registrationId: invRec.client.legalId, registrationName: invRec.client.name }
+        };
+
+        invRec.items.forEach(item => {
+            inv.addItem({
+                name: item.description,
+                unitQuantity: item.quantity,
+                unitNetPrice: item.unitPrice,
+                vatPercentage: item.vatRate || 0
+            });
+        });
+
+        //const xml = await inv.exportXml(format);
+
+        return await inv.embedInPdf(Buffer.from(pdfBuffer))
     }
 
     async createInvoiceFromQuote(quoteId: string) {

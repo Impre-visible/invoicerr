@@ -5,61 +5,103 @@ export const lightTemplate = `
   <meta charset="UTF-8" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 2cm;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      margin: 2.5cm;
       color: #333;
+      font-size: 14px;
     }
+
     h1 {
       text-align: right;
+      font-size: 24px;
+      color: #1a1a1a;
       margin-bottom: 0;
-      font-weight: 700;
     }
+
     p.date {
       text-align: right;
-      margin-top: 4px;
+      font-size: 13px;
       color: #666;
-      font-size: 0.9em;
+      margin-top: 4px;
     }
-    .info {
-      margin-top: 20px;
-      line-height: 1.4;
+
+    .flex {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
     }
+
+    .info-block {
+      width: 48%;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .info-block strong {
+      font-size: 15px;
+      display: block;
+      margin-bottom: 5px;
+      color: #111;
+    }
+
     .section-title {
-      margin-top: 40px;
-      margin-bottom: 10px;
       font-weight: 600;
-      font-size: 1.1em;
+      font-size: 15px;
+      margin-top: 40px;
+      margin-bottom: 12px;
       border-bottom: 2px solid #444;
       padding-bottom: 4px;
+      color: #222;
     }
+
+    .due-date {
+      margin-top: 25px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
     table.items {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
-      font-size: 0.95em;
+      margin-top: 16px;
+      font-size: 13px;
     }
+
     table.items thead {
-      background-color: #f5f5f5;
+      background-color: #f0f0f0;
     }
+
     table.items th, table.items td {
       border: 1px solid #ccc;
-      padding: 8px 12px;
+      padding: 10px;
       text-align: left;
     }
+
     table.items th {
-      font-weight: 700;
+      background-color: #fafafa;
+      font-weight: 600;
     }
+
     table.items td.numeric {
       text-align: right;
       white-space: nowrap;
     }
+
     .total {
       margin-top: 30px;
-      font-weight: 700;
-      font-size: 1em;
+      font-weight: 600;
+      font-size: 14px;
     }
+
     .total p {
       margin: 4px 0;
+    }
+
+    .notes {
+      margin-top: 40px;
+      font-style: italic;
+      color: #555;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -67,27 +109,37 @@ export const lightTemplate = `
   <h1>Invoice #{{number}}</h1>
   <p class="date">Date: {{date}}</p>
 
-  <div class="info">
-    <strong>From:</strong><br />
-    {{company.name}}<br />
-    {{company.address}}<br />
-    {{company.city}} {{company.postalCode}}<br />
-    {{company.country}}<br />
-    {{company.email}}<br />
-    {{company.phone}}
+  <div class="flex">
+    <div class="info-block">
+      <strong>From:</strong>
+      {{company.name}}<br />
+      {{company.description}}<br />
+      Legal ID: {{company.legalId}}<br />
+      VAT: {{company.VAT}}<br />
+      Founded: {{company.foundedAt}}<br />
+      {{company.address}}<br />
+      {{company.postalCode}} {{company.city}}<br />
+      {{company.country}}<br />
+      {{company.email}}<br />
+      {{company.phone}}
+    </div>
+
+    <div class="info-block">
+      <strong>Bill To:</strong>
+      {{client.name}}<br />
+      {{client.description}}<br />
+      Legal ID: {{client.legalId}}<br />
+      VAT: {{client.VAT}}<br />
+      Founded: {{client.foundedAt}}<br />
+      {{client.address}}<br />
+      {{client.postalCode}} {{client.city}}<br />
+      {{client.country}}<br />
+      {{client.email}}<br />
+      {{client.phone}}
+    </div>
   </div>
 
-  <div class="info">
-    <strong>Bill To:</strong><br />
-    {{client.name}}<br />
-    {{client.address}}<br />
-    {{client.city}} {{client.postalCode}}<br />
-    {{client.country}}<br />
-    {{client.email}}<br />
-    {{client.phone}}
-  </div>
-
-  <p><strong>Due Date:</strong> {{dueDate}}</p>
+  <p class="due-date">Due Date: {{dueDate}}</p>
 
   <div class="section-title">Items:</div>
   <table class="items">
@@ -120,10 +172,10 @@ export const lightTemplate = `
   </div>
 
   {{#if notes}}
-  <div class="section-title">Notes:</div>
-  <p>{{notes}}</p>
+  <div class="notes">
+    <p>{{notes}}</p>
+  </div>
   {{/if}}
-
 </body>
 </html>
 `;

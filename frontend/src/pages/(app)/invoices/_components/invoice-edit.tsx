@@ -86,7 +86,6 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
 
     useEffect(() => {
         if (invoice) {
-            console.log(invoice.items[0])
             form.reset({
                 quoteId: invoice.quoteId || "",
                 clientId: invoice.clientId || "",

@@ -24,6 +24,7 @@ import { Button } from "./ui/button"
 import type { Company } from "@/types"
 import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
+import { useEffect } from "react"
 import { useGet } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useTheme } from "./theme-provider"
@@ -62,7 +63,13 @@ export function Sidebar() {
     const location = useLocation()
     const { user, loading: userLoading } = useAuth()
     const { setTheme } = useTheme()
-    const { data: company, loading: companyLoading } = useGet<Company>("/api/company/info")
+    const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
+
+    useEffect(() => {
+        if (!company) {
+            mutate()
+        }
+    }, [location]);
 
     return (
         <RootSidebar collapsible="icon">

@@ -13,6 +13,7 @@ interface DatePickerProps {
   onChange: (date: Date | null) => void;
   placeholder?: string;
   className?: string;
+  showOutsideDays?: boolean;
 }
 
 const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
@@ -44,6 +45,7 @@ const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
           selected={field.value || undefined}
           onSelect={field.onChange}
           captionLayout="dropdown"
+          showOutsideDays={field.showOutsideDays || true}
         />
       </PopoverContent>
     </Popover>

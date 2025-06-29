@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { InvoicesService } from './invoices.service';
 import { Response } from 'express';
+import { ExportFormat } from '@fin.cx/einvoice';
 
 @Controller('invoices')
 export class InvoicesController {
@@ -17,9 +18,14 @@ export class InvoicesController {
 
     @Get(':id/pdf')
     @LoginRequired()
-    async getInvoicePdf(@Param('id') id: string, @Res() res: Response) {
+    async getInvoicePdf(@Param('id') id: string, @Query('format') format: ExportFormat | undefined, @Res() res: Response) {
         if (id === 'undefined') return res.status(400).send('Invalid invoice ID');
-        const pdfBuffer = await this.invoicesService.getInvoicePdf(id);
+        let pdfBuffer: Uint8Array | null = null;
+        if (format) {
+            pdfBuffer = await this.invoicesService.getInvoicePDFFormat(id, format);
+        } else {
+            pdfBuffer = await this.invoicesService.getInvoicePdf(id);
+        }
         if (!pdfBuffer) {
             res.status(404).send('Invoice not found or PDF generation failed');
             return;
