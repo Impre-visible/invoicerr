@@ -67,7 +67,7 @@ export default function Quotes() {
     )
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 p-6">
+        <div className="max-w-7xl mx-auto space-y-6 p-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">

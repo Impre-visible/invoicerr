@@ -31,8 +31,8 @@ export default function Settings() {
 
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 px-6">
-            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit p-8">
+        <div className="max-w-7xl mx-auto space-y-6 p-6">
+            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit">
                 <TabsList className="w-full h-12">
                     <TabsTrigger value="company">Company</TabsTrigger>
                     <TabsTrigger value="signature">Signature</TabsTrigger>

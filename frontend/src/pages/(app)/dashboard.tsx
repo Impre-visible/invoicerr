@@ -62,7 +62,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 p-6">
+        <div className="max-w-7xl mx-auto space-y-10 p-6">
             <Dialog open={!(dashboardData?.company)}>
                 <DialogContent>
                     <DialogHeader>
