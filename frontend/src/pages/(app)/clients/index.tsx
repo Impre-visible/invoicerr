@@ -1,5 +1,5 @@
-import { Building2, Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, Users } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, User, Users } from "lucide-react"
 
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
@@ -141,7 +141,7 @@ export default function Clients() {
             <Card className="gap-0">
                 <CardHeader className="border-b">
                     <CardTitle className="flex items-center space-x-2">
-                        <Building2 className="h-5 w-5 " />
+                        <Users className="h-5 w-5 " />
                         <span>Clients</span>
                     </CardTitle>
                     <CardDescription>Manage your clients, view details, edit or delete them.</CardDescription>
@@ -180,7 +180,7 @@ export default function Clients() {
                                     <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                         <div className="flex flex-row items-center gap-4 w-full">
                                             <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
-                                                <Building2 className="h-5 w-5 text-blue-600" />
+                                                <User className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">

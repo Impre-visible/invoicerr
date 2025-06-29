@@ -62,8 +62,8 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 p-6">
-            <Dialog open={!(dashboardData?.company)}>
+        <div className="max-w-7xl mx-auto space-y-6 p-6">
+            <Dialog open={!!dashboardData && !dashboardData.company}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Company not configured</DialogTitle>

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, FileSignature, FileText, Plus, Trash2 } from "lucide-react"
+import { Download, Edit, Eye, FileText, Plus, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
@@ -132,7 +132,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                 <CardHeader className="border-b flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="flex items-center space-x-2">
-                            <FileSignature className="h-5 w-5 " />
+                            <FileText className="h-5 w-5 " />
                             <span>{title}</span>
                         </CardTitle>
                         <CardDescription>{description}</CardDescription>
@@ -163,7 +163,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                     <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                         <div className="flex flex-row items-center gap-4 w-full">
                                             <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
-                                                <FileSignature className="h-5 w-5 text-blue-600" />
+                                                <FileText className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
@@ -239,7 +239,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(({
                                                     onClick={() => handleSendForSignature(quote.id)}
                                                     className="text-gray-600 hover:text-blue-600"
                                                 >
-                                                    <FileSignature className="h-4 w-4" />
+                                                    <FileText className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             {quote.status === 'SIGNED' && (
