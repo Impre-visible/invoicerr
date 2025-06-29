@@ -102,7 +102,12 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
     let cancelled = false;
     setLoading(true);
 
-    authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL}${url}`, {
+    let newURL = url;
+    if (!url.startsWith("http")) {
+      newURL = `${import.meta.env.VITE_BACKEND_URL}${url}`;
+    }
+
+    authenticatedFetch(newURL, {
       ...options,
       method: "GET",
     })
