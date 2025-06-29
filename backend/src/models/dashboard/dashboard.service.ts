@@ -25,10 +25,12 @@ interface DashboardData {
         total: number
     }
     revenue: {
+        last6Months: { createdAt: Date, total: number }[]
         currentMonth: number
         previousMonth: number
         monthlyChange: number
         monthlyChangePercent: number
+        last6Years: { createdAt: Date, total: number }[]
         currentYear: number
         previousYear: number
         yearlyChange: number
@@ -70,7 +72,7 @@ export class DashboardService {
                     orderBy: { updatedAt: 'desc' },
                     include: { company: true, client: true },
                     take: 5,
-                }),
+                })
             },
             invoices: {
                 total: invoices.reduce((acc, i) => acc + i._count, 0),
@@ -89,6 +91,14 @@ export class DashboardService {
                 total: clientsCount,
             },
             revenue: {
+                last6Months: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    return {
+                        createdAt: new Date(date.getFullYear(), date.getMonth(), 1),
+                        total: await this.getMonthlyRevenue(date),
+                    };
+                })),
                 currentMonth: await this.getMonthlyRevenue(new Date()),
                 previousMonth: await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
                 monthlyChange: await this.getMonthlyRevenue(new Date()) - await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
@@ -97,6 +107,14 @@ export class DashboardService {
                     await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1)))
                     ,
                 ),
+                last6Years: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+                    const date = new Date();
+                    date.setFullYear(date.getFullYear() - i);
+                    return {
+                        createdAt: new Date(date.getFullYear(), 0, 1),
+                        total: await this.getYearlyRevenue(date),
+                    };
+                })),
                 currentYear: await this.getYearlyRevenue(new Date()),
                 previousYear: await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
                 yearlyChange: await this.getYearlyRevenue(new Date()) - await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
