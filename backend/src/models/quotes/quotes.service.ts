@@ -178,6 +178,11 @@ export class QuotesService {
             },
         });
 
+        await this.prisma.signature.updateMany({
+            where: { quoteId: id },
+            data: { isActive: false },
+        });
+
         return updateQuote;
     }
 
