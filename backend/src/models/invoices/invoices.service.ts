@@ -70,7 +70,7 @@ export class InvoicesService {
             data: {
                 ...data,
                 number: await this.getNextInvoiceNumber(),
-                companyId: (await this.prisma.company.findFirst())?.id || '',
+                companyId: (await this.prisma.company.findFirst())?.id || '', // this should never append, as you cannot create an invoice without a company
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
                     (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0),
@@ -185,28 +185,34 @@ export class InvoicesService {
         const templateHtml = lightTemplate;
         const template = Handlebars.compile(templateHtml);
 
+        const formatDate = (date?: Date) =>
+            date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
+
         const html = template({
             number: invoice.number,
-            date: new Date(invoice.createdAt).toLocaleDateString('en-GB'),
-            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-GB') : 'N/A',
+            date: formatDate(invoice.createdAt),
+            dueDate: formatDate(invoice.dueDate),
             company: {
                 ...invoice.company,
-                currency: invoice.company.currency || '€',
+                currency: invoice.company.currency,
+                foundedAt: formatDate(invoice.company.foundedAt),
             },
-            client: invoice.client,
-            currency: invoice.company.currency || '€',
+            client: {
+                ...invoice.client,
+                foundedAt: formatDate(invoice.client.foundedAt),
+            },
+            currency: invoice.company.currency,
             items: invoice.items.map(i => ({
                 description: i.description,
                 quantity: i.quantity,
                 unitPrice: i.unitPrice.toFixed(2),
-                vatRate: i.vatRate ? i.vatRate.toFixed(2) : '0.00',
+                vatRate: i.vatRate.toFixed(2),
                 totalPrice: (i.quantity * i.unitPrice * (1 + (i.vatRate || 0) / 100)).toFixed(2),
             })),
             totalHT: invoice.totalHT.toFixed(2),
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
         });
-
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
@@ -236,36 +242,36 @@ export class InvoicesService {
 
         inv.from = {
             name: invRec.company.name,
-            description: invRec.company.description || '',
+            description: invRec.company.description,
             status: 'active',
             foundedDate: { day: companyFoundedDate.getDay(), month: companyFoundedDate.getMonth() + 1, year: companyFoundedDate.getFullYear() },
             type: 'company',
             address: {
-                streetName: invRec.company.address || '',
+                streetName: invRec.company.address,
                 houseNumber: '',
-                city: invRec.company.city || '',
-                postalCode: invRec.company.postalCode || '',
-                country: invRec.company.country || 'FR',
-                countryCode: invRec.company.country || 'FR'
+                city: invRec.company.city,
+                postalCode: invRec.company.postalCode,
+                country: invRec.company.country,
+                countryCode: invRec.company.country
             },
-            registrationDetails: { vatId: invRec.company.VAT || '', registrationId: invRec.company.legalId || '', registrationName: invRec.company.name || '' }
+            registrationDetails: { vatId: invRec.company.VAT, registrationId: invRec.company.legalId, registrationName: invRec.company.name }
         };
 
         inv.to = {
             name: invRec.client.name,
-            description: invRec.client.description || '',
+            description: invRec.client.description,
             type: 'company',
             foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
             status: invRec.client.isActive ? 'active' : 'planned',
             address: {
-                streetName: invRec.client.address || '',
+                streetName: invRec.client.address,
                 houseNumber: '',
-                city: invRec.client.city || '',
-                postalCode: invRec.client.postalCode || '',
+                city: invRec.client.city,
+                postalCode: invRec.client.postalCode,
                 country: invRec.client.country || 'FR',
                 countryCode: invRec.client.country || 'FR'
             },
-            registrationDetails: { vatId: invRec.client.VAT || '', registrationId: invRec.client.legalId || '', registrationName: invRec.client.name || '' }
+            registrationDetails: { vatId: invRec.client.VAT, registrationId: invRec.client.legalId, registrationName: invRec.client.name }
         };
 
         invRec.items.forEach(item => {
