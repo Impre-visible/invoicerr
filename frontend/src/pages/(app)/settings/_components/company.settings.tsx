@@ -7,6 +7,8 @@ import { useGet, usePost } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { Company } from "@/types"
 import { Input } from "@/components/ui/input"
+import SearchSelect from "@/components/search-input"
+import { currencies } from "@/lib/constants/currencies"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -14,9 +16,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 const companySchema = z.object({
     name: z.string({ required_error: "Company name is required" }).min(1, "Company name cannot be empty").max(100, "Name cannot exceed 100 characters"),
+    description: z.string().max(500, "Description cannot exceed 500 characters"),
+    legalId: z.string({ required_error: "Legal ID is required" }).min(1, "Legal ID cannot be empty").max(50, "Legal ID cannot exceed 50 characters"),
+    VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
+    foundedAt: z.date().refine((date) => date <= new Date(), "Founded date cannot be in the future"),
     language: z.string({ required_error: "Language is required" }).min(1, "Please select a language"),
     currency: z.string({ required_error: "Currency is required" }).min(1, "Please select a currency"),
-    VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
     address: z.string().min(1, "Address cannot be empty"),
     postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
     city: z.string().min(1, "City cannot be empty"),
@@ -28,15 +33,25 @@ const companySchema = z.object({
 export default function CompanySettings() {
     const { data } = useGet<Company>("/api/company/info")
     const { trigger } = usePost<Company>("/api/company/info")
+
+    const [currencySearch, setCurrencySearch] = useState("")
+    const [searchedCurrencies, setSearchedCurrencies] = useState<{
+        label: string
+        value: string
+    }[]>([])
+
     const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm<z.infer<typeof companySchema>>({
         resolver: zodResolver(companySchema),
         defaultValues: {
             name: "",
+            description: "",
+            legalId: "",
+            VAT: "",
+            foundedAt: new Date(),
             language: "",
             currency: "",
-            VAT: "",
             address: "",
             postalCode: "",
             city: "",
@@ -71,6 +86,40 @@ export default function CompanySettings() {
         }
     }
 
+    useEffect(() => {
+        if (currencies && currencySearch.length < 1) {
+            setSearchedCurrencies(
+                Object.entries(currencies).map(([code, { name, symbol }]) => ({
+                    label: `${name} (${symbol})`,
+                    value: code,
+                }))
+            )
+        }
+    }, [currencySearch])
+
+    const handleSearchChange = (search: string) => {
+        setCurrencySearch(search)
+        if (search.length == 0) {
+            setSearchedCurrencies(Object.entries(currencies).map(([code, { name, symbol }]) => ({
+                label: `${name} (${symbol})`,
+                value: code,
+            })))
+            return
+        }
+
+        const filteredCurrencies = Object.entries(currencies)
+            .filter(([code, { name, symbol, demonym }]) => {
+                const label = `${name} (${symbol})`
+                return label.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase()) || symbol.toLowerCase().includes(search.toLowerCase()) || demonym.toLowerCase().includes(search.toLowerCase())
+            })
+            .map(([code, { name, symbol }]) => ({
+                label: `${name} (${symbol})`,
+                value: code,
+            }))
+
+        setSearchedCurrencies(filteredCurrencies)
+    }
+
     return (
         <div className="">
             <div className="mb-4">
@@ -97,6 +146,21 @@ export default function CompanySettings() {
                                                 <Input placeholder="Your company name" {...field} />
                                             </FormControl>
                                             <FormDescription>This is your company's legal name.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>Description</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Brief description of your company" {...field} />
+                                            </FormControl>
+                                            <FormDescription>Optional description for your company.</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -134,21 +198,36 @@ export default function CompanySettings() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel required>Currency</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a currency" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="USD">USD ($)</SelectItem>
-                                                    <SelectItem value="EUR">EUR (€)</SelectItem>
-                                                    <SelectItem value="GBP">GBP (£)</SelectItem>
-                                                    <SelectItem value="CHF">CHF</SelectItem>
-                                                    <SelectItem value="CAD">CAD</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            <FormControl>
+                                                <SearchSelect
+                                                    options={searchedCurrencies}
+                                                    allOptions={Object.entries(currencies).map(([code, { name, symbol }]) => ({
+                                                        label: `${name} (${symbol})`,
+                                                        value: code,
+                                                    }))}
+                                                    value={field.value}
+                                                    onValueChange={(field.onChange)}
+                                                    onSearchChange={handleSearchChange}
+                                                    placeholder="Select a currency"
+                                                    className="w-full"
+                                                />
+                                            </FormControl>
                                             <FormDescription>Default currency for transactions.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="legalId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>Legal ID</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="123456789" {...field} />
+                                            </FormControl>
+                                            <FormDescription>Your company's legal identification number. (e.g., SIRET, EIN, etc.)</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
