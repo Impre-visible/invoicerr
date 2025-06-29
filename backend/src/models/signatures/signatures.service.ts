@@ -165,7 +165,6 @@ export class SignaturesService {
         };
 
         await this.transporter.sendMail(mailOptions)
-            .then(() => console.log('OTP sent successfully'))
             .catch(error => {
                 console.error('Error sending OTP:', error);
                 throw new Error('Failed to send OTP code.');
