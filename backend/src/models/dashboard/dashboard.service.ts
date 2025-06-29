@@ -42,16 +42,20 @@ export class DashboardService {
 
     async getDashboardData(): Promise<DashboardData> {
         const quotes = await this.prisma.quote.groupBy({
+            where: { isActive: true },
             by: ['status'],
             _count: true,
         });
 
         const invoices = await this.prisma.invoice.groupBy({
+            where: { isActive: true },
             by: ['status'],
             _count: true,
         });
 
-        const clientsCount = await this.prisma.client.count();
+        const clientsCount = await this.prisma.client.count({
+            where: { isActive: true },
+        });
 
         return {
             company: await this.prisma.company.findFirst(),
