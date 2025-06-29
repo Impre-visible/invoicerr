@@ -2,9 +2,11 @@ import * as Handlebars from 'handlebars';
 import * as puppeteer from 'puppeteer';
 
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
+import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 import { lightTemplate } from './templates/light.template';
 
 @Injectable()
@@ -215,6 +217,69 @@ export class InvoicesService {
         await browser.close();
 
         return pdfBuffer;
+    }
+
+    async getInvoicePDFFormat(invoiceId: string, format: ExportFormat): Promise<Uint8Array> {
+        const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
+        if (!invRec) throw new Error('Invoice not found');
+
+        const inv = new EInvoice();
+
+        const pdfBuffer = await this.getInvoicePdf(invoiceId);
+
+        const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
+        const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
+
+        inv.id = invRec.number;
+        inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
+        inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
+
+        inv.from = {
+            name: invRec.company.name,
+            description: invRec.company.description || '',
+            status: 'active',
+            foundedDate: { day: companyFoundedDate.getDay(), month: companyFoundedDate.getMonth() + 1, year: companyFoundedDate.getFullYear() },
+            type: 'company',
+            address: {
+                streetName: invRec.company.address || '',
+                houseNumber: '',
+                city: invRec.company.city || '',
+                postalCode: invRec.company.postalCode || '',
+                country: invRec.company.country || 'FR',
+                countryCode: invRec.company.country || 'FR'
+            },
+            registrationDetails: { vatId: invRec.company.VAT || '', registrationId: invRec.company.legalId || '', registrationName: invRec.company.name || '' }
+        };
+
+        inv.to = {
+            name: invRec.client.name,
+            description: invRec.client.description || '',
+            type: 'company',
+            foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
+            status: invRec.client.isActive ? 'active' : 'planned',
+            address: {
+                streetName: invRec.client.address || '',
+                houseNumber: '',
+                city: invRec.client.city || '',
+                postalCode: invRec.client.postalCode || '',
+                country: invRec.client.country || 'FR',
+                countryCode: invRec.client.country || 'FR'
+            },
+            registrationDetails: { vatId: invRec.client.VAT || '', registrationId: invRec.client.legalId || '', registrationName: invRec.client.name || '' }
+        };
+
+        invRec.items.forEach(item => {
+            inv.addItem({
+                name: item.description,
+                unitQuantity: item.quantity,
+                unitNetPrice: item.unitPrice,
+                vatPercentage: item.vatRate || 0
+            });
+        });
+
+        //const xml = await inv.exportXml(format);
+
+        return await inv.embedInPdf(Buffer.from(pdfBuffer))
     }
 
     async createInvoiceFromQuote(quoteId: string) {

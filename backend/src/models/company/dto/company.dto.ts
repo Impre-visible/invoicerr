@@ -1,7 +1,9 @@
+import { finance } from "@fin.cx/einvoice/dist_ts/plugins"
+
 export class EditCompanyDto {
     name: string
     language: string
-    currency: string
+    currency: finance.TCurrency
     VAT: string
     address?: string
     postalCode?: string
