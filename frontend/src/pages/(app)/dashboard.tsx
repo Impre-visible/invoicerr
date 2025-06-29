@@ -1,13 +1,16 @@
 import { AlertCircle, ArrowDownRight, ArrowUpRight, Calendar, CheckCircle, Clock, DollarSign, FileText, LayoutDashboard, Receipt, TrendingDown, TrendingUp, Users } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import type { Company, Invoice, Quote } from "@/types"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
+import { Button } from "@/components/ui/button"
 import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import { useGet } from "@/lib/utils"
+import { useNavigate } from "react-router"
 
 interface DashboardData {
-    company: Company,
+    company: Company | null,
     quotes: {
         total: number
         draft: number
@@ -42,10 +45,12 @@ interface DashboardData {
 export default function Dashboard() {
     const { data: dashboardData } = useGet<DashboardData>("/api/dashboard")
 
+    const navigate = useNavigate()
+
     const formatCurrency = (amount: number | null | undefined) => {
-        return new Intl.NumberFormat("fr-FR", {
+        return new Intl.NumberFormat("en-US", {
             style: "currency",
-            currency: dashboardData?.company.currency || "EUR",
+            currency: dashboardData?.company?.currency || "USD",
         }).format(amount || 0)
     }
 
@@ -56,6 +61,21 @@ export default function Dashboard() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 p-6">
+            <Dialog open={!(dashboardData?.company)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Company not configured</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                        Please configure your company details before using the dashboard.
+                    </p>
+                    <DialogFooter>
+                        <Button onClick={() => navigate("/settings/company")}>
+                            Go
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                     <LayoutDashboard className="h-5 w-5 text-blue-600" />
