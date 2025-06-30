@@ -74,20 +74,13 @@ export default function CompanySettings() {
     async function onSubmit(values: z.infer<typeof companySchema>) {
         setIsLoading(true)
 
-        try {
-            trigger(values).then((response) => {
-                if (response) {
-                    form.reset(response)
-                    toast.success("Company settings updated successfully!")
-                } else {
-                    return
-                }
-            })
-        } catch (error) {
+        trigger(values).then(() => {
+            toast.success("Company settings updated successfully!")
+        }).catch((error) => {
             console.error("Error updating company settings:", error)
-        } finally {
+        }).finally(() => {
             setIsLoading(false)
-        }
+        })
     }
 
     useEffect(() => {

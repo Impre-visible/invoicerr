@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { TabsContent } from "@radix-ui/react-tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 
@@ -66,7 +67,7 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
     const previewBody = replaceVariables(template.body, template.variables)
 
     return (
-        <div className="bg-gray-100 p-4 rounded-lg h-full">
+        <div className="bg-gray-100 p-4 rounded-lg h-full w-full">
             <div className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto">
                 {/* Email Header */}
                 <div className="border-b p-4">
@@ -130,7 +131,7 @@ function TemplateEditor({
     onUpdate: (template: EmailTemplate) => void
 }) {
     return (
-        <div className="space-y-4">
+        <div className="w-full space-y-4">
             <div className="space-y-2">
                 <Label htmlFor={`subject-${template.id}`}>Subject</Label>
                 <Input
@@ -206,29 +207,46 @@ export default function EmailTemplatesSettings() {
 
     return (
         <div>
+            <div className="mb-4">
+                <h1 className="text-3xl font-bold">Email Template Settings</h1>
+                <p className="text-muted-foreground">Manage your email templates for mail notifications.</p>
+            </div>
+
             <Tabs value={activeTab || undefined} onValueChange={setActiveTab}>
-                <TabsList>
+                <TabsList className="w-full">
                     {templates.map((template) => (
                         <TabsTrigger key={template.id} value={template.id}>
                             {template.name}
                         </TabsTrigger>
                     ))}
                 </TabsList>
+                <TabsContent value={activeTab || ''}>
+                    {editedTemplate && (
+                        <section className="flex flex-col gap-4">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-2xl font-semibold">{editedTemplate.name}</h2>
+                                <Button
+                                    onClick={saveEditing}
+                                    disabled={updateLoading}
+                                    loading={updateLoading}
+                                    variant="default"
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                            <div className="space-y-6 flex gap-4">
+                                <TemplateEditor
+                                    template={editedTemplate}
+                                    onUpdate={(updated) => setEditedTemplate(updated)}
+                                />
+
+                                <EmailPreview template={editedTemplate} />
+                            </div>
+                        </section>
+                    )}
+                </TabsContent>
             </Tabs>
 
-            {editedTemplate && (
-                <div className="flex gap-6 mt-4">
-                    <div className="flex-1">
-                        <TemplateEditor template={editedTemplate} onUpdate={setEditedTemplate} />
-                        <div className="mt-4">
-                            <Button loading={updateLoading} onClick={saveEditing}>Save</Button>
-                        </div>
-                    </div>
-                    <div className="flex-1">
-                        <EmailPreview template={editedTemplate} />
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
