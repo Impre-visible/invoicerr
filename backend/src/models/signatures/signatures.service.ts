@@ -119,6 +119,7 @@ export class SignaturesService {
                 quote: {
                     select: {
                         number: true,
+                        company: true,
                         client: {
                             select: {
                                 contactEmail: true
@@ -138,12 +139,27 @@ export class SignaturesService {
             data: { isActive: false },
         });
 
+        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+            where: { type: 'SIGNATURE_REQUEST', companyId: signature.quote.company.id },
+            select: { subject: true, body: true }
+        });
+
+        if (!mailTemplate) {
+            throw new Error('Email template for signature request not found.');
+        }
+
+        const envVariables = {
+            APP_URL: process.env.APP_URL,
+            SIGNATURE_URL: `${process.env.APP_URL}/signature/${signatureId}`,
+            SIGNATURE_ID: signatureId,
+            SIGNATURE_NUMBER: signature.quote.number,
+        };
+
         const mailOptions = {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: signature.quote.client.contactEmail,
-            subject: 'Signature Request for Quote',
-            text: `Please sign the quote by clicking on the following link: ${process.env.APP_URL}/signature/${signatureId}`,
-            html: `<p>Please sign the quote: <a href="${process.env.APP_URL}/signature/${signatureId}">#${signature.quote.number}</a>.</p>`,
+            subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
+            html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
         };
 
         await this.transporter.sendMail(mailOptions)
@@ -157,11 +173,33 @@ export class SignaturesService {
     }
 
     async sendOtpToUser(email: string, otpCode: string) {
+        const signature = await this.prisma.signature.findFirst({
+            where: { otpCode, otpUsed: false, isActive: true },
+            select: { id: true, quote: { select: { company: true } } }
+        });
+
+        if (!signature) {
+            throw new Error('Signature not found or OTP code is invalid.');
+        }
+
+        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+            where: { type: 'VERIFICATION_CODE', companyId: signature.quote.company.id },
+            select: { subject: true, body: true }
+        });
+
+        if (!mailTemplate) {
+            throw new Error('Email template for OTP code not found.');
+        }
+
+        const envVariables = {
+            OTP_CODE: `${otpCode.slice(0, 4)}-${otpCode.slice(4, 8)}`,
+        };
+
         const mailOptions = {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: email,
-            subject: 'Your OTP Code for Quote Signing',
-            text: `Your OTP code is: \n${otpCode.slice(0, 4)}-${otpCode.slice(4, 8)}\nIt is valid for 15 minutes.`,
+            subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
+            text: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
         };
 
         await this.transporter.sendMail(mailOptions)

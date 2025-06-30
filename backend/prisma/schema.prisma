@@ -190,24 +190,25 @@ enum Currency {
 }
 
 model Company {
-  id          String    @id @default(cuid())
-  name        String
-  description String
-  language    String    @default("en")
-  currency    Currency  @default(EUR)
-  legalId     String
-  foundedAt   DateTime
-  VAT         String
-  address     String
-  postalCode  String
-  city        String
-  country     String
-  phone       String
-  email       String
-  pDFConfigId String    @unique
-  pdfConfig   PDFConfig @relation(fields: [pDFConfigId], references: [id])
-  Quote       Quote[]
-  Invoice     Invoice[]
+  id             String         @id @default(cuid())
+  name           String
+  description    String
+  language       String         @default("en")
+  currency       Currency       @default(EUR)
+  legalId        String
+  foundedAt      DateTime
+  VAT            String
+  address        String
+  postalCode     String
+  city           String
+  country        String
+  phone          String
+  email          String
+  pDFConfigId    String         @unique
+  pdfConfig      PDFConfig      @relation(fields: [pDFConfigId], references: [id])
+  Quote          Quote[]
+  Invoice        Invoice[]
+  emailTemplates MailTemplate[]
 }
 
 model PDFConfig {
@@ -236,6 +237,22 @@ model PDFConfig {
   total       String @default("Total:")
   vat         String @default("VAT:")
   grandTotal  String @default("Grand total:")
+}
+
+enum MailTemplateType {
+  SIGNATURE_REQUEST
+  VERIFICATION_CODE
+}
+
+model MailTemplate {
+  id        String           @id @default(cuid())
+  type      MailTemplateType
+  subject   String
+  body      String
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+
+  @@unique([companyId, type])
 }
 
 model Client {
