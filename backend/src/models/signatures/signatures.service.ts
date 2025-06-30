@@ -1,6 +1,7 @@
 import * as nodemailer from 'nodemailer';
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -52,7 +53,7 @@ export class SignaturesService {
         });
 
         if (!quote || !quote.client || !quote.client.contactEmail) {
-            throw new Error('Quote not found or client information is missing.');
+            throw new BadRequestException('Quote not found or client information is missing.');
         }
 
         const signature = await this.prisma.signature.create({
@@ -92,7 +93,7 @@ export class SignaturesService {
         });
 
         if (!signature || !signature.quote || !signature.quote.client || !signature.quote.client.contactEmail) {
-            throw new Error('Quote not found or client information is missing.');
+            throw new BadRequestException('Quote not found or client information is missing.');
         }
 
         const otpCode = Math.floor(10000000 + Math.random() * 90000000).toString();
@@ -131,7 +132,7 @@ export class SignaturesService {
         });
 
         if (!signature || !signature.quote || !signature.quote.client || !signature.quote.client.contactEmail) {
-            throw new Error('Quote not found or client information is missing.');
+            throw new BadRequestException('Quote not found or client information is missing.');
         }
 
         await this.prisma.signature.updateMany({
@@ -145,7 +146,7 @@ export class SignaturesService {
         });
 
         if (!mailTemplate) {
-            throw new Error('Email template for signature request not found.');
+            throw new BadRequestException('Email template for signature request not found.');
         }
 
         const envVariables = {
@@ -166,7 +167,7 @@ export class SignaturesService {
             .then(() => { })
             .catch(error => {
                 console.error('Error sending signature email:', error);
-                throw new Error('Failed to send signature email.');
+                throw new BadRequestException('Failed to send signature email.');
             });
 
         return { message: 'Signature email sent successfully.' };
@@ -179,7 +180,7 @@ export class SignaturesService {
         });
 
         if (!signature) {
-            throw new Error('Signature not found or OTP code is invalid.');
+            throw new BadRequestException('Signature not found or OTP code is invalid.');
         }
 
         const mailTemplate = await this.prisma.mailTemplate.findFirst({
@@ -188,7 +189,7 @@ export class SignaturesService {
         });
 
         if (!mailTemplate) {
-            throw new Error('Email template for OTP code not found.');
+            throw new BadRequestException('Email template for OTP code not found.');
         }
 
         const envVariables = {
@@ -205,7 +206,7 @@ export class SignaturesService {
         await this.transporter.sendMail(mailOptions)
             .catch(error => {
                 console.error('Error sending OTP:', error);
-                throw new Error('Failed to send OTP code.');
+                throw new BadRequestException('Failed to send OTP code.');
             });
 
         return true;
@@ -225,7 +226,7 @@ export class SignaturesService {
         });
 
         if (!signature) {
-            throw new Error('Invalid or expired OTP code.');
+            throw new BadRequestException('Invalid or expired OTP code.');
         }
 
         await this.prisma.signature.update({

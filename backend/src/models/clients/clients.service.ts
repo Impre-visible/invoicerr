@@ -1,5 +1,6 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { EditClientsDto } from './dto/clients.dto';
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -63,10 +64,10 @@ export class ClientsService {
 
     async editClientsInfo(editClientsDto: EditClientsDto) {
         if (!editClientsDto.id) {
-            throw new Error('Client ID is required for editing');
+            throw new BadRequestException('Client ID is required for editing');
         }
         if (! await this.prisma.client.findUnique({ where: { id: editClientsDto.id } })) {
-            throw new Error('Client not found');
+            throw new BadRequestException('Client not found');
         }
 
         return await this.prisma.client.update({

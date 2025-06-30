@@ -1,9 +1,9 @@
 import * as Handlebars from 'handlebars';
 import * as puppeteer from 'puppeteer';
 
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 
@@ -118,7 +118,7 @@ export class QuotesService {
         const { items, id, ...data } = body;
 
         if (!id) {
-            throw new Error('Quote ID is required for editing');
+            throw new BadRequestException('Quote ID is required for editing');
         }
 
         const existingQuote = await this.prisma.quote.findUnique({
@@ -127,7 +127,7 @@ export class QuotesService {
         });
 
         if (!existingQuote) {
-            throw new Error('Quote not found');
+            throw new BadRequestException('Quote not found');
         }
 
         const existingItemIds = existingQuote.items.map(i => i.id);
@@ -188,7 +188,7 @@ export class QuotesService {
         const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
 
         if (!existingQuote) {
-            throw new Error('Quote not found');
+            throw new BadRequestException('Quote not found');
         }
 
         return this.prisma.quote.update({
@@ -209,7 +209,7 @@ export class QuotesService {
         });
 
         if (!quote || !quote.company || !quote.company.pdfConfig) {
-            throw new Error('Quote or associated PDF config not found');
+            throw new BadRequestException('Quote or associated PDF config not found');
         }
 
         const config = quote.company.pdfConfig;
@@ -270,13 +270,13 @@ export class QuotesService {
 
     async markQuoteAsSigned(id: string) {
         if (!id) {
-            throw new Error('Quote ID is required');
+            throw new BadRequestException('Quote ID is required');
         }
 
         const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
 
         if (!existingQuote) {
-            throw new Error('Quote not found');
+            throw new BadRequestException('Quote not found');
         }
 
         return this.prisma.quote.update({
