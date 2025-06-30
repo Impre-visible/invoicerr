@@ -40,9 +40,6 @@ export class QuotesController {
     @Post('/mark-as-signed')
     @LoginRequired()
     async markQuoteAsSigned(@Body('id') id: string) {
-        if (!id) {
-            throw new Error('Quote ID is required');
-        }
         return await this.quotesService.markQuoteAsSigned(id);
     }
 

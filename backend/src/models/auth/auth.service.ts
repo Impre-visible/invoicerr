@@ -1,7 +1,8 @@
 import * as bcrypt from 'bcrypt';
 import * as os from 'os';
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -32,7 +33,7 @@ export class AuthService {
         });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new BadRequestException('User not found');
         }
 
         return user;
@@ -61,11 +62,11 @@ export class AuthService {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
         if (!user || !bcrypt.compareSync(currentPassword, user.password)) {
-            throw new Error('Invalid current password');
+            throw new BadRequestException('Invalid current password');
         }
 
         if (!newPassword) {
-            throw new Error('New password is required');
+            throw new BadRequestException('New password is required');
         }
 
         const hashedPassword = bcrypt.hashSync(newPassword, 10);
@@ -79,15 +80,15 @@ export class AuthService {
 
     async signUp(firstname: string, lastname: string, email: string, password?: string) {
         if (await this.prisma.user.count() > 0) {
-            throw new Error('User already exists');
+            throw new BadRequestException('User already exists');
         }
 
         if (await this.prisma.user.findUnique({ where: { email } })) {
-            throw new Error('Email already used');
+            throw new BadRequestException('Email already used');
         }
 
         if (!password) {
-            throw new Error('Password is required');
+            throw new BadRequestException('Password is required');
         }
 
         const user = await this.prisma.user.create({
@@ -114,7 +115,7 @@ export class AuthService {
         const user = await this.prisma.user.findUnique({ where: { email } });
 
         if (!user || !bcrypt.compareSync(password, user.password)) {
-            throw new Error('Invalid email or password');
+            throw new BadRequestException('Invalid email or password');
         }
 
         const payload = { sub: user.id, email: user.email };
@@ -144,13 +145,13 @@ export class AuthService {
             const payload = this.jwt.verify<{ sub: string, email: string, iat: number, exp: number }>(token, { secret: AuthService.getJWTSecret() });
 
             if (!payload || !payload.sub || !payload.email) {
-                throw new Error('Invalid refresh token payload');
+                throw new BadRequestException('Invalid refresh token payload');
             }
 
             const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
 
             if (!user) {
-                throw new Error('User not found');
+                throw new BadRequestException('User not found');
             }
 
             const newAccessToken = this.jwt.sign({ sub: user.id, email: user.email }, {
@@ -161,7 +162,7 @@ export class AuthService {
             return { access_token: newAccessToken };
         } catch (error) {
             console.error('Error refreshing token:', error);
-            throw new Error('Invalid refresh token');
+            throw new BadRequestException('Invalid refresh token');
         }
     }
 }

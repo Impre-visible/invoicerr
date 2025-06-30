@@ -1,7 +1,7 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { EditCompanyDto, PDFConfig } from './dto/company.dto';
 import { MailTemplate, MailTemplateType } from '@prisma/client';
 
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
@@ -29,7 +29,7 @@ export class CompanyService {
         });
 
         if (!existingCompany?.pdfConfig) {
-            throw new Error('No PDF configuration found for the company');
+            throw new BadRequestException('No PDF configuration found for the company');
         }
 
         return {
@@ -65,7 +65,7 @@ export class CompanyService {
         });
 
         if (!existingCompany?.pdfConfig) {
-            throw new Error('No PDF configuration found for the company');
+            throw new BadRequestException('No PDF configuration found for the company');
         }
 
         return this.prisma.pDFConfig.update({
@@ -144,7 +144,7 @@ export class CompanyService {
         });
 
         if (!existingCompany?.emailTemplates) {
-            throw new Error('No email templates found for the company');
+            throw new BadRequestException('No email templates found for the company');
         }
 
         return existingCompany.emailTemplates.map(template => ({
@@ -174,7 +174,7 @@ export class CompanyService {
             where: { id },
         });
         if (!existingTemplate) {
-            throw new Error(`Email template with id ${id} not found`);
+            throw new BadRequestException(`Email template with id ${id} not found`);
         }
 
         existingTemplate = await this.prisma.mailTemplate.update({

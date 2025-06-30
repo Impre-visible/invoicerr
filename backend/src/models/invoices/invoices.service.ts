@@ -1,10 +1,10 @@
 import * as Handlebars from 'handlebars';
 import * as puppeteer from 'puppeteer';
 
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
@@ -94,7 +94,7 @@ export class InvoicesService {
         const { items, id, ...data } = body;
 
         if (!id) {
-            throw new Error('Invoice ID is required for editing');
+            throw new BadRequestException('Invoice ID is required for editing');
         }
 
         const existingInvoice = await this.prisma.invoice.findUnique({
@@ -103,7 +103,7 @@ export class InvoicesService {
         });
 
         if (!existingInvoice) {
-            throw new Error('Invoice not found');
+            throw new BadRequestException('Invoice not found');
         }
 
         const existingItemIds = existingInvoice.items.map(i => i.id);
@@ -159,7 +159,7 @@ export class InvoicesService {
         const existingInvoice = await this.prisma.invoice.findUnique({ where: { id } });
 
         if (!existingInvoice) {
-            throw new Error('Invoice not found');
+            throw new BadRequestException('Invoice not found');
         }
 
         return this.prisma.invoice.update({
@@ -180,7 +180,7 @@ export class InvoicesService {
         });
 
         if (!invoice) {
-            throw new Error('Invoice not found');
+            throw new BadRequestException('Invoice not found');
         }
 
         const template = Handlebars.compile(baseTemplate);
@@ -255,7 +255,7 @@ export class InvoicesService {
 
     async getInvoicePDFFormat(invoiceId: string, format: ExportFormat): Promise<Uint8Array> {
         const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
-        if (!invRec) throw new Error('Invoice not found');
+        if (!invRec) throw new BadRequestException('Invoice not found');
 
         const inv = new EInvoice();
 
@@ -320,7 +320,7 @@ export class InvoicesService {
         const quote = await this.prisma.quote.findUnique({ where: { id: quoteId }, include: { items: true } });
 
         if (!quote) {
-            throw new Error('Quote not found');
+            throw new BadRequestException('Quote not found');
         }
 
         return this.createInvoice({
@@ -334,7 +334,7 @@ export class InvoicesService {
         const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId } });
 
         if (!invoice) {
-            throw new Error('Invoice not found');
+            throw new BadRequestException('Invoice not found');
         }
 
         return this.prisma.invoice.update({
