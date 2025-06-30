@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowDownRight, ArrowUpRight, CheckCircle, Clock, DollarSign, FileText, LayoutDashboard, Receipt, TrendingUp } from "lucide-react"
+import { AlertCircle, ArrowDownRight, ArrowRight, ArrowUpRight, CheckCircle, Clock, DollarSign, FileText, LayoutDashboard, Receipt, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -61,7 +61,7 @@ export default function Dashboard() {
     }
 
     const formatChangePercent = (percent: number = 0) => {
-        const sign = percent >= 0 ? "+" : ""
+        const sign = percent > 0 ? "+" : ""
         return `${sign}${percent.toFixed(1)}%`
     }
 
@@ -123,13 +123,15 @@ export default function Dashboard() {
                                                     {formatCurrency(dashboardData?.revenue.currentMonth)}
                                                 </p>
                                                 <div className="flex items-center mt-2">
-                                                    {(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? (
+                                                    {(dashboardData?.revenue.monthlyChangePercent || 0) > 0 ? (
                                                         <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-                                                    ) : (
+                                                    ) : (dashboardData?.revenue.monthlyChangePercent || 0) < 0 ? (
                                                         <ArrowDownRight className="h-4 w-4 text-red-600" />
+                                                    ) : (
+                                                        <ArrowRight className="h-4 w-4 text-gray-400" />
                                                     )}
                                                     <span
-                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.monthlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
+                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.monthlyChangePercent || 0) > 0 ? "text-emerald-600" : (dashboardData?.revenue.monthlyChangePercent || 0) < 0 ? "text-red-600" : "text-gray-400"
                                                             }`}
                                                     >
                                                         {formatChangePercent(dashboardData?.revenue.monthlyChangePercent)}
@@ -186,13 +188,15 @@ export default function Dashboard() {
                                                     {formatCurrency(dashboardData?.revenue.currentYear)}
                                                 </p>
                                                 <div className="flex items-center mt-2">
-                                                    {(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? (
+                                                    {(dashboardData?.revenue.yearlyChangePercent || 0) > 0 ? (
                                                         <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-                                                    ) : (
+                                                    ) : (dashboardData?.revenue.yearlyChangePercent || 0) < 0 ? (
                                                         <ArrowDownRight className="h-4 w-4 text-red-600" />
+                                                    ) : (
+                                                        <ArrowRight className="h-4 w-4 text-gray-400" />
                                                     )}
                                                     <span
-                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.yearlyChangePercent || 0) >= 0 ? "text-emerald-600" : "text-red-600"
+                                                        className={`text-sm ml-1 ${(dashboardData?.revenue.yearlyChangePercent || 0) > 0 ? "text-emerald-600" : (dashboardData?.revenue.yearlyChangePercent || 0) < 0 ? "text-red-600" : "text-gray-400"
                                                             }`}
                                                     >
                                                         {formatChangePercent(dashboardData?.revenue.yearlyChangePercent)}
