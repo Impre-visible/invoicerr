@@ -214,7 +214,7 @@ interface TemplateSettings {
 export default function PDFTemplatesSettings() {
     const { data: companyTemplateSettings } = useGet<TemplateSettings>("/api/company/pdf-template")
 
-    const { trigger: updateTemplateSettings } = usePost<TemplateSettings>("/api/company/pdf-template")
+    const { trigger: updateTemplateSettings, loading: updateTemplateSettingsLoading } = usePost<TemplateSettings>("/api/company/pdf-template")
 
     const [settings, setSettings] = useState<TemplateSettings>({
         templateType: "invoice",
@@ -668,7 +668,7 @@ export default function PDFTemplatesSettings() {
                                     </Card>
 
                                     <div className="pb-6">
-                                        <Button size="lg" className="w-full" onClick={handleSaveSettings}>
+                                        <Button loading={updateTemplateSettingsLoading} size="lg" className="w-full" onClick={handleSaveSettings}>
                                             Save Template Settings
                                         </Button>
                                     </div>
