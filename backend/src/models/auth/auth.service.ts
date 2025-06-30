@@ -38,6 +38,45 @@ export class AuthService {
         return user;
     }
 
+    async updateMe(userId: string, firstname: string, lastname: string, email: string) {
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                firstname,
+                lastname,
+                email,
+            },
+            select: {
+                id: true,
+                firstname: true,
+                lastname: true,
+                email: true,
+            },
+        });
+
+        return user;
+    }
+
+    async updatePassword(userId: string, currentPassword: string, newPassword: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+        if (!user || !bcrypt.compareSync(currentPassword, user.password)) {
+            throw new Error('Invalid current password');
+        }
+
+        if (!newPassword) {
+            throw new Error('New password is required');
+        }
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword },
+        });
+
+        return { message: 'Password updated successfully' };
+    }
+
     async signUp(firstname: string, lastname: string, email: string, password?: string) {
         if (await this.prisma.user.count() > 0) {
             throw new Error('User already exists');

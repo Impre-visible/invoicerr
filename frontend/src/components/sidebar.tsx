@@ -61,7 +61,7 @@ export function Sidebar() {
     const { open: isOpen } = useSidebar()
     const isMobile = useIsMobile()
     const location = useLocation()
-    const { user, loading: userLoading } = useAuth()
+    const { user, loading: userLoading, logout } = useAuth()
     const { setTheme } = useTheme()
     const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
 
@@ -70,6 +70,10 @@ export function Sidebar() {
             mutate()
         }
     }, [location]);
+
+    const handleLogout = () => {
+        logout()
+    }
 
     return (
         <RootSidebar collapsible="icon">
@@ -187,7 +191,7 @@ export function Sidebar() {
                                         Account
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
-                                <DropdownMenuItem className="cursor-pointer">
+                                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                                     <LogOut />
                                     Log out
                                 </DropdownMenuItem>

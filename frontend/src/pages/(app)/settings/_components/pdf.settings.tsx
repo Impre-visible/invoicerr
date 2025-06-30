@@ -359,17 +359,17 @@ export default function PDFTemplatesSettings() {
     }
 
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex-shrink-0 p-6 pb-4 border-b bg-background">
+        <div>
+            <div className="mb-4">
                 <h1 className="text-3xl font-bold">PDF Template Settings</h1>
                 <p className="text-muted-foreground">Manage your PDF templates for invoices and quotes.</p>
             </div>
 
             <div className="flex-1 min-h-0">
-                <ResizablePanelGroup direction="horizontal" className="!h-[calc(100dvh-18rem)] ">
+                <ResizablePanelGroup direction="horizontal" className="!h-[calc(100dvh-18rem)]">
                     <ResizablePanel defaultSize={45} minSize={30} maxSize={70}>
                         <div className="h-full flex flex-col">
-                            <div className="flex-1 overflow-y-auto p-6">
+                            <div className="flex-1 overflow-y-auto pr-4">
                                 <div className="space-y-6">
                                     <Card>
                                         <CardHeader>

@@ -122,13 +122,13 @@ export class CompanyService {
                             data: [
                                 {
                                     type: 'SIGNATURE_REQUEST',
-                                    subject: 'Signature Request for Quote',
-                                    body: '<p>Please sign the quote: <a href="{{APP_URL}}/signature/{{SIGNATURE_ID}}">#{{SIGNATURE_NUMBER}}</a>.</p>'
+                                    subject: 'Please sign document #{{SIGNATURE_NUMBER}}',
+                                    body: '<h2>Document Signature Required</h2><p>Hello,</p><p>You have been requested to sign the following document:</p><div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">  <strong>Document:</strong> {{SIGNATURE_NUMBER}}<br>  <strong>Signature ID:</strong> {{SIGNATURE_ID}}</div><p>Please click the button below to review and sign the document:</p><div style="text-align: center; margin: 30px 0;">  <a href="{{SIGNATURE_URL}}" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Sign Document</a></div><p>If you have any questions, please don\'t hesitate to contact us.</p><p>Best regards,<br>The Invoicerr Team</p><hr><p style="font-size: 12px; color: #666;">This email was sent from {{APP_URL}}</p>'
                                 },
                                 {
                                     type: 'VERIFICATION_CODE',
-                                    subject: 'Your OTP Code for Quote Signing',
-                                    body: 'Your OTP code is: \n{{OTP_CODE}}\nIt is valid for 15 minutes.'
+                                    subject: 'Your verification code',
+                                    body: '<p>Hello,</p><p>Here is your verification code:</p><div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">  <div style="font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 4px; font-family: monospace;">{{OTP_CODE}}</div></div><p>This code will expire in 10 minutes. Please enter it in the application to complete your verification.</p><p>If you didn\'t request this code, please ignore this email.</p><p>Best regards,<br>The Invoicerr Team</p>'
                                 }
                             ]
                         }
