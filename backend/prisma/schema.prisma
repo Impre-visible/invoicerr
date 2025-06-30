@@ -195,8 +195,8 @@ model Company {
   description String
   language    String    @default("en")
   currency    Currency  @default(EUR)
-  legalId     String // Legal identification number (SIRET, EIN, etc.)
-  foundedAt   DateTime // Date when the company was founded
+  legalId     String
+  foundedAt   DateTime
   VAT         String
   address     String
   postalCode  String
@@ -204,8 +204,38 @@ model Company {
   country     String
   phone       String
   email       String
+  pDFConfigId String    @unique
+  pdfConfig   PDFConfig @relation(fields: [pDFConfigId], references: [id])
   Quote       Quote[]
   Invoice     Invoice[]
+}
+
+model PDFConfig {
+  id      String   @id @default(cuid())
+  Company Company? // 👈 Relation inverse, sans arguments
+
+  fontFamily     String @default("Arial")
+  padding        Int    @default(40)
+  primaryColor   String @default("#2563eb")
+  secondaryColor String @default("#64748b")
+
+  includeLogo Boolean @default(false)
+  logoB64     String?
+
+  invoice     String @default("Invoice")
+  quote       String @default("Quote")
+  description String @default("Description:")
+  dueDate     String @default("Due date:")
+  validUntil  String @default("Valid until:")
+  billTo      String @default("Bill to:")
+  quoteFor    String @default("Quote for:")
+  quantity    String @default("Qty")
+  vatRate     String @default("VAT (%)")
+  unitPrice   String @default("Unit price")
+  subtotal    String @default("Subtotal:")
+  total       String @default("Total:")
+  vat         String @default("VAT:")
+  grandTotal  String @default("Grand total:")
 }
 
 model Client {
