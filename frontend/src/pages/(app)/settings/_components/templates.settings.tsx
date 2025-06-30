@@ -35,7 +35,6 @@ function HtmlEditor({
 
     return (
         <div className="space-y-4">
-            {/* HTML Editor */}
             <div className="space-y-2">
                 <Textarea
                     id="html-editor"
@@ -69,7 +68,6 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
     return (
         <div className="bg-gray-100 p-4 rounded-lg h-full w-full">
             <div className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto">
-                {/* Email Header */}
                 <div className="border-b p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <Mail className="h-5 w-5 text-blue-600" />
@@ -94,7 +92,6 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
 
                 <Separator className="bg-neutral-200" orientation="horizontal" />
 
-                {/* Email Body */}
                 <div className="p-4">
                     <div
                         className="prose prose-sm max-w-none [*]:text-black"
@@ -103,7 +100,6 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
                     />
                 </div>
 
-                {/* Email Actions */}
                 <div className="border-t p-4 flex gap-2">
                     <Button>
                         <Reply className="h-4 w-4" />

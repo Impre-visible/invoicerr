@@ -300,7 +300,6 @@ export default function Signature() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 px-6 py-8">
-            {/* Header */}
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold">Quote Signature</h1>
                 <p className="text-muted-foreground">
@@ -309,7 +308,6 @@ export default function Signature() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* PDF Viewer */}
                 <div className="lg:col-span-2">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -381,11 +379,8 @@ export default function Signature() {
                     </Card>
                 </div>
 
-                {/* Signature Panel */}
                 <div className="space-y-6">
                     {renderSignatureStatus()}
-
-                    {/* Quote Info */}
                     <Card>
                         <CardHeader>
                             <h3 className="font-semibold">Quote Information</h3>
