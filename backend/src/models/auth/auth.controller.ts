@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 
 import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { User } from 'src/decorators/user.decorator';
@@ -15,6 +15,18 @@ export class AuthController {
     @LoginRequired()
     getMe(@User() user: CurrentUser) {
         return this.authService.getMe(user.id);
+    }
+
+    @Patch('me')
+    @LoginRequired()
+    updateMe(@User() user: CurrentUser, @Body() body: SignupDto) {
+        return this.authService.updateMe(user.id, body.firstname, body.lastname, body.email);
+    }
+
+    @Patch('password')
+    @LoginRequired()
+    updatePassword(@User() user: CurrentUser, @Body() body: { currentPassword: string, newPassword: string }) {
+        return this.authService.updatePassword(user.id, body.currentPassword, body.newPassword);
     }
 
     @Post('signup')
