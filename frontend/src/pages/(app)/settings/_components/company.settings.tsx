@@ -63,7 +63,7 @@ export default function CompanySettings() {
     })
 
     useEffect(() => {
-        if (data) {
+        if (data && Object.keys(data).length > 0) {
             form.reset({
                 ...data,
                 foundedAt: new Date(data.foundedAt),
