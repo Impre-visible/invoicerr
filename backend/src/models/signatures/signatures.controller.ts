@@ -9,9 +9,8 @@ export class SignaturesController {
     constructor(private readonly signaturesService: SignaturesService) { }
 
     @Get('/:id')
-    @LoginRequired()
-    async getSignatures(@Param('id') signatureId: string) {
-        return this.signaturesService.getSignature(signatureId);
+    async getSignature(@Param('id') signatureId: string) {
+        return (await this.signaturesService.getSignature(signatureId)) || {}
     }
 
     @Post('/')

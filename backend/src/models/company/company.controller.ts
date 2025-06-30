@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 
 import { CompanyService } from './company.service';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
@@ -34,6 +34,20 @@ export class CompanyController {
     @LoginRequired()
     async postPDFTemplateConfig(@Body() body: PDFConfig) {
         let data = await this.companyService.editPDFTemplateConfig(body);
+        return data || {};
+    }
+
+    @Get('email-templates')
+    @LoginRequired()
+    async getEmailTemplates() {
+        let data = await this.companyService.getEmailTemplates();
+        return data || {};
+    }
+
+    @Put('email-templates')
+    @LoginRequired()
+    async updateEmailTemplate(@Body() body: { dbId: string, subject: string, body: string }) {
+        let data = await this.companyService.updateEmailTemplate(body.dbId, body.subject, body.body);
         return data || {};
     }
 }

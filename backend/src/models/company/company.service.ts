@@ -1,7 +1,19 @@
 import { EditCompanyDto, PDFConfig } from './dto/company.dto';
+import { MailTemplate, MailTemplateType } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { randomUUID } from 'crypto';
+
+export interface EmailTemplate {
+    dbId: string
+    id: string
+    companyId: string
+    name: string
+    subject: string
+    body: string
+    variables: Record<string, string>
+}
 
 @Injectable()
 export class CompanyService {
@@ -104,9 +116,75 @@ export class CompanyService {
                     ...data,
                     pdfConfig: {
                         create: {}
+                    },
+                    emailTemplates: {
+                        createMany: {
+                            data: [
+                                {
+                                    type: 'SIGNATURE_REQUEST',
+                                    subject: 'Signature Request for Quote',
+                                    body: '<p>Please sign the quote: <a href="{{APP_URL}}/signature/{{SIGNATURE_ID}}">#{{SIGNATURE_NUMBER}}</a>.</p>'
+                                },
+                                {
+                                    type: 'VERIFICATION_CODE',
+                                    subject: 'Your OTP Code for Quote Signing',
+                                    body: 'Your OTP code is: \n{{OTP_CODE}}\nIt is valid for 15 minutes.'
+                                }
+                            ]
+                        }
                     }
                 }
             });
         }
+    }
+
+    async getEmailTemplates(): Promise<EmailTemplate[]> {
+        const existingCompany = await this.prisma.company.findFirst({
+            include: { emailTemplates: true }
+        });
+
+        if (!existingCompany?.emailTemplates) {
+            throw new Error('No email templates found for the company');
+        }
+
+        return existingCompany.emailTemplates.map(template => ({
+            id: template.type,
+            dbId: template.id,
+            companyId: existingCompany.id,
+            name: template.type
+                .replace('_', ' ')
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' '),
+            subject: template.subject,
+            body: template.body,
+            variables: {
+                APP_URL: process.env.APP_URL || 'http://localhost:3000',
+                SIGNATURE_ID: randomUUID(),
+                SIGNATURE_NUMBER: 'QUOTE-2025-0001',
+                SIGNATURE_URL: `${process.env.APP_URL || 'http://localhost:3000'}/signature/${randomUUID()}`,
+                OTP_CODE: '1234-5678'
+            }
+        }));
+    }
+
+    async updateEmailTemplate(id: MailTemplate['id'], subject: string, body: string) {
+        let existingTemplate = await this.prisma.mailTemplate.findUnique({
+            where: { id },
+        });
+        if (!existingTemplate) {
+            throw new Error(`Email template with id ${id} not found`);
+        }
+
+        existingTemplate = await this.prisma.mailTemplate.update({
+            where: { id },
+            data: {
+                subject,
+                body
+            }
+        });
+
+        return existingTemplate
     }
 }

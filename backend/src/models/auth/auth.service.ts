@@ -39,6 +39,10 @@ export class AuthService {
     }
 
     async signUp(firstname: string, lastname: string, email: string, password?: string) {
+        if (await this.prisma.user.count() > 0) {
+            throw new Error('User already exists');
+        }
+
         if (await this.prisma.user.findUnique({ where: { email } })) {
             throw new Error('Email already used');
         }
