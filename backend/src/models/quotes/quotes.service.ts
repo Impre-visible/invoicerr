@@ -1,13 +1,11 @@
 import * as Handlebars from 'handlebars';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { lightTemplate } from './templates/light.template';
+import { baseTemplate } from './templates/base.template';
 
 @Injectable()
 export class QuotesService {
@@ -178,6 +176,11 @@ export class QuotesService {
             },
         });
 
+        await this.prisma.signature.updateMany({
+            where: { quoteId: id },
+            data: { isActive: false },
+        });
+
         return updateQuote;
     }
 
@@ -193,22 +196,25 @@ export class QuotesService {
             data: { isActive: false },
         });
     }
-
     async getQuotePdf(id: string): Promise<Uint8Array> {
         const quote = await this.prisma.quote.findUnique({
             where: { id },
             include: {
                 items: true,
                 client: true,
-                company: true,
+                company: {
+                    include: { pdfConfig: true },
+                },
             },
         });
 
-        if (!quote) {
-            throw new Error('Quote not found');
+        if (!quote || !quote.company || !quote.company.pdfConfig) {
+            throw new Error('Quote or associated PDF config not found');
         }
 
-        const templateHtml = lightTemplate;
+        const config = quote.company.pdfConfig;
+
+        const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
 
         const html = template({
@@ -228,6 +234,27 @@ export class QuotesService {
             totalHT: quote.totalHT.toFixed(2),
             totalVAT: quote.totalVAT.toFixed(2),
             totalTTC: quote.totalTTC.toFixed(2),
+
+            // 🎨 Style & labels from PDFConfig
+            fontFamily: config.fontFamily,
+            padding: config.padding,
+            primaryColor: config.primaryColor,
+            secondaryColor: config.secondaryColor,
+            includeLogo: config.includeLogo,
+            logoB64: config.logoB64 ? `data:image/png;base64,${config.logoB64}` : undefined,
+            labels: {
+                quote: config.quote,
+                quoteFor: config.quoteFor,
+                description: config.description,
+                quantity: config.quantity,
+                unitPrice: config.unitPrice,
+                vatRate: config.vatRate,
+                subtotal: config.subtotal,
+                total: config.total,
+                vat: config.vat,
+                grandTotal: config.grandTotal,
+                validUntil: config.validUntil,
+            },
         });
 
         const browser = await puppeteer.launch({ headless: true });

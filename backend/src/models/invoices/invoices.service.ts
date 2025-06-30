@@ -6,8 +6,8 @@ import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
-import { lightTemplate } from './templates/light.template';
 
 @Injectable()
 export class InvoicesService {
@@ -167,14 +167,15 @@ export class InvoicesService {
             data: { isActive: false },
         });
     }
-
     async getInvoicePdf(id: string): Promise<Uint8Array> {
         const invoice = await this.prisma.invoice.findUnique({
             where: { id },
             include: {
                 items: true,
                 client: true,
-                company: true,
+                company: {
+                    include: { pdfConfig: true },
+                },
             },
         });
 
@@ -182,11 +183,12 @@ export class InvoicesService {
             throw new Error('Invoice not found');
         }
 
-        const templateHtml = lightTemplate;
-        const template = Handlebars.compile(templateHtml);
+        const template = Handlebars.compile(baseTemplate);
 
         const formatDate = (date?: Date) =>
             date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
+
+        const { pdfConfig } = invoice.company;
 
         const html = template({
             number: invoice.number,
@@ -212,6 +214,32 @@ export class InvoicesService {
             totalHT: invoice.totalHT.toFixed(2),
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
+
+            // Personnalisation via pdfConfig
+            fontFamily: pdfConfig?.fontFamily ?? 'Inter',
+            primaryColor: pdfConfig?.primaryColor ?? '#0ea5e9',
+            padding: pdfConfig?.padding ?? 40,
+            includeLogo: !!pdfConfig?.logoB64,
+            logoUrl: pdfConfig?.logoB64 ?? '',
+
+            // Labels
+            labels: {
+                invoice: 'Invoice',
+                dueDate: 'Due date:',
+                billTo: 'Bill to:',
+                description: 'Description',
+                quantity: 'Qty',
+                unitPrice: 'Unit Price',
+                vatRate: 'VAT %',
+                total: 'Total',
+                subtotal: 'Subtotal',
+                vat: 'VAT',
+                grandTotal: 'Total (incl. VAT)',
+            },
+
+            // Notes optionnelles
+            noteExists: !!invoice.notes,
+            notes: invoice.notes ?? '',
         });
 
         const browser = await puppeteer.launch({ headless: true });

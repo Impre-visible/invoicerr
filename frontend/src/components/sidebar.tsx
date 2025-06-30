@@ -1,4 +1,4 @@
-import { Building2, ChevronsUpDown, FileSignature, FileText, LayoutDashboard, LogOut, Moon, Settings, Sun, User, Users } from "lucide-react"
+import { Building2, ChevronsUpDown, FileText, LayoutDashboard, LogOut, Moon, Receipt, Settings, Sun, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,12 +37,12 @@ const items: { title: string, icon: React.ReactNode, url: string }[] = [
     },
     {
         title: "Quotes",
-        icon: <FileSignature className="w-4 h-4" />,
+        icon: <FileText className="w-4 h-4" />,
         url: "/quotes",
     },
     {
         title: "Invoices",
-        icon: <FileText className="w-4 h-4" />,
+        icon: <Receipt className="w-4 h-4" />,
         url: "/invoices",
     },
     {
@@ -114,7 +114,7 @@ export function Sidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="">
+            <SidebarFooter>
                 <SidebarMenu className="flex flex-col gap-2">
                     <SidebarMenuItem>
                         <DropdownMenu>

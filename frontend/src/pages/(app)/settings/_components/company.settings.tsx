@@ -64,7 +64,10 @@ export default function CompanySettings() {
 
     useEffect(() => {
         if (data) {
-            form.reset(data)
+            form.reset({
+                ...data,
+                foundedAt: new Date(data.foundedAt),
+            })
         }
     }, [data, form])
 
@@ -122,7 +125,7 @@ export default function CompanySettings() {
     }
 
     return (
-        <div className="">
+        <div>
             <div className="mb-4">
                 <h1 className="text-3xl font-bold">Company Settings</h1>
                 <p className="text-muted-foreground">Manage your company information</p>

@@ -1,4 +1,4 @@
-import { Banknote, Download, Edit, Eye, FileSignature, FileText, Plus, Trash2 } from "lucide-react"
+import { Banknote, Download, Edit, Eye, Plus, Receipt, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
@@ -111,7 +111,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                 <CardHeader className="border-b flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="flex items-center space-x-2">
-                            <FileSignature className="h-5 w-5 " />
+                            <Receipt className="h-5 w-5 " />
                             <span>{title}</span>
                         </CardTitle>
                         <CardDescription>{description}</CardDescription>
@@ -142,7 +142,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                     <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                         <div className="flex flex-row items-center gap-4 w-full">
                                             <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
-                                                <FileSignature className="h-5 w-5 text-blue-600" />
+                                                <Receipt className="h-5 w-5 text-blue-600" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
@@ -191,7 +191,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                 onClick={() => handleViewPdf(invoice)}
                                                 className="text-gray-600 hover:text-pink-600"
                                             >
-                                                <FileText className="h-4 w-4" />
+                                                <Receipt className="h-4 w-4" />
                                             </Button>
 
                                             <DropdownMenu>
@@ -214,15 +214,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                     <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: 'cii' })}>CII</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                            <Button
-                                                tooltip="Edit Invoice"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleEdit(invoice)}
-                                                className="text-gray-600 hover:text-green-600"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
+
+                                            {invoice.status !== 'PAID' && (
+                                                <Button
+                                                    tooltip="Edit Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleEdit(invoice)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                             {invoice.status !== 'PAID' && (
                                                 <Button
                                                     tooltip="Mark as Paid"
@@ -234,15 +237,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(({
                                                     <Banknote className="h-4 w-4" />
                                                 </Button>
                                             )}
-                                            <Button
-                                                tooltip="Delete Invoice"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(invoice)}
-                                                className="text-gray-600 hover:text-red-600"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            {(invoice.status !== 'PAID' && invoice.status !== 'OVERDUE') && (
+                                                <Button
+                                                    tooltip="Delete Invoice"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(invoice)}
+                                                    className="text-gray-600 hover:text-red-600"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

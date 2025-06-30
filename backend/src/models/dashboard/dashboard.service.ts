@@ -25,10 +25,12 @@ interface DashboardData {
         total: number
     }
     revenue: {
+        last6Months: { createdAt: Date, total: number }[]
         currentMonth: number
         previousMonth: number
         monthlyChange: number
         monthlyChangePercent: number
+        last6Years: { createdAt: Date, total: number }[]
         currentYear: number
         previousYear: number
         yearlyChange: number
@@ -42,16 +44,20 @@ export class DashboardService {
 
     async getDashboardData(): Promise<DashboardData> {
         const quotes = await this.prisma.quote.groupBy({
+            where: { isActive: true },
             by: ['status'],
             _count: true,
         });
 
         const invoices = await this.prisma.invoice.groupBy({
+            where: { isActive: true },
             by: ['status'],
             _count: true,
         });
 
-        const clientsCount = await this.prisma.client.count();
+        const clientsCount = await this.prisma.client.count({
+            where: { isActive: true },
+        });
 
         return {
             company: await this.prisma.company.findFirst(),
@@ -62,10 +68,11 @@ export class DashboardService {
                 signed: quotes.find(q => q.status === 'SIGNED')?._count || 0,
                 expired: quotes.find(q => q.status === 'EXPIRED')?._count || 0,
                 latests: await this.prisma.quote.findMany({
+                    where: { isActive: true },
                     orderBy: { updatedAt: 'desc' },
                     include: { company: true, client: true },
                     take: 5,
-                }),
+                })
             },
             invoices: {
                 total: invoices.reduce((acc, i) => acc + i._count, 0),
@@ -74,6 +81,7 @@ export class DashboardService {
                 paid: invoices.find(i => i.status === 'PAID')?._count || 0,
                 overdue: invoices.find(i => i.status === 'OVERDUE')?._count || 0,
                 latests: await this.prisma.invoice.findMany({
+                    where: { isActive: true },
                     orderBy: { updatedAt: 'desc' },
                     include: { company: true, client: true },
                     take: 5,
@@ -83,6 +91,14 @@ export class DashboardService {
                 total: clientsCount,
             },
             revenue: {
+                last6Months: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    return {
+                        createdAt: new Date(date.getFullYear(), date.getMonth(), 1),
+                        total: await this.getMonthlyRevenue(date),
+                    };
+                })),
                 currentMonth: await this.getMonthlyRevenue(new Date()),
                 previousMonth: await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
                 monthlyChange: await this.getMonthlyRevenue(new Date()) - await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
@@ -91,6 +107,14 @@ export class DashboardService {
                     await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1)))
                     ,
                 ),
+                last6Years: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+                    const date = new Date();
+                    date.setFullYear(date.getFullYear() - i);
+                    return {
+                        createdAt: new Date(date.getFullYear(), 0, 1),
+                        total: await this.getYearlyRevenue(date),
+                    };
+                })),
                 currentYear: await this.getYearlyRevenue(new Date()),
                 previousYear: await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
                 yearlyChange: await this.getYearlyRevenue(new Date()) - await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
@@ -137,7 +161,8 @@ export class DashboardService {
     }
 
     calculateChangePercent(current: number, previous: number): number {
-        if (previous === 0) return current > 0 ? 100 : -100; // Avoid division by zero
-        return ((current - previous) / previous) * 100;
+        if (current === previous) return 0;
+        if (previous === 0) return current > 0 ? 100 : -100; // Handle division by zero
+        return ((current - previous) / Math.abs(previous)) * 100;
     }
 }
