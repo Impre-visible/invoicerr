@@ -64,7 +64,10 @@ export default function CompanySettings() {
 
     useEffect(() => {
         if (data) {
-            form.reset(data)
+            form.reset({
+                ...data,
+                foundedAt: new Date(data.foundedAt),
+            })
         }
     }, [data, form])
 
