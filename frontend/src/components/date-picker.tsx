@@ -7,6 +7,8 @@ import { FormControl } from "./ui/form";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { languageToLocale } from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 interface DatePickerProps {
   value: Date | null;
@@ -17,6 +19,8 @@ interface DatePickerProps {
 }
 
 const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
+  const { i18n } = useTranslation()
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -30,7 +34,9 @@ const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
             )}
           >
             {field.value ? (
-              format(field.value, "PPP")
+              format(field.value, "PPP", {
+                locale: languageToLocale(i18n.language)
+              })
             ) : (
               <span>{field.placeholder || "Pick a date"}</span>
             )}

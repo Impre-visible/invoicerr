@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 
 import type { Quote } from "@/types"
 import { format } from "date-fns"
+import { languageToLocale } from "@/lib/i18n"
 import { useTranslation } from "react-i18next"
 
 interface QuoteViewDialogProps {
@@ -10,11 +11,11 @@ interface QuoteViewDialogProps {
 }
 
 export function QuoteViewDialog({ quote, onOpenChange }: QuoteViewDialogProps) {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
 
     if (!quote) return null
 
-    const formatDate = (date?: Date) => (date ? format(new Date(date), "PPP") : "—")
+    const formatDate = (date?: Date) => (date ? format(new Date(date), "PPP", { locale: languageToLocale(i18n.language) }) : "—")
 
     const getStatusLabel = (status: string) => {
         return t(`quotes.view.status.${status.toLowerCase()}`)
