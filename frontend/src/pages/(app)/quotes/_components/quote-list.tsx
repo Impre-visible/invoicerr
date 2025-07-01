@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, FileText, Plus, Trash2 } from "lucide-react"
+import { Download, Edit, Eye, FileText, Plus, Signature, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
@@ -280,7 +280,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         onClick={() => handleSendForSignature(quote.id)}
                                                         className="text-gray-600 hover:text-blue-600"
                                                     >
-                                                        <FileText className="h-4 w-4" />
+                                                        <Signature className="h-4 w-4" />
                                                     </Button>
                                                 )}
 
