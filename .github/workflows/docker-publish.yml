@@ -1,8 +1,6 @@
 name: Publish Docker Image to GitHub Container Registry
 
 on:
-  push:
-    branches: [ "main" ]
   release:
     types: [ "created" ]
 
