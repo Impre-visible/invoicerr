@@ -51,7 +51,8 @@ export class QuotesService {
             },
             include: {
                 items: true,
-                client: true
+                client: true,
+                company: true
             },
         });
 
