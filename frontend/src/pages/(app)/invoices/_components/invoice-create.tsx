@@ -127,7 +127,7 @@ export function InvoiceCreate({ open, onOpenChange }: InvoiceCreateDialogProps) 
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl min-w-fit">
+            <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
                     <DialogTitle>{t("invoices.create.title")}</DialogTitle>
                 </DialogHeader>

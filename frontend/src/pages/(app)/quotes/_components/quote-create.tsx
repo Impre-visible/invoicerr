@@ -125,7 +125,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl min-w-fit">
+            <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
                     <DialogTitle>{t("quotes.create.title")}</DialogTitle>
                 </DialogHeader>
