@@ -3,15 +3,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import type { Company, Invoice, Quote } from "@/types"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-import { Button } from "@/components/ui/button"
 import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import { useAuth } from "@/contexts/auth"
 import { useGet } from "@/lib/utils"
-import { useNavigate } from "react-router"
-
 interface DashboardData {
     company: Company | null,
     quotes: {
@@ -51,7 +47,6 @@ export default function Dashboard() {
     const { user } = useAuth()
     const { data: dashboardData } = useGet<DashboardData>("/api/dashboard")
 
-    const navigate = useNavigate()
 
     const formatCurrency = (amount: number | null | undefined) => {
         return new Intl.NumberFormat("en-US", {
@@ -74,21 +69,6 @@ export default function Dashboard() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 p-6">
-            <Dialog open={!!dashboardData && !dashboardData.company}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Company not configured</DialogTitle>
-                    </DialogHeader>
-                    <p className="text-sm text-muted-foreground">
-                        Please configure your company details before using the dashboard.
-                    </p>
-                    <DialogFooter>
-                        <Button onClick={() => navigate("/settings/company")}>
-                            Go
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
             <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                     <LayoutDashboard className="h-5 w-5 text-blue-600" />

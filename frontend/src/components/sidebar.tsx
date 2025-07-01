@@ -1,4 +1,5 @@
 import { Building2, ChevronsUpDown, FileText, LayoutDashboard, LogOut, Moon, Receipt, Settings, Sun, User, Users } from "lucide-react"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,7 +7,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
-import { Link, useLocation } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import {
     Sidebar as RootSidebar,
     SidebarContent,
@@ -65,6 +66,8 @@ export function Sidebar() {
     const { setTheme } = useTheme()
     const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         if (!company) {
             mutate()
@@ -77,6 +80,23 @@ export function Sidebar() {
 
     return (
         <RootSidebar collapsible="icon">
+
+            <Dialog open={!!company && !company.name && location.pathname !== "/settings/company"}>
+                <DialogContent className="[&>button]:hidden">
+                    <DialogHeader>
+                        <DialogTitle>Company not configured</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                        Please configure your company details before using the dashboard.
+                    </p>
+                    <DialogFooter>
+                        <Button onClick={() => navigate("/settings/company")}>
+                            Go
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             <SidebarHeader className="px-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
