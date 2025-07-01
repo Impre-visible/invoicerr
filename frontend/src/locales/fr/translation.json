@@ -1193,5 +1193,9 @@
                 "accountCreated": "Compte créé avec succès"
             }
         }
+    },
+    "unavailable": {
+        "title": "Indisponible sur Mobile/Tablet",
+        "description": "Cette fonctionnalité n'est disponible que sur les appareils de bureau pour une expérience optimale."
     }
 }
