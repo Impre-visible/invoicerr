@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 
 import type { Invoice } from "@/types"
 import { format } from "date-fns"
+import { languageToLocale } from "@/lib/i18n"
 import { useTranslation } from "react-i18next"
 
 interface InvoiceViewDialogProps {
@@ -10,11 +11,11 @@ interface InvoiceViewDialogProps {
 }
 
 export function InvoiceViewDialog({ invoice, onOpenChange }: InvoiceViewDialogProps) {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
 
     if (!invoice) return null
 
-    const formatDate = (date?: string) => (date ? format(new Date(date), "PPP") : "—")
+    const formatDate = (date?: string) => (date ? format(new Date(date), "PPP", { locale: languageToLocale(i18n.language) }) : "—")
 
     const getStatusLabel = (status: string) => {
         return t(`invoices.view.status.${status.toLowerCase()}`)
