@@ -49,7 +49,6 @@ export function Sidebar() {
     const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
     const navigate = useNavigate()
 
-    // Move items inside component to access t function
     const items: { title: string; icon: React.ReactNode; url: string }[] = [
         {
             title: t("sidebar.navigation.dashboard"),
@@ -136,7 +135,7 @@ export function Sidebar() {
                                 <SidebarMenuButton asChild>
                                     <Link
                                         to={item.url}
-                                        className={`flex items-center gap-2 py-6 ${location.pathname === item.url ? "text-sidebar-accent-foreground bg-sidebar-accent" : ""
+                                        className={`flex items-center gap-2 py-6 ${location.pathname.startsWith(item.url) ? "text-sidebar-accent-foreground bg-sidebar-accent" : ""
                                             }`}
                                     >
                                         {item.icon}
