@@ -1,3 +1,5 @@
+import { AlertTriangle, Building2, FileText, Mail, User } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useNavigate, useParams } from "react-router"
 
@@ -20,15 +22,71 @@ export default function Settings() {
         navigate(`/settings/${newTab}`)
     }
 
+    const tabsConfig = [
+        {
+            value: "company",
+            label: t("settings.tabs.company"),
+            icon: Building2,
+        },
+        {
+            value: "template",
+            label: t("settings.tabs.pdfTemplates"),
+            icon: FileText,
+        },
+        {
+            value: "email",
+            label: t("settings.tabs.emailTemplates"),
+            icon: Mail,
+        },
+        {
+            value: "account",
+            label: t("settings.tabs.account"),
+            icon: User,
+        },
+        {
+            value: "danger",
+            label: t("settings.tabs.dangerZone"),
+            icon: AlertTriangle,
+        },
+    ]
+
+    const currentTabConfig = tabsConfig.find((tab) => tab.value === currentTab)
+
     return (
         <div className="max-w-7xl mx-auto space-y-6 p-6">
+            {/* Mobile/Tablet Select */}
+            <div className="lg:hidden">
+                <Select value={currentTab} onValueChange={handleTabChange}>
+                    <SelectTrigger className="w-full h-12">
+                        <SelectValue>
+                            <div className="flex items-center gap-2">
+                                {currentTabConfig?.icon && <currentTabConfig.icon className="h-4 w-4" />}
+                                {currentTabConfig?.label}
+                            </div>
+                        </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {tabsConfig.map((tab) => (
+                            <SelectItem key={tab.value} value={tab.value}>
+                                <div className="flex items-center gap-2">
+                                    <tab.icon className="h-4 w-4" />
+                                    {tab.label}
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Desktop Tabs */}
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit">
-                <TabsList className="w-full h-12">
-                    <TabsTrigger value="company">{t("settings.tabs.company")}</TabsTrigger>
-                    <TabsTrigger value="template">{t("settings.tabs.pdfTemplates")}</TabsTrigger>
-                    <TabsTrigger value="email">{t("settings.tabs.emailTemplates")}</TabsTrigger>
-                    <TabsTrigger value="account">{t("settings.tabs.account")}</TabsTrigger>
-                    <TabsTrigger value="danger">{t("settings.tabs.dangerZone")}</TabsTrigger>
+                <TabsList className="hidden lg:flex w-full h-12">
+                    {tabsConfig.map((tab) => (
+                        <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
+                            <tab.icon className="h-4 w-4" />
+                            <span className="inline">{tab.label}</span>
+                        </TabsTrigger>
+                    ))}
                 </TabsList>
 
                 <section className="h-full w-full rounded-lg pt-4">
