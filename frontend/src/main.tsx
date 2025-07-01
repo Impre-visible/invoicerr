@@ -1,4 +1,5 @@
 import './index.css'
+import './lib/i18n'
 
 import { AuthProvider } from './contexts/auth'
 import { Routes } from '@generouted/react-router'
