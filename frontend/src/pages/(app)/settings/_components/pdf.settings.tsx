@@ -13,6 +13,7 @@ import type React from "react"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
+import { useTranslation } from "react-i18next"
 
 const defaultInvoiceTemplate = `<!DOCTYPE html>
 <html>
@@ -212,9 +213,10 @@ interface TemplateSettings {
 }
 
 export default function PDFTemplatesSettings() {
+    const { t } = useTranslation()
     const { data: companyTemplateSettings } = useGet<TemplateSettings>("/api/company/pdf-template")
-
-    const { trigger: updateTemplateSettings, loading: updateTemplateSettingsLoading } = usePost<TemplateSettings>("/api/company/pdf-template")
+    const { trigger: updateTemplateSettings, loading: updateTemplateSettingsLoading } =
+        usePost<TemplateSettings>("/api/company/pdf-template")
 
     const [settings, setSettings] = useState<TemplateSettings>({
         templateType: "invoice",
@@ -224,20 +226,20 @@ export default function PDFTemplatesSettings() {
         includeLogo: false,
         logoB64: "",
         labels: {
-            invoice: "Invoice",
-            quote: "Quote",
-            billTo: "Bill To",
-            quoteFor: "Quote For",
-            validUntil: "Valid Until",
-            dueDate: "Due Date",
-            description: "Description",
-            quantity: "Qty",
-            unitPrice: "Unit Price",
-            total: "Total",
-            subtotal: "Subtotal (HT)",
-            vat: "VAT",
-            grandTotal: "Grand Total (TTC)",
-            vatRate: "VAT Rate",
+            invoice: t("settings.pdfTemplates.defaultLabels.invoice"),
+            quote: t("settings.pdfTemplates.defaultLabels.quote"),
+            billTo: t("settings.pdfTemplates.defaultLabels.billTo"),
+            quoteFor: t("settings.pdfTemplates.defaultLabels.quoteFor"),
+            validUntil: t("settings.pdfTemplates.defaultLabels.validUntil"),
+            dueDate: t("settings.pdfTemplates.defaultLabels.dueDate"),
+            description: t("settings.pdfTemplates.defaultLabels.description"),
+            quantity: t("settings.pdfTemplates.defaultLabels.quantity"),
+            unitPrice: t("settings.pdfTemplates.defaultLabels.unitPrice"),
+            total: t("settings.pdfTemplates.defaultLabels.total"),
+            subtotal: t("settings.pdfTemplates.defaultLabels.subtotal"),
+            vat: t("settings.pdfTemplates.defaultLabels.vat"),
+            grandTotal: t("settings.pdfTemplates.defaultLabels.grandTotal"),
+            vatRate: t("settings.pdfTemplates.defaultLabels.vatRate"),
         },
         padding: 40,
     })
@@ -350,19 +352,21 @@ export default function PDFTemplatesSettings() {
     }, [settings, sampleData])
 
     const handleSaveSettings = () => {
-        updateTemplateSettings(settings).then(() => {
-            toast.success("Template settings updated successfully!")
-        }).catch((error) => {
-            console.error("Error updating template settings:", error)
-            toast.error("Failed to update template settings.")
-        })
+        updateTemplateSettings(settings)
+            .then(() => {
+                toast.success(t("settings.pdfTemplates.messages.updateSuccess"))
+            })
+            .catch((error) => {
+                console.error("Error updating template settings:", error)
+                toast.error(t("settings.pdfTemplates.messages.updateError"))
+            })
     }
 
     return (
         <div>
             <div className="mb-4">
-                <h1 className="text-3xl font-bold">PDF Template Settings</h1>
-                <p className="text-muted-foreground">Manage your PDF templates for invoices and quotes.</p>
+                <h1 className="text-3xl font-bold">{t("settings.pdfTemplates.title")}</h1>
+                <p className="text-muted-foreground">{t("settings.pdfTemplates.description")}</p>
             </div>
 
             <div className="flex-1 min-h-0">
@@ -373,12 +377,12 @@ export default function PDFTemplatesSettings() {
                                 <div className="space-y-6">
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Template Type</CardTitle>
-                                            <CardDescription>Choose between invoice or quote template</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.templateType.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.templateType.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="space-y-2">
-                                                <Label htmlFor="template-type">Template Type</Label>
+                                                <Label htmlFor="template-type">{t("settings.pdfTemplates.templateType.label")}</Label>
                                                 <Select
                                                     value={settings.templateType}
                                                     onValueChange={(value: "invoice" | "quote") =>
@@ -389,8 +393,12 @@ export default function PDFTemplatesSettings() {
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="invoice">Invoice</SelectItem>
-                                                        <SelectItem value="quote">Quote</SelectItem>
+                                                        <SelectItem value="invoice">
+                                                            {t("settings.pdfTemplates.templateType.options.invoice")}
+                                                        </SelectItem>
+                                                        <SelectItem value="quote">
+                                                            {t("settings.pdfTemplates.templateType.options.quote")}
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -399,12 +407,12 @@ export default function PDFTemplatesSettings() {
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Typography</CardTitle>
-                                            <CardDescription>Choose the font family for your documents</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.typography.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.typography.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="space-y-2">
-                                                <Label htmlFor="font-family">Font Family</Label>
+                                                <Label htmlFor="font-family">{t("settings.pdfTemplates.typography.fontFamily")}</Label>
                                                 <Select
                                                     value={settings.fontFamily}
                                                     onValueChange={(value) => setSettings((prev) => ({ ...prev, fontFamily: value }))}
@@ -426,12 +434,12 @@ export default function PDFTemplatesSettings() {
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Colors</CardTitle>
-                                            <CardDescription>Customize the color scheme of your templates</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.colors.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.colors.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="primary-color">Primary Color</Label>
+                                                <Label htmlFor="primary-color">{t("settings.pdfTemplates.colors.primaryColor")}</Label>
                                                 <div className="flex items-center space-x-2">
                                                     <input
                                                         type="color"
@@ -447,32 +455,13 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                             </div>
-                                            {false && ( // Secondary color is not used in the template, but kept for future use
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="secondary-color">Secondary Color</Label>
-                                                    <div className="flex items-center space-x-2">
-                                                        <input
-                                                            type="color"
-                                                            id="secondary-color"
-                                                            value={settings.secondaryColor}
-                                                            onChange={(e) => setSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
-                                                            className="w-12 h-10 rounded border border-input"
-                                                        />
-                                                        <Input
-                                                            value={settings.secondaryColor}
-                                                            onChange={(e) => setSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
-                                                            className="flex-1"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
                                         </CardContent>
                                     </Card>
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Logo</CardTitle>
-                                            <CardDescription>Add your company logo to the templates</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.logo.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.logo.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="flex items-center space-x-2">
@@ -481,16 +470,15 @@ export default function PDFTemplatesSettings() {
                                                     checked={settings.includeLogo}
                                                     onCheckedChange={(checked) => setSettings((prev) => ({ ...prev, includeLogo: checked }))}
                                                 />
-                                                <Label htmlFor="include-logo">Include Logo</Label>
+                                                <Label htmlFor="include-logo">{t("settings.pdfTemplates.logo.includeLogo")}</Label>
                                             </div>
-
                                             {settings.includeLogo && (
                                                 <div className="space-y-4">
                                                     {settings.logoB64 ? (
                                                         <div className="relative inline-block">
                                                             <img
                                                                 src={settings.logoB64 || "/placeholder.svg"}
-                                                                alt="Logo preview"
+                                                                alt={t("settings.pdfTemplates.logo.logoPreview")}
                                                                 className="max-h-20 max-w-40 border border-border rounded"
                                                             />
                                                             <Button
@@ -506,7 +494,9 @@ export default function PDFTemplatesSettings() {
                                                         <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
                                                             <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
                                                             <Label htmlFor="logo-upload" className="cursor-pointer">
-                                                                <span className="text-sm text-muted-foreground">Click to upload logo</span>
+                                                                <span className="text-sm text-muted-foreground">
+                                                                    {t("settings.pdfTemplates.logo.uploadText")}
+                                                                </span>
                                                                 <Input
                                                                     id="logo-upload"
                                                                     type="file"
@@ -524,13 +514,15 @@ export default function PDFTemplatesSettings() {
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Spacing</CardTitle>
-                                            <CardDescription>Adjust the padding and margins</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.spacing.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.spacing.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
-                                                    <Label>Padding: {settings.padding}px</Label>
+                                                    <Label>
+                                                        {t("settings.pdfTemplates.spacing.padding")}: {settings.padding}px
+                                                    </Label>
                                                     <Slider
                                                         value={[settings.padding]}
                                                         onValueChange={(value) => setSettings((prev) => ({ ...prev, padding: value[0] }))}
@@ -546,13 +538,13 @@ export default function PDFTemplatesSettings() {
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Label Overrides</CardTitle>
-                                            <CardDescription>Customize the text labels used in your templates</CardDescription>
+                                            <CardTitle>{t("settings.pdfTemplates.title")}</CardTitle>
+                                            <CardDescription>{t("settings.pdfTemplates.description")}</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-invoice">Invoice</Label>
+                                                    <Label htmlFor="label-invoice">{t("settings.pdfTemplates.labels.invoice")}</Label>
                                                     <Input
                                                         id="label-invoice"
                                                         value={settings.labels.invoice}
@@ -560,7 +552,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-quote">Quote</Label>
+                                                    <Label htmlFor="label-quote">{t("settings.pdfTemplates.labels.quote")}</Label>
                                                     <Input
                                                         id="label-quote"
                                                         value={settings.labels.quote}
@@ -568,7 +560,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-bill-to">Bill To</Label>
+                                                    <Label htmlFor="label-bill-to">{t("settings.pdfTemplates.labels.billTo")}</Label>
                                                     <Input
                                                         id="label-bill-to"
                                                         value={settings.labels.billTo}
@@ -576,7 +568,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-quote-for">Quote For</Label>
+                                                    <Label htmlFor="label-quote-for">{t("settings.pdfTemplates.labels.quoteFor")}</Label>
                                                     <Input
                                                         id="label-quote-for"
                                                         value={settings.labels.quoteFor}
@@ -584,7 +576,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-valid-until">Valid Until</Label>
+                                                    <Label htmlFor="label-valid-until">{t("settings.pdfTemplates.labels.validUntil")}</Label>
                                                     <Input
                                                         id="label-valid-until"
                                                         value={settings.labels.validUntil}
@@ -592,7 +584,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-due-date">Due Date</Label>
+                                                    <Label htmlFor="label-due-date">{t("settings.pdfTemplates.labels.dueDate")}</Label>
                                                     <Input
                                                         id="label-due-date"
                                                         value={settings.labels.dueDate}
@@ -600,7 +592,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-description">Description</Label>
+                                                    <Label htmlFor="label-description">{t("settings.pdfTemplates.labels.description")}</Label>
                                                     <Input
                                                         id="label-description"
                                                         value={settings.labels.description}
@@ -608,7 +600,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-quantity">Quantity</Label>
+                                                    <Label htmlFor="label-quantity">{t("settings.pdfTemplates.labels.quantity")}</Label>
                                                     <Input
                                                         id="label-quantity"
                                                         value={settings.labels.quantity}
@@ -616,7 +608,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-unit-price">Unit Price</Label>
+                                                    <Label htmlFor="label-unit-price">{t("settings.pdfTemplates.labels.unitPrice")}</Label>
                                                     <Input
                                                         id="label-unit-price"
                                                         value={settings.labels.unitPrice}
@@ -624,7 +616,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-total">Total</Label>
+                                                    <Label htmlFor="label-total">{t("settings.pdfTemplates.labels.total")}</Label>
                                                     <Input
                                                         id="label-total"
                                                         value={settings.labels.total}
@@ -632,7 +624,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-subtotal">Subtotal</Label>
+                                                    <Label htmlFor="label-subtotal">{t("settings.pdfTemplates.labels.subtotal")}</Label>
                                                     <Input
                                                         id="label-subtotal"
                                                         value={settings.labels.subtotal}
@@ -640,7 +632,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-vat">VAT</Label>
+                                                    <Label htmlFor="label-vat">{t("settings.pdfTemplates.labels.vat")}</Label>
                                                     <Input
                                                         id="label-vat"
                                                         value={settings.labels.vat}
@@ -648,7 +640,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-vat-rate">VAT Rate</Label>
+                                                    <Label htmlFor="label-vat-rate">{t("settings.pdfTemplates.labels.vatRate")}</Label>
                                                     <Input
                                                         id="label-vat-rate"
                                                         value={settings.labels.vatRate}
@@ -656,7 +648,7 @@ export default function PDFTemplatesSettings() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="label-grand-total">Grand Total</Label>
+                                                    <Label htmlFor="label-grand-total">{t("settings.pdfTemplates.labels.grandTotal")}</Label>
                                                     <Input
                                                         id="label-grand-total"
                                                         value={settings.labels.grandTotal}
@@ -668,8 +660,13 @@ export default function PDFTemplatesSettings() {
                                     </Card>
 
                                     <div className="pb-6">
-                                        <Button loading={updateTemplateSettingsLoading} size="lg" className="w-full" onClick={handleSaveSettings}>
-                                            Save Template Settings
+                                        <Button
+                                            loading={updateTemplateSettingsLoading}
+                                            size="lg"
+                                            className="w-full"
+                                            onClick={handleSaveSettings}
+                                        >
+                                            {t("settings.pdfTemplates.saveButton")}
                                         </Button>
                                     </div>
                                 </div>
@@ -690,9 +687,11 @@ export default function PDFTemplatesSettings() {
                     <ResizablePanel defaultSize={55} minSize={30}>
                         <div className="h-full flex flex-col">
                             <div className="flex-shrink-0 p-6 pb-4 border-b">
-                                <h3 className="text-lg font-semibold">Live Preview</h3>
+                                <h3 className="text-lg font-semibold">{t("settings.pdfTemplates.preview.title")}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Real-time preview of your {settings.templateType} template
+                                    {t("settings.pdfTemplates.preview.description", {
+                                        templateType: t(`settings.pdfTemplates.templateType.options.${settings.templateType}`),
+                                    })}
                                 </p>
                             </div>
                             <div className="flex-1 p-6 min-h-0 relative">
@@ -701,7 +700,7 @@ export default function PDFTemplatesSettings() {
                                     key={iframeKey}
                                     srcDoc={generatePreviewHTML}
                                     className="w-full h-full bg-white border border-border rounded-lg"
-                                    title="PDF Template Preview"
+                                    title={t("settings.pdfTemplates.preview.iframeTitle")}
                                 />
                             </div>
                         </div>

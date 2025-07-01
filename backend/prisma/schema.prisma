@@ -193,7 +193,6 @@ model Company {
   id             String         @id @default(cuid())
   name           String
   description    String
-  language       String         @default("en")
   currency       Currency       @default(EUR)
   legalId        String
   foundedAt      DateTime

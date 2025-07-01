@@ -1,5 +1,3 @@
-"use client"
-
 import { AlertTriangle, Database, Loader2, RotateCcw } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -20,14 +18,15 @@ import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
 import { usePost } from "@/lib/utils"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 export default function DangerZoneSettings() {
+    const { t } = useTranslation()
     const [currentAction, setCurrentAction] = useState<"app" | "all" | null>(null)
     const [otp, setOtp] = useState("")
     const { trigger: sendOTP, loading: isLoadingOtp } = usePost("/api/danger/otp")
     const { trigger: sendAction } = usePost(`/api/danger/reset/${currentAction}?otp=${otp}`)
     const [otpModalOpen, setOtpModalOpen] = useState(false)
-
     const { logout } = useAuth()
     const navigate = useNavigate()
 
@@ -35,14 +34,13 @@ export default function DangerZoneSettings() {
         setCurrentAction(action)
         setOtpModalOpen(true)
         setOtp("")
-
         sendOTP()
             .then(() => {
-                toast.success("OTP sent successfully. Please check your email.")
+                toast.success(t("settings.dangerZone.messages.otpSentSuccess"))
             })
             .catch((error) => {
-                toast.error("Failed to send OTP. Please try again later.", {
-                    description: error instanceof Error ? error.message : "An unexpected error occurred.",
+                toast.error(t("settings.dangerZone.messages.otpSentError"), {
+                    description: error instanceof Error ? error.message : t("settings.dangerZone.messages.unexpectedError"),
                 })
             })
     }
@@ -50,24 +48,26 @@ export default function DangerZoneSettings() {
     const executeReset = () => {
         if (!currentAction || !otp) return
 
-        sendAction({ otp }).then((d) => {
-            if (!d) {
-                throw new Error("Failed to execute action. Please try again.")
-            }
-            toast.success("Action executed successfully.")
-            setOtpModalOpen(false)
-            setOtp("")
-            setCurrentAction(null)
-            if (currentAction === "all") {
-                logout()
-            } else {
-                navigate("/dashboard")
-            }
-        }).catch((error) => {
-            toast.error("Error while executing action.", {
-                description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        sendAction({ otp })
+            .then((d) => {
+                if (!d) {
+                    throw new Error(t("settings.dangerZone.messages.actionFailed"))
+                }
+                toast.success(t("settings.dangerZone.messages.actionSuccess"))
+                setOtpModalOpen(false)
+                setOtp("")
+                setCurrentAction(null)
+                if (currentAction === "all") {
+                    logout()
+                } else {
+                    navigate("/dashboard")
+                }
             })
-        })
+            .catch((error) => {
+                toast.error(t("settings.dangerZone.messages.actionError"), {
+                    description: error instanceof Error ? error.message : t("settings.dangerZone.messages.unexpectedError"),
+                })
+            })
     }
 
     const formatOtp = (value: string) => {
@@ -83,8 +83,8 @@ export default function DangerZoneSettings() {
     return (
         <div>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold">Danger Zone</h1>
-                <p className="text-muted-foreground">Do irreversible actions with caution.</p>
+                <h1 className="text-3xl font-bold">{t("settings.dangerZone.title")}</h1>
+                <p className="text-muted-foreground">{t("settings.dangerZone.description")}</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -93,9 +93,9 @@ export default function DangerZoneSettings() {
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-lg">
                             <RotateCcw className="h-4 w-4" />
-                            Reset App Data
+                            {t("settings.dangerZone.resetApp.title")}
                         </CardTitle>
-                        <CardDescription className="text-sm">Remove all content while preserving user accounts</CardDescription>
+                        <CardDescription className="text-sm">{t("settings.dangerZone.resetApp.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
                         <Button
@@ -104,7 +104,7 @@ export default function DangerZoneSettings() {
                             onClick={() => requestOtp("app")}
                             loading={isLoadingOtp}
                         >
-                            Reset Application
+                            {t("settings.dangerZone.resetApp.button")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -114,9 +114,9 @@ export default function DangerZoneSettings() {
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400 text-lg">
                             <Database className="h-4 w-4" />
-                            Reset Database
+                            {t("settings.dangerZone.resetDatabase.title")}
                         </CardTitle>
-                        <CardDescription className="text-sm">Completely wipe everything including all accounts</CardDescription>
+                        <CardDescription className="text-sm">{t("settings.dangerZone.resetDatabase.description")}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-0">
                         <Button
@@ -126,7 +126,7 @@ export default function DangerZoneSettings() {
                             disabled={isLoadingOtp}
                         >
                             {isLoadingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
-                            Reset Everything
+                            {t("settings.dangerZone.resetDatabase.button")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -138,20 +138,18 @@ export default function DangerZoneSettings() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <AlertTriangle className="h-5 w-5 text-amber-500" />
-                            Verify Action
+                            {t("settings.dangerZone.modal.title")}
                         </DialogTitle>
-                        <DialogDescription>
-                            Enter the 8-digit verification code sent to your email to confirm this dangerous action.
-                        </DialogDescription>
+                        <DialogDescription>{t("settings.dangerZone.modal.description")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="otp">Verification Code</Label>
+                            <Label htmlFor="otp">{t("settings.dangerZone.modal.otpLabel")}</Label>
                             <Input
                                 id="otp"
                                 value={otp}
                                 onChange={handleOtpChange}
-                                placeholder="XXXX-XXXX"
+                                placeholder={t("settings.dangerZone.modal.otpPlaceholder")}
                                 className="text-center text-lg font-mono tracking-wider"
                                 maxLength={9}
                             />
@@ -159,22 +157,24 @@ export default function DangerZoneSettings() {
                         {currentAction && (
                             <div className="bg-muted p-3 rounded-lg">
                                 <p className="text-sm font-medium">
-                                    {currentAction === "app" ? "⚠️ Reset Application Data" : "🚨 Reset Entire Database"}
+                                    {currentAction === "app"
+                                        ? t("settings.dangerZone.modal.warningApp")
+                                        : t("settings.dangerZone.modal.warningDatabase")}
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-1">
                                     {currentAction === "app"
-                                        ? "This will remove all content but preserve user accounts"
-                                        : "This will permanently delete EVERYTHING including all accounts"}
+                                        ? t("settings.dangerZone.modal.warningAppDescription")
+                                        : t("settings.dangerZone.modal.warningDatabaseDescription")}
                                 </p>
                             </div>
                         )}
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setOtpModalOpen(false)}>
-                            Cancel
+                            {t("settings.dangerZone.modal.cancel")}
                         </Button>
                         <Button variant="destructive" onClick={executeReset} disabled={otp.length !== 9}>
-                            Confirm Reset
+                            {t("settings.dangerZone.modal.confirm")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

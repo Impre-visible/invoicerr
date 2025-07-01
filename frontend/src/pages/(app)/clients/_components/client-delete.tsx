@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
 import { useDelete } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 
 interface ClientDeleteDialogProps {
     client: Client | null
@@ -17,7 +18,7 @@ interface ClientDeleteDialogProps {
 }
 
 export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogProps) {
-
+    const { t } = useTranslation()
     const { trigger } = useDelete(`/api/clients/${client?.id}`)
 
     const handleDelete = () => {
@@ -36,17 +37,17 @@ export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogP
         <Dialog open={client != null} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Delete Client</DialogTitle>
+                    <DialogTitle>{t('clients.delete.title')}</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to delete this client? This action cannot be undone.
+                        {t('clients.delete.description')}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex !flex-col-reverse gap-2 justify-end">
                     <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
-                        Cancel
+                        {t('clients.delete.actions.cancel')}
                     </Button>
                     <Button variant="destructive" className="w-full" onClick={handleDelete}>
-                        Delete
+                        {t('clients.delete.actions.delete')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

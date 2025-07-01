@@ -4,16 +4,13 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type React from "react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
 import { usePost } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
-
-const loginSchema = z.object({
-    email: z.string().email("Invalid email"),
-    password: z.string().min(1, "Password is required"),
-})
 
 interface LoginResponse {
     access_token: string
@@ -27,13 +24,21 @@ interface LoginResponse {
 }
 
 export default function LoginPage() {
+    const { t } = useTranslation()
     const { setAccessToken, setRefreshToken } = useAuth()
     const navigate = useNavigate()
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
 
+    // Move schema inside component to access t function
+    const loginSchema = z.object({
+        email: z.string().email(t("auth.login.errors.invalidEmail")),
+        password: z.string().min(1, t("auth.login.errors.passwordRequired")),
+    })
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+
         const formData = new FormData(event.currentTarget)
         const data = {
             email: formData.get("email") as string,
@@ -64,43 +69,39 @@ export default function LoginPage() {
             setTimeout(() => {
                 navigate("/")
             }, 1000)
-            toast.success("Login successful! Redirecting...")
+            toast.success(t("auth.login.messages.loginSuccess"))
         } else if (error) {
-            toast.error("Login failed. Please check your credentials.")
+            toast.error(t("auth.login.messages.loginError"))
         }
-    }, [data, error])
+    }, [data, error, navigate, setAccessToken, setRefreshToken, t])
 
     return (
         <div className="min-h-screen flex items-center justify-center">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle className="text-2xl text-center">Login</CardTitle>
-                    <CardDescription className="text-center">
-                        Enter your credentials to access your account
-                    </CardDescription>
+                    <CardTitle className="text-2xl text-center">{t("auth.login.title")}</CardTitle>
+                    <CardDescription className="text-center">{t("auth.login.description")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">{t("auth.login.form.email.label")}</Label>
                             <Input id="email" name="email" type="email" disabled={loading} />
                             {errors.email && <p className="text-sm text-red-600">{errors.email[0]}</p>}
                         </div>
-
                         <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t("auth.login.form.password.label")}</Label>
                             <Input id="password" name="password" type="password" disabled={loading} />
                             {errors.password && <p className="text-sm text-red-600">{errors.password[0]}</p>}
                         </div>
                         <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? "Logging in..." : "Log in"}
+                            {loading ? t("auth.login.form.loggingIn") : t("auth.login.form.loginButton")}
                         </Button>
                     </form>
-
                     <div className="mt-4 text-center text-sm">
-                        Don't have an account?{" "}
+                        {t("auth.login.noAccount")}{" "}
                         <button onClick={() => navigate("/signup")} className="underline hover:text-primary">
-                            Sign up
+                            {t("auth.login.signUpLink")}
                         </button>
                     </div>
                 </CardContent>

@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect, useState } from "react"
 import { useGet, usePost } from "@/lib/utils"
 
@@ -12,35 +11,67 @@ import SearchSelect from "@/components/search-input"
 import { currencies } from "@/lib/constants/currencies"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-const companySchema = z.object({
-    name: z.string({ required_error: "Company name is required" }).min(1, "Company name cannot be empty").max(100, "Name cannot exceed 100 characters"),
-    description: z.string().max(500, "Description cannot exceed 500 characters"),
-    legalId: z.string({ required_error: "Legal ID is required" }).min(1, "Legal ID cannot be empty").max(50, "Legal ID cannot exceed 50 characters"),
-    VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
-    foundedAt: z.date().refine((date) => date <= new Date(), "Founded date cannot be in the future"),
-    language: z.string({ required_error: "Language is required" }).min(1, "Please select a language"),
-    currency: z.string({ required_error: "Currency is required" }).min(1, "Please select a currency"),
-    address: z.string().min(1, "Address cannot be empty"),
-    postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
-    city: z.string().min(1, "City cannot be empty"),
-    country: z.string().min(1, "Country cannot be empty"),
-    phone: z.string().min(8, "Phone number must be at least 8 characters").refine((val) => { return /^[+]?[0-9\s\-()]{8,20}$/.test(val) }, "Invalid phone number format"),
-    email: z.string().email().min(1, "Email is required").refine((val) => { return z.string().email().safeParse(val).success }, "Invalid email format"),
-})
-
 export default function CompanySettings() {
+    const { t } = useTranslation()
+    const navigate = useNavigate()
+
+    // Move schema inside component to access t function
+    const companySchema = z.object({
+        name: z
+            .string({ required_error: t("settings.company.form.company.errors.required") })
+            .min(1, t("settings.company.form.company.errors.empty"))
+            .max(100, t("settings.company.form.company.errors.maxLength")),
+        description: z.string().max(500, t("settings.company.form.description.errors.maxLength")),
+        legalId: z
+            .string({ required_error: t("settings.company.form.legalId.errors.required") })
+            .min(1, t("settings.company.form.legalId.errors.empty"))
+            .max(50, t("settings.company.form.legalId.errors.maxLength")),
+        VAT: z
+            .string({ required_error: t("settings.company.form.vat.errors.required") })
+            .min(1, t("settings.company.form.vat.errors.empty"))
+            .max(15, t("settings.company.form.vat.errors.maxLength"))
+            .refine((val) => {
+                return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
+            }, t("settings.company.form.vat.errors.format")),
+        foundedAt: z.date().refine((date) => date <= new Date(), t("settings.company.form.foundedAt.errors.future")),
+        currency: z
+            .string({ required_error: t("settings.company.form.currency.errors.required") })
+            .min(1, t("settings.company.form.currency.errors.select")),
+        address: z.string().min(1, t("settings.company.form.address.errors.empty")),
+        postalCode: z.string().refine((val) => {
+            return /^[0-9A-Z\s-]{3,10}$/.test(val)
+        }, t("settings.company.form.postalCode.errors.format")),
+        city: z.string().min(1, t("settings.company.form.city.errors.empty")),
+        country: z.string().min(1, t("settings.company.form.country.errors.empty")),
+        phone: z
+            .string()
+            .min(8, t("settings.company.form.phone.errors.minLength"))
+            .refine((val) => {
+                return /^[+]?[0-9\s\-()]{8,20}$/.test(val)
+            }, t("settings.company.form.phone.errors.format")),
+        email: z
+            .string()
+            .email()
+            .min(1, t("settings.company.form.email.errors.required"))
+            .refine((val) => {
+                return z.string().email().safeParse(val).success
+            }, t("settings.company.form.email.errors.format")),
+    })
+
     const { data } = useGet<Company>("/api/company/info")
     const { trigger } = usePost<Company>("/api/company/info")
-
     const [currencySearch, setCurrencySearch] = useState("")
-    const [searchedCurrencies, setSearchedCurrencies] = useState<{
-        label: string
-        value: string
-    }[]>([])
-
+    const [searchedCurrencies, setSearchedCurrencies] = useState<
+        {
+            label: string
+            value: string
+        }[]
+    >([])
     const [isLoading, setIsLoading] = useState(false)
 
     const form = useForm<z.infer<typeof companySchema>>({
@@ -51,7 +82,6 @@ export default function CompanySettings() {
             legalId: "",
             VAT: "",
             foundedAt: new Date(),
-            language: "",
             currency: "",
             address: "",
             postalCode: "",
@@ -73,14 +103,20 @@ export default function CompanySettings() {
 
     async function onSubmit(values: z.infer<typeof companySchema>) {
         setIsLoading(true)
-
-        trigger(values).then(() => {
-            toast.success("Company settings updated successfully!")
-        }).catch((error) => {
-            console.error("Error updating company settings:", error)
-        }).finally(() => {
-            setIsLoading(false)
-        })
+        trigger(values)
+            .then(() => {
+                toast.success(t("settings.company.messages.updateSuccess"))
+                setTimeout(() => {
+                    navigate(0)
+                }, 150)
+            })
+            .catch((error) => {
+                console.error("Error updating company settings:", error)
+                toast.error(t("settings.company.messages.updateError"))
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -89,7 +125,7 @@ export default function CompanySettings() {
                 Object.entries(currencies).map(([code, { name, symbol }]) => ({
                     label: `${name} (${symbol})`,
                     value: code,
-                }))
+                })),
             )
         }
     }, [currencySearch])
@@ -97,17 +133,24 @@ export default function CompanySettings() {
     const handleSearchChange = (search: string) => {
         setCurrencySearch(search)
         if (search.length == 0) {
-            setSearchedCurrencies(Object.entries(currencies).map(([code, { name, symbol }]) => ({
-                label: `${name} (${symbol})`,
-                value: code,
-            })))
+            setSearchedCurrencies(
+                Object.entries(currencies).map(([code, { name, symbol }]) => ({
+                    label: `${name} (${symbol})`,
+                    value: code,
+                })),
+            )
             return
         }
 
         const filteredCurrencies = Object.entries(currencies)
             .filter(([code, { name, symbol, demonym }]) => {
                 const label = `${name} (${symbol})`
-                return label.toLowerCase().includes(search.toLowerCase()) || code.toLowerCase().includes(search.toLowerCase()) || symbol.toLowerCase().includes(search.toLowerCase()) || demonym.toLowerCase().includes(search.toLowerCase())
+                return (
+                    label.toLowerCase().includes(search.toLowerCase()) ||
+                    code.toLowerCase().includes(search.toLowerCase()) ||
+                    symbol.toLowerCase().includes(search.toLowerCase()) ||
+                    demonym.toLowerCase().includes(search.toLowerCase())
+                )
             })
             .map(([code, { name, symbol }]) => ({
                 label: `${name} (${symbol})`,
@@ -120,16 +163,16 @@ export default function CompanySettings() {
     return (
         <div>
             <div className="mb-4">
-                <h1 className="text-3xl font-bold">Company Settings</h1>
-                <p className="text-muted-foreground">Manage your company information</p>
+                <h1 className="text-3xl font-bold">{t("settings.company.title")}</h1>
+                <p className="text-muted-foreground">{t("settings.company.description")}</p>
             </div>
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>General Information</CardTitle>
-                            <CardDescription>Basic information about your company</CardDescription>
+                            <CardTitle>{t("settings.company.basicInfo")}</CardTitle>
+                            <CardDescription>{t("settings.company.basicInfoDescription")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -138,11 +181,11 @@ export default function CompanySettings() {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Company Name</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.company.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Your company name" {...field} />
+                                                <Input placeholder={t("settings.company.form.company.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>This is your company's legal name.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.company.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -153,11 +196,11 @@ export default function CompanySettings() {
                                     name="description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Description</FormLabel>
+                                            <FormLabel>{t("settings.company.form.description.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Brief description of your company" {...field} />
+                                                <Input placeholder={t("settings.company.form.description.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>Optional description for your company.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.description.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -168,42 +211,16 @@ export default function CompanySettings() {
                                     name="foundedAt"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Founded Date</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.foundedAt.label")}</FormLabel>
                                             <FormControl>
                                                 <DatePicker
                                                     className="w-full bg-opacity-100"
                                                     value={field.value || null}
                                                     onChange={field.onChange}
-                                                    placeholder="Select a date"
+                                                    placeholder={t("settings.company.form.foundedAt.placeholder")}
                                                 />
                                             </FormControl>
-                                            <FormDescription>Date your company was founded.</FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="language"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel required>Language</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a language" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="en">English</SelectItem>
-                                                    <SelectItem value="fr">Français</SelectItem>
-                                                    <SelectItem value="es">Español</SelectItem>
-                                                    <SelectItem value="de">Deutsch</SelectItem>
-                                                    <SelectItem value="it">Italiano</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormDescription>Default language for your company.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.foundedAt.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -214,7 +231,7 @@ export default function CompanySettings() {
                                     name="currency"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Currency</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.currency.label")}</FormLabel>
                                             <FormControl>
                                                 <SearchSelect
                                                     options={searchedCurrencies}
@@ -223,13 +240,13 @@ export default function CompanySettings() {
                                                         value: code,
                                                     }))}
                                                     value={field.value}
-                                                    onValueChange={(field.onChange)}
+                                                    onValueChange={field.onChange}
                                                     onSearchChange={handleSearchChange}
-                                                    placeholder="Select a currency"
+                                                    placeholder={t("settings.company.form.currency.placeholder")}
                                                     className="w-full"
                                                 />
                                             </FormControl>
-                                            <FormDescription>Default currency for transactions.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.currency.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -240,11 +257,11 @@ export default function CompanySettings() {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Legal ID</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.legalId.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="123456789" {...field} />
+                                                <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>Your company's legal identification number. (e.g., SIRET, EIN, etc.)</FormDescription>
+                                            <FormDescription>{t("settings.company.form.legalId.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -255,11 +272,11 @@ export default function CompanySettings() {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>VAT Number</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.vat.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="FR12345678901" {...field} />
+                                                <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>Your company's VAT identification number.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.vat.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -270,8 +287,8 @@ export default function CompanySettings() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Address</CardTitle>
-                            <CardDescription>Physical address of your company</CardDescription>
+                            <CardTitle>{t("settings.company.address.title")}</CardTitle>
+                            <CardDescription>{t("settings.company.address.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <FormField
@@ -279,11 +296,11 @@ export default function CompanySettings() {
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>Address</FormLabel>
+                                        <FormLabel required>{t("settings.company.form.address.label")}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="123 Main Street" {...field} />
+                                            <Input placeholder={t("settings.company.form.address.placeholder")} {...field} />
                                         </FormControl>
-                                        <FormDescription>Street address of your company.</FormDescription>
+                                        <FormDescription>{t("settings.company.form.address.description")}</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -295,9 +312,9 @@ export default function CompanySettings() {
                                     name="postalCode"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Postal Code</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.postalCode.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="12345" {...field} />
+                                                <Input placeholder={t("settings.company.form.postalCode.placeholder")} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -309,9 +326,9 @@ export default function CompanySettings() {
                                     name="city"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>City</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.city.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="New York" {...field} />
+                                                <Input placeholder={t("settings.company.form.city.placeholder")} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -323,8 +340,10 @@ export default function CompanySettings() {
                                     name="country"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Country</FormLabel>
-                                            <Input placeholder="United States" {...field} />
+                                            <FormLabel required>{t("settings.company.form.country.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder={t("settings.company.form.country.placeholder")} {...field} />
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -335,8 +354,8 @@ export default function CompanySettings() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Contact Information</CardTitle>
-                            <CardDescription>Contact details for your company</CardDescription>
+                            <CardTitle>{t("settings.company.contact.title")}</CardTitle>
+                            <CardDescription>{t("settings.company.contact.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -345,11 +364,11 @@ export default function CompanySettings() {
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Phone</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.phone.label")}</FormLabel>
                                             <FormControl>
-                                                <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
+                                                <Input type="tel" placeholder={t("settings.company.form.phone.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>Primary phone number for your company.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.phone.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -360,11 +379,11 @@ export default function CompanySettings() {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>Email</FormLabel>
+                                            <FormLabel required>{t("settings.company.form.email.label")}</FormLabel>
                                             <FormControl>
-                                                <Input type="email" placeholder="contact@company.com" {...field} />
+                                                <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} />
                                             </FormControl>
-                                            <FormDescription>Primary email address for your company.</FormDescription>
+                                            <FormDescription>{t("settings.company.form.email.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -375,7 +394,7 @@ export default function CompanySettings() {
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={isLoading} className="min-w-32">
-                            {isLoading ? "Saving..." : "Save Settings"}
+                            {isLoading ? t("settings.company.form.saving") : t("settings.company.form.saveSettings")}
                         </Button>
                     </div>
                 </form>

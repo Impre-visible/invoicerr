@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 
 import type { Client } from "@/types";
+import { useTranslation } from "react-i18next";
 
 interface ClientViewDialogProps {
     client: Client | null;
@@ -14,24 +15,26 @@ interface ClientViewDialogProps {
 }
 
 export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps) {
+    const { t } = useTranslation();
+
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-[95vw] lg:max-w-lg max-h-[90dvh] w-fit p-6">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">Client Details</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">{t("clients.view.title")}</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
-                        View all relevant information about this client.
+                        {t("clients.view.description")}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4 w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                         <div className="w-fit">
-                            <p className="text-sm text-muted-foreground">Company Name</p>
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.companyName")}</p>
                             <p className="font-medium">{client?.name || "—"}</p>
                         </div>
                         <div className="w-fit">
-                            <p className="text-sm text-muted-foreground">Contact Person</p>
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.contactPerson")}</p>
                             <p className="font-medium">
                                 {client?.contactFirstname} {client?.contactLastname}
                             </p>
@@ -40,12 +43,12 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                         <div className="w-fit">
-                            <p className="text-sm text-muted-foreground">Email</p>
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.email")}</p>
                             <p className="font-medium">{client?.contactEmail || "—"}</p>
                         </div>
                         {client?.contactPhone && (
                             <div className="w-fit">
-                                <p className="text-sm text-muted-foreground">Phone</p>
+                                <p className="text-sm text-muted-foreground">{t("clients.view.fields.phone")}</p>
                                 <p className="font-medium">{client.contactPhone}</p>
                             </div>
                         )}
@@ -55,25 +58,25 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                             {client?.address && (
                                 <div>
-                                    <p className="text-sm text-muted-foreground">Address</p>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.address")}</p>
                                     <p className="font-medium">{client.address}</p>
                                 </div>
                             )}
                             {client?.postalCode && (
                                 <div>
-                                    <p className="text-sm text-muted-foreground">Postal Code</p>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.postalCode")}</p>
                                     <p className="font-medium">{client.postalCode}</p>
                                 </div>
                             )}
                             {client?.city && (
                                 <div>
-                                    <p className="text-sm text-muted-foreground">City</p>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.city")}</p>
                                     <p className="font-medium">{client.city}</p>
                                 </div>
                             )}
                             {client?.country && (
                                 <div>
-                                    <p className="text-sm text-muted-foreground">Country</p>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.country")}</p>
                                     <p className="font-medium">{client.country}</p>
                                 </div>
                             )}
