@@ -1,6 +1,6 @@
 services:
   invoicerr:
-    image: ghcr.io/impre-visible/invoicerr:main
+    image: ghcr.io/impre-visible/invoicerr:latest
     ports:
       - "80:80"
     environment:
