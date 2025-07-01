@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import type { Invoice } from "@/types"
 import { useDelete } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 
 interface InvoiceDeleteDialogProps {
     invoice: Invoice | null
@@ -17,36 +18,34 @@ interface InvoiceDeleteDialogProps {
 }
 
 export function InvoiceDeleteDialog({ invoice, onOpenChange }: InvoiceDeleteDialogProps) {
-
+    const { t } = useTranslation()
     const { trigger } = useDelete(`/api/invoices/${invoice?.id}`)
 
     const handleDelete = () => {
-        if (!invoice) return;
+        if (!invoice) return
 
         trigger()
             .then(() => {
-                onOpenChange(false);
+                onOpenChange(false)
             })
             .catch((error) => {
-                console.error("Failed to delete invoice:", error);
-            });
+                console.error("Failed to delete invoice:", error)
+            })
     }
 
     return (
         <Dialog open={invoice != null} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Delete Invoice</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to delete this invoice? This action cannot be undone.
-                    </DialogDescription>
+                    <DialogTitle>{t("invoices.delete.title")}</DialogTitle>
+                    <DialogDescription>{t("invoices.delete.description")}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex !flex-col-reverse gap-2 justify-end">
-                    <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
-                        Cancel
+                    <Button variant="outline" className="w-full bg-transparent" onClick={() => onOpenChange(false)}>
+                        {t("invoices.delete.actions.cancel")}
                     </Button>
                     <Button variant="destructive" className="w-full" onClick={handleDelete}>
-                        Delete
+                        {t("invoices.delete.actions.delete")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

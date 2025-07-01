@@ -1,28 +1,9 @@
 import type { Client, Invoice, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import {
-    DndContext,
-    MouseSensor,
-    TouchSensor,
-    closestCenter,
-    useSensor,
-    useSensors,
-} from "@dnd-kit/core"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
-import {
-    SortableContext,
-    arrayMove,
-    useSortable,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
+import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useGet, usePatch } from "@/lib/utils"
@@ -32,7 +13,9 @@ import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import type React from "react"
 import SearchSelect from "@/components/search-input"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -41,37 +24,52 @@ interface InvoiceEditDialogProps {
     onOpenChange: (open: boolean) => void
 }
 
-const invoiceSchema = z.object({
-    quoteId: z.string().min(1, "Quote ID is required").optional(),
-    clientId: z.string().min(1, "Client is required").refine(val => val !== "", {
-        message: "Client is required",
-    }),
-    dueDate: z.date().optional(),
-    items: z.array(
-        z.object({
-            id: z.string().optional(),
-            description: z.string().min(1, "Description is required").refine(val => val !== "", {
-                message: "Description is required",
-            }),
-            quantity: z.number({ invalid_type_error: "Quantity is required" }).min(1, "Quantity must be greater than 0").refine(val => !isNaN(val), {
-                message: "Quantity must be a valid number",
-            }),
-            unitPrice: z.number({ invalid_type_error: "Unit Price is required" }).min(0, "Unit Price must be greater than or equal to 0").refine(val => !isNaN(val), {
-                message: "Unit Price must be a valid number",
-            }),
-            vatRate: z.number({ invalid_type_error: "VAT Rate is required" }).min(0, "VAT Rate must be greater than or equal to 0"),
-            order: z.number(),
-        })
-    ),
-})
-
 export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
+    const { t } = useTranslation()
+
+    // Move schema inside component to access t function
+    const invoiceSchema = z.object({
+        quoteId: z.string().min(1, t("invoices.edit.form.quote.errors.required")).optional(),
+        clientId: z
+            .string()
+            .min(1, t("invoices.edit.form.client.errors.required"))
+            .refine((val) => val !== "", {
+                message: t("invoices.edit.form.client.errors.required"),
+            }),
+        dueDate: z.date().optional(),
+        items: z.array(
+            z.object({
+                id: z.string().optional(),
+                description: z
+                    .string()
+                    .min(1, t("invoices.edit.form.items.description.errors.required"))
+                    .refine((val) => val !== "", {
+                        message: t("invoices.edit.form.items.description.errors.required"),
+                    }),
+                quantity: z
+                    .number({ invalid_type_error: t("invoices.edit.form.items.quantity.errors.required") })
+                    .min(1, t("invoices.edit.form.items.quantity.errors.min"))
+                    .refine((val) => !isNaN(val), {
+                        message: t("invoices.edit.form.items.quantity.errors.invalid"),
+                    }),
+                unitPrice: z
+                    .number({ invalid_type_error: t("invoices.edit.form.items.unitPrice.errors.required") })
+                    .min(0, t("invoices.edit.form.items.unitPrice.errors.min"))
+                    .refine((val) => !isNaN(val), {
+                        message: t("invoices.edit.form.items.unitPrice.errors.invalid"),
+                    }),
+                vatRate: z
+                    .number({ invalid_type_error: t("invoices.edit.form.items.vatRate.errors.required") })
+                    .min(0, t("invoices.edit.form.items.vatRate.errors.min")),
+                order: z.number(),
+            }),
+        ),
+    })
+
     const [clientSearchTerm, setClientsSearchTerm] = useState("")
     const [quoteSearchTerm, setQuoteSearchTerm] = useState("")
-
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
     const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
-
     const { trigger } = usePatch(`/api/invoices/${invoice?.id}`)
 
     const form = useForm<z.infer<typeof invoiceSchema>>({
@@ -90,14 +88,16 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                 quoteId: invoice.quoteId || "",
                 clientId: invoice.clientId || "",
                 dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-                items: invoice.items.sort((a, b) => a.order - b.order).map(item => ({
-                    id: item.id,
-                    description: item.description || "",
-                    quantity: item.quantity || 1,
-                    unitPrice: item.unitPrice || 0,
-                    vatRate: item.vatRate || 0,
-                    order: item.order || 0,
-                })),
+                items: invoice.items
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => ({
+                        id: item.id,
+                        description: item.description || "",
+                        quantity: item.quantity || 1,
+                        unitPrice: item.unitPrice || 0,
+                        vatRate: item.vatRate || 0,
+                        order: item.order || 0,
+                    })),
             })
         }
     }, [invoice, form])
@@ -112,12 +112,15 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
 
     const onDragEnd = (event: any) => {
         const { active, over } = event
+
         if (active.id !== over?.id) {
-            const oldIndex = fields.findIndex(f => f.id === active.id)
-            const newIndex = fields.findIndex(f => f.id === over.id)
+            const oldIndex = fields.findIndex((f) => f.id === active.id)
+            const newIndex = fields.findIndex((f) => f.id === over.id)
+
             move(oldIndex, newIndex)
+
             const reordered = arrayMove(fields, oldIndex, newIndex)
-            reordered.forEach((_item, index) => {
+            reordered.forEach((_, index) => {
                 setValue(`items.${index}.order`, index)
             })
         }
@@ -147,7 +150,7 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
         <Dialog open={!!invoice} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>Edit Invoice</DialogTitle>
+                    <DialogTitle>{t("invoices.edit.title")}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -156,13 +159,20 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                             name="quoteId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Quote</FormLabel>
+                                    <FormLabel>{t("invoices.edit.form.quote.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
-                                            options={(quotes || []).map((c) => ({ label: `${c.number}${c.title ? ` (${c.title})` : ''}`, value: c.id }))}
+                                            options={(quotes || []).map((c) => ({
+                                                label: `${c.number}${c.title ? ` (${c.title})` : ""}`,
+                                                value: c.id,
+                                            }))}
                                             value={field.value ?? ""}
-                                            onValueChange={val => { field.onChange(val || null); if (val) form.setValue("clientId", quotes?.find(q => q.id === val)?.clientId || "") }}
+                                            onValueChange={(val) => {
+                                                field.onChange(val || null)
+                                                if (val) form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
+                                            }}
                                             onSearchChange={setQuoteSearchTerm}
+                                            placeholder={t("invoices.edit.form.quote.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -170,19 +180,19 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                             )}
                         />
 
-
                         <FormField
                             control={control}
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel required>Client</FormLabel>
+                                    <FormLabel required>{t("invoices.edit.form.client.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={val => field.onChange(val || null)}
+                                            onValueChange={(val) => field.onChange(val || null)}
                                             onSearchChange={setClientsSearchTerm}
+                                            placeholder={t("invoices.edit.form.client.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -195,13 +205,13 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                             name="dueDate"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Due Date</FormLabel>
+                                    <FormLabel>{t("invoices.edit.form.dueDate.label")}</FormLabel>
                                     <FormControl>
                                         <DatePicker
                                             className="w-full"
                                             value={field.value || null}
                                             onChange={field.onChange}
-                                            placeholder="Select a date"
+                                            placeholder={t("invoices.edit.form.dueDate.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -210,12 +220,16 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                         />
 
                         <FormItem>
-                            <FormLabel>Invoice Items</FormLabel>
+                            <FormLabel>{t("invoices.edit.form.items.label")}</FormLabel>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                                <SortableContext items={fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
+                                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
                                         {fields.map((fieldItem, index) => (
-                                            <SortableItem key={fieldItem.id} id={fieldItem.id} dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}>
+                                            <SortableItem
+                                                key={fieldItem.id}
+                                                id={fieldItem.id}
+                                                dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}
+                                            >
                                                 <div className="flex gap-2 items-center">
                                                     <FormField
                                                         control={control}
@@ -223,7 +237,10 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                                         render={({ field }) => (
                                                             <FormItem>
                                                                 <FormControl>
-                                                                    <Input {...field} placeholder="Description" />
+                                                                    <Input
+                                                                        {...field}
+                                                                        placeholder={t("invoices.edit.form.items.description.placeholder")}
+                                                                    />
                                                                 </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>
@@ -239,10 +256,12 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                                                     <BetterInput
                                                                         {...field}
                                                                         defaultValue={field.value || ""}
-                                                                        postAdornment="Qty"
+                                                                        postAdornment={t("invoices.edit.form.items.quantity.unit")}
                                                                         type="number"
-                                                                        placeholder="Quantity"
-                                                                        onChange={e => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                                                                        placeholder={t("invoices.edit.form.items.quantity.placeholder")}
+                                                                        onChange={(e) =>
+                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                        }
                                                                     />
                                                                 </FormControl>
                                                                 <FormMessage />
@@ -261,8 +280,10 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                                                         defaultValue={field.value || ""}
                                                                         postAdornment="$"
                                                                         type="number"
-                                                                        placeholder="Unit Price"
-                                                                        onChange={e => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                                                                        placeholder={t("invoices.edit.form.items.unitPrice.placeholder")}
+                                                                        onChange={(e) =>
+                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                        }
                                                                     />
                                                                 </FormControl>
                                                                 <FormMessage />
@@ -282,8 +303,14 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                                                         postAdornment="%"
                                                                         type="number"
                                                                         step="0.01"
-                                                                        placeholder="VAT Rate"
-                                                                        onChange={e => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value.replace(',', '.')))}
+                                                                        placeholder={t("invoices.edit.form.items.vatRate.placeholder")}
+                                                                        onChange={(e) =>
+                                                                            field.onChange(
+                                                                                e.target.value === ""
+                                                                                    ? undefined
+                                                                                    : Number.parseFloat(e.target.value.replace(",", ".")),
+                                                                            )
+                                                                        }
                                                                     />
                                                                 </FormControl>
                                                                 <FormMessage />
@@ -297,33 +324,33 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
                                                 </div>
                                             </SortableItem>
                                         ))}
-
                                     </div>
                                 </SortableContext>
                             </DndContext>
+
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() =>
                                     append({
                                         description: "",
-                                        quantity: NaN,
-                                        unitPrice: NaN,
-                                        vatRate: NaN,
+                                        quantity: Number.NaN,
+                                        unitPrice: Number.NaN,
+                                        vatRate: Number.NaN,
                                         order: fields.length,
                                     })
                                 }
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Item
+                                {t("invoices.edit.form.items.addItem")}
                             </Button>
                         </FormItem>
 
                         <div className="flex justify-end space-x-2">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                Cancel
+                                {t("invoices.edit.actions.cancel")}
                             </Button>
-                            <Button type="submit">Edit</Button>
+                            <Button type="submit">{t("invoices.edit.actions.save")}</Button>
                         </div>
                     </form>
                 </Form>
@@ -332,7 +359,15 @@ export function InvoiceEdit({ invoice, onOpenChange }: InvoiceEditDialogProps) {
     )
 }
 
-function SortableItem({ id, children, dragHandle }: { id: string; children: React.ReactNode; dragHandle: React.ReactNode }) {
+function SortableItem({
+    id,
+    children,
+    dragHandle,
+}: {
+    id: string
+    children: React.ReactNode
+    dragHandle: React.ReactNode
+}) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 
     const style = {

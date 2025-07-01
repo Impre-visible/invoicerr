@@ -11,26 +11,32 @@ import { ClientViewDialog } from "./_components/client-view"
 import { Input } from "@/components/ui/input"
 import { useGet } from "@/lib/utils"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 export default function Clients() {
+    const { t } = useTranslation()
     const [page, setPage] = useState(1)
-
-    const { data: clients, mutate, loading } = useGet<{ pageCount: number, clients: Client[] }>(`/api/clients?page=${page}`)
+    const {
+        data: clients,
+        mutate,
+        loading,
+    } = useGet<{ pageCount: number; clients: Client[] }>(`/api/clients?page=${page}`)
 
     const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
     const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
     const [viewClientDialog, setViewClientDialog] = useState<Client | null>(null)
     const [deleteClientDialog, setDeleteClientDialog] = useState<Client | null>(null)
 
-
     const [searchTerm, setSearchTerm] = useState("")
 
-    const filteredClients = clients?.clients.filter(client =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.contactEmail.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || []
+    const filteredClients =
+        clients?.clients.filter(
+            (client) =>
+                client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.contactEmail.toLowerCase().includes(searchTerm.toLowerCase()),
+        ) || []
 
     function handleAddClick() {
         setCreateClientDialog(true)
@@ -48,6 +54,26 @@ export default function Clients() {
         setDeleteClientDialog(client)
     }
 
+    const emptyState = (
+        <div className="text-center py-12">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">
+                {searchTerm ? t("clients.emptyState.noResults") : t("clients.emptyState.noClients")}
+            </h3>
+            <p className="mt-1 text-sm text-primary">
+                {searchTerm ? t("clients.emptyState.tryDifferentSearch") : t("clients.emptyState.startAdding")}
+            </p>
+            {!searchTerm && (
+                <div className="mt-6">
+                    <Button onClick={handleAddClick}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t("clients.actions.addNew")}
+                    </Button>
+                </div>
+            )}
+        </div>
+    )
+
     return (
         <div className="max-w-7xl mx-auto space-y-6 p-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
@@ -56,10 +82,12 @@ export default function Clients() {
                         <Users className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                        <div className="text-sm text-primary">Manage your clients</div>
+                        <div className="text-sm text-primary">{t("clients.header.subtitle")}</div>
                         <div className="font-medium text-foreground">
-                            {filteredClients.length} client{filteredClients.length > 1 ? 's' : ''}
-                            {searchTerm && ` trouvé${filteredClients.length > 1 ? 's' : ''}`}
+                            {t("clients.header.count", {
+                                count: filteredClients.length,
+                                found: searchTerm ? t("clients.header.found") : "",
+                            })}
                         </div>
                     </div>
                 </div>
@@ -68,20 +96,15 @@ export default function Clients() {
                     <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Search clients..."
+                            placeholder={t("clients.search.placeholder")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-full"
                         />
                     </div>
-
-                    <Button
-                        onClick={handleAddClick}
-                    >
+                    <Button onClick={handleAddClick}>
                         <Plus className="h-4 w-4 mr-0 md:mr-2" />
-                        <span className="hidden md:inline-flex">
-                            Add New Client
-                        </span>
+                        <span className="hidden md:inline-flex">{t("clients.actions.addNew")}</span>
                     </Button>
                 </div>
             </div>
@@ -95,7 +118,7 @@ export default function Clients() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">{clients?.clients.length || 0}</p>
-                                <p className="text-sm text-primary">Total Clients</p>
+                                <p className="text-sm text-primary">{t("clients.stats.total")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -111,9 +134,9 @@ export default function Clients() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.clients.filter(c => c.isActive).length || 0}
+                                    {clients?.clients.filter((c) => c.isActive).length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Active Clients</p>
+                                <p className="text-sm text-primary">{t("clients.stats.active")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -129,9 +152,9 @@ export default function Clients() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {clients?.clients.filter(c => !c.isActive).length || 0}
+                                    {clients?.clients.filter((c) => !c.isActive).length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Inactive Clients</p>
+                                <p className="text-sm text-primary">{t("clients.stats.inactive")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -142,37 +165,20 @@ export default function Clients() {
                 <CardHeader className="border-b">
                     <CardTitle className="flex items-center space-x-2">
                         <Users className="h-5 w-5 " />
-                        <span>Clients</span>
+                        <span>{t("clients.list.title")}</span>
                     </CardTitle>
-                    <CardDescription>Manage your clients, view details, edit or delete them.</CardDescription>
+                    <CardDescription>{t("clients.list.description")}</CardDescription>
                 </CardHeader>
+
                 <CardContent className="p-0">
                     {loading && (
                         <div className="flex items-center justify-center py-12">
                             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                         </div>
                     )}
+
                     {!loading && filteredClients.length === 0 ? (
-                        <div className="text-center py-12">
-                            <Users className="mx-auto h-12 w-12 text-gray-400" />
-                            <h3 className="mt-2 text-sm font-medium text-foreground">
-                                {searchTerm ? 'No clients found' : 'No clients added yet'}
-                            </h3>
-                            <p className="mt-1 text-sm text-primary">
-                                {searchTerm
-                                    ? 'Try a different search term'
-                                    : 'Start adding clients to manage your business effectively.'
-                                }
-                            </p>
-                            {!searchTerm && (
-                                <div className="mt-6">
-                                    <Button onClick={handleAddClick}>
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Add New Client
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+                        emptyState
                     ) : (
                         <div className="divide-y">
                             {filteredClients.map((client, index) => (
@@ -186,10 +192,10 @@ export default function Clients() {
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     <h3 className="font-medium text-foreground break-words">{client.name}</h3>
                                                     <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                                                             } w-fit`}
                                                     >
-                                                        {client.isActive ? 'Actif' : 'Inactif'}
+                                                        {client.isActive ? t("clients.list.status.active") : t("clients.list.status.inactive")}
                                                     </span>
                                                 </div>
                                                 <div className="mt-2 flex flex-col lg:flex-row flex-wrap gap-2 text-sm text-primary">
@@ -215,7 +221,7 @@ export default function Clients() {
 
                                         <div className="mt-0 w-fit flex flex-col lg:flex-row space-x-2 justify-center items-center lg:justify-end">
                                             <Button
-                                                tooltip="View Client"
+                                                tooltip={t("clients.list.tooltips.view")}
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleView(client)}
@@ -224,7 +230,7 @@ export default function Clients() {
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                                tooltip="Edit Client"
+                                                tooltip={t("clients.list.tooltips.edit")}
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleEdit(client)}
@@ -233,7 +239,7 @@ export default function Clients() {
                                                 <Edit className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                                tooltip="Delete Client"
+                                                tooltip={t("clients.list.tooltips.delete")}
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(client)}
@@ -246,9 +252,9 @@ export default function Clients() {
                                 </div>
                             ))}
                         </div>
-
                     )}
                 </CardContent>
+
                 <CardFooter>
                     {!loading && filteredClients.length > 0 && (
                         <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
@@ -258,24 +264,34 @@ export default function Clients() {
 
             <ClientCreate
                 open={createClientDialog}
-                onOpenChange={(open) => { setCreateClientDialog(open); mutate() }}
+                onOpenChange={(open) => {
+                    setCreateClientDialog(open)
+                    mutate()
+                }}
             />
 
             <ClientEdit
                 client={editClientDialog}
-                onOpenChange={(open) => { if (!open) setEditClientDialog(null); mutate() }}
+                onOpenChange={(open) => {
+                    if (!open) setEditClientDialog(null)
+                    mutate()
+                }}
             />
 
             <ClientViewDialog
                 client={viewClientDialog}
-                onOpenChange={(open) => { if (!open) setViewClientDialog(null) }}
+                onOpenChange={(open) => {
+                    if (!open) setViewClientDialog(null)
+                }}
             />
 
             <ClientDeleteDialog
                 client={deleteClientDialog}
-                onOpenChange={(open) => { if (!open) setDeleteClientDialog(null); mutate() }}
+                onOpenChange={(open) => {
+                    if (!open) setDeleteClientDialog(null)
+                    mutate()
+                }}
             />
-
         </div>
     )
 }

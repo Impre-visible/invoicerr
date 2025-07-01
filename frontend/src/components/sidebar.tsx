@@ -1,11 +1,18 @@
-import { Building2, ChevronsUpDown, FileText, LayoutDashboard, LogOut, Moon, Receipt, Settings, Sun, User, Users } from "lucide-react"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Building2,
+    ChevronsUpDown,
+    FileText,
+    LayoutDashboard,
+    LogOut,
+    Moon,
+    Receipt,
+    Settings,
+    Sun,
+    User,
+    Users,
+} from "lucide-react"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
 import { Link, useLocation, useNavigate } from "react-router"
 import {
@@ -23,56 +30,59 @@ import {
 
 import { Button } from "./ui/button"
 import type { Company } from "@/types"
+import type React from "react"
 import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
 import { useEffect } from "react"
 import { useGet } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useTheme } from "./theme-provider"
-
-const items: { title: string, icon: React.ReactNode, url: string }[] = [
-    {
-        title: "Dashboard",
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        url: "/dashboard",
-    },
-    {
-        title: "Quotes",
-        icon: <FileText className="w-4 h-4" />,
-        url: "/quotes",
-    },
-    {
-        title: "Invoices",
-        icon: <Receipt className="w-4 h-4" />,
-        url: "/invoices",
-    },
-    {
-        title: "Clients",
-        icon: <Users className="w-4 h-4" />,
-        url: "/clients",
-    },
-    {
-        title: "Settings",
-        icon: <Settings className="w-4 h-4" />,
-        url: "/settings",
-    },
-]
+import { useTranslation } from "react-i18next"
 
 export function Sidebar() {
+    const { t } = useTranslation()
     const { open: isOpen } = useSidebar()
     const isMobile = useIsMobile()
     const location = useLocation()
     const { user, loading: userLoading, logout } = useAuth()
     const { setTheme } = useTheme()
     const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
-
     const navigate = useNavigate()
+
+    // Move items inside component to access t function
+    const items: { title: string; icon: React.ReactNode; url: string }[] = [
+        {
+            title: t("sidebar.navigation.dashboard"),
+            icon: <LayoutDashboard className="w-4 h-4" />,
+            url: "/dashboard",
+        },
+        {
+            title: t("sidebar.navigation.quotes"),
+            icon: <FileText className="w-4 h-4" />,
+            url: "/quotes",
+        },
+        {
+            title: t("sidebar.navigation.invoices"),
+            icon: <Receipt className="w-4 h-4" />,
+            url: "/invoices",
+        },
+        {
+            title: t("sidebar.navigation.clients"),
+            icon: <Users className="w-4 h-4" />,
+            url: "/clients",
+        },
+        {
+            title: t("sidebar.navigation.settings"),
+            icon: <Settings className="w-4 h-4" />,
+            url: "/settings",
+        },
+    ]
 
     useEffect(() => {
         if (!company) {
             mutate()
         }
-    }, [location]);
+    }, [location])
 
     const handleLogout = () => {
         logout()
@@ -80,19 +90,14 @@ export function Sidebar() {
 
     return (
         <RootSidebar collapsible="icon">
-
             <Dialog open={!!company && !company.name && location.pathname !== "/settings/company"}>
                 <DialogContent className="[&>button]:hidden">
                     <DialogHeader>
-                        <DialogTitle>Company not configured</DialogTitle>
+                        <DialogTitle>{t("sidebar.companyDialog.title")}</DialogTitle>
                     </DialogHeader>
-                    <p className="text-sm text-muted-foreground">
-                        Please configure your company details before using the dashboard.
-                    </p>
+                    <p className="text-sm text-muted-foreground">{t("sidebar.companyDialog.description")}</p>
                     <DialogFooter>
-                        <Button onClick={() => navigate("/settings/company")}>
-                            Go
-                        </Button>
+                        <Button onClick={() => navigate("/settings/company")}>{t("sidebar.companyDialog.goButton")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -110,25 +115,30 @@ export function Sidebar() {
                                         <Skeleton className="h-3 w-3/4" />
                                         <Skeleton className="h-2 w-1/4 mt-1" />
                                     </div>
-                                ) :
+                                ) : (
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-medium">{company?.name}</span>
-                                        <span className="truncate text-xs">Enterprise</span>
+                                        <span className="truncate text-xs">{t("sidebar.company.plan")}</span>
                                     </div>
-                                }
+                                )}
                             </section>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
+
             <SidebarContent className="px-2">
                 <SidebarGroup className="px-0">
-                    <SidebarGroupLabel>Menu</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t("sidebar.menu")}</SidebarGroupLabel>
                     <SidebarMenu>
                         {items.map((item, index) => (
                             <SidebarMenuItem key={index}>
                                 <SidebarMenuButton asChild>
-                                    <Link to={item.url} className={`flex items-center gap-2 py-6 ${location.pathname === item.url ? 'text-sidebar-accent-foreground bg-sidebar-accent' : ''}`}>
+                                    <Link
+                                        to={item.url}
+                                        className={`flex items-center gap-2 py-6 ${location.pathname === item.url ? "text-sidebar-accent-foreground bg-sidebar-accent" : ""
+                                            }`}
+                                    >
                                         {item.icon}
                                         <span>{item.title}</span>
                                     </Link>
@@ -138,34 +148,26 @@ export function Sidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
+
             <SidebarFooter>
                 <SidebarMenu className="flex flex-col gap-2">
                     <SidebarMenuItem>
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild >
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className={`${isOpen ? 'ml-2' : ''} w-8 h-8`}
-                                >
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon" className={`${isOpen ? "ml-2" : ""} w-8 h-8`}>
                                     <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                                     <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                                    <span className="sr-only">Toggle theme</span>
+                                    <span className="sr-only">{t("sidebar.theme.toggleTheme")}</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setTheme("light")}>
-                                    Light
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                                    Dark
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setTheme("system")}>
-                                    System
-                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("light")}>{t("sidebar.theme.light")}</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("dark")}>{t("sidebar.theme.dark")}</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("system")}>{t("sidebar.theme.system")}</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </SidebarMenuItem>
+
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger className="cursor-pointer" asChild>
@@ -181,12 +183,14 @@ export function Sidebar() {
                                             <Skeleton className="h-3 w-3/4" />
                                             <Skeleton className="h-2 w-1/2 mt-1" />
                                         </div>
-                                    ) :
+                                    ) : (
                                         <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-medium">{user?.lastname} {user?.firstname}</span>
+                                            <span className="truncate font-medium">
+                                                {user?.lastname} {user?.firstname}
+                                            </span>
                                             <span className="truncate text-xs">{user?.email}</span>
                                         </div>
-                                    }
+                                    )}
                                     <ChevronsUpDown className="ml-auto size-4" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
@@ -199,7 +203,9 @@ export function Sidebar() {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-medium">{user?.lastname} {user?.firstname}</span>
+                                            <span className="truncate font-medium">
+                                                {user?.lastname} {user?.firstname}
+                                            </span>
                                             <span className="truncate text-xs">{user?.email}</span>
                                         </div>
                                     </div>
@@ -208,12 +214,12 @@ export function Sidebar() {
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem className="cursor-pointer">
                                         <User className="w-4 h-4" />
-                                        Account
+                                        {t("sidebar.userMenu.account")}
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                                     <LogOut />
-                                    Log out
+                                    {t("sidebar.userMenu.logout")}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

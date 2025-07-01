@@ -1,5 +1,3 @@
-"use client"
-
 import { Archive, Forward, Mail, Reply } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react"
@@ -13,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { TabsContent } from "@radix-ui/react-tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
+import { useTranslation } from "react-i18next"
 
 interface EmailTemplate {
     id: string
@@ -32,6 +31,7 @@ function HtmlEditor({
     onChange: (value: string) => void
     variables: Record<string, string>
 }) {
+    const { t } = useTranslation()
 
     return (
         <div className="space-y-4">
@@ -40,19 +40,19 @@ function HtmlEditor({
                     id="html-editor"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    placeholder="Écrivez votre HTML ici..."
+                    placeholder={t("settings.emailTemplates.editor.htmlPlaceholder")}
                     className="min-h-[400px] font-mono text-sm"
                     style={{ resize: "vertical" }}
                 />
-                <div className="text-xs text-muted-foreground">
-                    💡 Écrivez du HTML directement. Utilisez les boutons ci-dessus pour insérer des balises et variables.
-                </div>
+                <div className="text-xs text-muted-foreground">{t("settings.emailTemplates.editor.htmlTip")}</div>
             </div>
         </div>
     )
 }
 
 function EmailPreview({ template }: { template: EmailTemplate }) {
+    const { t } = useTranslation()
+
     const replaceVariables = (text: string, variables: Record<string, string>) => {
         console.log("Replacing variables in:", text, "with", variables)
         let result = text
@@ -73,25 +73,22 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
                         <Mail className="h-5 w-5 text-blue-600" />
                         <span className="font-semibold text-gray-900">Invoicerr Mail</span>
                     </div>
-
                     <div className="space-y-2 text-sm">
                         <div className="flex gap-2 bg-gray-50 p-2 rounded">
-                            <span className="font-medium text-gray-600">From:</span>
+                            <span className="font-medium text-gray-600">{t("settings.emailTemplates.preview.from")}:</span>
                             <span className="text-gray-900">noreply@invoicerr.dev</span>
                         </div>
                         <div className="flex gap-2 bg-gray-50 p-2 rounded">
-                            <span className="font-medium text-gray-600">To:</span>
+                            <span className="font-medium text-gray-600">{t("settings.emailTemplates.preview.to")}:</span>
                             <span className="text-gray-900">user@example.com</span>
                         </div>
                         <div className="flex gap-2 bg-gray-50 p-2 rounded">
-                            <span className="font-medium text-gray-600">Subject:</span>
+                            <span className="font-medium text-gray-600">{t("settings.emailTemplates.preview.subject")}:</span>
                             <span className="text-gray-900">{previewSubject}</span>
                         </div>
                     </div>
                 </div>
-
                 <Separator className="bg-neutral-200" orientation="horizontal" />
-
                 <div className="p-4">
                     <div
                         className="prose prose-sm max-w-none [*]:text-black"
@@ -99,19 +96,18 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
                         dangerouslySetInnerHTML={{ __html: previewBody }}
                     />
                 </div>
-
                 <div className="border-t p-4 flex gap-2">
                     <Button>
                         <Reply className="h-4 w-4" />
-                        Reply
+                        {t("settings.emailTemplates.preview.reply")}
                     </Button>
                     <Button>
                         <Forward className="h-4 w-4" />
-                        Forward
+                        {t("settings.emailTemplates.preview.forward")}
                     </Button>
                     <Button>
                         <Archive className="h-4 w-4" />
-                        Archive
+                        {t("settings.emailTemplates.preview.archive")}
                     </Button>
                 </div>
             </div>
@@ -126,22 +122,27 @@ function TemplateEditor({
     template: EmailTemplate
     onUpdate: (template: EmailTemplate) => void
 }) {
+    const { t } = useTranslation()
+
     return (
         <div className="w-full space-y-4">
             <div className="space-y-2">
-                <Label htmlFor={`subject-${template.id}`}>Subject</Label>
+                <Label htmlFor={`subject-${template.id}`}>{t("settings.emailTemplates.editor.subject")}</Label>
                 <Input
                     id={`subject-${template.id}`}
                     value={template.subject}
                     autoComplete="off"
-                    data-bwignore data-1p-ignore data-lpignore data-form-type="other"
+                    data-bwignore
+                    data-1p-ignore
+                    data-lpignore
+                    data-form-type="other"
                     onChange={(e) => onUpdate({ ...template, subject: e.target.value })}
-                    placeholder="Email subject..."
+                    placeholder={t("settings.emailTemplates.editor.subjectPlaceholder")}
                 />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor={`body-${template.id}`}>Body (HTML)</Label>
+                <Label htmlFor={`body-${template.id}`}>{t("settings.emailTemplates.editor.body")}</Label>
                 <HtmlEditor
                     value={template.body}
                     onChange={(body) => onUpdate({ ...template, body })}
@@ -150,7 +151,7 @@ function TemplateEditor({
             </div>
 
             <div className="space-y-2">
-                <Label>Available Variables</Label>
+                <Label>{t("settings.emailTemplates.editor.availableVariables")}</Label>
                 <div className="flex flex-wrap gap-2">
                     {Object.keys(template.variables).map((variable) => (
                         <Badge key={variable} variant="secondary" className="font-mono">
@@ -158,16 +159,14 @@ function TemplateEditor({
                         </Badge>
                     ))}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                    Click on variable buttons in the editor toolbar to insert them into your HTML.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("settings.emailTemplates.editor.variablesTip")}</p>
             </div>
         </div>
     )
 }
 
-
 export default function EmailTemplatesSettings() {
+    const { t } = useTranslation()
     const { data: templates } = useGet<EmailTemplate[]>("/api/company/email-templates")
     const { trigger: updateTemplate, loading: updateLoading } = usePut<EmailTemplate>("/api/company/email-templates")
 
@@ -189,14 +188,17 @@ export default function EmailTemplatesSettings() {
 
     function saveEditing() {
         if (!editedTemplate) return
+
         updateTemplate({
             ...editedTemplate,
             companyId: editedTemplate.companyId,
-        }).then(() => {
-            toast.success(`Template "${editedTemplate.name}" saved successfully`)
-        }).catch((_error) => {
-            toast.error(`Failed to save template`)
         })
+            .then(() => {
+                toast.success(t("settings.emailTemplates.messages.saveSuccess", { name: editedTemplate.name }))
+            })
+            .catch((_error) => {
+                toast.error(t("settings.emailTemplates.messages.saveError"))
+            })
     }
 
     if (!templates) return null
@@ -204,8 +206,8 @@ export default function EmailTemplatesSettings() {
     return (
         <div>
             <div className="mb-4">
-                <h1 className="text-3xl font-bold">Email Template Settings</h1>
-                <p className="text-muted-foreground">Manage your email templates for mail notifications.</p>
+                <h1 className="text-3xl font-bold">{t("settings.emailTemplates.title")}</h1>
+                <p className="text-muted-foreground">{t("settings.emailTemplates.description")}</p>
             </div>
 
             <Tabs value={activeTab || undefined} onValueChange={setActiveTab}>
@@ -216,33 +218,24 @@ export default function EmailTemplatesSettings() {
                         </TabsTrigger>
                     ))}
                 </TabsList>
-                <TabsContent value={activeTab || ''}>
+
+                <TabsContent value={activeTab || ""}>
                     {editedTemplate && (
                         <section className="flex flex-col gap-4">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-2xl font-semibold">{editedTemplate.name}</h2>
-                                <Button
-                                    onClick={saveEditing}
-                                    disabled={updateLoading}
-                                    loading={updateLoading}
-                                    variant="default"
-                                >
-                                    Save Changes
+                                <Button onClick={saveEditing} disabled={updateLoading} loading={updateLoading} variant="default">
+                                    {t("settings.emailTemplates.saveButton")}
                                 </Button>
                             </div>
                             <div className="space-y-6 flex gap-4">
-                                <TemplateEditor
-                                    template={editedTemplate}
-                                    onUpdate={(updated) => setEditedTemplate(updated)}
-                                />
-
+                                <TemplateEditor template={editedTemplate} onUpdate={(updated) => setEditedTemplate(updated)} />
                                 <EmailPreview template={editedTemplate} />
                             </div>
                         </section>
                     )}
                 </TabsContent>
             </Tabs>
-
         </div>
     )
 }

@@ -1,10 +1,9 @@
 import { Navigate } from "react-router"
 import { useAuth } from "@/contexts/auth"
 
-export default function LoginPage() {
+export default function LogoutPage() {
     const { logout } = useAuth()
-
-    logout(); // Clear tokens and user data
+    logout()
 
     return <Navigate to="/login" />
 }

@@ -1,5 +1,3 @@
-"use client"
-
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, Clock, Download, FileText, Mail, RefreshCw, ZoomIn, ZoomOut } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"

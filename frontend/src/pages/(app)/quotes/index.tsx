@@ -8,58 +8,56 @@ import { Input } from "@/components/ui/input"
 import type { Quote } from "@/types"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import type { QuoteListHandle } from "@/pages/(app)/quotes/_components/quote-list"
+import { useTranslation } from "react-i18next"
 
 export default function Quotes() {
+    const { t } = useTranslation()
     const quoteListRef = useRef<QuoteListHandle>(null)
     const [page, setPage] = useState(1)
-
-    const { data: quotes, mutate, loading } = useGet<{ pageCount: number, quotes: Quote[] }>(`/api/quotes?page=${page}`)
-
+    const { data: quotes, mutate, loading } = useGet<{ pageCount: number; quotes: Quote[] }>(`/api/quotes?page=${page}`)
     const [downloadQuotePdf, setDownloadQuotePdf] = useState<Quote | null>(null)
-
     const { data: pdf } = useGetRaw<Response>(`/api/quotes/${downloadQuotePdf?.id}/pdf`)
 
     useEffect(() => {
         if (downloadQuotePdf && pdf) {
             pdf.arrayBuffer().then((buffer) => {
-                const blob = new Blob([buffer], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `quote-${downloadQuotePdf.number}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                setDownloadQuotePdf(null); // Reset after download
-            });
+                const blob = new Blob([buffer], { type: "application/pdf" })
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement("a")
+                link.href = url
+                link.download = `quote-${downloadQuotePdf.number}.pdf`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+                setDownloadQuotePdf(null) // Reset after download
+            })
         }
-    }, [downloadQuotePdf, pdf]);
+    }, [downloadQuotePdf, pdf])
 
     const [searchTerm, setSearchTerm] = useState("")
 
-    const filteredQuotes = quotes?.quotes.filter(quote =>
-        quote.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        quote.status.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || []
+    const filteredQuotes =
+        quotes?.quotes.filter(
+            (quote) =>
+                quote.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                quote.status.toLowerCase().includes(searchTerm.toLowerCase()),
+        ) || []
 
     const emptyState = (
         <div className="text-center py-12">
             <FileText className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-foreground">
-                {searchTerm ? 'No quotes found' : 'No quotes added yet'}
+                {searchTerm ? t("quotes.emptyState.noResults") : t("quotes.emptyState.noQuotes")}
             </h3>
             <p className="mt-1 text-sm text-primary">
-                {searchTerm
-                    ? 'Try a different search term'
-                    : 'Start adding quotes to manage your business effectively.'
-                }
+                {searchTerm ? t("quotes.emptyState.tryDifferentSearch") : t("quotes.emptyState.startAdding")}
             </p>
             {!searchTerm && (
                 <div className="mt-6">
                     <Button onClick={() => quoteListRef.current?.handleAddClick()}>
                         <Plus className="h-4 w-4 mr-2" />
-                        Add New Quote
+                        {t("quotes.actions.addNew")}
                     </Button>
                 </div>
             )}
@@ -74,10 +72,12 @@ export default function Quotes() {
                         <FileText className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                        <div className="text-sm text-primary">Manage your quotes</div>
+                        <div className="text-sm text-primary">{t("quotes.header.subtitle")}</div>
                         <div className="font-medium text-foreground">
-                            {filteredQuotes.length} quote{filteredQuotes.length > 1 ? 's' : ''}
-                            {searchTerm && ` trouvé${filteredQuotes.length > 1 ? 's' : ''}`}
+                            {t("quotes.header.count", {
+                                count: filteredQuotes.length,
+                                found: searchTerm ? t("quotes.header.found") : "",
+                            })}
                         </div>
                     </div>
                 </div>
@@ -86,20 +86,15 @@ export default function Quotes() {
                     <div className="relative w-full lg:w-fit">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Search quotes..."
+                            placeholder={t("quotes.search.placeholder")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-full"
                         />
                     </div>
-
-                    <Button
-                        onClick={() => quoteListRef.current?.handleAddClick()}
-                    >
+                    <Button onClick={() => quoteListRef.current?.handleAddClick()}>
                         <Plus className="h-4 w-4 mr-0 md:mr-2" />
-                        <span className="hidden md:inline-flex">
-                            Add New Quote
-                        </span>
+                        <span className="hidden md:inline-flex">{t("quotes.actions.addNew")}</span>
                     </Button>
                 </div>
             </div>
@@ -113,7 +108,7 @@ export default function Quotes() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">{quotes?.quotes.length || 0}</p>
-                                <p className="text-sm text-primary">Total Quotes</p>
+                                <p className="text-sm text-primary">{t("quotes.stats.total")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -129,9 +124,9 @@ export default function Quotes() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {quotes?.quotes.filter(c => c.status === "DRAFT").length || 0}
+                                    {quotes?.quotes.filter((c) => c.status === "DRAFT").length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Draft Quotes</p>
+                                <p className="text-sm text-primary">{t("quotes.stats.draft")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -147,9 +142,9 @@ export default function Quotes() {
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">
-                                    {quotes?.quotes.filter(c => c.status === "SIGNED").length || 0}
+                                    {quotes?.quotes.filter((c) => c.status === "SIGNED").length || 0}
                                 </p>
-                                <p className="text-sm text-primary">Signed Quotes</p>
+                                <p className="text-sm text-primary">{t("quotes.stats.signed")}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -160,8 +155,8 @@ export default function Quotes() {
                 ref={quoteListRef}
                 quotes={filteredQuotes}
                 loading={loading}
-                title="Quotes"
-                description="Manage your quotes, view details, edit or delete them."
+                title={t("quotes.list.title")}
+                description={t("quotes.list.description")}
                 page={page}
                 pageCount={quotes?.pageCount || 1}
                 setPage={setPage}
@@ -169,7 +164,6 @@ export default function Quotes() {
                 emptyState={emptyState}
                 showCreateButton={true}
             />
-
         </div>
     )
 }
