@@ -1,93 +1,89 @@
 import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
-import { Button } from "@/components/ui/button"
-import type { Client } from "@/types"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useTranslation } from "react-i18next"
+import type { Client } from "@/types";
+import { useTranslation } from "react-i18next";
 
 interface ClientViewDialogProps {
-    client: Client | null
-    onOpenChange?: (open: boolean) => void
+    client: Client | null;
+    onOpenChange: (open: boolean) => void;
 }
 
 export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps) {
-    const { t } = useTranslation()
+    const { t } = useTranslation();
 
     return (
-        <AlertDialog onOpenChange={onOpenChange}>
-            <AlertDialogTrigger asChild>
-                <Button variant="outline">View</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{t("clients.view.title")}</AlertDialogTitle>
-                    <AlertDialogDescription>{t("clients.view.description")}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="companyName" className="text-right">
-                            {t("clients.view.fields.companyName")}
-                        </Label>
-                        <Input type="text" id="companyName" value={client?.name} readOnly className="col-span-3" />
+        <Dialog open={client != null} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-[95vw] lg:max-w-lg max-h-[90dvh] w-fit p-6">
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold">{t("clients.view.title")}</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                        {t("clients.view.description")}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="flex flex-col gap-4 w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
+                        <div className="w-fit">
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.companyName")}</p>
+                            <p className="font-medium">{client?.name || "—"}</p>
+                        </div>
+                        <div className="w-fit">
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.contactPerson")}</p>
+                            <p className="font-medium">
+                                {client?.contactFirstname} {client?.contactLastname}
+                            </p>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="contactPerson" className="text-right">
-                            {t("clients.view.fields.contactPerson")}
-                        </Label>
-                        <Input type="text" id="contactPerson" value={`${client?.contactFirstname} ${client?.contactLastname}`} readOnly className="col-span-3" />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
+                        <div className="w-fit">
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.email")}</p>
+                            <p className="font-medium">{client?.contactEmail || "—"}</p>
+                        </div>
+                        {client?.contactPhone && (
+                            <div className="w-fit">
+                                <p className="text-sm text-muted-foreground">{t("clients.view.fields.phone")}</p>
+                                <p className="font-medium">{client.contactPhone}</p>
+                            </div>
+                        )}
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="email" className="text-right">
-                            {t("clients.view.fields.email")}
-                        </Label>
-                        <Input type="email" id="email" value={client?.contactEmail} readOnly className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="phone" className="text-right">
-                            {t("clients.view.fields.phone")}
-                        </Label>
-                        <Input type="tel" id="phone" value={client?.contactPhone} readOnly className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="address" className="text-right">
-                            {t("clients.view.fields.address")}
-                        </Label>
-                        <Input type="text" id="address" value={client?.address} readOnly className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="postalCode" className="text-right">
-                            {t("clients.view.fields.postalCode")}
-                        </Label>
-                        <Input type="text" id="postalCode" value={client?.postalCode} readOnly className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="city" className="text-right">
-                            {t("clients.view.fields.city")}
-                        </Label>
-                        <Input type="text" id="city" value={client?.city} readOnly className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="country" className="text-right">
-                            {t("clients.view.fields.country")}
-                        </Label>
-                        <Input type="text" id="country" value={client?.country} readOnly className="col-span-3" />
-                    </div>
+
+                    {(client?.address || client?.postalCode || client?.city || client?.country) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
+                            {client?.address && (
+                                <div>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.address")}</p>
+                                    <p className="font-medium">{client.address}</p>
+                                </div>
+                            )}
+                            {client?.postalCode && (
+                                <div>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.postalCode")}</p>
+                                    <p className="font-medium">{client.postalCode}</p>
+                                </div>
+                            )}
+                            {client?.city && (
+                                <div>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.city")}</p>
+                                    <p className="font-medium">{client.city}</p>
+                                </div>
+                            )}
+                            {client?.country && (
+                                <div>
+                                    <p className="text-sm text-muted-foreground">{t("clients.view.fields.country")}</p>
+                                    <p className="font-medium">{client.country}</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-                <AlertDialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange?.(false)}>
-                        Close
-                    </Button>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    )
+            </DialogContent>
+        </Dialog>
+    );
 }
