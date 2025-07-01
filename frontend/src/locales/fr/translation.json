@@ -1,8 +1,1196 @@
 {
+    "clients": {
+        "header": {
+            "subtitle": "Gérez vos clients",
+            "count": "{{count}} clients {{found}}",
+            "found": "trouvés"
+        },
+        "search": {
+            "placeholder": "Rechercher des clients..."
+        },
+        "actions": {
+            "addNew": "Ajouter un nouveau client"
+        },
+        "stats": {
+            "total": "Total des clients",
+            "active": "Actifs",
+            "inactive": "Inactifs"
+        },
+        "emptyState": {
+            "noClients": "Aucun client pour le moment",
+            "noResults": "Aucun client trouvé",
+            "startAdding": "Commencez par créer votre premier client.",
+            "tryDifferentSearch": "Essayez d'ajuster vos termes de recherche."
+        },
+        "list": {
+            "title": "Tous les clients",
+            "description": "Gérez et consultez tous vos clients en un seul endroit.",
+            "status": {
+                "active": "Actif",
+                "inactive": "Inactif"
+            },
+            "tooltips": {
+                "view": "Voir les détails du client",
+                "edit": "Modifier le client",
+                "delete": "Supprimer le client"
+            }
+        },
+        "create": {
+            "title": "Ajouter un nouveau client",
+            "fields": {
+                "contactFirstname": {
+                    "label": "Prénom",
+                    "placeholder": "Saisir le prénom"
+                },
+                "contactLastname": {
+                    "label": "Nom",
+                    "placeholder": "Saisir le nom"
+                },
+                "name": {
+                    "label": "Nom de l'entreprise",
+                    "placeholder": "Saisir le nom de l'entreprise"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Saisir la description de l'entreprise"
+                },
+                "legalId": {
+                    "label": "Identifiant légal",
+                    "placeholder": "Saisir l'identifiant légal"
+                },
+                "vat": {
+                    "label": "Numéro de TVA",
+                    "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)"
+                },
+                "foundedAt": {
+                    "label": "Date de création",
+                    "placeholder": "Sélectionner la date de création"
+                },
+                "contactEmail": {
+                    "label": "Email",
+                    "placeholder": "Saisir l'adresse email"
+                },
+                "contactPhone": {
+                    "label": "Téléphone",
+                    "placeholder": "Saisir le numéro de téléphone"
+                },
+                "address": {
+                    "label": "Adresse",
+                    "placeholder": "Saisir l'adresse"
+                },
+                "postalCode": {
+                    "label": "Code postal",
+                    "placeholder": "Saisir le code postal"
+                },
+                "city": {
+                    "label": "Ville",
+                    "placeholder": "Saisir la ville"
+                },
+                "country": {
+                    "label": "Pays",
+                    "placeholder": "Saisir le pays"
+                }
+            },
+            "validation": {
+                "name": {
+                    "required": "Le nom de l'entreprise est requis"
+                },
+                "description": {
+                    "required": "La description est requise",
+                    "maxLength": "La description doit faire moins de 500 caractères"
+                },
+                "legalId": {
+                    "required": "L'identifiant légal est requis",
+                    "empty": "L'identifiant légal ne peut pas être vide",
+                    "maxLength": "L'identifiant légal doit faire moins de 50 caractères"
+                },
+                "vat": {
+                    "required": "Le numéro de TVA est requis",
+                    "empty": "Le numéro de TVA ne peut pas être vide",
+                    "maxLength": "Le numéro de TVA doit faire moins de 15 caractères",
+                    "format": "Le format du numéro de TVA est invalide (ex: FR12345678901)"
+                },
+                "foundedAt": {
+                    "future": "La date de création ne peut pas être dans le futur"
+                },
+                "contactFirstname": {
+                    "required": "Le prénom est requis"
+                },
+                "contactLastname": {
+                    "required": "Le nom est requis"
+                },
+                "contactPhone": {
+                    "minLength": "Le numéro de téléphone doit faire au moins 8 caractères",
+                    "format": "Le format du numéro de téléphone est invalide"
+                },
+                "contactEmail": {
+                    "required": "L'email est requis",
+                    "format": "Le format de l'email est invalide"
+                },
+                "address": {
+                    "required": "L'adresse est requise"
+                },
+                "postalCode": {
+                    "format": "Le format du code postal est invalide"
+                },
+                "city": {
+                    "required": "La ville est requise"
+                },
+                "country": {
+                    "required": "Le pays est requis"
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "create": "Créer le client"
+            }
+        },
+        "edit": {
+            "title": "Modifier le client",
+            "fields": {
+                "contactFirstname": {
+                    "label": "Prénom",
+                    "placeholder": "Saisir le prénom"
+                },
+                "contactLastname": {
+                    "label": "Nom",
+                    "placeholder": "Saisir le nom"
+                },
+                "name": {
+                    "label": "Nom de l'entreprise",
+                    "placeholder": "Saisir le nom de l'entreprise"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Saisir la description de l'entreprise"
+                },
+                "legalId": {
+                    "label": "Identifiant légal",
+                    "placeholder": "Saisir l'identifiant légal"
+                },
+                "vat": {
+                    "label": "Numéro de TVA",
+                    "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)"
+                },
+                "foundedAt": {
+                    "label": "Date de création",
+                    "placeholder": "Sélectionner la date de création"
+                },
+                "contactEmail": {
+                    "label": "Email",
+                    "placeholder": "Saisir l'adresse email"
+                },
+                "contactPhone": {
+                    "label": "Téléphone",
+                    "placeholder": "Saisir le numéro de téléphone"
+                },
+                "address": {
+                    "label": "Adresse",
+                    "placeholder": "Saisir l'adresse"
+                },
+                "postalCode": {
+                    "label": "Code postal",
+                    "placeholder": "Saisir le code postal"
+                },
+                "city": {
+                    "label": "Ville",
+                    "placeholder": "Saisir la ville"
+                },
+                "country": {
+                    "label": "Pays",
+                    "placeholder": "Saisir le pays"
+                }
+            },
+            "validation": {
+                "name": {
+                    "required": "Le nom de l'entreprise est requis"
+                },
+                "description": {
+                    "required": "La description est requise",
+                    "maxLength": "La description doit faire moins de 500 caractères"
+                },
+                "legalId": {
+                    "required": "L'identifiant légal est requis",
+                    "empty": "L'identifiant légal ne peut pas être vide",
+                    "maxLength": "L'identifiant légal doit faire moins de 50 caractères"
+                },
+                "vat": {
+                    "required": "Le numéro de TVA est requis",
+                    "empty": "Le numéro de TVA ne peut pas être vide",
+                    "maxLength": "Le numéro de TVA doit faire moins de 15 caractères",
+                    "format": "Le format du numéro de TVA est invalide (ex: FR12345678901)"
+                },
+                "foundedAt": {
+                    "future": "La date de création ne peut pas être dans le futur"
+                },
+                "contactFirstname": {
+                    "required": "Le prénom est requis"
+                },
+                "contactLastname": {
+                    "required": "Le nom est requis"
+                },
+                "contactPhone": {
+                    "minLength": "Le numéro de téléphone doit faire au moins 8 caractères",
+                    "format": "Le format du numéro de téléphone est invalide"
+                },
+                "contactEmail": {
+                    "required": "L'email est requis",
+                    "format": "Le format de l'email est invalide"
+                },
+                "address": {
+                    "required": "L'adresse est requise"
+                },
+                "postalCode": {
+                    "format": "Le format du code postal est invalide"
+                },
+                "city": {
+                    "required": "La ville est requise"
+                },
+                "country": {
+                    "required": "Le pays est requis"
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "save": "Enregistrer les modifications"
+            }
+        },
+        "view": {
+            "title": "Détails du client",
+            "description": "Consultez toutes les informations pertinentes sur ce client.",
+            "fields": {
+                "companyName": "Nom de l'entreprise",
+                "contactPerson": "Personne de contact",
+                "email": "Email",
+                "phone": "Téléphone",
+                "address": "Adresse",
+                "postalCode": "Code postal",
+                "city": "Ville",
+                "country": "Pays"
+            }
+        },
+        "delete": {
+            "title": "Supprimer le client",
+            "description": "Êtes-vous sûr de vouloir supprimer ce client ? Cette action ne peut pas être annulée.",
+            "actions": {
+                "cancel": "Annuler",
+                "delete": "Supprimer le client"
+            }
+        }
+    },
+    "quotes": {
+        "header": {
+            "subtitle": "Gérez vos devis",
+            "count": "{{count}} devis {{found}}",
+            "found": "trouvés"
+        },
+        "search": {
+            "placeholder": "Rechercher des devis..."
+        },
+        "actions": {
+            "addNew": "Ajouter un nouveau devis"
+        },
+        "stats": {
+            "total": "Total des devis",
+            "draft": "Brouillon",
+            "signed": "Signés"
+        },
+        "emptyState": {
+            "noQuotes": "Aucun devis pour le moment",
+            "noResults": "Aucun devis trouvé",
+            "startAdding": "Commencez par créer votre premier devis.",
+            "tryDifferentSearch": "Essayez d'ajuster vos termes de recherche."
+        },
+        "list": {
+            "title": "Tous les devis",
+            "description": "Gérez et consultez tous vos devis en un seul endroit.",
+            "status": {
+                "draft": "Brouillon",
+                "sent": "Envoyé",
+                "expired": "Expiré",
+                "signed": "Signé"
+            },
+            "item": {
+                "title": "Devis {{number}}{{title}}",
+                "client": "Client",
+                "issued": "Émis le",
+                "validUntil": "Valide jusqu'au",
+                "totalHT": "Total HT",
+                "totalTTC": "Total TTC"
+            },
+            "tooltips": {
+                "view": "Voir les détails du devis",
+                "viewPdf": "Voir le PDF",
+                "downloadPdf": "Télécharger le PDF",
+                "edit": "Modifier le devis",
+                "sendSignature": "Envoyer pour signature",
+                "resendSignature": "Renvoyer pour signature",
+                "createInvoice": "Créer une facture à partir du devis",
+                "delete": "Supprimer le devis"
+            },
+            "actions": {
+                "addNew": "Ajouter un nouveau devis"
+            },
+            "messages": {
+                "sendSignatureError": "Échec de l'envoi du devis pour signature",
+                "invoiceCreated": "Facture créée avec succès à partir du devis",
+                "invoiceCreateError": "Échec de la création de la facture à partir du devis"
+            }
+        },
+        "create": {
+            "title": "Créer un nouveau devis",
+            "form": {
+                "title": {
+                    "label": "Titre",
+                    "placeholder": "Saisir le titre du devis (optionnel)"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Sélectionner un client",
+                    "errors": {
+                        "required": "Veuillez sélectionner un client"
+                    }
+                },
+                "validUntil": {
+                    "label": "Valide jusqu'au",
+                    "placeholder": "Sélectionner la date d'expiration"
+                },
+                "items": {
+                    "label": "Articles du devis",
+                    "addItem": "Ajouter un article",
+                    "description": {
+                        "placeholder": "Description de l'article",
+                        "errors": {
+                            "required": "La description est requise"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qté",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "La quantité est requise",
+                            "min": "La quantité doit être d'au moins 1",
+                            "invalid": "Quantité invalide"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Prix unitaire",
+                        "errors": {
+                            "required": "Le prix unitaire est requis",
+                            "min": "Le prix unitaire doit être positif",
+                            "invalid": "Prix unitaire invalide"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "TVA %",
+                        "errors": {
+                            "required": "Le taux de TVA est requis",
+                            "min": "Le taux de TVA doit être positif"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "create": "Créer le devis"
+            }
+        },
+        "edit": {
+            "title": "Modifier le devis",
+            "form": {
+                "title": {
+                    "label": "Titre",
+                    "placeholder": "Saisir le titre du devis (optionnel)"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Sélectionner un client",
+                    "errors": {
+                        "required": "Veuillez sélectionner un client"
+                    }
+                },
+                "validUntil": {
+                    "label": "Valide jusqu'au",
+                    "placeholder": "Sélectionner la date d'expiration"
+                },
+                "items": {
+                    "label": "Articles du devis",
+                    "addItem": "Ajouter un article",
+                    "description": {
+                        "placeholder": "Description de l'article",
+                        "errors": {
+                            "required": "La description est requise"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qté",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "La quantité est requise",
+                            "min": "La quantité doit être d'au moins 1",
+                            "invalid": "Quantité invalide"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Prix unitaire",
+                        "errors": {
+                            "required": "Le prix unitaire est requis",
+                            "min": "Le prix unitaire doit être positif",
+                            "invalid": "Prix unitaire invalide"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "TVA %",
+                        "errors": {
+                            "required": "Le taux de TVA est requis",
+                            "min": "Le taux de TVA doit être positif"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "save": "Enregistrer les modifications"
+            }
+        },
+        "view": {
+            "title": "Devis {{number}}",
+            "description": "Consultez tous les détails de ce devis.",
+            "status": {
+                "draft": "Brouillon",
+                "sent": "Envoyé",
+                "expired": "Expiré",
+                "signed": "Signé"
+            },
+            "fields": {
+                "title": "Titre",
+                "status": "Statut",
+                "createdAt": "Créé le",
+                "validUntil": "Valide jusqu'au",
+                "signedAt": "Signé le",
+                "viewedAt": "Consulté le",
+                "client": "Client",
+                "signedBy": "Signé par",
+                "totalHT": "Total HT",
+                "totalVAT": "Montant TVA",
+                "totalTTC": "Total TTC",
+                "signature": "Signature"
+            }
+        },
+        "delete": {
+            "title": "Supprimer le devis",
+            "description": "Êtes-vous sûr de vouloir supprimer ce devis ? Cette action ne peut pas être annulée.",
+            "actions": {
+                "cancel": "Annuler",
+                "delete": "Supprimer le devis"
+            }
+        },
+        "pdf": {
+            "title": "Devis {{number}} - PDF"
+        }
+    },
+    "invoices": {
+        "header": {
+            "subtitle": "Gérez vos factures",
+            "count": "{{count}} factures {{found}}",
+            "found": "trouvées"
+        },
+        "search": {
+            "placeholder": "Rechercher des factures..."
+        },
+        "actions": {
+            "addNew": "Ajouter une nouvelle facture"
+        },
+        "stats": {
+            "total": "Total des factures",
+            "sent": "Envoyées",
+            "paid": "Payées"
+        },
+        "emptyState": {
+            "noInvoices": "Aucune facture pour le moment",
+            "noResults": "Aucune facture trouvée",
+            "startAdding": "Commencez par créer votre première facture.",
+            "tryDifferentSearch": "Essayez d'ajuster vos termes de recherche."
+        },
+        "list": {
+            "title": "Toutes les factures",
+            "description": "Gérez et consultez toutes vos factures en un seul endroit.",
+            "status": {
+                "sent": "Envoyée",
+                "unpaid": "Impayée",
+                "overdue": "En retard",
+                "paid": "Payée"
+            },
+            "item": {
+                "title": "Facture {{number}}{{title}}",
+                "client": "Client",
+                "issued": "Émise le",
+                "due": "Échéance",
+                "payment": "Paiement",
+                "totalHT": "Total HT",
+                "totalTTC": "Total TTC"
+            },
+            "tooltips": {
+                "view": "Voir les détails de la facture",
+                "viewPdf": "Voir le PDF",
+                "downloadPdf": "Télécharger le PDF",
+                "edit": "Modifier la facture",
+                "markAsPaid": "Marquer comme payée",
+                "delete": "Supprimer la facture"
+            },
+            "actions": {
+                "addNew": "Ajouter une nouvelle facture"
+            },
+            "downloadFormats": {
+                "pdf": "PDF standard",
+                "facturx": "Factur-X",
+                "zugferd": "ZUGFeRD",
+                "xrechnung": "XRechnung",
+                "ubl": "UBL",
+                "cii": "CII"
+            },
+            "messages": {
+                "markAsPaidSuccess": "Facture marquée comme payée avec succès",
+                "markAsPaidError": "Échec du marquage de la facture comme payée"
+            }
+        },
+        "create": {
+            "title": "Créer une nouvelle facture",
+            "form": {
+                "quote": {
+                    "label": "À partir d'un devis",
+                    "placeholder": "Sélectionner un devis (optionnel)",
+                    "errors": {
+                        "required": "Veuillez sélectionner un devis"
+                    }
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Sélectionner un client",
+                    "errors": {
+                        "required": "Veuillez sélectionner un client"
+                    }
+                },
+                "dueDate": {
+                    "label": "Date d'échéance",
+                    "placeholder": "Sélectionner la date d'échéance"
+                },
+                "items": {
+                    "label": "Articles de la facture",
+                    "addItem": "Ajouter un article",
+                    "description": {
+                        "placeholder": "Description de l'article",
+                        "errors": {
+                            "required": "La description est requise"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qté",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "La quantité est requise",
+                            "min": "La quantité doit être d'au moins 1",
+                            "invalid": "Quantité invalide"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Prix unitaire",
+                        "errors": {
+                            "required": "Le prix unitaire est requis",
+                            "min": "Le prix unitaire doit être positif",
+                            "invalid": "Prix unitaire invalide"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "TVA %",
+                        "errors": {
+                            "required": "Le taux de TVA est requis",
+                            "min": "Le taux de TVA doit être positif"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "create": "Créer la facture"
+            }
+        },
+        "edit": {
+            "title": "Modifier la facture",
+            "form": {
+                "quote": {
+                    "label": "À partir d'un devis",
+                    "placeholder": "Sélectionner un devis (optionnel)",
+                    "errors": {
+                        "required": "Veuillez sélectionner un devis"
+                    }
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Sélectionner un client",
+                    "errors": {
+                        "required": "Veuillez sélectionner un client"
+                    }
+                },
+                "dueDate": {
+                    "label": "Date d'échéance",
+                    "placeholder": "Sélectionner la date d'échéance"
+                },
+                "items": {
+                    "label": "Articles de la facture",
+                    "addItem": "Ajouter un article",
+                    "description": {
+                        "placeholder": "Description de l'article",
+                        "errors": {
+                            "required": "La description est requise"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qté",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "La quantité est requise",
+                            "min": "La quantité doit être d'au moins 1",
+                            "invalid": "Quantité invalide"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Prix unitaire",
+                        "errors": {
+                            "required": "Le prix unitaire est requis",
+                            "min": "Le prix unitaire doit être positif",
+                            "invalid": "Prix unitaire invalide"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "TVA %",
+                        "errors": {
+                            "required": "Le taux de TVA est requis",
+                            "min": "Le taux de TVA doit être positif"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "save": "Enregistrer les modifications"
+            }
+        },
+        "view": {
+            "title": "Facture {{number}}",
+            "description": "Consultez tous les détails de cette facture.",
+            "status": {
+                "sent": "Envoyée",
+                "unpaid": "Impayée",
+                "overdue": "En retard",
+                "paid": "Payée"
+            },
+            "fields": {
+                "number": "Numéro de facture",
+                "title": "Titre",
+                "status": "Statut",
+                "createdAt": "Créée le",
+                "dueDate": "Date d'échéance",
+                "paidAt": "Payée le",
+                "updatedAt": "Mise à jour le",
+                "client": "Client",
+                "paymentMethod": "Mode de paiement",
+                "totalHT": "Total HT",
+                "totalVAT": "Montant TVA",
+                "totalTTC": "Total TTC",
+                "notes": "Notes"
+            }
+        },
+        "delete": {
+            "title": "Supprimer la facture",
+            "description": "Êtes-vous sûr de vouloir supprimer cette facture ? Cette action ne peut pas être annulée.",
+            "actions": {
+                "cancel": "Annuler",
+                "delete": "Supprimer la facture"
+            }
+        },
+        "pdf": {
+            "title": "Facture {{number}} - PDF"
+        }
+    },
+    "dashboard": {
+        "title": "Tableau de bord",
+        "welcomeMessage": "Bon retour, {{firstname}} !",
+        "revenue": {
+            "title": "Aperçu du chiffre d'affaires",
+            "description": "Suivez vos performances financières dans le temps",
+            "thisMonth": "Ce mois-ci",
+            "thisYear": "Cette année",
+            "chartLabel": "Chiffre d'affaires"
+        },
+        "quotes": {
+            "title": "Aperçu des devis",
+            "description": "Surveillez votre pipeline de devis et les taux de conversion",
+            "stats": {
+                "total": "Total des devis",
+                "draft": "Brouillons",
+                "sent": "Envoyés",
+                "signed": "Signés",
+                "expired": "Expirés"
+            },
+            "latestTitle": "Devis récents",
+            "noRecent": "Aucun devis récent"
+        },
+        "invoices": {
+            "title": "Aperçu des factures",
+            "description": "Suivez votre facturation et vos paiements",
+            "stats": {
+                "total": "Total des factures",
+                "unpaid": "Impayées",
+                "sent": "Envoyées",
+                "paid": "Payées",
+                "overdue": "En retard"
+            },
+            "latestTitle": "Factures récentes",
+            "noRecent": "Aucune facture récente"
+        },
+        "clients": {
+            "title": "Aperçu des clients",
+            "stats": {
+                "total": "Total des clients"
+            }
+        }
+    },
     "settings": {
+        "tabs": {
+            "company": "Entreprise",
+            "pdfTemplates": "Modèles PDF",
+            "emailTemplates": "Modèles d'email",
+            "account": "Compte",
+            "dangerZone": "Zone de danger"
+        },
         "company": {
             "title": "Paramètres de l'entreprise",
-            "description": "Gérez les détails et les paramètres de votre entreprise."
+            "description": "Gérez les informations de votre entreprise et les détails commerciaux",
+            "basicInfo": "Informations de base",
+            "basicInfoDescription": "Détails essentiels sur votre entreprise",
+            "address": {
+                "title": "Informations d'adresse",
+                "description": "L'emplacement physique de votre entreprise"
+            },
+            "contact": {
+                "title": "Informations de contact",
+                "description": "Comment les clients peuvent contacter votre entreprise"
+            },
+            "form": {
+                "company": {
+                    "label": "Nom de l'entreprise",
+                    "placeholder": "Saisir le nom de votre entreprise",
+                    "description": "Le nom légal de votre entreprise",
+                    "errors": {
+                        "required": "Le nom de l'entreprise est requis",
+                        "empty": "Le nom de l'entreprise ne peut pas être vide",
+                        "maxLength": "Le nom de l'entreprise doit faire moins de 100 caractères"
+                    }
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Brève description de votre entreprise",
+                    "description": "Une courte description de vos activités commerciales",
+                    "errors": {
+                        "maxLength": "La description doit faire moins de 500 caractères"
+                    }
+                },
+                "legalId": {
+                    "label": "Identifiant légal",
+                    "placeholder": "Saisir l'identifiant légal",
+                    "description": "Le numéro d'enregistrement légal de votre entreprise",
+                    "errors": {
+                        "required": "L'identifiant légal est requis",
+                        "empty": "L'identifiant légal ne peut pas être vide",
+                        "maxLength": "L'identifiant légal doit faire moins de 50 caractères"
+                    }
+                },
+                "vat": {
+                    "label": "Numéro de TVA",
+                    "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)",
+                    "description": "Le numéro d'identification TVA de votre entreprise",
+                    "errors": {
+                        "required": "Le numéro de TVA est requis",
+                        "empty": "Le numéro de TVA ne peut pas être vide",
+                        "maxLength": "Le numéro de TVA doit faire moins de 15 caractères",
+                        "format": "Le format du numéro de TVA est invalide (ex: FR12345678901)"
+                    }
+                },
+                "foundedAt": {
+                    "label": "Date de création",
+                    "placeholder": "Sélectionner la date de création",
+                    "description": "Quand votre entreprise a été créée",
+                    "errors": {
+                        "future": "La date de création ne peut pas être dans le futur"
+                    }
+                },
+                "currency": {
+                    "label": "Devise",
+                    "placeholder": "Sélectionner votre devise",
+                    "description": "Devise par défaut pour les factures et devis",
+                    "errors": {
+                        "required": "La devise est requise",
+                        "select": "Veuillez sélectionner une devise"
+                    }
+                },
+                "address": {
+                    "label": "Adresse",
+                    "placeholder": "Saisir l'adresse",
+                    "description": "L'adresse de votre entreprise",
+                    "errors": {
+                        "empty": "L'adresse est requise"
+                    }
+                },
+                "postalCode": {
+                    "label": "Code postal",
+                    "placeholder": "Saisir le code postal",
+                    "errors": {
+                        "format": "Le format du code postal est invalide"
+                    }
+                },
+                "city": {
+                    "label": "Ville",
+                    "placeholder": "Saisir la ville",
+                    "errors": {
+                        "empty": "La ville est requise"
+                    }
+                },
+                "country": {
+                    "label": "Pays",
+                    "placeholder": "Saisir le pays",
+                    "errors": {
+                        "empty": "Le pays est requis"
+                    }
+                },
+                "phone": {
+                    "label": "Téléphone",
+                    "placeholder": "Saisir le numéro de téléphone",
+                    "description": "Le numéro de téléphone principal de votre entreprise",
+                    "errors": {
+                        "minLength": "Le numéro de téléphone doit faire au moins 8 caractères",
+                        "format": "Le format du numéro de téléphone est invalide"
+                    }
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Saisir l'adresse email",
+                    "description": "L'adresse email principale de votre entreprise",
+                    "errors": {
+                        "required": "L'email est requis",
+                        "format": "Le format de l'email est invalide"
+                    }
+                },
+                "saving": "Enregistrement...",
+                "saveSettings": "Enregistrer les paramètres"
+            },
+            "messages": {
+                "updateSuccess": "Paramètres de l'entreprise mis à jour avec succès",
+                "updateError": "Échec de la mise à jour des paramètres de l'entreprise"
+            }
+        },
+        "account": {
+            "title": "Paramètres du compte",
+            "description": "Gérez vos informations personnelles et la sécurité",
+            "profile": {
+                "title": "Informations du profil",
+                "description": "Mettez à jour vos détails personnels"
+            },
+            "password": {
+                "title": "Mot de passe et sécurité",
+                "description": "Changez votre mot de passe et les paramètres de sécurité"
+            },
+            "form": {
+                "firstname": {
+                    "label": "Prénom",
+                    "placeholder": "Saisir votre prénom",
+                    "errors": {
+                        "required": "Le prénom est requis"
+                    }
+                },
+                "lastname": {
+                    "label": "Nom",
+                    "placeholder": "Saisir votre nom",
+                    "errors": {
+                        "required": "Le nom est requis"
+                    }
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Saisir votre email",
+                    "errors": {
+                        "invalid": "Le format de l'email est invalide"
+                    }
+                },
+                "currentPassword": {
+                    "label": "Mot de passe actuel",
+                    "placeholder": "Saisir le mot de passe actuel",
+                    "errors": {
+                        "required": "Le mot de passe actuel est requis"
+                    }
+                },
+                "password": {
+                    "label": "Nouveau mot de passe",
+                    "placeholder": "Saisir le nouveau mot de passe",
+                    "errors": {
+                        "minLength": "Le mot de passe doit faire au moins 8 caractères",
+                        "letter": "Le mot de passe doit contenir au moins une lettre",
+                        "number": "Le mot de passe doit contenir au moins un chiffre",
+                        "special": "Le mot de passe doit contenir au moins un caractère spécial"
+                    }
+                },
+                "confirmPassword": {
+                    "label": "Confirmer le mot de passe",
+                    "placeholder": "Confirmer le nouveau mot de passe",
+                    "errors": {
+                        "match": "Les mots de passe ne correspondent pas"
+                    }
+                },
+                "errors": {
+                    "fieldsEmpty": "Tous les champs sont requis"
+                },
+                "updatingProfile": "Mise à jour...",
+                "updateProfile": "Mettre à jour le profil",
+                "updatingPassword": "Mise à jour...",
+                "updatePassword": "Mettre à jour le mot de passe"
+            },
+            "messages": {
+                "profileUpdateSuccess": "Profil mis à jour avec succès",
+                "profileUpdateError": "Échec de la mise à jour du profil",
+                "passwordUpdateSuccess": "Mot de passe mis à jour avec succès",
+                "passwordUpdateError": "Échec de la mise à jour du mot de passe"
+            }
+        },
+        "dangerZone": {
+            "title": "Zone de danger",
+            "description": "Actions irréversibles et destructrices",
+            "resetApp": {
+                "title": "Réinitialiser les données de l'application",
+                "description": "Supprimer tous les devis, factures et clients mais conserver votre compte",
+                "button": "Réinitialiser les données"
+            },
+            "resetDatabase": {
+                "title": "Tout réinitialiser",
+                "description": "Supprimer définitivement votre compte et toutes les données associées",
+                "button": "Réinitialiser la base de données"
+            },
+            "modal": {
+                "title": "Confirmer l'action dangereuse",
+                "description": "Veuillez saisir le code de vérification envoyé à votre email pour confirmer cette action.",
+                "otpLabel": "Code de vérification",
+                "otpPlaceholder": "0000-0000",
+                "warningApp": "Ceci réinitialisera toutes vos données d'application",
+                "warningAppDescription": "Tous les devis, factures et clients seront définitivement supprimés",
+                "warningDatabase": "Ceci supprimera entièrement votre compte",
+                "warningDatabaseDescription": "Votre compte et toutes les données seront définitivement supprimés",
+                "cancel": "Annuler",
+                "confirm": "Confirmer l'action"
+            },
+            "messages": {
+                "otpSentSuccess": "Code de vérification envoyé à votre email",
+                "otpSentError": "Échec de l'envoi du code de vérification",
+                "actionSuccess": "Action terminée avec succès",
+                "actionError": "Échec de l'action",
+                "actionFailed": "L'action a échoué",
+                "unexpectedError": "Une erreur inattendue s'est produite"
+            }
+        },
+        "pdfTemplates": {
+            "title": "Modèles PDF",
+            "description": "Personnalisez l'apparence de vos factures et devis",
+            "templateType": {
+                "title": "Type de modèle",
+                "description": "Choisissez quel modèle personnaliser",
+                "label": "Type de modèle",
+                "options": {
+                    "invoice": "Modèle de facture",
+                    "quote": "Modèle de devis"
+                }
+            },
+            "typography": {
+                "title": "Typographie",
+                "description": "Options de police et de style de texte",
+                "fontFamily": "Famille de police"
+            },
+            "colors": {
+                "title": "Couleurs",
+                "description": "Couleurs de marque et thème",
+                "primaryColor": "Couleur principale"
+            },
+            "logo": {
+                "title": "Logo",
+                "description": "Paramètres du logo de l'entreprise",
+                "includeLogo": "Inclure le logo",
+                "logoPreview": "Aperçu du logo",
+                "uploadText": "Cliquer pour télécharger le logo"
+            },
+            "spacing": {
+                "title": "Espacement et mise en page",
+                "description": "Contrôler l'espacement et les marges",
+                "padding": "Espacement"
+            },
+            "labels": {
+                "title": "Libellés et texte",
+                "invoice": "Facture",
+                "quote": "Devis",
+                "billTo": "Facturer à",
+                "quoteFor": "Devis pour",
+                "validUntil": "Valide jusqu'au",
+                "dueDate": "Date d'échéance",
+                "description": "Description",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "total": "Total",
+                "subtotal": "Sous-total",
+                "vat": "TVA",
+                "grandTotal": "Total général",
+                "vatRate": "Taux de TVA"
+            },
+            "defaultLabels": {
+                "invoice": "Facture",
+                "quote": "Devis",
+                "billTo": "Facturer à",
+                "quoteFor": "Devis pour",
+                "validUntil": "Valide jusqu'au",
+                "dueDate": "Date d'échéance",
+                "description": "Description",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "total": "Total",
+                "subtotal": "Sous-total",
+                "vat": "TVA",
+                "grandTotal": "Total général",
+                "vatRate": "Taux de TVA"
+            },
+            "preview": {
+                "title": "Aperçu",
+                "description": "Aperçu en direct de votre modèle de {{templateType}}",
+                "iframeTitle": "Aperçu du modèle"
+            },
+            "saveButton": "Enregistrer les paramètres du modèle",
+            "messages": {
+                "updateSuccess": "Paramètres du modèle mis à jour avec succès",
+                "updateError": "Échec de la mise à jour des paramètres du modèle"
+            }
+        },
+        "emailTemplates": {
+            "title": "Modèles d'email",
+            "description": "Personnalisez les modèles d'email pour les factures et devis",
+            "editor": {
+                "subject": "Objet",
+                "subjectPlaceholder": "Saisir l'objet de l'email",
+                "body": "Corps de l'email",
+                "htmlPlaceholder": "Saisir le contenu HTML...",
+                "htmlTip": "Vous pouvez utiliser des balises HTML pour le formatage",
+                "availableVariables": "Variables disponibles",
+                "variablesTip": "Utilisez ces variables dans votre modèle en les entourant d'accolades doubles"
+            },
+            "preview": {
+                "from": "De",
+                "to": "À",
+                "subject": "Objet",
+                "reply": "Répondre",
+                "forward": "Transférer",
+                "archive": "Archiver"
+            },
+            "saveButton": "Enregistrer le modèle",
+            "messages": {
+                "saveSuccess": "Modèle {{name}} enregistré avec succès",
+                "saveError": "Échec de l'enregistrement du modèle"
+            }
+        }
+    },
+    "sidebar": {
+        "navigation": {
+            "dashboard": "Tableau de bord",
+            "quotes": "Devis",
+            "invoices": "Factures",
+            "clients": "Clients",
+            "settings": "Paramètres"
+        },
+        "company": {
+            "plan": "Entreprise"
+        },
+        "menu": "Menu",
+        "theme": {
+            "toggleTheme": "Basculer le thème",
+            "light": "Clair",
+            "dark": "Sombre",
+            "system": "Système"
+        },
+        "userMenu": {
+            "account": "Compte",
+            "logout": "Se déconnecter"
+        },
+        "companyDialog": {
+            "title": "Terminer la configuration de l'entreprise",
+            "description": "Veuillez compléter les informations de votre entreprise pour continuer à utiliser l'application.",
+            "goButton": "Aller aux paramètres de l'entreprise"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Se connecter",
+            "description": "Saisissez vos identifiants pour accéder à votre compte",
+            "form": {
+                "email": {
+                    "label": "Email"
+                },
+                "password": {
+                    "label": "Mot de passe"
+                },
+                "loggingIn": "Connexion...",
+                "loginButton": "Se connecter"
+            },
+            "noAccount": "Vous n'avez pas de compte ?",
+            "signUpLink": "S'inscrire",
+            "errors": {
+                "invalidEmail": "Veuillez saisir une adresse email valide",
+                "passwordRequired": "Le mot de passe est requis"
+            },
+            "messages": {
+                "loginSuccess": "Connexion réussie",
+                "loginError": "Identifiants invalides"
+            }
+        },
+        "signup": {
+            "title": "Créer un compte",
+            "description": "Créez un nouveau compte pour commencer",
+            "form": {
+                "firstname": {
+                    "label": "Prénom",
+                    "placeholder": "Saisir votre prénom"
+                },
+                "lastname": {
+                    "label": "Nom",
+                    "placeholder": "Saisir votre nom"
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Saisir votre email"
+                },
+                "password": {
+                    "label": "Mot de passe",
+                    "placeholder": "Créer un mot de passe",
+                    "requirements": "Exigences du mot de passe :"
+                },
+                "creatingAccount": "Création du compte...",
+                "createButton": "Créer le compte"
+            },
+            "hasAccount": "Vous avez déjà un compte ?",
+            "signInLink": "Se connecter",
+            "errors": {
+                "firstnameMinLength": "Le prénom doit faire au moins 2 caractères",
+                "lastnameMinLength": "Le nom doit faire au moins 2 caractères",
+                "invalidEmail": "Veuillez saisir une adresse email valide",
+                "passwordMinLength": "Le mot de passe doit faire au moins 8 caractères",
+                "passwordLetter": "Le mot de passe doit contenir au moins une lettre",
+                "passwordNumber": "Le mot de passe doit contenir au moins un chiffre",
+                "passwordSpecial": "Le mot de passe doit contenir au moins un caractère spécial"
+            },
+            "messages": {
+                "accountCreated": "Compte créé avec succès"
+            }
         }
     }
 }

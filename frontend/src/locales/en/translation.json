@@ -1,8 +1,1196 @@
 {
+    "clients": {
+        "header": {
+            "subtitle": "Manage your clients",
+            "count": "{{count}} clients {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search clients..."
+        },
+        "actions": {
+            "addNew": "Add New Client"
+        },
+        "stats": {
+            "total": "Total Clients",
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "emptyState": {
+            "noClients": "No clients yet",
+            "noResults": "No clients found",
+            "startAdding": "Get started by creating your first client.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Clients",
+            "description": "Manage and view all your clients in one place.",
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "tooltips": {
+                "view": "View client details",
+                "edit": "Edit client",
+                "delete": "Delete client"
+            }
+        },
+        "create": {
+            "title": "Add New Client",
+            "fields": {
+                "contactFirstname": {
+                    "label": "First Name",
+                    "placeholder": "Enter first name"
+                },
+                "contactLastname": {
+                    "label": "Last Name",
+                    "placeholder": "Enter last name"
+                },
+                "name": {
+                    "label": "Company Name",
+                    "placeholder": "Enter company name"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Enter company description"
+                },
+                "legalId": {
+                    "label": "Legal ID",
+                    "placeholder": "Enter legal identifier"
+                },
+                "vat": {
+                    "label": "VAT Number",
+                    "placeholder": "Enter VAT number (e.g., FR12345678901)"
+                },
+                "foundedAt": {
+                    "label": "Founded Date",
+                    "placeholder": "Select founding date"
+                },
+                "contactEmail": {
+                    "label": "Email",
+                    "placeholder": "Enter email address"
+                },
+                "contactPhone": {
+                    "label": "Phone",
+                    "placeholder": "Enter phone number"
+                },
+                "address": {
+                    "label": "Address",
+                    "placeholder": "Enter street address"
+                },
+                "postalCode": {
+                    "label": "Postal Code",
+                    "placeholder": "Enter postal code"
+                },
+                "city": {
+                    "label": "City",
+                    "placeholder": "Enter city"
+                },
+                "country": {
+                    "label": "Country",
+                    "placeholder": "Enter country"
+                }
+            },
+            "validation": {
+                "name": {
+                    "required": "Company name is required"
+                },
+                "description": {
+                    "required": "Description is required",
+                    "maxLength": "Description must be less than 500 characters"
+                },
+                "legalId": {
+                    "required": "Legal ID is required",
+                    "empty": "Legal ID cannot be empty",
+                    "maxLength": "Legal ID must be less than 50 characters"
+                },
+                "vat": {
+                    "required": "VAT number is required",
+                    "empty": "VAT number cannot be empty",
+                    "maxLength": "VAT number must be less than 15 characters",
+                    "format": "VAT number format is invalid (e.g., FR12345678901)"
+                },
+                "foundedAt": {
+                    "future": "Founded date cannot be in the future"
+                },
+                "contactFirstname": {
+                    "required": "First name is required"
+                },
+                "contactLastname": {
+                    "required": "Last name is required"
+                },
+                "contactPhone": {
+                    "minLength": "Phone number must be at least 8 characters",
+                    "format": "Phone number format is invalid"
+                },
+                "contactEmail": {
+                    "required": "Email is required",
+                    "format": "Email format is invalid"
+                },
+                "address": {
+                    "required": "Address is required"
+                },
+                "postalCode": {
+                    "format": "Postal code format is invalid"
+                },
+                "city": {
+                    "required": "City is required"
+                },
+                "country": {
+                    "required": "Country is required"
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "create": "Create Client"
+            }
+        },
+        "edit": {
+            "title": "Edit Client",
+            "fields": {
+                "contactFirstname": {
+                    "label": "First Name",
+                    "placeholder": "Enter first name"
+                },
+                "contactLastname": {
+                    "label": "Last Name",
+                    "placeholder": "Enter last name"
+                },
+                "name": {
+                    "label": "Company Name",
+                    "placeholder": "Enter company name"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Enter company description"
+                },
+                "legalId": {
+                    "label": "Legal ID",
+                    "placeholder": "Enter legal identifier"
+                },
+                "vat": {
+                    "label": "VAT Number",
+                    "placeholder": "Enter VAT number (e.g., FR12345678901)"
+                },
+                "foundedAt": {
+                    "label": "Founded Date",
+                    "placeholder": "Select founding date"
+                },
+                "contactEmail": {
+                    "label": "Email",
+                    "placeholder": "Enter email address"
+                },
+                "contactPhone": {
+                    "label": "Phone",
+                    "placeholder": "Enter phone number"
+                },
+                "address": {
+                    "label": "Address",
+                    "placeholder": "Enter street address"
+                },
+                "postalCode": {
+                    "label": "Postal Code",
+                    "placeholder": "Enter postal code"
+                },
+                "city": {
+                    "label": "City",
+                    "placeholder": "Enter city"
+                },
+                "country": {
+                    "label": "Country",
+                    "placeholder": "Enter country"
+                }
+            },
+            "validation": {
+                "name": {
+                    "required": "Company name is required"
+                },
+                "description": {
+                    "required": "Description is required",
+                    "maxLength": "Description must be less than 500 characters"
+                },
+                "legalId": {
+                    "required": "Legal ID is required",
+                    "empty": "Legal ID cannot be empty",
+                    "maxLength": "Legal ID must be less than 50 characters"
+                },
+                "vat": {
+                    "required": "VAT number is required",
+                    "empty": "VAT number cannot be empty",
+                    "maxLength": "VAT number must be less than 15 characters",
+                    "format": "VAT number format is invalid (e.g., FR12345678901)"
+                },
+                "foundedAt": {
+                    "future": "Founded date cannot be in the future"
+                },
+                "contactFirstname": {
+                    "required": "First name is required"
+                },
+                "contactLastname": {
+                    "required": "Last name is required"
+                },
+                "contactPhone": {
+                    "minLength": "Phone number must be at least 8 characters",
+                    "format": "Phone number format is invalid"
+                },
+                "contactEmail": {
+                    "required": "Email is required",
+                    "format": "Email format is invalid"
+                },
+                "address": {
+                    "required": "Address is required"
+                },
+                "postalCode": {
+                    "format": "Postal code format is invalid"
+                },
+                "city": {
+                    "required": "City is required"
+                },
+                "country": {
+                    "required": "Country is required"
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes"
+            }
+        },
+        "view": {
+            "title": "Client Details",
+            "description": "View all relevant information about this client.",
+            "fields": {
+                "companyName": "Company Name",
+                "contactPerson": "Contact Person",
+                "email": "Email",
+                "phone": "Phone",
+                "address": "Address",
+                "postalCode": "Postal Code",
+                "city": "City",
+                "country": "Country"
+            }
+        },
+        "delete": {
+            "title": "Delete Client",
+            "description": "Are you sure you want to delete this client? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete Client"
+            }
+        }
+    },
+    "quotes": {
+        "header": {
+            "subtitle": "Manage your quotes",
+            "count": "{{count}} quotes {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search quotes..."
+        },
+        "actions": {
+            "addNew": "Add New Quote"
+        },
+        "stats": {
+            "total": "Total Quotes",
+            "draft": "Draft",
+            "signed": "Signed"
+        },
+        "emptyState": {
+            "noQuotes": "No quotes yet",
+            "noResults": "No quotes found",
+            "startAdding": "Get started by creating your first quote.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Quotes",
+            "description": "Manage and view all your quotes in one place.",
+            "status": {
+                "draft": "Draft",
+                "sent": "Sent",
+                "expired": "Expired",
+                "signed": "Signed"
+            },
+            "item": {
+                "title": "Quote {{number}}{{title}}",
+                "client": "Client",
+                "issued": "Issued",
+                "validUntil": "Valid Until",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)"
+            },
+            "tooltips": {
+                "view": "View quote details",
+                "viewPdf": "View PDF",
+                "downloadPdf": "Download PDF",
+                "edit": "Edit quote",
+                "sendSignature": "Send for signature",
+                "resendSignature": "Resend for signature",
+                "createInvoice": "Create invoice from quote",
+                "delete": "Delete quote"
+            },
+            "actions": {
+                "addNew": "Add New Quote"
+            },
+            "messages": {
+                "sendSignatureError": "Failed to send quote for signature",
+                "invoiceCreated": "Invoice created successfully from quote",
+                "invoiceCreateError": "Failed to create invoice from quote"
+            }
+        },
+        "create": {
+            "title": "Create New Quote",
+            "form": {
+                "title": {
+                    "label": "Title",
+                    "placeholder": "Enter quote title (optional)"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "validUntil": {
+                    "label": "Valid Until",
+                    "placeholder": "Select expiration date"
+                },
+                "items": {
+                    "label": "Quote Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "create": "Create Quote"
+            }
+        },
+        "edit": {
+            "title": "Edit Quote",
+            "form": {
+                "title": {
+                    "label": "Title",
+                    "placeholder": "Enter quote title (optional)"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "validUntil": {
+                    "label": "Valid Until",
+                    "placeholder": "Select expiration date"
+                },
+                "items": {
+                    "label": "Quote Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes"
+            }
+        },
+        "view": {
+            "title": "Quote {{number}}",
+            "description": "View all details of this quote.",
+            "status": {
+                "draft": "Draft",
+                "sent": "Sent",
+                "expired": "Expired",
+                "signed": "Signed"
+            },
+            "fields": {
+                "title": "Title",
+                "status": "Status",
+                "createdAt": "Created",
+                "validUntil": "Valid Until",
+                "signedAt": "Signed At",
+                "viewedAt": "Viewed At",
+                "client": "Client",
+                "signedBy": "Signed By",
+                "totalHT": "Total (excl. VAT)",
+                "totalVAT": "VAT Amount",
+                "totalTTC": "Total (incl. VAT)",
+                "signature": "Signature"
+            }
+        },
+        "delete": {
+            "title": "Delete Quote",
+            "description": "Are you sure you want to delete this quote? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete Quote"
+            }
+        },
+        "pdf": {
+            "title": "Quote {{number}} - PDF"
+        }
+    },
+    "invoices": {
+        "header": {
+            "subtitle": "Manage your invoices",
+            "count": "{{count}} invoices {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search invoices..."
+        },
+        "actions": {
+            "addNew": "Add New Invoice"
+        },
+        "stats": {
+            "total": "Total Invoices",
+            "sent": "Sent",
+            "paid": "Paid"
+        },
+        "emptyState": {
+            "noInvoices": "No invoices yet",
+            "noResults": "No invoices found",
+            "startAdding": "Get started by creating your first invoice.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Invoices",
+            "description": "Manage and view all your invoices in one place.",
+            "status": {
+                "sent": "Sent",
+                "unpaid": "Unpaid",
+                "overdue": "Overdue",
+                "paid": "Paid"
+            },
+            "item": {
+                "title": "Invoice {{number}}{{title}}",
+                "client": "Client",
+                "issued": "Issued",
+                "due": "Due",
+                "payment": "Payment",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)"
+            },
+            "tooltips": {
+                "view": "View invoice details",
+                "viewPdf": "View PDF",
+                "downloadPdf": "Download PDF",
+                "edit": "Edit invoice",
+                "markAsPaid": "Mark as paid",
+                "delete": "Delete invoice"
+            },
+            "actions": {
+                "addNew": "Add New Invoice"
+            },
+            "downloadFormats": {
+                "pdf": "Standard PDF",
+                "facturx": "Factur-X",
+                "zugferd": "ZUGFeRD",
+                "xrechnung": "XRechnung",
+                "ubl": "UBL",
+                "cii": "CII"
+            },
+            "messages": {
+                "markAsPaidSuccess": "Invoice marked as paid successfully",
+                "markAsPaidError": "Failed to mark invoice as paid"
+            }
+        },
+        "create": {
+            "title": "Create New Invoice",
+            "form": {
+                "quote": {
+                    "label": "From Quote",
+                    "placeholder": "Select a quote (optional)",
+                    "errors": {
+                        "required": "Please select a quote"
+                    }
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "dueDate": {
+                    "label": "Due Date",
+                    "placeholder": "Select due date"
+                },
+                "items": {
+                    "label": "Invoice Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "create": "Create Invoice"
+            }
+        },
+        "edit": {
+            "title": "Edit Invoice",
+            "form": {
+                "quote": {
+                    "label": "From Quote",
+                    "placeholder": "Select a quote (optional)",
+                    "errors": {
+                        "required": "Please select a quote"
+                    }
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "dueDate": {
+                    "label": "Due Date",
+                    "placeholder": "Select due date"
+                },
+                "items": {
+                    "label": "Invoice Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes"
+            }
+        },
+        "view": {
+            "title": "Invoice {{number}}",
+            "description": "View all details of this invoice.",
+            "status": {
+                "sent": "Sent",
+                "unpaid": "Unpaid",
+                "overdue": "Overdue",
+                "paid": "Paid"
+            },
+            "fields": {
+                "number": "Invoice Number",
+                "title": "Title",
+                "status": "Status",
+                "createdAt": "Created",
+                "dueDate": "Due Date",
+                "paidAt": "Paid At",
+                "updatedAt": "Updated",
+                "client": "Client",
+                "paymentMethod": "Payment Method",
+                "totalHT": "Total (excl. VAT)",
+                "totalVAT": "VAT Amount",
+                "totalTTC": "Total (incl. VAT)",
+                "notes": "Notes"
+            }
+        },
+        "delete": {
+            "title": "Delete Invoice",
+            "description": "Are you sure you want to delete this invoice? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete Invoice"
+            }
+        },
+        "pdf": {
+            "title": "Invoice {{number}} - PDF"
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcomeMessage": "Welcome back, {{firstname}}!",
+        "revenue": {
+            "title": "Revenue Overview",
+            "description": "Track your financial performance over time",
+            "thisMonth": "This Month",
+            "thisYear": "This Year",
+            "chartLabel": "Revenue"
+        },
+        "quotes": {
+            "title": "Quotes Overview",
+            "description": "Monitor your quote pipeline and conversion rates",
+            "stats": {
+                "total": "Total Quotes",
+                "draft": "Draft",
+                "sent": "Sent",
+                "signed": "Signed",
+                "expired": "Expired"
+            },
+            "latestTitle": "Recent Quotes",
+            "noRecent": "No recent quotes"
+        },
+        "invoices": {
+            "title": "Invoices Overview",
+            "description": "Keep track of your billing and payments",
+            "stats": {
+                "total": "Total Invoices",
+                "unpaid": "Unpaid",
+                "sent": "Sent",
+                "paid": "Paid",
+                "overdue": "Overdue"
+            },
+            "latestTitle": "Recent Invoices",
+            "noRecent": "No recent invoices"
+        },
+        "clients": {
+            "title": "Clients Overview",
+            "stats": {
+                "total": "Total Clients"
+            }
+        }
+    },
     "settings": {
+        "tabs": {
+            "company": "Company",
+            "pdfTemplates": "PDF Templates",
+            "emailTemplates": "Email Templates",
+            "account": "Account",
+            "dangerZone": "Danger Zone"
+        },
         "company": {
             "title": "Company Settings",
-            "description": "Manage your company details and settings."
+            "description": "Manage your company information and business details",
+            "basicInfo": "Basic Information",
+            "basicInfoDescription": "Essential details about your company",
+            "address": {
+                "title": "Address Information",
+                "description": "Your company's physical location"
+            },
+            "contact": {
+                "title": "Contact Information",
+                "description": "How clients can reach your company"
+            },
+            "form": {
+                "company": {
+                    "label": "Company Name",
+                    "placeholder": "Enter your company name",
+                    "description": "The legal name of your business",
+                    "errors": {
+                        "required": "Company name is required",
+                        "empty": "Company name cannot be empty",
+                        "maxLength": "Company name must be less than 100 characters"
+                    }
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Brief description of your company",
+                    "description": "A short description of your business activities",
+                    "errors": {
+                        "maxLength": "Description must be less than 500 characters"
+                    }
+                },
+                "legalId": {
+                    "label": "Legal ID",
+                    "placeholder": "Enter legal identifier",
+                    "description": "Your company's legal registration number",
+                    "errors": {
+                        "required": "Legal ID is required",
+                        "empty": "Legal ID cannot be empty",
+                        "maxLength": "Legal ID must be less than 50 characters"
+                    }
+                },
+                "vat": {
+                    "label": "VAT Number",
+                    "placeholder": "Enter VAT number (e.g., FR12345678901)",
+                    "description": "Your company's VAT identification number",
+                    "errors": {
+                        "required": "VAT number is required",
+                        "empty": "VAT number cannot be empty",
+                        "maxLength": "VAT number must be less than 15 characters",
+                        "format": "VAT number format is invalid (e.g., FR12345678901)"
+                    }
+                },
+                "foundedAt": {
+                    "label": "Founded Date",
+                    "placeholder": "Select founding date",
+                    "description": "When your company was established",
+                    "errors": {
+                        "future": "Founded date cannot be in the future"
+                    }
+                },
+                "currency": {
+                    "label": "Currency",
+                    "placeholder": "Select your currency",
+                    "description": "Default currency for invoices and quotes",
+                    "errors": {
+                        "required": "Currency is required",
+                        "select": "Please select a currency"
+                    }
+                },
+                "address": {
+                    "label": "Address",
+                    "placeholder": "Enter street address",
+                    "description": "Your company's street address",
+                    "errors": {
+                        "empty": "Address is required"
+                    }
+                },
+                "postalCode": {
+                    "label": "Postal Code",
+                    "placeholder": "Enter postal code",
+                    "errors": {
+                        "format": "Postal code format is invalid"
+                    }
+                },
+                "city": {
+                    "label": "City",
+                    "placeholder": "Enter city",
+                    "errors": {
+                        "empty": "City is required"
+                    }
+                },
+                "country": {
+                    "label": "Country",
+                    "placeholder": "Enter country",
+                    "errors": {
+                        "empty": "Country is required"
+                    }
+                },
+                "phone": {
+                    "label": "Phone",
+                    "placeholder": "Enter phone number",
+                    "description": "Your company's main phone number",
+                    "errors": {
+                        "minLength": "Phone number must be at least 8 characters",
+                        "format": "Phone number format is invalid"
+                    }
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Enter email address",
+                    "description": "Your company's main email address",
+                    "errors": {
+                        "required": "Email is required",
+                        "format": "Email format is invalid"
+                    }
+                },
+                "saving": "Saving...",
+                "saveSettings": "Save Settings"
+            },
+            "messages": {
+                "updateSuccess": "Company settings updated successfully",
+                "updateError": "Failed to update company settings"
+            }
+        },
+        "account": {
+            "title": "Account Settings",
+            "description": "Manage your personal account information and security",
+            "profile": {
+                "title": "Profile Information",
+                "description": "Update your personal details"
+            },
+            "password": {
+                "title": "Password & Security",
+                "description": "Change your password and security settings"
+            },
+            "form": {
+                "firstname": {
+                    "label": "First Name",
+                    "placeholder": "Enter your first name",
+                    "errors": {
+                        "required": "First name is required"
+                    }
+                },
+                "lastname": {
+                    "label": "Last Name",
+                    "placeholder": "Enter your last name",
+                    "errors": {
+                        "required": "Last name is required"
+                    }
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Enter your email",
+                    "errors": {
+                        "invalid": "Email format is invalid"
+                    }
+                },
+                "currentPassword": {
+                    "label": "Current Password",
+                    "placeholder": "Enter current password",
+                    "errors": {
+                        "required": "Current password is required"
+                    }
+                },
+                "password": {
+                    "label": "New Password",
+                    "placeholder": "Enter new password",
+                    "errors": {
+                        "minLength": "Password must be at least 8 characters",
+                        "letter": "Password must contain at least one letter",
+                        "number": "Password must contain at least one number",
+                        "special": "Password must contain at least one special character"
+                    }
+                },
+                "confirmPassword": {
+                    "label": "Confirm Password",
+                    "placeholder": "Confirm new password",
+                    "errors": {
+                        "match": "Passwords do not match"
+                    }
+                },
+                "errors": {
+                    "fieldsEmpty": "All fields are required"
+                },
+                "updatingProfile": "Updating...",
+                "updateProfile": "Update Profile",
+                "updatingPassword": "Updating...",
+                "updatePassword": "Update Password"
+            },
+            "messages": {
+                "profileUpdateSuccess": "Profile updated successfully",
+                "profileUpdateError": "Failed to update profile",
+                "passwordUpdateSuccess": "Password updated successfully",
+                "passwordUpdateError": "Failed to update password"
+            }
+        },
+        "dangerZone": {
+            "title": "Danger Zone",
+            "description": "Irreversible and destructive actions",
+            "resetApp": {
+                "title": "Reset Application Data",
+                "description": "Remove all quotes, invoices, and clients but keep your account",
+                "button": "Reset App Data"
+            },
+            "resetDatabase": {
+                "title": "Reset Everything",
+                "description": "Permanently delete your account and all associated data",
+                "button": "Reset Database"
+            },
+            "modal": {
+                "title": "Confirm Dangerous Action",
+                "description": "Please enter the verification code sent to your email to confirm this action.",
+                "otpLabel": "Verification Code",
+                "otpPlaceholder": "0000-0000",
+                "warningApp": "This will reset all your application data",
+                "warningAppDescription": "All quotes, invoices, and clients will be permanently deleted",
+                "warningDatabase": "This will delete your entire account",
+                "warningDatabaseDescription": "Your account and all data will be permanently deleted",
+                "cancel": "Cancel",
+                "confirm": "Confirm Action"
+            },
+            "messages": {
+                "otpSentSuccess": "Verification code sent to your email",
+                "otpSentError": "Failed to send verification code",
+                "actionSuccess": "Action completed successfully",
+                "actionError": "Failed to complete action",
+                "actionFailed": "Action failed",
+                "unexpectedError": "An unexpected error occurred"
+            }
+        },
+        "pdfTemplates": {
+            "title": "PDF Templates",
+            "description": "Customize the appearance of your invoices and quotes",
+            "templateType": {
+                "title": "Template Type",
+                "description": "Choose which template to customize",
+                "label": "Template Type",
+                "options": {
+                    "invoice": "Invoice Template",
+                    "quote": "Quote Template"
+                }
+            },
+            "typography": {
+                "title": "Typography",
+                "description": "Font and text styling options",
+                "fontFamily": "Font Family"
+            },
+            "colors": {
+                "title": "Colors",
+                "description": "Brand colors and theme",
+                "primaryColor": "Primary Color"
+            },
+            "logo": {
+                "title": "Logo",
+                "description": "Company logo settings",
+                "includeLogo": "Include Logo",
+                "logoPreview": "Logo Preview",
+                "uploadText": "Click to upload logo"
+            },
+            "spacing": {
+                "title": "Spacing & Layout",
+                "description": "Control spacing and margins",
+                "padding": "Padding"
+            },
+            "labels": {
+                "title": "Labels & Text",
+                "invoice": "Invoice",
+                "quote": "Quote",
+                "billTo": "Bill To",
+                "quoteFor": "Quote For",
+                "validUntil": "Valid Until",
+                "dueDate": "Due Date",
+                "description": "Description",
+                "quantity": "Quantity",
+                "unitPrice": "Unit Price",
+                "total": "Total",
+                "subtotal": "Subtotal",
+                "vat": "VAT",
+                "grandTotal": "Grand Total",
+                "vatRate": "VAT Rate"
+            },
+            "defaultLabels": {
+                "invoice": "Invoice",
+                "quote": "Quote",
+                "billTo": "Bill To",
+                "quoteFor": "Quote For",
+                "validUntil": "Valid Until",
+                "dueDate": "Due Date",
+                "description": "Description",
+                "quantity": "Quantity",
+                "unitPrice": "Unit Price",
+                "total": "Total",
+                "subtotal": "Subtotal",
+                "vat": "VAT",
+                "grandTotal": "Grand Total",
+                "vatRate": "VAT Rate"
+            },
+            "preview": {
+                "title": "Preview",
+                "description": "Live preview of your {{templateType}} template",
+                "iframeTitle": "Template Preview"
+            },
+            "saveButton": "Save Template Settings",
+            "messages": {
+                "updateSuccess": "Template settings updated successfully",
+                "updateError": "Failed to update template settings"
+            }
+        },
+        "emailTemplates": {
+            "title": "Email Templates",
+            "description": "Customize email templates for invoices and quotes",
+            "editor": {
+                "subject": "Subject",
+                "subjectPlaceholder": "Enter email subject",
+                "body": "Email Body",
+                "htmlPlaceholder": "Enter HTML content...",
+                "htmlTip": "You can use HTML tags for formatting",
+                "availableVariables": "Available Variables",
+                "variablesTip": "Use these variables in your template by wrapping them in double curly braces"
+            },
+            "preview": {
+                "from": "From",
+                "to": "To",
+                "subject": "Subject",
+                "reply": "Reply",
+                "forward": "Forward",
+                "archive": "Archive"
+            },
+            "saveButton": "Save Template",
+            "messages": {
+                "saveSuccess": "{{name}} template saved successfully",
+                "saveError": "Failed to save template"
+            }
+        }
+    },
+    "sidebar": {
+        "navigation": {
+            "dashboard": "Dashboard",
+            "quotes": "Quotes",
+            "invoices": "Invoices",
+            "clients": "Clients",
+            "settings": "Settings"
+        },
+        "company": {
+            "plan": "Entreprise"
+        },
+        "menu": "Menu",
+        "theme": {
+            "toggleTheme": "Toggle theme",
+            "light": "Light",
+            "dark": "Dark",
+            "system": "System"
+        },
+        "userMenu": {
+            "account": "Account",
+            "logout": "Log out"
+        },
+        "companyDialog": {
+            "title": "Complete Company Setup",
+            "description": "Please complete your company information to continue using the application.",
+            "goButton": "Go to Company Settings"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Sign In",
+            "description": "Enter your credentials to access your account",
+            "form": {
+                "email": {
+                    "label": "Email"
+                },
+                "password": {
+                    "label": "Password"
+                },
+                "loggingIn": "Signing in...",
+                "loginButton": "Sign In"
+            },
+            "noAccount": "Don't have an account?",
+            "signUpLink": "Sign up",
+            "errors": {
+                "invalidEmail": "Please enter a valid email address",
+                "passwordRequired": "Password is required"
+            },
+            "messages": {
+                "loginSuccess": "Successfully signed in",
+                "loginError": "Invalid credentials"
+            }
+        },
+        "signup": {
+            "title": "Create Account",
+            "description": "Create a new account to get started",
+            "form": {
+                "firstname": {
+                    "label": "First Name",
+                    "placeholder": "Enter your first name"
+                },
+                "lastname": {
+                    "label": "Last Name",
+                    "placeholder": "Enter your last name"
+                },
+                "email": {
+                    "label": "Email",
+                    "placeholder": "Enter your email"
+                },
+                "password": {
+                    "label": "Password",
+                    "placeholder": "Create a password",
+                    "requirements": "Password requirements:"
+                },
+                "creatingAccount": "Creating account...",
+                "createButton": "Create Account"
+            },
+            "hasAccount": "Already have an account?",
+            "signInLink": "Sign in",
+            "errors": {
+                "firstnameMinLength": "First name must be at least 2 characters",
+                "lastnameMinLength": "Last name must be at least 2 characters",
+                "invalidEmail": "Please enter a valid email address",
+                "passwordMinLength": "Password must be at least 8 characters",
+                "passwordLetter": "Password must contain at least one letter",
+                "passwordNumber": "Password must contain at least one number",
+                "passwordSpecial": "Password must contain at least one special character"
+            },
+            "messages": {
+                "accountCreated": "Account created successfully"
+            }
         }
     }
 }
