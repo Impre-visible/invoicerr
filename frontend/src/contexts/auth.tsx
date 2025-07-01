@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         async function fetchMe() {
             try {
-                const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
+                const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/me`, {
                     method: "GET"
                 }, true, null, setAccessToken);
                 if (!res.ok) throw new Error("Non authentifié");

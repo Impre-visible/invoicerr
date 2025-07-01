@@ -29,7 +29,7 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
   if (isExpired && retry) {
     console.warn("Access token expired, attempting to refresh...");
     let refreshRes: Response;
-    refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`, {
+    refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/refresh`, {
       body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }),
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetRe
     let cancelled = false;
     setLoading(true);
 
-    authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL}${url}`, {
+    authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}${url}`, {
       ...options,
       method: "GET",
     })
@@ -104,7 +104,7 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
 
     let newURL = url;
     if (!url.startsWith("http")) {
-      newURL = `${import.meta.env.VITE_BACKEND_URL}${url}`;
+      newURL = `${import.meta.env.VITE_BACKEND_URL || ''}${url}`;
     }
 
     authenticatedFetch(newURL, {
@@ -161,7 +161,7 @@ function createMethodHook(method: string) {
       setError(null);
 
       try {
-        const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL}${url}`, {
+        const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}${url}`, {
           method,
           headers: {
             "Content-Type": "application/json",
