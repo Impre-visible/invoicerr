@@ -1,7 +1,9 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Monitor, Smartphone, Tablet, Upload, X } from "lucide-react"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useGet, usePost } from "@/lib/utils"
 
@@ -12,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import type React from "react"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import { UnavailablePlatform } from "@/components/unavailable-platform"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
@@ -369,7 +372,11 @@ export default function PDFTemplatesSettings() {
                 <p className="text-muted-foreground">{t("settings.pdfTemplates.description")}</p>
             </div>
 
-            <div className="flex-1 min-h-0">
+            <div className="lg:hidden">
+                <UnavailablePlatform />
+            </div>
+
+            <div className="hidden lg:block flex-1 min-h-0">
                 <ResizablePanelGroup direction="horizontal" className="!h-[calc(100dvh-18rem)]">
                     <ResizablePanel defaultSize={45} minSize={30} maxSize={70}>
                         <div className="h-full flex flex-col">

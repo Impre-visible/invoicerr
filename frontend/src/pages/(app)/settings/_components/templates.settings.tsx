@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { TabsContent } from "@radix-ui/react-tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { UnavailablePlatform } from "@/components/unavailable-platform"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
@@ -210,7 +211,12 @@ export default function EmailTemplatesSettings() {
                 <p className="text-muted-foreground">{t("settings.emailTemplates.description")}</p>
             </div>
 
-            <Tabs value={activeTab || undefined} onValueChange={setActiveTab}>
+            <div className="lg:hidden">
+                <UnavailablePlatform />
+            </div>
+
+
+            <Tabs value={activeTab || undefined} onValueChange={setActiveTab} className="hidden lg:block flex-1 min-h-0">
                 <TabsList className="w-full">
                     {templates.map((template) => (
                         <TabsTrigger key={template.id} value={template.id}>

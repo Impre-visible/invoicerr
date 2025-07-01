@@ -87,8 +87,7 @@ export default function DangerZoneSettings() {
                 <p className="text-muted-foreground">{t("settings.dangerZone.description")}</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                {/* Reset App Card */}
+            <div className="grid gap-4 lg:grid-cols-2">
                 <Card className="border-orange-200 dark:border-orange-900/50">
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-lg">
@@ -109,7 +108,6 @@ export default function DangerZoneSettings() {
                     </CardContent>
                 </Card>
 
-                {/* Reset Database Card */}
                 <Card className="border-red-200 dark:border-red-900/50">
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400 text-lg">
@@ -132,7 +130,6 @@ export default function DangerZoneSettings() {
                 </Card>
             </div>
 
-            {/* OTP Modal */}
             <Dialog open={otpModalOpen} onOpenChange={setOtpModalOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>

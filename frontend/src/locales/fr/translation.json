@@ -55,8 +55,8 @@
                     "placeholder": "Saisir la description de l'entreprise"
                 },
                 "legalId": {
-                    "label": "Identifiant légal",
-                    "placeholder": "Saisir l'identifiant légal"
+                    "label": "SIREN/SIRET",
+                    "placeholder": "Saisir le SIREN/SIRET de l'entreprise"
                 },
                 "vat": {
                     "label": "Numéro de TVA",
@@ -165,8 +165,8 @@
                     "placeholder": "Saisir la description de l'entreprise"
                 },
                 "legalId": {
-                    "label": "Identifiant légal",
-                    "placeholder": "Saisir l'identifiant légal"
+                    "label": "SIREN/SIRET",
+                    "placeholder": "Saisir le SIREN/SIRET de l'entreprise"
                 },
                 "vat": {
                     "label": "Numéro de TVA",
@@ -798,9 +798,9 @@
                     }
                 },
                 "legalId": {
-                    "label": "Identifiant légal",
-                    "placeholder": "Saisir l'identifiant légal",
-                    "description": "Le numéro d'enregistrement légal de votre entreprise",
+                    "label": "SIREN/SIRET",
+                    "placeholder": "Saisir le SIREN/SIRET de l'entreprise",
+                    "description": "Le numéro d'identification légal de votre entreprise",
                     "errors": {
                         "required": "L'identifiant légal est requis",
                         "empty": "L'identifiant légal ne peut pas être vide",
@@ -1193,5 +1193,9 @@
                 "accountCreated": "Compte créé avec succès"
             }
         }
+    },
+    "unavailable": {
+        "title": "Indisponible sur Mobile/Tablet",
+        "description": "Cette fonctionnalité n'est disponible que sur les appareils de bureau pour une expérience optimale."
     }
 }

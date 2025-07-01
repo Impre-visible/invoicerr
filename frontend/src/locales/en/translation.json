@@ -1193,5 +1193,9 @@
                 "accountCreated": "Account created successfully"
             }
         }
+    },
+    "unavailable": {
+        "title": "Unavailable on Mobile/Tablet",
+        "description": "This feature is only available on desktop devices for optimal experience."
     }
 }

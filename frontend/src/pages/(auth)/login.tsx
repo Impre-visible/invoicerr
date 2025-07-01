@@ -29,6 +29,8 @@ export default function LoginPage() {
     const navigate = useNavigate()
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
+    const [hasToasted, setHasToasted] = useState(false)
+
 
     // Move schema inside component to access t function
     const loginSchema = z.object({
@@ -63,9 +65,10 @@ export default function LoginPage() {
     }
 
     useEffect(() => {
-        if (data && !error) {
+        if (data && !error && !hasToasted) {
             setAccessToken(data.access_token)
             setRefreshToken(data.refresh_token)
+            setHasToasted(true)
             setTimeout(() => {
                 navigate("/")
             }, 1000)
@@ -73,11 +76,11 @@ export default function LoginPage() {
         } else if (error) {
             toast.error(t("auth.login.messages.loginError"))
         }
-    }, [data, error, navigate, setAccessToken, setRefreshToken, t])
+    }, [data, error, navigate, setAccessToken, setRefreshToken, t, hasToasted])
 
     return (
         <div className="min-h-screen flex items-center justify-center">
-            <Card className="w-full max-w-md">
+            <Card className="w-full max-w-sm md:max-w-md">
                 <CardHeader>
                     <CardTitle className="text-2xl text-center">{t("auth.login.title")}</CardTitle>
                     <CardDescription className="text-center">{t("auth.login.description")}</CardDescription>
