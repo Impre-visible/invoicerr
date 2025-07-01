@@ -1,12 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Document, Page, pdfjs } from "react-pdf"
 import { useEffect, useState } from "react"
 
 import type { Invoice } from "@/types"
 import { useGetRaw } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString()
 
 type InvoicePdfModalProps = {
   invoice: Invoice | null
@@ -38,25 +35,23 @@ export function InvoicePdfModal({ invoice, onOpenChange }: InvoicePdfModalProps)
         onOpenChange(open)
       }}
     >
-      <DialogContent className="!max-w-none w-fit min-w-[90vw] md:min-w-128 h-[90dvh] overflow-hidden">
+      <DialogContent className="!max-w-none w-fit min-w-[90vw] md:min-w-128 h-[90dvh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>{t("invoices.pdf.title", { number: invoice?.number })}</DialogTitle>
         </DialogHeader>
-
         <section className="h-full overflow-auto">
-          {pdfData && (
+          {pdfData ? (
             <div className="flex justify-center h-full overflow-auto">
-              <Document
-                file={{ data: pdfData }}
-                loading={
-                  <div className="flex items-center justify-center h-full w-full">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
-                  </div>
-                }
-              >
-                <Page pageNumber={1} className="rounded-md" />
-              </Document>
+              <iframe
+                className="w-full h-full"
+                src={`data:application/pdf;base64,${btoa(String.fromCharCode(...pdfData))}`}
+                title={t("invoices.pdf.title", { number: invoice?.number })}
+              />
             </div>
+          ) : (
+            <section className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </section>
           )}
         </section>
       </DialogContent>

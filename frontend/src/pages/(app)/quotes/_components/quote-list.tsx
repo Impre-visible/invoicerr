@@ -195,7 +195,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         </span>
                                                     </div>
                                                     <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                                                        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.client")}:</span>{" "}
                                                                 {quote.client.name}
@@ -225,7 +225,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
+                                            <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-1 md:gap-2">
                                                 <Button
                                                     tooltip={t("quotes.list.tooltips.view")}
                                                     variant="ghost"

@@ -182,7 +182,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         </span>
                                                     </div>
                                                     <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+                                                        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.client")}:</span>{" "}
                                                                 {invoice.client.name}
@@ -216,7 +216,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-2">
+                                            <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-1 md:gap-2">
                                                 <Button
                                                     tooltip={t("invoices.list.tooltips.view")}
                                                     variant="ghost"

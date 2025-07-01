@@ -1,9 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Monitor, Smartphone, Tablet, Upload, X } from "lucide-react"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Upload, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useGet, usePost } from "@/lib/utils"
 
