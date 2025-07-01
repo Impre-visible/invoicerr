@@ -107,7 +107,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                         return
                     }
 
-                    toast.success(data.message)
+                    toast.success(t("quotes.list.messages.sendSignatureSuccess"))
                     mutate()
                 })
                 .catch((error) => {

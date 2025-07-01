@@ -333,6 +333,7 @@
             },
             "messages": {
                 "sendSignatureError": "Échec de l'envoi du devis pour signature",
+                "sendSignatureSuccess": "Devis envoyé pour signature avec succès",
                 "invoiceCreated": "Facture créée avec succès à partir du devis",
                 "invoiceCreateError": "Échec de la création de la facture à partir du devis"
             }

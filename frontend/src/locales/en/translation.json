@@ -333,6 +333,7 @@
             },
             "messages": {
                 "sendSignatureError": "Failed to send quote for signature",
+                "sendSignatureSuccess": "Quote sent for signature successfully",
                 "invoiceCreated": "Invoice created successfully from quote",
                 "invoiceCreateError": "Failed to create invoice from quote"
             }

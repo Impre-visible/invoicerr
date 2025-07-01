@@ -74,7 +74,7 @@ export default function SignupPage() {
 
     useEffect(() => {
         if (data && !error) {
-            toast.success(data.message || t("auth.signup.messages.accountCreated"))
+            toast.success(t("auth.signup.messages.accountCreated"))
             setTimeout(() => {
                 navigate("/login")
             }, 1000)
