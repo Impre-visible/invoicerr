@@ -21,7 +21,6 @@ const companySchema = z.object({
     legalId: z.string({ required_error: "Legal ID is required" }).min(1, "Legal ID cannot be empty").max(50, "Legal ID cannot exceed 50 characters"),
     VAT: z.string({ required_error: "VAT number is required" }).min(1, "VAT number cannot be empty").max(15, "VAT number cannot exceed 15 characters").refine((val) => { return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val) }, "Invalid VAT number format (e.g., FR12345678901)"),
     foundedAt: z.date().refine((date) => date <= new Date(), "Founded date cannot be in the future"),
-    language: z.string({ required_error: "Language is required" }).min(1, "Please select a language"),
     currency: z.string({ required_error: "Currency is required" }).min(1, "Please select a currency"),
     address: z.string().min(1, "Address cannot be empty"),
     postalCode: z.string().refine((val) => { return /^[0-9A-Z\s-]{3,10}$/.test(val) }, "Invalid postal code format"),
@@ -51,7 +50,6 @@ export default function CompanySettings() {
             legalId: "",
             VAT: "",
             foundedAt: new Date(),
-            language: "",
             currency: "",
             address: "",
             postalCode: "",
@@ -178,32 +176,6 @@ export default function CompanySettings() {
                                                 />
                                             </FormControl>
                                             <FormDescription>Date your company was founded.</FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="language"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel required>Language</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a language" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="en">English</SelectItem>
-                                                    <SelectItem value="fr">Français</SelectItem>
-                                                    <SelectItem value="es">Español</SelectItem>
-                                                    <SelectItem value="de">Deutsch</SelectItem>
-                                                    <SelectItem value="it">Italiano</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormDescription>Default language for your company.</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}

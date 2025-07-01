@@ -30,7 +30,6 @@ export class EditCompanyDto {
     legalId: string
     foundedAt: Date
     name: string
-    language: string
     currency: finance.TCurrency
     VAT: string
     address: string

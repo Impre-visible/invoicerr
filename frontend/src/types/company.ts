@@ -3,7 +3,6 @@ export interface Company {
     description: string
     foundedAt: Date | string
     name: string
-    language: string
     currency: string
     VAT: string
     address: string
