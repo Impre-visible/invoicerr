@@ -22,15 +22,16 @@ export function QuoteViewDialog({ quote, onOpenChange }: QuoteViewDialogProps) {
 
     return (
         <Dialog open={!!quote} onOpenChange={onOpenChange}>
-            <DialogContent className="!max-w-4xl p-6">
-                <DialogHeader>
+            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col">
+                <DialogHeader className="flex-shrink-0">
                     <DialogTitle className="text-xl font-semibold">
                         {t("quotes.view.title", { number: quote.number })}
                     </DialogTitle>
                     <DialogDescription className="text-muted-foreground">{t("quotes.view.description")}</DialogDescription>
                 </DialogHeader>
 
-                <div className="flex flex-col gap-6">
+
+                <div className="overflow-auto mt-2 flex-1 flex flex-col gap-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-4 rounded-lg">
                         <div>
                             <p className="text-sm text-muted-foreground">{t("quotes.view.fields.title")}</p>
