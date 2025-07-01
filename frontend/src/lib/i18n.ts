@@ -15,18 +15,22 @@ for (const path in translations) {
     resources[lang] = {
         translation: (translations[path] as any).default
     }
-} console.log(resources)
-
+}
 
 i18n
-    .use(LanguageDetector)
+    .use(
+        new LanguageDetector(null, {
+            order: ['navigator'],
+            caches: []
+        })
+    )
     .use(initReactI18next)
     .init({
         resources,
         fallbackLng: 'en',
         interpolation: {
             escapeValue: false
-        }
+        },
+        load: 'languageOnly'
     })
 
-export default i18n
