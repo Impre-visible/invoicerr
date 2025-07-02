@@ -269,6 +269,7 @@ model Client {
   postalCode       String
   city             String
   country          String
+  currency         Currency?
   isActive         Boolean   @default(true)
   Quote            Quote[]
   Invoice          Invoice[]
@@ -301,6 +302,7 @@ model Quote {
   totalHT    Float
   totalVAT   Float
   totalTTC   Float
+  currency   Currency
   isActive   Boolean     @default(true)
   Invoice    Invoice[]
   signatures Signature[]
@@ -344,6 +346,7 @@ model Invoice {
   totalHT       Float
   totalVAT      Float
   totalTTC      Float
+  currency      Currency
   isActive      Boolean       @default(true)
 }
 

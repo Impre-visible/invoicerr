@@ -1,3 +1,5 @@
+import { Currency } from "@prisma/client";
+
 export class EditClientsDto {
     description: string
     legalId?: string
@@ -13,5 +15,6 @@ export class EditClientsDto {
     postalCode: string;
     city: string;
     country: string;
+    currency: Currency;
     isActive: boolean;
 }

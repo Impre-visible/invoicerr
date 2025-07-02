@@ -62,6 +62,9 @@
                     "label": "Numéro de TVA",
                     "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)"
                 },
+                "currency": {
+                    "label": "Devise"
+                },
                 "foundedAt": {
                     "label": "Date de création",
                     "placeholder": "Sélectionner la date de création"
@@ -171,6 +174,9 @@
                 "vat": {
                     "label": "Numéro de TVA",
                     "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)"
+                },
+                "currency": {
+                    "label": "Devise"
                 },
                 "foundedAt": {
                     "label": "Date de création",
@@ -311,7 +317,7 @@
                 "signed": "Signé"
             },
             "item": {
-                "title": "Devis {{number}}{{title}}",
+                "title": "Devis {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Émis le",
                 "validUntil": "Valide jusqu'au",
@@ -351,6 +357,9 @@
                     "errors": {
                         "required": "Veuillez sélectionner un client"
                     }
+                },
+                "currency": {
+                    "label": "Devise"
                 },
                 "validUntil": {
                     "label": "Valide jusqu'au",
@@ -409,6 +418,9 @@
                     "errors": {
                         "required": "Veuillez sélectionner un client"
                     }
+                },
+                "currency": {
+                    "label": "Devise"
                 },
                 "validUntil": {
                     "label": "Valide jusqu'au",
@@ -523,7 +535,7 @@
                 "paid": "Payée"
             },
             "item": {
-                "title": "Facture {{number}}{{title}}",
+                "title": "Facture {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Émise le",
                 "due": "Échéance",
@@ -828,7 +840,6 @@
                 },
                 "currency": {
                     "label": "Devise",
-                    "placeholder": "Sélectionner votre devise",
                     "description": "Devise par défaut pour les factures et devis",
                     "errors": {
                         "required": "La devise est requise",
@@ -1197,5 +1208,12 @@
     "unavailable": {
         "title": "Indisponible sur Mobile/Tablet",
         "description": "Cette fonctionnalité n'est disponible que sur les appareils de bureau pour une expérience optimale."
+    },
+    "component": {
+        "currency-select": {
+            "placeholder": "Sélectionner une devise",
+            "searchPlaceholder": "Rechercher des devises...",
+            "noResults": "Aucune devise trouvée"
+        }
     }
 }

@@ -19,6 +19,7 @@ interface SearchSelectProps {
     onSearchChange?: (search: string) => void
     placeholder?: string
     searchPlaceholder?: string
+    noResultsText?: string
     className?: string
     disabled?: boolean
     multiple?: boolean
@@ -32,6 +33,7 @@ export default function SearchSelect({
     onSearchChange,
     placeholder = "Select an option...",
     searchPlaceholder = "Search...",
+    noResultsText = "No options available",
     className,
     disabled = false,
     multiple = false,
@@ -58,7 +60,7 @@ export default function SearchSelect({
 
     const getOptionLabel = (optionValue: string) => {
         const searchOptions = allOptions || options
-        return searchOptions.find((option) => option.value === optionValue)?.label || optionValue
+        return searchOptions.find((option) => option.value === optionValue)?.label
     }
 
     const isSelected = (optionValue: string) => {
@@ -127,7 +129,7 @@ export default function SearchSelect({
                                 </Badge>
                             ))
                         )
-                    ) : value ? (
+                    ) : getOptionLabel(value as string) ? (
                         <span>{getOptionLabel(value as string)}</span>
                     ) : (
                         <span>{placeholder}</span>
@@ -151,7 +153,9 @@ export default function SearchSelect({
 
                     <div className="max-h-60 overflow-auto p-1 flex flex-col gap-1">
                         {options.length === 0 ? (
-                            <div className="py-2 px-3 text-sm text-muted-foreground">Aucune option disponible</div>
+                            <div className="py-2 px-3 text-sm text-muted-foreground">
+                                {noResultsText}
+                            </div>
                         ) : (
                             options.map((option) => (
                                 <button

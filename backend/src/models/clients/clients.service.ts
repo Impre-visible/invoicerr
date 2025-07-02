@@ -72,7 +72,7 @@ export class ClientsService {
 
         return await this.prisma.client.update({
             where: { id: editClientsDto.id },
-            data: editClientsDto,
+            data: { ...editClientsDto, isActive: true },
         })
     }
 

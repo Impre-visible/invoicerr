@@ -85,17 +85,17 @@ export function InvoiceViewDialog({ invoice, onOpenChange }: InvoiceViewDialogPr
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-muted/50 p-4 rounded-lg">
                         <div>
                             <p className="text-sm text-muted-foreground">{t("invoices.view.fields.totalHT")}</p>
-                            <p className="font-medium">{invoice.totalHT.toFixed(2)} {invoice.company.currency}</p>
+                            <p className="font-medium">{invoice.totalHT.toFixed(2)} {invoice.currency}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-muted-foreground">{t("invoices.view.fields.totalVAT")}</p>
-                            <p className="font-medium">{invoice.totalVAT.toFixed(2)} {invoice.company.currency}</p>
+                            <p className="font-medium">{invoice.totalVAT.toFixed(2)} {invoice.currency}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-muted-foreground">{t("invoices.view.fields.totalTTC")}</p>
-                            <p className="font-medium">{invoice.totalTTC.toFixed(2)} {invoice.company.currency}</p>
+                            <p className="font-medium">{invoice.totalTTC.toFixed(2)} {invoice.currency}</p>
                         </div>
                     </div>
 

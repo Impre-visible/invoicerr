@@ -11,6 +11,7 @@ import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
 import type { Client } from "@/types"
+import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
@@ -36,6 +37,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             .refine((val) => val !== "", {
                 message: t("quotes.create.form.client.errors.required"),
             }),
+        currency: z.string().optional(),
         validUntil: z.date().optional(),
         items: z.array(
             z.object({
@@ -123,6 +125,16 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             .catch((err) => console.error(err))
     }
 
+    const handleClientChange = (value: string | string[] | null) => {
+        if (value) {
+            const selectedClient = clients?.find((c) => c.id === value)
+            if (selectedClient) {
+                setValue("clientId", selectedClient.id)
+                if (selectedClient.currency) setValue("currency", selectedClient.currency)
+            }
+        }
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
@@ -155,9 +167,26 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={(val) => field.onChange(val || null)}
+                                            onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
                                             placeholder={t("quotes.create.form.client.placeholder")}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="currency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("quotes.create.form.currency.label")}</FormLabel>
+                                    <FormControl>
+                                        <CurrencySelect
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
                                         />
                                     </FormControl>
                                     <FormMessage />

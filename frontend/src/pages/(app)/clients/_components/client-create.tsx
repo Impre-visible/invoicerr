@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
 import { Button } from "@/components/ui/button"
+import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form"
@@ -26,17 +27,18 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
             .min(1, t("clients.create.validation.description.required"))
             .max(500, t("clients.create.validation.description.maxLength")),
         legalId: z
-            .string({ required_error: t("clients.create.validation.legalId.required") })
+            .string()
             .max(50, t("clients.create.validation.legalId.maxLength"))
             .optional(),
         VAT: z
-            .string({ required_error: t("clients.create.validation.vat.required") })
+            .string()
             .max(15, t("clients.create.validation.vat.maxLength"))
             .refine((val) => {
                 if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
             }, t("clients.create.validation.vat.format"))
             .optional(),
+        currency: z.string().nullable().optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("clients.create.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.create.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.create.validation.contactLastname.required")),
@@ -186,6 +188,23 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     )}
                                 />
                             </div>
+
+                            <FormField
+                                control={form.control}
+                                name="currency"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("clients.create.fields.currency.label")}</FormLabel>
+                                        <FormControl>
+                                            <CurrencySelect
+                                                value={field.value}
+                                                onChange={(value) => field.onChange(value)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={form.control}

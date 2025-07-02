@@ -11,6 +11,7 @@ import { useGet, usePatch } from "@/lib/utils"
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
+import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
@@ -37,6 +38,7 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
                 message: t("quotes.edit.form.client.errors.required"),
             }),
         validUntil: z.date().optional(),
+        currency: z.string().optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -86,6 +88,7 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
                 title: quote.title || "",
                 clientId: quote.clientId || "",
                 validUntil: quote.validUntil ? new Date(quote.validUntil) : undefined,
+                currency: quote.currency,
                 items: quote.items
                     .sort((a, b) => a.order - b.order)
                     .map((item) => ({
@@ -144,6 +147,16 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
             .catch((err) => console.error(err))
     }
 
+    const handleClientChange = (value: string | string[] | null) => {
+        if (value) {
+            const selectedClient = clients?.find((c) => c.id === value)
+            if (selectedClient) {
+                setValue("clientId", selectedClient.id)
+                if (selectedClient.currency) setValue("currency", selectedClient.currency)
+            }
+        }
+    }
+
     return (
         <Dialog open={!!quote} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl min-w-fit">
@@ -176,9 +189,26 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={(val) => field.onChange(val || null)}
+                                            onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
                                             placeholder={t("quotes.edit.form.client.placeholder")}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="currency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("quotes.create.form.currency.label")}</FormLabel>
+                                    <FormControl>
+                                        <CurrencySelect
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
                                         />
                                     </FormControl>
                                     <FormMessage />
