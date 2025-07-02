@@ -790,6 +790,10 @@
                 "title": "Informations de contact",
                 "description": "Comment les clients peuvent contacter votre entreprise"
             },
+            "numberFormats": {
+                "title": "Formats de numéros",
+                "description": "Personnalisez les formats de numéros pour les devis et factures"
+            },
             "form": {
                 "company": {
                     "label": "Nom de l'entreprise",
@@ -891,6 +895,26 @@
                     "errors": {
                         "required": "L'email est requis",
                         "format": "Le format de l'email est invalide"
+                    }
+                },
+                "quoteNumberFormat": {
+                    "label": "Format du numéro de devis",
+                    "placeholder": "Entrez le format du numéro de devis (ex: QUOTE-{year}-{number})",
+                    "description": "Format pour les numéros de devis",
+                    "errors": {
+                        "required": "Le format du numéro de devis est requis",
+                        "maxLength": "Le format du numéro de devis doit faire moins de 100 caractères",
+                        "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
+                    }
+                },
+                "invoiceNumberFormat": {
+                    "label": "Format du numéro de facture",
+                    "placeholder": "Entrez le format du numéro de facture (ex: INVOICE-{year}-{number})",
+                    "description": "Format pour les numéros de facture",
+                    "errors": {
+                        "required": "Le format du numéro de facture est requis",
+                        "maxLength": "Le format du numéro de facture doit faire moins de 100 caractères",
+                        "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
                     }
                 },
                 "saving": "Enregistrement...",

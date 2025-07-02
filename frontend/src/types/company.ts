@@ -11,4 +11,6 @@ export interface Company {
     country: string
     phone: string
     email: string
+    quoteNumberFormat: string
+    invoiceNumberFormat: string
 }

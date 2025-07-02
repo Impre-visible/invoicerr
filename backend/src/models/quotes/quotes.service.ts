@@ -11,28 +11,35 @@ import { baseTemplate } from './templates/base.template';
 export class QuotesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private async getNextQuoteNumber() {
-        const currentYear = new Date().getFullYear();
+    private formatPattern(pattern: string, number: number, date: Date = new Date()): string {
+        return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
+            let value: number | string;
 
-        const lastQuote = await this.prisma.quote.findFirst({
-            where: {
-                createdAt: {
-                    gte: new Date(`${currentYear}-01-01T00:00:00Z`),
-                    lt: new Date(`${currentYear + 1}-01-01T00:00:00Z`),
-                },
-            },
-            orderBy: {
-                number: 'desc',
-            },
+            switch (key) {
+                case "year":
+                    value = date.getFullYear();
+                    break;
+                case "month":
+                    value = date.getMonth() + 1;
+                    break;
+                case "day":
+                    value = date.getDate();
+                    break;
+                case "number":
+                    value = number;
+                    break;
+                default:
+                    return key;
+            }
+
+            const padLength = padding !== undefined
+                ? parseInt(padding, 10)
+                : key === "number"
+                    ? 4
+                    : 0;
+
+            return value.toString().padStart(padLength, "0");
         });
-
-        let nextIndex = 1;
-        if (lastQuote) {
-            const parts = lastQuote.number.split('-');
-            nextIndex = parseInt(parts[2]) + 1;
-        }
-        const paddedIndex = String(nextIndex).padStart(4, '0');
-        return `Q-${currentYear}-${paddedIndex}`;
     }
 
     async getQuotes(page: string) {
@@ -56,9 +63,14 @@ export class QuotesService {
             },
         });
 
+        const returnedQuotes = quotes.map(quote => ({
+            ...quote,
+            number: this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+        }));
+
         const totalQuotes = await this.prisma.quote.count();
 
-        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
+        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes: returnedQuotes };
     }
 
     async searchQuotes(query: string) {
@@ -75,7 +87,6 @@ export class QuotesService {
             where: {
                 isActive: true,
                 OR: [
-                    { number: { contains: query } },
                     { title: { contains: query } },
                     { client: { name: { contains: query } } },
                 ],
@@ -110,7 +121,6 @@ export class QuotesService {
         return this.prisma.quote.create({
             data: {
                 ...data,
-                number: await this.getNextQuoteNumber(),
                 companyId: company.id,
                 currency: body.currency || client.currency || company.currency,
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),

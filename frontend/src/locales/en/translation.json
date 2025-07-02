@@ -790,6 +790,10 @@
                 "title": "Contact Information",
                 "description": "How clients can reach your company"
             },
+            "numberFormats": {
+                "title": "Number Formats",
+                "description": "Customize the number formats for quotes and invoices"
+            },
             "form": {
                 "company": {
                     "label": "Company Name",
@@ -891,6 +895,26 @@
                     "errors": {
                         "required": "Email is required",
                         "format": "Email format is invalid"
+                    }
+                },
+                "quoteNumberFormat": {
+                    "label": "Quote Number Format",
+                    "placeholder": "Enter quote number format (e.g., Q-{year}-{number})",
+                    "description": "Format for quote numbers",
+                    "errors": {
+                        "required": "Quote number format is required",
+                        "maxLength": "Quote number format must be less than 100 characters",
+                        "format": "Quote number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
+                    }
+                },
+                "invoiceNumberFormat": {
+                    "label": "Invoice Number Format",
+                    "placeholder": "Enter invoice number format (e.g., INV-{year}-{number})",
+                    "description": "Format for invoice numbers",
+                    "errors": {
+                        "required": "Invoice number format is required",
+                        "maxLength": "Invoice number format must be less than 100 characters",
+                        "format": "Invoice number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
                     }
                 },
                 "saving": "Saving...",
