@@ -29,6 +29,20 @@ FROM nginx:alpine
 
 RUN apk add --no-cache nodejs npm
 
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ttf-freefont \
+    chromium-chromedriver \
+    bash \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
 
 COPY --from=backend-builder /app/dist /usr/share/nginx/backend
