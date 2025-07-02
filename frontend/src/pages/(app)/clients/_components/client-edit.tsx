@@ -40,7 +40,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
             }, t("clients.create.validation.vat.format"))
             .optional(),
-        currency: z.string().optional(),
+        currency: z.string().nullable().optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("clients.edit.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.edit.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.edit.validation.contactLastname.required")),
@@ -72,7 +72,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
             description: "",
             legalId: "",
             VAT: "",
-            currency: "",
+            currency: undefined,
             foundedAt: new Date(),
             contactFirstname: "",
             contactLastname: "",

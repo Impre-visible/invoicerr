@@ -38,7 +38,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
             }, t("clients.create.validation.vat.format"))
             .optional(),
-        currency: z.string().optional(),
+        currency: z.string().nullable().optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("clients.create.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.create.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.create.validation.contactLastname.required")),
