@@ -1,7 +1,7 @@
 export class EditClientsDto {
     description: string
-    legalId: string
-    VAT: string
+    legalId?: string
+    VAT?: string
     foundedAt: Date
     id: string;
     name: string;
