@@ -225,6 +225,7 @@ model PDFConfig {
   invoice     String @default("Invoice")
   quote       String @default("Quote")
   description String @default("Description:")
+  date        String @default("Date:")
   dueDate     String @default("Due date:")
   validUntil  String @default("Valid until:")
   billTo      String @default("Bill to:")
