@@ -39,6 +39,8 @@ export class EditCompanyDto {
     phone: string
     email: string
     pdfConfig: PDFConfig
+    quoteStartingNumber: number
     quoteNumberFormat: string
+    invoiceStartingNumber: number
     invoiceNumberFormat: string
 }
