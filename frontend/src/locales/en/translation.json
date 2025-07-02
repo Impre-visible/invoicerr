@@ -358,6 +358,9 @@
                         "required": "Please select a client"
                     }
                 },
+                "currency": {
+                    "label": "Currency"
+                },
                 "validUntil": {
                     "label": "Valid Until",
                     "placeholder": "Select expiration date"
@@ -415,6 +418,9 @@
                     "errors": {
                         "required": "Please select a client"
                     }
+                },
+                "currency": {
+                    "label": "Currency"
                 },
                 "validUntil": {
                     "label": "Valid Until",

@@ -358,6 +358,9 @@
                         "required": "Veuillez sélectionner un client"
                     }
                 },
+                "currency": {
+                    "label": "Devise"
+                },
                 "validUntil": {
                     "label": "Valide jusqu'au",
                     "placeholder": "Sélectionner la date d'expiration"
@@ -415,6 +418,9 @@
                     "errors": {
                         "required": "Veuillez sélectionner un client"
                     }
+                },
+                "currency": {
+                    "label": "Devise"
                 },
                 "validUntil": {
                     "label": "Valide jusqu'au",
