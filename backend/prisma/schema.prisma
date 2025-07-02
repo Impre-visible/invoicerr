@@ -190,24 +190,26 @@ enum Currency {
 }
 
 model Company {
-  id             String         @id @default(cuid())
-  name           String
-  description    String
-  currency       Currency       @default(EUR)
-  legalId        String
-  foundedAt      DateTime
-  VAT            String
-  address        String
-  postalCode     String
-  city           String
-  country        String
-  phone          String
-  email          String
-  pDFConfigId    String         @unique
-  pdfConfig      PDFConfig      @relation(fields: [pDFConfigId], references: [id])
-  Quote          Quote[]
-  Invoice        Invoice[]
-  emailTemplates MailTemplate[]
+  id                  String         @id @default(cuid())
+  name                String
+  description         String
+  currency            Currency       @default(EUR)
+  legalId             String
+  foundedAt           DateTime
+  VAT                 String
+  address             String
+  postalCode          String
+  city                String
+  country             String
+  phone               String
+  email               String
+  quoteNumberFormat   String         @default("Q-{year}-{number:4}") // Ex: "Q-2025-0001"
+  invoiceNumberFormat String         @default("INV-{year}-{number:4}") // Ex: "INV-2025-0001"
+  pDFConfigId         String         @unique
+  pdfConfig           PDFConfig      @relation(fields: [pDFConfigId], references: [id])
+  Quote               Quote[]
+  Invoice             Invoice[]
+  emailTemplates      MailTemplate[]
 }
 
 model PDFConfig {
@@ -286,7 +288,7 @@ enum QuoteStatus {
 
 model Quote {
   id         String      @id @default(uuid())
-  number     String      @unique // Ex: "Q-2025-0001"
+  number     Int         @default(autoincrement())
   title      String?
   client     Client      @relation(fields: [clientId], references: [id])
   clientId   String
@@ -329,7 +331,7 @@ enum InvoiceStatus {
 
 model Invoice {
   id            String        @id @default(uuid())
-  number        String        @unique // Ex: "INV-2025-0001"
+  number        Int           @default(autoincrement())
   quote         Quote?        @relation(fields: [quoteId], references: [id])
   quoteId       String?
   client        Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
