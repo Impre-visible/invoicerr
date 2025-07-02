@@ -29,15 +29,16 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
             .max(500, t("clients.edit.validation.description.maxLength")),
         legalId: z
             .string({ required_error: t("clients.edit.validation.legalId.required") })
-            .min(1, t("clients.edit.validation.legalId.empty"))
-            .max(50, t("clients.edit.validation.legalId.maxLength")),
+            .max(50, t("clients.edit.validation.legalId.maxLength"))
+            .optional(),
         VAT: z
             .string({ required_error: t("clients.edit.validation.vat.required") })
-            .min(1, t("clients.edit.validation.vat.empty"))
             .max(15, t("clients.edit.validation.vat.maxLength"))
             .refine((val) => {
+                if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("clients.edit.validation.vat.format")),
+            }, t("clients.edit.validation.vat.format"))
+            .optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("clients.edit.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.edit.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.edit.validation.contactLastname.required")),
@@ -174,7 +175,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.legalId.label")}</FormLabel>
+                                            <FormLabel>{t("clients.edit.fields.legalId.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.edit.fields.legalId.placeholder")} />
                                             </FormControl>
@@ -187,7 +188,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.vat.label")}</FormLabel>
+                                            <FormLabel>{t("clients.edit.fields.vat.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.edit.fields.vat.placeholder")} />
                                             </FormControl>
