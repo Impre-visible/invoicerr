@@ -72,6 +72,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
             description: "",
             legalId: "",
             VAT: "",
+            currency: "",
             foundedAt: new Date(),
             contactFirstname: "",
             contactLastname: "",

@@ -201,10 +201,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                                 onChange={(value) => field.onChange(value)}
                                             />
                                         </FormControl>
-                                        <FormMessage /> <CurrencySelect
-                                            value={field.value}
-                                            onChange={(value) => field.onChange(value)}
-                                        />
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
