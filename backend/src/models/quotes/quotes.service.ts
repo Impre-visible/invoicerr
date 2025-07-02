@@ -11,8 +11,7 @@ import { baseTemplate } from './templates/base.template';
 export class QuotesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private formatPattern(pattern: string, number: number): string {
-        const date = new Date();
+    private formatPattern(pattern: string, number: number, date: Date = new Date()): string {
         return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
             let value: number | string;
 
@@ -66,7 +65,7 @@ export class QuotesService {
 
         const returnedQuotes = quotes.map(quote => ({
             ...quote,
-            number: this.formatPattern(quote.company.quoteNumberFormat, quote.number)
+            number: this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
         }));
 
         const totalQuotes = await this.prisma.quote.count();
