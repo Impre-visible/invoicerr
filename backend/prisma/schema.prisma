@@ -269,6 +269,7 @@ model Client {
   postalCode       String
   city             String
   country          String
+  currency         Currency?
   isActive         Boolean   @default(true)
   Quote            Quote[]
   Invoice          Invoice[]
