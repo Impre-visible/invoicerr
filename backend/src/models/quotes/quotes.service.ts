@@ -67,9 +67,11 @@ export class QuotesService {
             },
         });
 
-        const returnedQuotes = quotes.map(quote => ({
-            ...quote,
-            number: this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+        const returnedQuotes = await Promise.all(quotes.map(async (quote) => {
+            return {
+                ...quote,
+                number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+            }
         }));
 
         const totalQuotes = await this.prisma.quote.count();
