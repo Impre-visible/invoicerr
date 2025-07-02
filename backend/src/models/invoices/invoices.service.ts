@@ -32,7 +32,7 @@ export class InvoicesService {
                     value = number;
                     break;
                 default:
-                    throw new Error(`Unknown key: ${key}`);
+                    return key; // If the key is not recognized, return it as is
             }
 
             const padLength = padding !== undefined

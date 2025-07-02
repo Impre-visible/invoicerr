@@ -30,7 +30,7 @@ export class QuotesService {
                     value = number;
                     break;
                 default:
-                    throw new Error(`Unknown key: ${key}`);
+                    return key;
             }
 
             const padLength = padding !== undefined
