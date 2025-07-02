@@ -96,13 +96,17 @@ export default function CompanySettings() {
             .refine((val) => {
                 return z.string().email().safeParse(val).success
             }, t("settings.company.form.email.errors.format")),
-        quoteNumberFormat: z.string()
+        quoteStartingNumber: z.number().min(1, t("settings.company.form.quoteStartingNumber.errors.min")),
+        quoteNumberFormat: z
+            .string()
             .min(1, t("settings.company.form.quoteNumberFormat.errors.required"))
             .max(100, t("settings.company.form.quoteNumberFormat.errors.maxLength"))
             .refine((val) => {
                 return validateNumberFormat(val)
             }, t("settings.company.form.quoteNumberFormat.errors.format")),
-        invoiceNumberFormat: z.string()
+        invoiceStartingNumber: z.number().min(1, t("settings.company.form.invoiceStartingNumber.errors.min")),
+        invoiceNumberFormat: z
+            .string()
             .min(1, t("settings.company.form.invoiceNumberFormat.errors.required"))
             .max(100, t("settings.company.form.invoiceNumberFormat.errors.maxLength"))
             .refine((val) => {
@@ -389,35 +393,79 @@ export default function CompanySettings() {
                             <CardDescription>{t("settings.company.numberFormats.description")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <FormField
-                                    control={form.control}
-                                    name="quoteNumberFormat"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} />
-                                            </FormControl>
-                                            <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="invoiceNumberFormat"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} />
-                                            </FormControl>
-                                            <FormDescription>{t("settings.company.form.invoiceNumberFormat.description")}</FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="quoteStartingNumber"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.quoteStartingNumber.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder={t("settings.company.form.quoteStartingNumber.placeholder")}
+                                                        {...field}
+                                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>{t("settings.company.form.quoteStartingNumber.description")}</FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="quoteNumberFormat"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} />
+                                                </FormControl>
+                                                <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="invoiceStartingNumber"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.invoiceStartingNumber.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder={t("settings.company.form.invoiceStartingNumber.placeholder")}
+                                                        {...field}
+                                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    {t("settings.company.form.invoiceStartingNumber.description")}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="invoiceNumberFormat"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} />
+                                                </FormControl>
+                                                <FormDescription>{t("settings.company.form.invoiceNumberFormat.description")}</FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

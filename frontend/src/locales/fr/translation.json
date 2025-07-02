@@ -897,6 +897,14 @@
                         "format": "Le format de l'email est invalide"
                     }
                 },
+                "quoteStartingNumber": {
+                    "label": "Numéro de départ des devis",
+                    "placeholder": "Saisir le numéro de départ des devis",
+                    "description": "Le numéro à partir duquel les devis commenceront",
+                    "errors": {
+                        "min": "Le numéro de départ des devis doit être d'au moins 1"
+                    }
+                },
                 "quoteNumberFormat": {
                     "label": "Format du numéro de devis",
                     "placeholder": "Entrez le format du numéro de devis (ex: QUOTE-{year}-{number})",
@@ -905,6 +913,14 @@
                         "required": "Le format du numéro de devis est requis",
                         "maxLength": "Le format du numéro de devis doit faire moins de 100 caractères",
                         "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
+                    }
+                },
+                "invoiceStartingNumber": {
+                    "label": "Numéro de départ des factures",
+                    "placeholder": "Saisir le numéro de départ des factures",
+                    "description": "Le numéro à partir duquel les factures commenceront",
+                    "errors": {
+                        "min": "Le numéro de départ des factures doit être d'au moins 1"
                     }
                 },
                 "invoiceNumberFormat": {
