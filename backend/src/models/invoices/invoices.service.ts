@@ -13,7 +13,11 @@ import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 export class InvoicesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private formatPattern(pattern: string, number: number, date: Date = new Date()): string {
+    private async formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
+        const company = await this.prisma.company.findFirst();
+        if (!company) {
+            throw new BadRequestException('No company found. Please create a company first.');
+        }
         return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
             let value: number | string;
 
@@ -28,7 +32,7 @@ export class InvoicesService {
                     value = date.getDate();
                     break;
                 case "number":
-                    value = number;
+                    value = number + company.invoiceStartingNumber - 1;
                     break;
                 default:
                     return key; // If the key is not recognized, return it as is
@@ -65,10 +69,10 @@ export class InvoicesService {
             },
         });
 
-        const returnedInvoices = invoices.map(quote => ({
+        const returnedInvoices = await Promise.all(invoices.map(async quote => ({
             ...quote,
-            number: this.formatPattern(quote.company.invoiceNumberFormat, quote.number, quote.createdAt),
-        }));
+            number: await this.formatPattern(quote.company.invoiceNumberFormat, quote.number, quote.createdAt),
+        })));
 
         const totalInvoices = await this.prisma.invoice.count();
 
@@ -315,7 +319,7 @@ export class InvoicesService {
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
 
-        inv.id = this.formatPattern(invRec.company.invoiceNumberFormat, invRec.number, invRec.createdAt);
+        inv.id = await this.formatPattern(invRec.company.invoiceNumberFormat, invRec.number, invRec.createdAt);
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 

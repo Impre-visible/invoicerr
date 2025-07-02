@@ -11,7 +11,11 @@ import { baseTemplate } from './templates/base.template';
 export class QuotesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private formatPattern(pattern: string, number: number, date: Date = new Date()): string {
+    private async formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
+        const company = await this.prisma.company.findFirst();
+        if (!company) {
+            throw new BadRequestException('No company found. Please create a company first.');
+        }
         return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
             let value: number | string;
 
@@ -26,7 +30,7 @@ export class QuotesService {
                     value = date.getDate();
                     break;
                 case "number":
-                    value = number;
+                    value = number + company.quoteStartingNumber - 1; // Use the quote starting number from the company
                     break;
                 default:
                     return key;
