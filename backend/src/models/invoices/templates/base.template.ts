@@ -12,9 +12,9 @@ export const baseTemplate = `
         .client-info { margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #f8f9fa; }
-        .notes { margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 4px; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; }
+        .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
 </head>
