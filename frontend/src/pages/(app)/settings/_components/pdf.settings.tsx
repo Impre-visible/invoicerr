@@ -31,9 +31,9 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
         .client-info { margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #f8f9fa; }
-        .notes { margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 4px; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; }
+        .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
 </head>
@@ -458,6 +458,23 @@ export default function PDFTemplatesSettings() {
                                                     <Input
                                                         value={settings.primaryColor}
                                                         onChange={(e) => setSettings((prev) => ({ ...prev, primaryColor: e.target.value }))}
+                                                        className="flex-1"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="primary-color">{t("settings.pdfTemplates.colors.secondaryColor")}</Label>
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="color"
+                                                        id="primary-color"
+                                                        value={settings.secondaryColor}
+                                                        onChange={(e) => setSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
+                                                        className="w-12 h-10 rounded border border-input"
+                                                    />
+                                                    <Input
+                                                        value={settings.secondaryColor}
+                                                        onChange={(e) => setSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
                                                         className="flex-1"
                                                     />
                                                 </div>
