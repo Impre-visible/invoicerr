@@ -13,28 +13,36 @@ import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 export class InvoicesService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private async getNextInvoiceNumber() {
-        const currentYear = new Date().getFullYear();
+    private formatPattern(pattern: string, number: number): string {
+        const date = new Date();
+        return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
+            let value: number | string;
 
-        const lastInvoice = await this.prisma.invoice.findFirst({
-            where: {
-                createdAt: {
-                    gte: new Date(`${currentYear}-01-01T00:00:00Z`),
-                    lt: new Date(`${currentYear + 1}-01-01T00:00:00Z`),
-                },
-            },
-            orderBy: {
-                number: 'desc',
-            },
+            switch (key) {
+                case "year":
+                    value = date.getFullYear();
+                    break;
+                case "month":
+                    value = date.getMonth() + 1;
+                    break;
+                case "day":
+                    value = date.getDate();
+                    break;
+                case "number":
+                    value = number;
+                    break;
+                default:
+                    throw new Error(`Unknown key: ${key}`);
+            }
+
+            const padLength = padding !== undefined
+                ? parseInt(padding, 10)
+                : key === "number"
+                    ? 4
+                    : 0;
+
+            return value.toString().padStart(padLength, "0");
         });
-
-        let nextIndex = 1;
-        if (lastInvoice) {
-            const parts = lastInvoice.number.split('-');
-            nextIndex = parseInt(parts[2]) + 1;
-        }
-        const paddedIndex = String(nextIndex).padStart(4, '0');
-        return `INV-${currentYear}-${paddedIndex}`;
     }
 
     async getInvoices(page: string) {
@@ -58,9 +66,14 @@ export class InvoicesService {
             },
         });
 
+        const returnedInvoices = invoices.map(quote => ({
+            ...quote,
+            number: this.formatPattern(quote.company.invoiceNumberFormat, quote.number)
+        }));
+
         const totalInvoices = await this.prisma.invoice.count();
 
-        return { pageCount: Math.ceil(totalInvoices / pageSize), invoices };
+        return { pageCount: Math.ceil(totalInvoices / pageSize), invoices: returnedInvoices };
     }
 
     async createInvoice(body: CreateInvoiceDto) {
@@ -82,7 +95,6 @@ export class InvoicesService {
             data: {
                 ...data,
                 currency: body.currency || client.currency || company.currency,
-                number: await this.getNextInvoiceNumber(),
                 companyId: company.id, // reuse the already fetched company object
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
@@ -304,7 +316,7 @@ export class InvoicesService {
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
 
-        inv.id = invRec.number;
+        inv.id = this.formatPattern(invRec.company.invoiceNumberFormat, invRec.number);
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 
