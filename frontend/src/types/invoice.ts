@@ -38,5 +38,6 @@ export interface Invoice {
     totalHT: number;
     totalVAT: number;
     totalTTC: number;
+    currency: string; // Currency code, e.g., "EUR", "USD"
     isActive: boolean;
 }
