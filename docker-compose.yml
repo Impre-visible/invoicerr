@@ -13,7 +13,9 @@ services:
       - SMTP_USER="username@example.com"
       - SMTP_FROM="user-from@example.com" # Not required if SMTP_USER is the same as SMTP_FROM
       - SMTP_PASSWORD="your_smtp_password"
-    
+
+      # Optional, but recommended for docker deployments
+      - JWT_SECRET="your_jwt_secret" # Used for JWT authentication, can be any random string
     depends_on:
       - invoicerr_db
 

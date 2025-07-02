@@ -6,7 +6,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-const ACCESS_DURATION = '1min';
+const ACCESS_DURATION = '15m';
 const REFRESH_DURATION = '7d';
 
 @Injectable()
@@ -15,6 +15,9 @@ export class AuthService {
 
 
     static getJWTSecret() {
+        if (process.env.JWT_SECRET) {
+            return process.env.JWT_SECRET;
+        }
         const platform = os.platform();
         const arch = os.arch();
         const ram = os.totalmem();
