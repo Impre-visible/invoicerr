@@ -93,11 +93,26 @@ export class QuotesService {
     async createQuote(body: CreateQuoteDto) {
         const { items, ...data } = body;
 
+        const company = await this.prisma.company.findFirst();
+
+        if (!company) {
+            throw new BadRequestException('No company found. Please create a company first.');
+        }
+
+        const client = await this.prisma.client.findUnique({
+            where: { id: body.clientId },
+        });
+
+        if (!client) {
+            throw new BadRequestException('Client not found');
+        }
+
         return this.prisma.quote.create({
             data: {
                 ...data,
                 number: await this.getNextQuoteNumber(),
-                companyId: (await this.prisma.company.findFirst())?.id || '',
+                companyId: company.id,
+                currency: body.currency || client.currency || company.currency,
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
                     (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0),

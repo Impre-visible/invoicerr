@@ -66,9 +66,22 @@ export class InvoicesService {
     async createInvoice(body: CreateInvoiceDto) {
         const { items, ...data } = body;
 
+        const company = await this.prisma.company.findFirst();
+        if (!company) {
+            throw new BadRequestException('No company found. Please create a company first.');
+        }
+
+        const client = await this.prisma.client.findUnique({
+            where: { id: body.clientId },
+        });
+        if (!client) {
+            throw new BadRequestException('Client not found');
+        }
+
         return this.prisma.invoice.create({
             data: {
                 ...data,
+                currency: body.currency || client.currency || company.currency,
                 number: await this.getNextInvoiceNumber(),
                 companyId: (await this.prisma.company.findFirst())?.id || '', // this should never append, as you cannot create an invoice without a company
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
@@ -97,6 +110,18 @@ export class InvoicesService {
             throw new BadRequestException('Invoice ID is required for editing');
         }
 
+        const company = await this.prisma.company.findFirst();
+        if (!company) {
+            throw new BadRequestException('No company found. Please create a company first.');
+        }
+
+        const client = await this.prisma.client.findUnique({
+            where: { id: data.clientId },
+        });
+        if (!client) {
+            throw new BadRequestException('Client not found');
+        }
+
         const existingInvoice = await this.prisma.invoice.findUnique({
             where: { id },
             include: { items: true }
@@ -119,6 +144,7 @@ export class InvoicesService {
             where: { id },
             data: {
                 ...data,
+                currency: body.currency || client.currency || company.currency,
                 dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 totalHT,
                 totalVAT,
@@ -331,6 +357,7 @@ export class InvoicesService {
             clientId: quote.clientId,
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             items: quote.items,
+            currency: quote.currency,
         });
     }
 
