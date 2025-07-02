@@ -247,10 +247,13 @@ export class InvoicesService {
             secondaryColor: pdfConfig?.secondaryColor ?? '#f3f4f6',
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
-            logoB64: pdfConfig.logoB64 ? `data:image/png;base64,${pdfConfig.logoB64}` : undefined,
+            logoUrl: pdfConfig?.logoB64 ?? '',
+
+            // Labels
             labels: {
-                quote: pdfConfig.quote,
-                quoteFor: pdfConfig.quoteFor,
+                invoice: pdfConfig.invoice,
+                dueDate: pdfConfig.dueDate,
+                billTo: pdfConfig.billTo,
                 description: pdfConfig.description,
                 quantity: pdfConfig.quantity,
                 unitPrice: pdfConfig.unitPrice,
@@ -259,9 +262,10 @@ export class InvoicesService {
                 total: pdfConfig.total,
                 vat: pdfConfig.vat,
                 grandTotal: pdfConfig.grandTotal,
-                validUntil: pdfConfig.validUntil,
                 date: pdfConfig.date,
             },
+
+            // Notes optionnelles
             noteExists: !!invoice.notes,
             notes: invoice.notes ?? '',
         });
