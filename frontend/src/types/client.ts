@@ -2,8 +2,8 @@ export interface Client {
     id: string;
     name: string;
     description: string;
-    legalId: string;
-    VAT: string;
+    legalId?: string;
+    VAT?: string;
     foundedAt: Date;
     contactFirstname: string;
     contactLastname: string;
