@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-export default function CurrencySelect({ value, onChange }: { value: string | undefined; onChange: (value: string | string[]) => void }) {
+export default function CurrencySelect({ value, onChange }: { value: string | null | undefined; onChange: (value: string | string[]) => void }) {
     const [currencySearch, setCurrencySearch] = useState("")
     const [searchedCurrencies, setSearchedCurrencies] = useState<
         {
@@ -65,7 +65,7 @@ export default function CurrencySelect({ value, onChange }: { value: string | un
                 label: `${name} (${symbol})`,
                 value: code,
             }))}
-            value={value}
+            value={value || undefined}
             multiple={false}
             onValueChange={onChange}
             onSearchChange={handleSearchChange}

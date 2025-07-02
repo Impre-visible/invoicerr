@@ -60,7 +60,7 @@ export default function SearchSelect({
 
     const getOptionLabel = (optionValue: string) => {
         const searchOptions = allOptions || options
-        return searchOptions.find((option) => option.value === optionValue)?.label || placeholder
+        return searchOptions.find((option) => option.value === optionValue)?.label
     }
 
     const isSelected = (optionValue: string) => {
@@ -129,7 +129,7 @@ export default function SearchSelect({
                                 </Badge>
                             ))
                         )
-                    ) : value ? (
+                    ) : getOptionLabel(value as string) ? (
                         <span>{getOptionLabel(value as string)}</span>
                     ) : (
                         <span>{placeholder}</span>
