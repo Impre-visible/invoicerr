@@ -11,6 +11,7 @@ import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
 import type { Client } from "@/types"
+import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
@@ -36,6 +37,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             .refine((val) => val !== "", {
                 message: t("quotes.create.form.client.errors.required"),
             }),
+        currency: z.string().optional(),
         validUntil: z.date().optional(),
         items: z.array(
             z.object({
@@ -158,6 +160,23 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                             onValueChange={(val) => field.onChange(val || null)}
                                             onSearchChange={setSearchTerm}
                                             placeholder={t("quotes.create.form.client.placeholder")}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="currency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t("quotes.create.form.currency.label")}</FormLabel>
+                                    <FormControl>
+                                        <CurrencySelect
+                                            value={field.value}
+                                            onChange={(value) => field.onChange(value)}
                                         />
                                     </FormControl>
                                     <FormMessage />
