@@ -83,7 +83,7 @@ export class InvoicesService {
                 ...data,
                 currency: body.currency || client.currency || company.currency,
                 number: await this.getNextInvoiceNumber(),
-                companyId: (await this.prisma.company.findFirst())?.id || '', // this should never append, as you cannot create an invoice without a company
+                companyId: company.id, // reuse the already fetched company object
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
                 totalVAT: items.reduce((sum, item) => sum +
                     (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0),
