@@ -244,6 +244,7 @@ export class InvoicesService {
             // Personnalisation via pdfConfig
             fontFamily: pdfConfig?.fontFamily ?? 'Inter',
             primaryColor: pdfConfig?.primaryColor ?? '#0ea5e9',
+            secondaryColor: pdfConfig?.secondaryColor ?? '#f3f4f6',
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
             logoUrl: pdfConfig?.logoB64 ?? '',
@@ -268,11 +269,19 @@ export class InvoicesService {
             notes: invoice.notes ?? '',
         });
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
+        let browser: puppeteer.Browser;
+        if (!process.env.PUPPETEER_EXECUTABLE_PATH) {
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            })
+        } else {
+            browser = await puppeteer.launch({
+                headless: true,
+                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            });
+        }
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: 'networkidle0' });
 
