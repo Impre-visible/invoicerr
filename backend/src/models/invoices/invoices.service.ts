@@ -303,7 +303,7 @@ export class InvoicesService {
                 country: invRec.client.country || 'FR',
                 countryCode: invRec.client.country || 'FR'
             },
-            registrationDetails: { vatId: invRec.client.VAT, registrationId: invRec.client.legalId, registrationName: invRec.client.name }
+            registrationDetails: { vatId: invRec.client.VAT || 'N/A', registrationId: invRec.client.legalId || 'N/A', registrationName: invRec.client.name }
         };
 
         invRec.items.forEach(item => {

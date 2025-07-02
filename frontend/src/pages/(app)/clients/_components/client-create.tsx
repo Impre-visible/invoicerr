@@ -27,15 +27,16 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
             .max(500, t("clients.create.validation.description.maxLength")),
         legalId: z
             .string({ required_error: t("clients.create.validation.legalId.required") })
-            .min(1, t("clients.create.validation.legalId.empty"))
-            .max(50, t("clients.create.validation.legalId.maxLength")),
+            .max(50, t("clients.create.validation.legalId.maxLength"))
+            .optional(),
         VAT: z
             .string({ required_error: t("clients.create.validation.vat.required") })
-            .min(1, t("clients.create.validation.vat.empty"))
             .max(15, t("clients.create.validation.vat.maxLength"))
             .refine((val) => {
+                if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("clients.create.validation.vat.format")),
+            }, t("clients.create.validation.vat.format"))
+            .optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("clients.create.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.create.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.create.validation.contactLastname.required")),
@@ -163,7 +164,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.legalId.label")}</FormLabel>
+                                            <FormLabel>{t("clients.create.fields.legalId.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.create.fields.legalId.placeholder")} />
                                             </FormControl>
@@ -176,7 +177,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.vat.label")}</FormLabel>
+                                            <FormLabel>{t("clients.create.fields.vat.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.create.fields.vat.placeholder")} />
                                             </FormControl>
