@@ -19,7 +19,43 @@ export default function CompanySettings() {
     const { t } = useTranslation()
     const navigate = useNavigate()
 
-    // Move schema inside component to access t function
+    const validateNumberFormat = (pattern: string): boolean => {
+        const patternRegex = /\{(\w+)(?::(\d+))?\}/g
+        const validKeys = ["year", "month", "day", "number"]
+        const requiredKeys = ["number"]
+
+        let match
+        const matches = []
+
+        while ((match = patternRegex.exec(pattern)) !== null) {
+            matches.push(match)
+        }
+
+        for (const key of requiredKeys) {
+            if (!matches.some(m => m[1] === key)) {
+                return false
+            }
+        }
+
+        for (const match of matches) {
+            const key = match[1]
+            const padding = match[2]
+
+            if (!validKeys.includes(key)) {
+                return false
+            }
+
+            if (padding !== undefined) {
+                const paddingNum = Number.parseInt(padding, 10)
+                if (isNaN(paddingNum) || paddingNum < 0 || paddingNum > 20) {
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
     const companySchema = z.object({
         name: z
             .string({ required_error: t("settings.company.form.company.errors.required") })
@@ -60,6 +96,18 @@ export default function CompanySettings() {
             .refine((val) => {
                 return z.string().email().safeParse(val).success
             }, t("settings.company.form.email.errors.format")),
+        quoteNumberFormat: z.string()
+            .min(1, t("settings.company.form.quoteNumberFormat.errors.required"))
+            .max(100, t("settings.company.form.quoteNumberFormat.errors.maxLength"))
+            .refine((val) => {
+                return validateNumberFormat(val)
+            }, t("settings.company.form.quoteNumberFormat.errors.format")),
+        invoiceNumberFormat: z.string()
+            .min(1, t("settings.company.form.invoiceNumberFormat.errors.required"))
+            .max(100, t("settings.company.form.invoiceNumberFormat.errors.maxLength"))
+            .refine((val) => {
+                return validateNumberFormat(val)
+            }, t("settings.company.form.invoiceNumberFormat.errors.format")),
     })
 
     const { data } = useGet<Company>("/api/company/info")
@@ -327,6 +375,45 @@ export default function CompanySettings() {
                                                 <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.email.description")}</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t("settings.company.numberFormats.title")}</CardTitle>
+                            <CardDescription>{t("settings.company.numberFormats.description")}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField
+                                    control={form.control}
+                                    name="quoteNumberFormat"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} />
+                                            </FormControl>
+                                            <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="invoiceNumberFormat"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} />
+                                            </FormControl>
+                                            <FormDescription>{t("settings.company.form.invoiceNumberFormat.description")}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
