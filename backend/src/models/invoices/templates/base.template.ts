@@ -79,12 +79,12 @@ export const baseTemplate = `
             </tr>
         </tfoot>
     </table>
-    {% if noteExists %}
+    {{#if noteExists}}
     <div class="notes">
         <h4>Notes:</h4>
         <p>{{notes}}</p>
     </div>
-    {% endif %}
+    {{/if}}
 </body>
 </html>
 `;
