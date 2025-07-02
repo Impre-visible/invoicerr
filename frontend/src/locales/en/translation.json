@@ -317,7 +317,7 @@
                 "signed": "Signed"
             },
             "item": {
-                "title": "Quote {{number}}{{title}}",
+                "title": "Quote {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Issued",
                 "validUntil": "Valid Until",
@@ -535,7 +535,7 @@
                 "paid": "Paid"
             },
             "item": {
-                "title": "Invoice {{number}}{{title}}",
+                "title": "Invoice {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Issued",
                 "due": "Due",

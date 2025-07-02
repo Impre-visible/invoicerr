@@ -317,7 +317,7 @@
                 "signed": "Signé"
             },
             "item": {
-                "title": "Devis {{number}}{{title}}",
+                "title": "Devis {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Émis le",
                 "validUntil": "Valide jusqu'au",
@@ -535,7 +535,7 @@
                 "paid": "Payée"
             },
             "item": {
-                "title": "Facture {{number}}{{title}}",
+                "title": "Facture {{number}} {{title}}",
                 "client": "Client",
                 "issued": "Émise le",
                 "due": "Échéance",
