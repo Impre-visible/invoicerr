@@ -302,7 +302,7 @@ model Quote {
   totalHT    Float
   totalVAT   Float
   totalTTC   Float
-  currency   Currency?
+  currency   Currency
   isActive   Boolean     @default(true)
   Invoice    Invoice[]
   signatures Signature[]
@@ -346,7 +346,7 @@ model Invoice {
   totalHT       Float
   totalVAT      Float
   totalTTC      Float
-  currency      Currency?
+  currency      Currency
   isActive      Boolean       @default(true)
 }
 
