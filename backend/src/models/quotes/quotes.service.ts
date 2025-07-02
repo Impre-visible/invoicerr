@@ -270,6 +270,7 @@ export class QuotesService {
                 vat: config.vat,
                 grandTotal: config.grandTotal,
                 validUntil: config.validUntil,
+                date: config.date,
             },
         });
 

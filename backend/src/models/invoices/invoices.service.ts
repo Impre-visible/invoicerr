@@ -251,17 +251,18 @@ export class InvoicesService {
 
             // Labels
             labels: {
-                invoice: 'Invoice',
-                dueDate: 'Due date:',
-                billTo: 'Bill to:',
-                description: 'Description',
-                quantity: 'Qty',
-                unitPrice: 'Unit Price',
-                vatRate: 'VAT %',
-                total: 'Total',
-                subtotal: 'Subtotal',
-                vat: 'VAT',
-                grandTotal: 'Total (incl. VAT)',
+                invoice: pdfConfig.invoice,
+                dueDate: pdfConfig.dueDate,
+                billTo: pdfConfig.billTo,
+                description: pdfConfig.description,
+                quantity: pdfConfig.quantity,
+                unitPrice: pdfConfig.unitPrice,
+                vatRate: pdfConfig.vatRate,
+                subtotal: pdfConfig.subtotal,
+                total: pdfConfig.total,
+                vat: pdfConfig.vat,
+                grandTotal: pdfConfig.grandTotal,
+                date: pdfConfig.date,
             },
 
             // Notes optionnelles

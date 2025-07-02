@@ -46,12 +46,13 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
             <h1>{{company.name}}</h1>
             <p>{{company.address}}<br>
             {{company.city}}, {{company.zip}}<br>
+            {{company.country}}<br>
             {{company.email}} | {{company.phone}}</p>
         </div>
         <div class="invoice-info">
             <h2>{{labels.invoice}}</h2>
-            <p><strong>{{labels.invoice}} #:</strong> {{number}}<br>
-            <strong>Date:</strong> {{date}}<br>
+            <p><strong>{{labels.invoice}}:</strong> #{{number}}<br>
+            <strong>{{labels.date}}</strong> {{date}}<br>
             <strong>{{labels.dueDate}}</strong> {{dueDate}}</p>
         </div>
     </div>
@@ -60,6 +61,7 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
         <p>{{client.name}}<br>
         {{client.address}}<br>
         {{client.city}}, {{client.zip}}<br>
+        {{client.country}}<br>
         {{client.email}}</p>
     </div>
     <table>
@@ -98,14 +100,17 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
             </tr>
         </tfoot>
     </table>
+    {{#if noteExists}}
     <div class="notes">
         <h4>Notes:</h4>
         <p>{{notes}}</p>
     </div>
+    {{/if}}
 </body>
 </html>`
 
-const defaultQuoteTemplate = `<!DOCTYPE html>
+const defaultQuoteTemplate = `
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -120,7 +125,6 @@ const defaultQuoteTemplate = `<!DOCTYPE html>
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #f0fdf4; font-weight: bold; }
         .total-row { font-weight: bold; background-color: #f0fdf4; }
-        .notes { margin-top: 30px; padding: 20px; background-color: #f0fdf4; border-radius: 4px; }
         .validity { color: #dc2626; font-weight: bold; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
@@ -134,12 +138,13 @@ const defaultQuoteTemplate = `<!DOCTYPE html>
             <h1>{{company.name}}</h1>
             <p>{{company.address}}<br>
             {{company.city}}, {{company.zip}}<br>
+            {{company.country}}<br>
             {{company.email}} | {{company.phone}}</p>
         </div>
         <div class="quote-info">
             <h2>{{labels.quote}}</h2>
-            <p><strong>{{labels.quote}} #:</strong> {{number}}<br>
-            <strong>Date:</strong> {{date}}<br>
+            <p><strong>{{labels.quote}}:</strong> #{{number}}<br>
+            <strong>{{labels.date}}</strong> {{date}}<br>
             <strong class="validity">{{labels.validUntil}}</strong> {{validUntil}}</p>
         </div>
     </div>
@@ -148,6 +153,7 @@ const defaultQuoteTemplate = `<!DOCTYPE html>
         <p>{{client.name}}<br>
         {{client.address}}<br>
         {{client.city}}, {{client.zip}}<br>
+        {{client.country}}<br>
         {{client.email}}</p>
     </div>
     <table>
@@ -202,6 +208,7 @@ interface TemplateSettings {
         billTo: string
         quoteFor: string
         validUntil: string
+        date: string
         dueDate: string
         description: string
         quantity: string
@@ -234,6 +241,7 @@ export default function PDFTemplatesSettings() {
             billTo: t("settings.pdfTemplates.defaultLabels.billTo"),
             quoteFor: t("settings.pdfTemplates.defaultLabels.quoteFor"),
             validUntil: t("settings.pdfTemplates.defaultLabels.validUntil"),
+            date: t("settings.pdfTemplates.defaultLabels.date"),
             dueDate: t("settings.pdfTemplates.defaultLabels.dueDate"),
             description: t("settings.pdfTemplates.defaultLabels.description"),
             quantity: t("settings.pdfTemplates.defaultLabels.quantity"),
@@ -613,6 +621,14 @@ export default function PDFTemplatesSettings() {
                                                         id="label-due-date"
                                                         value={settings.labels.dueDate}
                                                         onChange={(e) => updateLabel("dueDate", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-date">{t("settings.pdfTemplates.labels.date")}</Label>
+                                                    <Input
+                                                        id="label-date"
+                                                        value={settings.labels.date}
+                                                        onChange={(e) => updateLabel("date", e.target.value)}
                                                     />
                                                 </div>
                                                 <div className="space-y-2">

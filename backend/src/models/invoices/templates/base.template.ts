@@ -32,8 +32,8 @@ export const baseTemplate = `
         </div>
         <div class="invoice-info">
             <h2>{{labels.invoice}}</h2>
-            <p><strong>{{labels.invoice}} #:</strong> {{number}}<br>
-            <strong>Date:</strong> {{date}}<br>
+            <p><strong>{{labels.invoice}}:</strong> #{{number}}<br>
+            <strong>{{labels.date}}</strong> {{date}}<br>
             <strong>{{labels.dueDate}}</strong> {{dueDate}}</p>
         </div>
     </div>

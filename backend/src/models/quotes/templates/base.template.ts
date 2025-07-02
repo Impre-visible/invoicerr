@@ -32,8 +32,8 @@ export const baseTemplate = `
         </div>
         <div class="quote-info">
             <h2>{{labels.quote}}</h2>
-            <p><strong>{{labels.quote}} #:</strong> {{number}}<br>
-            <strong>Date:</strong> {{date}}<br>
+            <p><strong>{{labels.quote}}:</strong> #{{number}}<br>
+            <strong>{{labels.date}}</strong> {{date}}<br>
             <strong class="validity">{{labels.validUntil}}</strong> {{validUntil}}</p>
         </div>
     </div>
