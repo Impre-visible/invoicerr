@@ -229,7 +229,7 @@ export class InvoicesService {
                 ...invoice.client,
                 foundedAt: formatDate(invoice.client.foundedAt),
             },
-            currency: invoice.company.currency,
+            currency: invoice.currency,
             items: invoice.items.map(i => ({
                 description: i.description,
                 quantity: i.quantity,

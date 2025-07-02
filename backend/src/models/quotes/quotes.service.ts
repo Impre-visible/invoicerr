@@ -239,7 +239,7 @@ export class QuotesService {
             validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
             company: quote.company,
             client: quote.client,
-            currency: quote.company.currency,
+            currency: quote.currency,
             items: quote.items.map(i => ({
                 description: i.description,
                 quantity: i.quantity,
