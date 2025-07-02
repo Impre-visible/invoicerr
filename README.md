@@ -6,20 +6,20 @@ Invoicerr is a simple, open-source invoicing application designed to help freela
 
 ## ✨ Features
 
-- 🧾 Create and manage invoices  
-- 📄 Create and manage quotes (convertible to invoices)  
-- 👥 Manage clients and their contact details  
-- 📊 Track status of quotes and invoices (signed, paid, unread, etc.)  
-- 🖋️ Built-in quote signing system with secure tokens  
-- 📬 Generate and send quote/invoice emails directly from the app
-- 🖨️ Generate clean PDF documents (quotes and invoices)  
-- 🎨 Custom brand identity: logo, company name, VAT, and more  
-- 🔐 Authentication via JWT (stored in local storage)  
-- 🧭 International-friendly: Default English UI, customizable currencies  
-- 📁 SQLite database for quick local setup  
-- 🐳 Docker & docker-compose ready for self-hosting  
-- 🧱 Built with modern stack: React, NestJS, Prisma, SQLite/PostgreSQL  
-- 🔧 REST API backend, ready for future integrations
+- Create and manage invoices  
+- Create and manage quotes (convertible to invoices)  
+- Manage clients and their contact details  
+- Track status of quotes and invoices (signed, paid, unread, etc.)  
+- Built-in quote signing system with secure tokens  
+- Generate and send quote/invoice emails directly from the app
+- Generate clean PDF documents (quotes and invoices)  
+- Custom brand identity: logo, company name, VAT, and more  
+- Authentication via JWT (stored in local storage)  
+- International-friendly: Default English UI, customizable currencies  
+- SQLite database for quick local setup  
+- Docker & docker-compose ready for self-hosting  
+- Built with modern stack: React, NestJS, Prisma, SQLite/PostgreSQL  
+- REST API backend, ready for future integrations
 
 ---
 
