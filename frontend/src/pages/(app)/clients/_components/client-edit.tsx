@@ -28,7 +28,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
             .min(1, t("clients.edit.validation.description.required"))
             .max(500, t("clients.edit.validation.description.maxLength")),
         legalId: z
-            .string({ required_error: t("clients.edit.validation.legalId.required") })
+            .string()
             .max(50, t("clients.edit.validation.legalId.maxLength"))
             .optional(),
         VAT: z
