@@ -27,6 +27,7 @@ export const baseTemplate = `
             <h1>{{company.name}}</h1>
             <p>{{company.address}}<br>
             {{company.city}}, {{company.zip}}<br>
+            {{company.country}}<br>
             {{company.email}} | {{company.phone}}</p>
         </div>
         <div class="invoice-info">
@@ -41,6 +42,7 @@ export const baseTemplate = `
         <p>{{client.name}}<br>
         {{client.address}}<br>
         {{client.city}}, {{client.zip}}<br>
+        {{client.country}}<br>
         {{client.email}}</p>
     </div>
     <table>
