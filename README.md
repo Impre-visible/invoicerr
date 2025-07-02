@@ -67,6 +67,10 @@ These environment variables are defined in `docker-compose.yml` under the `invoi
 - `SMTP_FROM`  
   Optional — address used as the sender for emails. If omitted, defaults to `SMTP_USER`.
 
+- `JWT_SECRET`  
+  Optional but recommended for JWT authentication. Can be any random string.  
+  If not set, a default secret will be used. But it can have issues with docker deployments.
+
 Make sure port 80 is available on your host machine, or change the mapping.
 
 ---
