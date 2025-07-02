@@ -147,6 +147,16 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
             .catch((err) => console.error(err))
     }
 
+    const handleClientChange = (value: string | string[] | null) => {
+        if (value) {
+            const selectedClient = clients?.find((c) => c.id === value)
+            if (selectedClient) {
+                setValue("clientId", selectedClient.id)
+                if (selectedClient.currency) setValue("currency", selectedClient.currency)
+            }
+        }
+    }
+
     return (
         <Dialog open={!!quote} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl min-w-fit">
@@ -179,7 +189,7 @@ export function QuoteEdit({ quote, onOpenChange }: QuoteEditDialogProps) {
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={(val) => field.onChange(val || null)}
+                                            onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
                                             placeholder={t("quotes.edit.form.client.placeholder")}
                                         />

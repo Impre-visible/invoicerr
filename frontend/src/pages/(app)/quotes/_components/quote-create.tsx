@@ -125,6 +125,16 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             .catch((err) => console.error(err))
     }
 
+    const handleClientChange = (value: string | string[] | null) => {
+        if (value) {
+            const selectedClient = clients?.find((c) => c.id === value)
+            if (selectedClient) {
+                setValue("clientId", selectedClient.id)
+                if (selectedClient.currency) setValue("currency", selectedClient.currency)
+            }
+        }
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
@@ -157,7 +167,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
-                                            onValueChange={(val) => field.onChange(val || null)}
+                                            onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
                                             placeholder={t("quotes.create.form.client.placeholder")}
                                         />
