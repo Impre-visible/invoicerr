@@ -897,6 +897,14 @@
                         "format": "Email format is invalid"
                     }
                 },
+                "quoteStartingNumber": {
+                    "label": "Quote Starting Number",
+                    "placeholder": "Enter starting number for quotes",
+                    "description": "Initial number for quote numbering",
+                    "errors": {
+                        "min": "Quote starting number must be at least 1"
+                    }
+                },
                 "quoteNumberFormat": {
                     "label": "Quote Number Format",
                     "placeholder": "Enter quote number format (e.g., Q-{year}-{number})",
@@ -905,6 +913,14 @@
                         "required": "Quote number format is required",
                         "maxLength": "Quote number format must be less than 100 characters",
                         "format": "Quote number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
+                    }
+                },
+                "invoiceStartingNumber": {
+                    "label": "Invoice Starting Number",
+                    "placeholder": "Enter starting number for invoices",
+                    "description": "Initial number for invoice numbering",
+                    "errors": {
+                        "min": "Invoice starting number must be at least 1"
                     }
                 },
                 "invoiceNumberFormat": {
