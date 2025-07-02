@@ -1027,7 +1027,8 @@
             "colors": {
                 "title": "Colors",
                 "description": "Brand colors and theme",
-                "primaryColor": "Primary Color"
+                "primaryColor": "Primary Color",
+                "secondaryColor": "Secondary Color"
             },
             "logo": {
                 "title": "Logo",
