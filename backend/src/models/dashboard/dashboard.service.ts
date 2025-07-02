@@ -126,6 +126,20 @@ export class DashboardService {
         };
     }
 
+    async convertToMainCurrency(amount: number, fromCurrency: string, toCurrency: string): Promise<number> {
+        if (fromCurrency === toCurrency) {
+            return amount;
+        }
+        const res = await fetch(`https://hexarate.paikama.co/api/rates/latest/${fromCurrency}?target=${toCurrency}`)
+        const data = await res.json();
+        if (!data || data.status_code !== 200 || !data.data || !data.data.mid) {
+            console.error(`Failed to fetch currency conversion data for ${fromCurrency} to ${toCurrency}`);
+            return 0;
+        }
+        const rate = data.data.mid;
+        return amount * rate;
+    }
+
     async getMonthlyRevenue(date: Date): Promise<number> {
         const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
         const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -138,9 +152,15 @@ export class DashboardService {
                 },
                 status: 'PAID',
             },
+            include: { company: true }
         });
 
-        return invoices.reduce((total, invoice) => total + invoice.totalTTC, 0);
+        const convertedAmounts = await Promise.all(
+            invoices.map(async (invoice) =>
+                await this.convertToMainCurrency(invoice.totalTTC, invoice.currency, invoice.company.currency)
+            )
+        );
+        return convertedAmounts.reduce((total, amount) => total + amount, 0);
     }
 
     async getYearlyRevenue(date: Date): Promise<number> {
@@ -155,9 +175,15 @@ export class DashboardService {
                 },
                 status: 'PAID',
             },
+            include: { company: true }
         });
 
-        return invoices.reduce((total, invoice) => total + invoice.totalTTC, 0);
+        const convertedAmounts = await Promise.all(
+            invoices.map(async (invoice) =>
+                await this.convertToMainCurrency(invoice.totalTTC, invoice.currency, invoice.company.currency)
+            )
+        );
+        return convertedAmounts.reduce((total, amount) => total + amount, 0);
     }
 
     calculateChangePercent(current: number, previous: number): number {
