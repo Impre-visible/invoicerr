@@ -166,13 +166,11 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     </CardHeader>
 
                     <CardContent className="p-0">
-                        {loading && (
+                        {loading ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
                             </div>
-                        )}
-
-                        {!loading && quotes.length === 0 ? (
+                        ) : quotes.length === 0 ? (
                             emptyState
                         ) : (
                             <div className="divide-y">
