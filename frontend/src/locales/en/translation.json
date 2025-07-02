@@ -62,6 +62,9 @@
                     "label": "VAT Number",
                     "placeholder": "Enter VAT number (e.g., FR12345678901)"
                 },
+                "currency": {
+                    "label": "Currency"
+                },
                 "foundedAt": {
                     "label": "Founded Date",
                     "placeholder": "Select founding date"
@@ -171,6 +174,9 @@
                 "vat": {
                     "label": "VAT Number",
                     "placeholder": "Enter VAT number (e.g., FR12345678901)"
+                },
+                "currency": {
+                    "label": "Currency"
                 },
                 "foundedAt": {
                     "label": "Founded Date",
@@ -828,7 +834,6 @@
                 },
                 "currency": {
                     "label": "Currency",
-                    "placeholder": "Select your currency",
                     "description": "Default currency for invoices and quotes",
                     "errors": {
                         "required": "Currency is required",
@@ -1197,5 +1202,12 @@
     "unavailable": {
         "title": "Unavailable on Mobile/Tablet",
         "description": "This feature is only available on desktop devices for optimal experience."
+    },
+    "component": {
+        "currency-select": {
+            "placeholder": "Select your currency",
+            "searchPlaceholder": "Search currencies...",
+            "noResults": "No currencies found"
+        }
     }
 }
