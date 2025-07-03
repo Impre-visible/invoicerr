@@ -84,7 +84,7 @@ export const baseTemplate = `
     {{#if noteExists}}
     <div class="notes">
         <h4>Notes:</h4>
-        <p>{{notes}}</p>
+        <p>{{{notes}}}</p>
     </div>
     {{/if}}
 </body>
