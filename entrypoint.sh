@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cd /usr/share/nginx
-npx prisma db push --skip-generate
+npx prisma db push --skip-generate --accept-data-loss
 
 cd /usr/share/nginx/backend
 echo "Waiting for backend to start..."
