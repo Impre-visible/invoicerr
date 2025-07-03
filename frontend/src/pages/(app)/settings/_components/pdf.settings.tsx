@@ -325,7 +325,6 @@ export default function PDFTemplatesSettings() {
         if (file) {
             const reader = new FileReader()
             reader.onloadend = () => {
-                console.log("Logo uploaded:", reader.result)
                 setSettings((prev) => ({
                     ...prev,
                     logoB64: reader.result as string,
