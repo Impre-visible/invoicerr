@@ -55,7 +55,6 @@ function EmailPreview({ template }: { template: EmailTemplate }) {
     const { t } = useTranslation()
 
     const replaceVariables = (text: string, variables: Record<string, string>) => {
-        console.log("Replacing variables in:", text, "with", variables)
         let result = text
         Object.entries(variables).forEach(([key, value]) => {
             result = result.replace(new RegExp(`{{${key}}}`, "g"), value)

@@ -249,7 +249,6 @@ export class InvoicesService {
             date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
 
         const { pdfConfig } = invoice.company;
-        console.log(invoice.paymentMethod)
         const html = template({
             number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.createdAt),
