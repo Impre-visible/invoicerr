@@ -23,6 +23,9 @@ export interface PDFConfig {
         validUntil: string
         vat: string
         vatRate: string
+        notes: string
+        paymentMethod: string
+        paymentDetails: string
     }
 }
 

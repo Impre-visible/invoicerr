@@ -5,6 +5,9 @@ export class CreateInvoiceDto {
     quoteId?: string;
     dueDate?: Date;
     currency?: Currency;
+    notes: string;
+    paymentMethod?: string;
+    paymentDetails?: string;
     items: {
         description: string;
         quantity: number;
@@ -16,9 +19,13 @@ export class CreateInvoiceDto {
 
 export class EditInvoicesDto {
     id: string;
+    quoteId?: string;
     clientId: string;
     dueDate?: Date;
     currency?: Currency;
+    notes: string;
+    paymentMethod?: string;
+    paymentDetails?: string;
     items: {
         id?: string; // Optional for new items
         description: string;

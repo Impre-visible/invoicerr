@@ -26,10 +26,13 @@ export interface Quote {
     viewedAt?: Date;
     signedBy?: string;
     signatureSvg?: string;
+    notes?: string; // Additional notes for the quote
     totalHT: number;
     totalVAT: number;
     totalTTC: number;
     currency: string; // Currency code, e.g., "EUR", "USD"
+    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
+    paymentDetails?: string; // Additional details for the payment method
     isActive: boolean;
 }
 

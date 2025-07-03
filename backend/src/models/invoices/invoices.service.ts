@@ -173,7 +173,11 @@ export class InvoicesService {
         const updateInvoice = await this.prisma.invoice.update({
             where: { id },
             data: {
-                ...data,
+                paymentMethod: data.paymentMethod || existingInvoice.paymentMethod,
+                paymentDetails: data.paymentDetails || existingInvoice.paymentDetails,
+                quoteId: data.quoteId || existingInvoice.quoteId,
+                clientId: data.clientId || existingInvoice.clientId,
+                notes: data.notes,
                 currency: body.currency || client.currency || company.currency,
                 dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 totalHT,
@@ -245,9 +249,9 @@ export class InvoicesService {
             date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
 
         const { pdfConfig } = invoice.company;
-
+        console.log(invoice.paymentMethod)
         const html = template({
-            number: invoice.number,
+            number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.createdAt),
             dueDate: formatDate(invoice.dueDate),
             company: {
@@ -271,6 +275,9 @@ export class InvoicesService {
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
 
+            paymentMethod: invoice.paymentMethod,
+            paymentDetails: invoice.paymentDetails,
+
             fontFamily: pdfConfig.fontFamily ?? 'Inter',
             primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
             secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',
@@ -278,6 +285,9 @@ export class InvoicesService {
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
             logoUrl: pdfConfig?.logoB64 ?? '',
+
+            noteExists: !!invoice.notes,
+            notes: (invoice.notes || '').replace(/\n/g, '<br>'),
 
             // Labels
             labels: {
@@ -293,11 +303,10 @@ export class InvoicesService {
                 vat: pdfConfig.vat,
                 grandTotal: pdfConfig.grandTotal,
                 date: pdfConfig.date,
+                notes: pdfConfig.notes,
+                paymentMethod: pdfConfig.paymentMethod,
+                paymentDetails: pdfConfig.paymentDetails,
             },
-
-            // Notes optionnelles
-            noteExists: !!invoice.notes,
-            notes: invoice.notes ?? '',
         });
 
         let browser: puppeteer.Browser;
@@ -398,6 +407,7 @@ export class InvoicesService {
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             items: quote.items,
             currency: quote.currency,
+            notes: quote.notes || '',
         });
     }
 

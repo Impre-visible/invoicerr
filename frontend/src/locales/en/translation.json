@@ -349,7 +349,7 @@
             "form": {
                 "title": {
                     "label": "Title",
-                    "placeholder": "Enter quote title (optional)"
+                    "placeholder": "Enter quote title"
                 },
                 "client": {
                     "label": "Client",
@@ -398,6 +398,20 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -410,7 +424,7 @@
             "form": {
                 "title": {
                     "label": "Title",
-                    "placeholder": "Enter quote title (optional)"
+                    "placeholder": "Enter quote title"
                 },
                 "client": {
                     "label": "Client",
@@ -459,6 +473,20 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -572,7 +600,7 @@
             "form": {
                 "quote": {
                     "label": "From Quote",
-                    "placeholder": "Select a quote (optional)",
+                    "placeholder": "Select a quote",
                     "errors": {
                         "required": "Please select a quote"
                     }
@@ -621,6 +649,20 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -633,7 +675,7 @@
             "form": {
                 "quote": {
                     "label": "From Quote",
-                    "placeholder": "Select a quote (optional)",
+                    "placeholder": "Select a quote",
                     "errors": {
                         "required": "Please select a quote"
                     }
@@ -682,6 +724,20 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -1098,7 +1154,10 @@
                 "subtotal": "Subtotal",
                 "vat": "VAT",
                 "grandTotal": "Grand Total",
-                "vatRate": "VAT Rate"
+                "vatRate": "VAT Rate",
+                "paymentMethod": "Payment Method",
+                "paymentDetails": "Payment Details",
+                "notes": "Notes"
             },
             "defaultLabels": {
                 "invoice": "Invoice",
@@ -1115,7 +1174,10 @@
                 "subtotal": "Subtotal",
                 "vat": "VAT",
                 "grandTotal": "Grand Total",
-                "vatRate": "VAT Rate"
+                "vatRate": "VAT Rate",
+                "paymentMethod": "Payment Method",
+                "paymentDetails": "Payment Details",
+                "notes": "Notes"
             },
             "preview": {
                 "title": "Preview",

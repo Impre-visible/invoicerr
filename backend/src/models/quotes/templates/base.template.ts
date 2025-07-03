@@ -14,6 +14,8 @@ export const baseTemplate = `
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
         .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        .notes { margin-top: 20px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
+        .payment-info { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid {{primaryColor}}; color: #333; }
         .validity { color: #dc2626; font-weight: bold; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
@@ -81,6 +83,22 @@ export const baseTemplate = `
             </tr>
         </tfoot>
     </table>
+    
+    {{#if paymentMethod}}
+    <div class="payment-info">
+        <strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}<br>
+        {{#if paymentDetails}}
+        <strong>{{labels.paymentDetails}}</strong> {{{paymentDetails}}}
+        {{/if}}
+    </div>
+    {{/if}}
+    
+    {{#if noteExists}}
+    <div class="notes">
+        <h4>{{labels.notes}}</h4>
+        <p>{{{notes}}}</p>
+    </div>
+    {{/if}}
 </body>
 </html>
 `;

@@ -226,21 +226,24 @@ model PDFConfig {
   includeLogo Boolean @default(false)
   logoB64     String?
 
-  invoice     String @default("Invoice")
-  quote       String @default("Quote")
-  description String @default("Description:")
-  date        String @default("Date:")
-  dueDate     String @default("Due date:")
-  validUntil  String @default("Valid until:")
-  billTo      String @default("Bill to:")
-  quoteFor    String @default("Quote for:")
-  quantity    String @default("Qty")
-  vatRate     String @default("VAT (%)")
-  unitPrice   String @default("Unit price")
-  subtotal    String @default("Subtotal:")
-  total       String @default("Total:")
-  vat         String @default("VAT:")
-  grandTotal  String @default("Grand total:")
+  invoice        String @default("Invoice")
+  quote          String @default("Quote")
+  description    String @default("Description:")
+  date           String @default("Date:")
+  dueDate        String @default("Due date:")
+  validUntil     String @default("Valid until:")
+  billTo         String @default("Bill to:")
+  quoteFor       String @default("Quote for:")
+  quantity       String @default("Qty")
+  vatRate        String @default("VAT (%)")
+  unitPrice      String @default("Unit price")
+  subtotal       String @default("Subtotal:")
+  total          String @default("Total:")
+  vat            String @default("VAT:")
+  grandTotal     String @default("Grand total:")
+  notes          String @default("Notes:")
+  paymentMethod  String @default("Payment Method:")
+  paymentDetails String @default("Payment Details:")
 }
 
 enum MailTemplateType {
@@ -289,28 +292,31 @@ enum QuoteStatus {
 }
 
 model Quote {
-  id         String      @id @default(uuid())
-  number     Int         @default(autoincrement())
-  title      String?
-  client     Client      @relation(fields: [clientId], references: [id])
-  clientId   String
-  company    Company     @relation(fields: [companyId], references: [id])
-  companyId  String
-  items      QuoteItem[]
-  status     QuoteStatus @default(DRAFT)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  validUntil DateTime?
-  signedAt   DateTime?
-  viewedAt   DateTime?
-  signedBy   String?
-  totalHT    Float
-  totalVAT   Float
-  totalTTC   Float
-  currency   Currency
-  isActive   Boolean     @default(true)
-  Invoice    Invoice[]
-  signatures Signature[]
+  id             String      @id @default(uuid())
+  number         Int         @default(autoincrement())
+  title          String?
+  client         Client      @relation(fields: [clientId], references: [id])
+  clientId       String
+  company        Company     @relation(fields: [companyId], references: [id])
+  companyId      String
+  items          QuoteItem[]
+  status         QuoteStatus @default(DRAFT)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  validUntil     DateTime?
+  signedAt       DateTime?
+  viewedAt       DateTime?
+  signedBy       String?
+  totalHT        Float
+  totalVAT       Float
+  totalTTC       Float
+  currency       Currency
+  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String? // Details for the payment method (e.g., bank account number)
+  notes          String?     @default("")
+  isActive       Boolean     @default(true)
+  Invoice        Invoice[]
+  signatures     Signature[]
 }
 
 model QuoteItem {
@@ -332,27 +338,28 @@ enum InvoiceStatus {
 }
 
 model Invoice {
-  id            String        @id @default(uuid())
-  number        Int           @default(autoincrement())
-  quote         Quote?        @relation(fields: [quoteId], references: [id])
-  quoteId       String?
-  client        Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
-  clientId      String
-  company       Company       @relation(fields: [companyId], references: [id]) // Company issuing the invoice
-  companyId     String
-  items         InvoiceItem[]
-  status        InvoiceStatus @default(UNPAID)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  dueDate       DateTime
-  paidAt        DateTime?
-  paymentMethod String? // Ex: "Bank Transfer", "PayPal"
-  notes         String?
-  totalHT       Float
-  totalVAT      Float
-  totalTTC      Float
-  currency      Currency
-  isActive      Boolean       @default(true)
+  id             String        @id @default(uuid())
+  number         Int           @default(autoincrement())
+  quote          Quote?        @relation(fields: [quoteId], references: [id])
+  quoteId        String?
+  client         Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
+  clientId       String
+  company        Company       @relation(fields: [companyId], references: [id]) // Company issuing the invoice
+  companyId      String
+  items          InvoiceItem[]
+  status         InvoiceStatus @default(UNPAID)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  dueDate        DateTime
+  paidAt         DateTime?
+  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String? // Details for the payment method (e.g., bank account number)
+  notes          String?       @default("")
+  totalHT        Float
+  totalVAT       Float
+  totalTTC       Float
+  currency       Currency
+  isActive       Boolean       @default(true)
 }
 
 model InvoiceItem {

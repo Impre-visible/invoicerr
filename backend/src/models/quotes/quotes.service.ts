@@ -142,6 +142,7 @@ export class QuotesService {
         return this.prisma.quote.create({
             data: {
                 ...data,
+                notes: body.notes,
                 companyId: company.id,
                 currency: body.currency || client.currency || company.currency,
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
@@ -260,12 +261,10 @@ export class QuotesService {
         }
 
         const config = quote.company.pdfConfig;
-
         const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
-
         const html = template({
-            number: quote.number,
+            number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
             date: new Date(quote.createdAt).toLocaleDateString(),
             validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
             company: quote.company,
@@ -282,6 +281,9 @@ export class QuotesService {
             totalVAT: quote.totalVAT.toFixed(2),
             totalTTC: quote.totalTTC.toFixed(2),
 
+            paymentMethod: quote.paymentMethod,
+            paymentDetails: quote.paymentDetails,
+
             // 🎨 Style & labels from PDFConfig
             fontFamily: config.fontFamily,
             padding: config.padding,
@@ -290,6 +292,8 @@ export class QuotesService {
             tableTextColor: this.getInvertColor(config.secondaryColor),
             includeLogo: config.includeLogo,
             logoB64: config.logoB64 ? `data:image/png;base64,${config.logoB64}` : undefined,
+            noteExists: !!quote.notes,
+            notes: (quote.notes || '').replace(/\n/g, '<br>'),
             labels: {
                 quote: config.quote,
                 quoteFor: config.quoteFor,
@@ -303,6 +307,9 @@ export class QuotesService {
                 grandTotal: config.grandTotal,
                 validUntil: config.validUntil,
                 date: config.date,
+                notes: config.notes,
+                paymentMethod: config.paymentMethod,
+                paymentDetails: config.paymentDetails,
             },
         });
 

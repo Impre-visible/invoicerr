@@ -349,7 +349,7 @@
             "form": {
                 "title": {
                     "label": "Titre",
-                    "placeholder": "Saisir le titre du devis (optionnel)"
+                    "placeholder": "Saisir le titre du devis"
                 },
                 "client": {
                     "label": "Client",
@@ -398,6 +398,20 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires"
+                },
+                "paymentMethod": {
+                    "label": "Méthode de paiement",
+                    "placeholder": "Sélectionner la méthode de paiement",
+                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Détails de paiement",
+                    "placeholder": "Saisir les détails de paiement",
+                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -410,7 +424,7 @@
             "form": {
                 "title": {
                     "label": "Titre",
-                    "placeholder": "Saisir le titre du devis (optionnel)"
+                    "placeholder": "Saisir le titre du devis"
                 },
                 "client": {
                     "label": "Client",
@@ -459,6 +473,20 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires"
+                },
+                "paymentMethod": {
+                    "label": "Méthode de paiement",
+                    "placeholder": "Sélectionner la méthode de paiement",
+                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Détails de paiement",
+                    "placeholder": "Saisir les détails de paiement",
+                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -572,7 +600,7 @@
             "form": {
                 "quote": {
                     "label": "À partir d'un devis",
-                    "placeholder": "Sélectionner un devis (optionnel)",
+                    "placeholder": "Sélectionner un devis",
                     "errors": {
                         "required": "Veuillez sélectionner un devis"
                     }
@@ -621,6 +649,20 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires"
+                },
+                "paymentMethod": {
+                    "label": "Méthode de paiement",
+                    "placeholder": "Sélectionner la méthode de paiement",
+                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Détails de paiement",
+                    "placeholder": "Saisir les détails de paiement",
+                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -633,7 +675,7 @@
             "form": {
                 "quote": {
                     "label": "À partir d'un devis",
-                    "placeholder": "Sélectionner un devis (optionnel)",
+                    "placeholder": "Sélectionner un devis",
                     "errors": {
                         "required": "Veuillez sélectionner un devis"
                     }
@@ -682,6 +724,20 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires"
+                },
+                "paymentMethod": {
+                    "label": "Méthode de paiement",
+                    "placeholder": "Sélectionner la méthode de paiement",
+                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Détails de paiement",
+                    "placeholder": "Saisir les détails de paiement",
+                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -1098,7 +1154,10 @@
                 "subtotal": "Sous-total",
                 "vat": "TVA",
                 "grandTotal": "Total général",
-                "vatRate": "Taux de TVA"
+                "vatRate": "Taux de TVA",
+                "paymentMethod": "Méthode de paiement",
+                "paymentDetails": "Détails de paiement",
+                "notes": "Notes"
             },
             "defaultLabels": {
                 "invoice": "Facture",
@@ -1115,7 +1174,10 @@
                 "subtotal": "Sous-total",
                 "vat": "TVA",
                 "grandTotal": "Total général",
-                "vatRate": "Taux de TVA"
+                "vatRate": "Taux de TVA",
+                "paymentMethod": "Méthode de paiement",
+                "paymentDetails": "Détails de paiement",
+                "notes": "Notes"
             },
             "preview": {
                 "title": "Aperçu",
