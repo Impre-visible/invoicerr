@@ -31,9 +31,9 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
         .client-info { margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: {{secondaryColor}}; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: {{secondaryColor}}; }
-        .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
 </head>
@@ -123,8 +123,8 @@ const defaultQuoteTemplate = `
         .client-info { margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f0fdf4; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #f0fdf4; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
         .validity { color: #dc2626; font-weight: bold; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
@@ -227,6 +227,21 @@ export default function PDFTemplatesSettings() {
     const { data: companyTemplateSettings } = useGet<TemplateSettings>("/api/company/pdf-template")
     const { trigger: updateTemplateSettings, loading: updateTemplateSettingsLoading } =
         usePost<TemplateSettings>("/api/company/pdf-template")
+
+    function getInvertColor(hex: string): string {
+        let cleanHex = hex.replace(/^#/, '');
+        if (cleanHex.length === 3) {
+            cleanHex = cleanHex.split('').map(c => c + c).join('');
+        }
+
+        const r = parseInt(cleanHex.slice(0, 2), 16);
+        const g = parseInt(cleanHex.slice(2, 4), 16);
+        const b = parseInt(cleanHex.slice(4, 6), 16);
+
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        return luminance > 186 ? '#000000' : '#ffffff';
+    }
 
     const [settings, setSettings] = useState<TemplateSettings>({
         templateType: "invoice",
@@ -348,6 +363,7 @@ export default function PDFTemplatesSettings() {
             fontFamily: settings.fontFamily,
             primaryColor: settings.primaryColor,
             secondaryColor: settings.secondaryColor,
+            tableTextColor: getInvertColor(settings.secondaryColor),
             padding: settings.padding,
             includeLogo: settings.includeLogo,
             logoB64: settings.logoB64,
