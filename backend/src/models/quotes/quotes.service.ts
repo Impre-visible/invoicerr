@@ -46,6 +46,21 @@ export class QuotesService {
         });
     }
 
+    private getInvertColor(hex: string): string {
+        let cleanHex = hex.replace(/^#/, '');
+        if (cleanHex.length === 3) {
+            cleanHex = cleanHex.split('').map(c => c + c).join('');
+        }
+
+        const r = parseInt(cleanHex.slice(0, 2), 16);
+        const g = parseInt(cleanHex.slice(2, 4), 16);
+        const b = parseInt(cleanHex.slice(4, 6), 16);
+
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        return luminance > 186 ? '#000000' : '#ffffff';
+    }
+
     async getQuotes(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
         const pageSize = 10;
@@ -272,6 +287,7 @@ export class QuotesService {
             padding: config.padding,
             primaryColor: config.primaryColor,
             secondaryColor: config.secondaryColor,
+            tableTextColor: this.getInvertColor(config.secondaryColor),
             includeLogo: config.includeLogo,
             logoB64: config.logoB64 ? `data:image/png;base64,${config.logoB64}` : undefined,
             labels: {

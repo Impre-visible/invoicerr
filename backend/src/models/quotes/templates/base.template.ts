@@ -12,8 +12,8 @@ export const baseTemplate = `
         .client-info { margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f0fdf4; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #f0fdf4; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
         .validity { color: #dc2626; font-weight: bold; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>

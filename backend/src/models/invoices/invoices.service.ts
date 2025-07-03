@@ -13,6 +13,21 @@ import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 export class InvoicesService {
     constructor(private readonly prisma: PrismaService) { }
 
+    private getInvertColor(hex: string): string {
+        let cleanHex = hex.replace(/^#/, '');
+        if (cleanHex.length === 3) {
+            cleanHex = cleanHex.split('').map(c => c + c).join('');
+        }
+
+        const r = parseInt(cleanHex.slice(0, 2), 16);
+        const g = parseInt(cleanHex.slice(2, 4), 16);
+        const b = parseInt(cleanHex.slice(4, 6), 16);
+
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        return luminance > 186 ? '#000000' : '#ffffff';
+    }
+
     private async formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
         const company = await this.prisma.company.findFirst();
         if (!company) {
@@ -256,10 +271,10 @@ export class InvoicesService {
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
 
-            // Personnalisation via pdfConfig
-            fontFamily: pdfConfig?.fontFamily ?? 'Inter',
-            primaryColor: pdfConfig?.primaryColor ?? '#0ea5e9',
-            secondaryColor: pdfConfig?.secondaryColor ?? '#f3f4f6',
+            fontFamily: pdfConfig.fontFamily ?? 'Inter',
+            primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
+            secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',
+            tableTextColor: this.getInvertColor(pdfConfig.secondaryColor),
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
             logoUrl: pdfConfig?.logoB64 ?? '',
