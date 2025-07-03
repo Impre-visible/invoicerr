@@ -18,7 +18,8 @@ import { UnavailablePlatform } from "@/components/unavailable-platform"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
-const defaultInvoiceTemplate = `<!DOCTYPE html>
+const defaultInvoiceTemplate = `
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -34,6 +35,7 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
         th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
         .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
         .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
+        .payment-info { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid {{primaryColor}}; color: #333; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
 </head>
@@ -100,16 +102,27 @@ const defaultInvoiceTemplate = `<!DOCTYPE html>
             </tr>
         </tfoot>
     </table>
+
+    {{#if paymentMethod}}
+    <div class="payment-info">
+        <strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}<br>
+        {{#if paymentDetails}}
+        <strong>{{labels.paymentDetails}}</strong> {{{paymentDetails}}}
+        {{/if}}
+    </div>
+    {{/if}}
+    
     {{#if noteExists}}
     <div class="notes">
-        <h4>Notes:</h4>
-        <p>{{notes}}</p>
+        <h4>{{labels.notes}}</h4>
+        <p>{{{notes}}}</p>
     </div>
     {{/if}}
 </body>
 </html>`
 
 const defaultQuoteTemplate = `
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -125,6 +138,8 @@ const defaultQuoteTemplate = `
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
         .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        .notes { margin-top: 20px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
+        .payment-info { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid {{primaryColor}}; color: #333; }
         .validity { color: #dc2626; font-weight: bold; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
@@ -192,8 +207,25 @@ const defaultQuoteTemplate = `
             </tr>
         </tfoot>
     </table>
+    
+    {{#if paymentMethod}}
+    <div class="payment-info">
+        <strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}<br>
+        {{#if paymentDetails}}
+        <strong>{{labels.paymentDetails}}</strong> {{{paymentDetails}}}
+        {{/if}}
+    </div>
+    {{/if}}
+    
+    {{#if noteExists}}
+    <div class="notes">
+        <h4>{{labels.notes}}</h4>
+        <p>{{{notes}}}</p>
+    </div>
+    {{/if}}
 </body>
-</html>`
+</html>
+`
 
 interface TemplateSettings {
     templateType: "invoice" | "quote"
@@ -345,6 +377,10 @@ export default function PDFTemplatesSettings() {
             date: new Date().toLocaleDateString("en-US"),
             dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
             validUntil: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
+            paymentMethod: "Bank Transfer",
+            paymentDetails: "Bank: Acme Bank, Account: 123456789, SWIFT: ACMEUS33",
+            noteExists: true,
+            notes: "Thank you for your business! If you have any questions, feel free to contact us.",
             items: [
                 {
                     description: "Web Development",
@@ -364,8 +400,7 @@ export default function PDFTemplatesSettings() {
             totalHT: "4000.00",
             totalVAT: "800.00",
             totalTTC: "4800.00",
-            currency: "€",
-            notes: "Thank you for your business!",
+            currency: "EUR",
             fontFamily: settings.fontFamily,
             primaryColor: settings.primaryColor,
             secondaryColor: settings.secondaryColor,
