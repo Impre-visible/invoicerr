@@ -308,6 +308,7 @@ model Quote {
   totalVAT   Float
   totalTTC   Float
   currency   Currency
+  notes      String?     @default("")
   isActive   Boolean     @default(true)
   Invoice    Invoice[]
   signatures Signature[]
@@ -332,27 +333,28 @@ enum InvoiceStatus {
 }
 
 model Invoice {
-  id            String        @id @default(uuid())
-  number        Int           @default(autoincrement())
-  quote         Quote?        @relation(fields: [quoteId], references: [id])
-  quoteId       String?
-  client        Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
-  clientId      String
-  company       Company       @relation(fields: [companyId], references: [id]) // Company issuing the invoice
-  companyId     String
-  items         InvoiceItem[]
-  status        InvoiceStatus @default(UNPAID)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  dueDate       DateTime
-  paidAt        DateTime?
-  paymentMethod String? // Ex: "Bank Transfer", "PayPal"
-  notes         String?
-  totalHT       Float
-  totalVAT      Float
-  totalTTC      Float
-  currency      Currency
-  isActive      Boolean       @default(true)
+  id             String        @id @default(uuid())
+  number         Int           @default(autoincrement())
+  quote          Quote?        @relation(fields: [quoteId], references: [id])
+  quoteId        String?
+  client         Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
+  clientId       String
+  company        Company       @relation(fields: [companyId], references: [id]) // Company issuing the invoice
+  companyId      String
+  items          InvoiceItem[]
+  status         InvoiceStatus @default(UNPAID)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  dueDate        DateTime
+  paidAt         DateTime?
+  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String? // Details for the payment method (e.g., bank account number)
+  notes          String?       @default("")
+  totalHT        Float
+  totalVAT       Float
+  totalTTC       Float
+  currency       Currency
+  isActive       Boolean       @default(true)
 }
 
 model InvoiceItem {
