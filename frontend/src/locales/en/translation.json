@@ -402,6 +402,16 @@
                 "notes": {
                     "label": "Notes",
                     "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
@@ -467,6 +477,16 @@
                 "notes": {
                     "label": "Notes",
                     "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
                 }
             },
             "actions": {
