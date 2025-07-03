@@ -173,6 +173,8 @@ export class InvoicesService {
         const updateInvoice = await this.prisma.invoice.update({
             where: { id },
             data: {
+                paymentMethod: data.paymentMethod || existingInvoice.paymentMethod,
+                paymentDetails: data.paymentDetails || existingInvoice.paymentDetails,
                 quoteId: data.quoteId || existingInvoice.quoteId,
                 clientId: data.clientId || existingInvoice.clientId,
                 notes: data.notes,
@@ -247,7 +249,7 @@ export class InvoicesService {
             date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
 
         const { pdfConfig } = invoice.company;
-
+        console.log(invoice.paymentMethod)
         const html = template({
             number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.createdAt),
@@ -301,6 +303,9 @@ export class InvoicesService {
                 vat: pdfConfig.vat,
                 grandTotal: pdfConfig.grandTotal,
                 date: pdfConfig.date,
+                notes: pdfConfig.notes,
+                paymentMethod: pdfConfig.paymentMethod,
+                paymentDetails: pdfConfig.paymentDetails,
             },
         });
 

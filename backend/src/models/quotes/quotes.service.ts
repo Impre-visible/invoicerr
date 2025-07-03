@@ -261,7 +261,6 @@ export class QuotesService {
         }
 
         const config = quote.company.pdfConfig;
-
         const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
         const html = template({
@@ -308,6 +307,9 @@ export class QuotesService {
                 grandTotal: config.grandTotal,
                 validUntil: config.validUntil,
                 date: config.date,
+                notes: config.notes,
+                paymentMethod: config.paymentMethod,
+                paymentDetails: config.paymentDetails,
             },
         });
 

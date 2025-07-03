@@ -55,7 +55,10 @@ export class CompanyService {
                 unitPrice: existingCompany.pdfConfig.unitPrice,
                 validUntil: existingCompany.pdfConfig.validUntil,
                 vat: existingCompany.pdfConfig.vat,
-                vatRate: existingCompany.pdfConfig.vatRate
+                vatRate: existingCompany.pdfConfig.vatRate,
+                notes: existingCompany.pdfConfig.notes,
+                paymentMethod: existingCompany.pdfConfig.paymentMethod,
+                paymentDetails: existingCompany.pdfConfig.paymentDetails,
             }
         }
     }
