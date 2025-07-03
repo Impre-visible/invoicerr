@@ -289,29 +289,31 @@ enum QuoteStatus {
 }
 
 model Quote {
-  id         String      @id @default(uuid())
-  number     Int         @default(autoincrement())
-  title      String?
-  client     Client      @relation(fields: [clientId], references: [id])
-  clientId   String
-  company    Company     @relation(fields: [companyId], references: [id])
-  companyId  String
-  items      QuoteItem[]
-  status     QuoteStatus @default(DRAFT)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  validUntil DateTime?
-  signedAt   DateTime?
-  viewedAt   DateTime?
-  signedBy   String?
-  totalHT    Float
-  totalVAT   Float
-  totalTTC   Float
-  currency   Currency
-  notes      String?     @default("")
-  isActive   Boolean     @default(true)
-  Invoice    Invoice[]
-  signatures Signature[]
+  id             String      @id @default(uuid())
+  number         Int         @default(autoincrement())
+  title          String?
+  client         Client      @relation(fields: [clientId], references: [id])
+  clientId       String
+  company        Company     @relation(fields: [companyId], references: [id])
+  companyId      String
+  items          QuoteItem[]
+  status         QuoteStatus @default(DRAFT)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  validUntil     DateTime?
+  signedAt       DateTime?
+  viewedAt       DateTime?
+  signedBy       String?
+  totalHT        Float
+  totalVAT       Float
+  totalTTC       Float
+  currency       Currency
+  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String? // Details for the payment method (e.g., bank account number)
+  notes          String?     @default("")
+  isActive       Boolean     @default(true)
+  Invoice        Invoice[]
+  signatures     Signature[]
 }
 
 model QuoteItem {
