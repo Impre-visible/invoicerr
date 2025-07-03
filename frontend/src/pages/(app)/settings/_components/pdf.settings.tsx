@@ -218,6 +218,9 @@ interface TemplateSettings {
         vat: string
         grandTotal: string
         vatRate: string
+        notes: string
+        paymentMethod: string
+        paymentDetails: string
     }
     padding: number
 }
@@ -266,6 +269,9 @@ export default function PDFTemplatesSettings() {
             vat: t("settings.pdfTemplates.defaultLabels.vat"),
             grandTotal: t("settings.pdfTemplates.defaultLabels.grandTotal"),
             vatRate: t("settings.pdfTemplates.defaultLabels.vatRate"),
+            notes: t("settings.pdfTemplates.defaultLabels.notes"),
+            paymentMethod: t("settings.pdfTemplates.defaultLabels.paymentMethod"),
+            paymentDetails: t("settings.pdfTemplates.defaultLabels.paymentDetails"),
         },
         padding: 40,
     })
@@ -709,6 +715,30 @@ export default function PDFTemplatesSettings() {
                                                         id="label-grand-total"
                                                         value={settings.labels.grandTotal}
                                                         onChange={(e) => updateLabel("grandTotal", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-payment-method">{t("settings.pdfTemplates.labels.paymentMethod")}</Label>
+                                                    <Input
+                                                        id="label-payment-method"
+                                                        value={settings.labels.paymentMethod}
+                                                        onChange={(e) => updateLabel("paymentMethod", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-payment-details">{t("settings.pdfTemplates.labels.paymentDetails")}</Label>
+                                                    <Input
+                                                        id="label-payment-details"
+                                                        value={settings.labels.paymentDetails}
+                                                        onChange={(e) => updateLabel("paymentDetails", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-notes">{t("settings.pdfTemplates.labels.notes")}</Label>
+                                                    <Input
+                                                        id="label-notes"
+                                                        value={settings.labels.notes}
+                                                        onChange={(e) => updateLabel("notes", e.target.value)}
                                                     />
                                                 </div>
                                             </div>
