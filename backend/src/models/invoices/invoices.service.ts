@@ -173,7 +173,9 @@ export class InvoicesService {
         const updateInvoice = await this.prisma.invoice.update({
             where: { id },
             data: {
-                ...data,
+                quoteId: data.quoteId || existingInvoice.quoteId,
+                clientId: data.clientId || existingInvoice.clientId,
+                notes: data.notes,
                 currency: body.currency || client.currency || company.currency,
                 dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 totalHT,
@@ -247,7 +249,7 @@ export class InvoicesService {
         const { pdfConfig } = invoice.company;
 
         const html = template({
-            number: invoice.number,
+            number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.createdAt),
             dueDate: formatDate(invoice.dueDate),
             company: {
@@ -279,6 +281,9 @@ export class InvoicesService {
             includeLogo: !!pdfConfig?.logoB64,
             logoUrl: pdfConfig?.logoB64 ?? '',
 
+            noteExists: !!invoice.notes,
+            notes: (invoice.notes || '').replace(/\n/g, '<br>'),
+
             // Labels
             labels: {
                 invoice: pdfConfig.invoice,
@@ -294,10 +299,6 @@ export class InvoicesService {
                 grandTotal: pdfConfig.grandTotal,
                 date: pdfConfig.date,
             },
-
-            // Notes optionnelles
-            noteExists: !!invoice.notes,
-            notes: invoice.notes ?? '',
         });
 
         let browser: puppeteer.Browser;
@@ -398,6 +399,7 @@ export class InvoicesService {
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             items: quote.items,
             currency: quote.currency,
+            notes: quote.notes || '',
         });
     }
 
