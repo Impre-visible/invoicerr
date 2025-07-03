@@ -43,6 +43,7 @@ export class CompanyService {
             labels: {
                 billTo: existingCompany.pdfConfig.billTo,
                 description: existingCompany.pdfConfig.description,
+                date: existingCompany.pdfConfig.date,
                 dueDate: existingCompany.pdfConfig.dueDate,
                 grandTotal: existingCompany.pdfConfig.grandTotal,
                 invoice: existingCompany.pdfConfig.invoice,
@@ -81,6 +82,7 @@ export class CompanyService {
                 billTo: pdfConfig.labels.billTo,
                 description: pdfConfig.labels.description,
                 dueDate: pdfConfig.labels.dueDate,
+                date: pdfConfig.labels.date,
                 grandTotal: pdfConfig.labels.grandTotal,
                 invoice: pdfConfig.labels.invoice,
                 quantity: pdfConfig.labels.quantity,
