@@ -282,6 +282,9 @@ export class QuotesService {
             totalVAT: quote.totalVAT.toFixed(2),
             totalTTC: quote.totalTTC.toFixed(2),
 
+            paymentMethod: quote.paymentMethod,
+            paymentDetails: quote.paymentDetails,
+
             // 🎨 Style & labels from PDFConfig
             fontFamily: config.fontFamily,
             padding: config.padding,
