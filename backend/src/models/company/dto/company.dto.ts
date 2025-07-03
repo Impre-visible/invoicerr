@@ -11,6 +11,7 @@ export interface PDFConfig {
         billTo: string
         description: string
         dueDate: string
+        date: string
         grandTotal: string
         invoice: string
         quantity: string
