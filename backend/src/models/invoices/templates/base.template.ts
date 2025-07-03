@@ -15,6 +15,7 @@ export const baseTemplate = `
         th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
         .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
         .notes { margin-top: 30px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
+        .payment-info { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid {{primaryColor}}; color: #333; }
         .logo { max-height: 80px; margin-bottom: 10px; }
     </style>
 </head>
@@ -81,6 +82,19 @@ export const baseTemplate = `
             </tr>
         </tfoot>
     </table>
+
+    {{#if paymentMethod}}
+    <div class="payment-info">
+        <strong>Payment Method:</strong> {{paymentMethod}}
+    </div>
+    {{/if}}
+
+    {{#if paymentDetails}}
+    <div class="payment-info">
+        <strong>Payment Details:</strong> {{{paymentDetails}}}
+    </div>
+    {{/if}}
+
     {{#if noteExists}}
     <div class="notes">
         <h4>Notes:</h4>
