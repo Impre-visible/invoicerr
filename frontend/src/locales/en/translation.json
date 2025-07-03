@@ -398,6 +398,10 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms (optional)"
                 }
             },
             "actions": {
@@ -459,6 +463,10 @@
                             "min": "VAT rate must be positive"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms (optional)"
                 }
             },
             "actions": {

@@ -398,6 +398,10 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires (optionnel)"
                 }
             },
             "actions": {
@@ -459,6 +463,10 @@
                             "min": "Le taux de TVA doit être positif"
                         }
                     }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Saisir des notes ou conditions supplémentaires (optionnel)"
                 }
             },
             "actions": {
