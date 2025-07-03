@@ -1154,7 +1154,10 @@
                 "subtotal": "Sous-total",
                 "vat": "TVA",
                 "grandTotal": "Total général",
-                "vatRate": "Taux de TVA"
+                "vatRate": "Taux de TVA",
+                "paymentMethod": "Méthode de paiement",
+                "paymentDetails": "Détails de paiement",
+                "notes": "Notes"
             },
             "defaultLabels": {
                 "invoice": "Facture",
@@ -1171,7 +1174,10 @@
                 "subtotal": "Sous-total",
                 "vat": "TVA",
                 "grandTotal": "Total général",
-                "vatRate": "Taux de TVA"
+                "vatRate": "Taux de TVA",
+                "paymentMethod": "Méthode de paiement",
+                "paymentDetails": "Détails de paiement",
+                "notes": "Notes"
             },
             "preview": {
                 "title": "Aperçu",

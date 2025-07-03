@@ -1154,7 +1154,10 @@
                 "subtotal": "Subtotal",
                 "vat": "VAT",
                 "grandTotal": "Grand Total",
-                "vatRate": "VAT Rate"
+                "vatRate": "VAT Rate",
+                "paymentMethod": "Payment Method",
+                "paymentDetails": "Payment Details",
+                "notes": "Notes"
             },
             "defaultLabels": {
                 "invoice": "Invoice",
@@ -1171,7 +1174,10 @@
                 "subtotal": "Subtotal",
                 "vat": "VAT",
                 "grandTotal": "Grand Total",
-                "vatRate": "VAT Rate"
+                "vatRate": "VAT Rate",
+                "paymentMethod": "Payment Method",
+                "paymentDetails": "Payment Details",
+                "notes": "Notes"
             },
             "preview": {
                 "title": "Preview",
