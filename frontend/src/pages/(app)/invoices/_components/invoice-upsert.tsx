@@ -254,9 +254,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="notes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
+                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
+                                        <Textarea {...field} placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
