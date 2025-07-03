@@ -15,6 +15,7 @@ import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
+import { Textarea } from "@/components/ui/textarea"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,7 +34,6 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     const invoiceSchema = z.object({
         quoteId: z
             .string()
-            .min(1, t(`invoices.${isEdit ? "edit" : "create"}.form.quote.errors.required`))
             .optional(),
         clientId: z
             .string()
@@ -42,6 +42,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                 message: t(`invoices.${isEdit ? "edit" : "create"}.form.client.errors.required`),
             }),
         dueDate: z.date().optional(),
+        notes: z.string().optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -93,6 +94,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             clientId: "",
             dueDate: undefined,
             items: [],
+            notes: "",
         },
     })
 
@@ -104,6 +106,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                     quoteId: invoice.quoteId || "",
                     clientId: invoice.clientId || "",
                     dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
+                    notes: invoice.notes || "",
                     items: invoice.items
                         .sort((a, b) => a.order - b.order)
                         .map((item) => ({
@@ -237,6 +240,20 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                             onChange={field.onChange}
                                             placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.dueDate.placeholder`)}
                                         />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={control}
+                            name="notes"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
+                                    <FormControl>
+                                        <Textarea {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
