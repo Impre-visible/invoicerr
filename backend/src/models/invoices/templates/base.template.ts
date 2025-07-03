@@ -85,19 +85,16 @@ export const baseTemplate = `
 
     {{#if paymentMethod}}
     <div class="payment-info">
-        <strong>Payment Method:</strong> {{paymentMethod}}
+        <strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}<br>
+        {{#if paymentDetails}}
+        <strong>{{labels.paymentDetails}}</strong> {{{paymentDetails}}}
+        {{/if}}
     </div>
     {{/if}}
-
-    {{#if paymentDetails}}
-    <div class="payment-info">
-        <strong>Payment Details:</strong> {{{paymentDetails}}}
-    </div>
-    {{/if}}
-
+    
     {{#if noteExists}}
     <div class="notes">
-        <h4>Notes:</h4>
+        <h4>{{labels.notes}}</h4>
         <p>{{{notes}}}</p>
     </div>
     {{/if}}
