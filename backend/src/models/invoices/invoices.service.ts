@@ -273,6 +273,9 @@ export class InvoicesService {
             totalVAT: invoice.totalVAT.toFixed(2),
             totalTTC: invoice.totalTTC.toFixed(2),
 
+            paymentMethod: invoice.paymentMethod,
+            paymentDetails: invoice.paymentDetails,
+
             fontFamily: pdfConfig.fontFamily ?? 'Inter',
             primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
             secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',

@@ -1,7 +1,7 @@
 import type { Client, Invoice, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
@@ -30,7 +30,6 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     const { t } = useTranslation()
     const isEdit = !!invoice
 
-    // Move schema inside component to access t function
     const invoiceSchema = z.object({
         quoteId: z
             .string()
@@ -43,6 +42,12 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             }),
         dueDate: z.date().optional(),
         notes: z.string().optional(),
+        paymentMethod: z
+            .string()
+            .optional(),
+        paymentDetails: z
+            .string()
+            .optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -83,7 +88,6 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
     const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
 
-    // Use appropriate hook based on mode
     const { trigger: createTrigger } = usePost("/api/invoices")
     const { trigger: updateTrigger } = usePatch(`/api/invoices/${invoice?.id}`)
 
@@ -98,36 +102,35 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         },
     })
 
-    // Reset form when invoice changes or dialog opens
     useEffect(() => {
-        if (open) {
-            if (isEdit && invoice) {
-                form.reset({
-                    quoteId: invoice.quoteId || "",
-                    clientId: invoice.clientId || "",
-                    dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-                    notes: invoice.notes || "",
-                    items: invoice.items
-                        .sort((a, b) => a.order - b.order)
-                        .map((item) => ({
-                            id: item.id,
-                            description: item.description || "",
-                            quantity: item.quantity || 1,
-                            unitPrice: item.unitPrice || 0,
-                            vatRate: item.vatRate || 0,
-                            order: item.order || 0,
-                        })),
-                })
-            } else {
-                form.reset({
-                    quoteId: undefined,
-                    clientId: "",
-                    dueDate: undefined,
-                    items: [],
-                })
-            }
+        if (isEdit && invoice) {
+            form.reset({
+                quoteId: invoice.quoteId || "",
+                clientId: invoice.clientId || "",
+                dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
+                notes: invoice.notes || "",
+                paymentMethod: invoice.paymentMethod || "",
+                paymentDetails: invoice.paymentDetails || "",
+                items: invoice.items
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => ({
+                        id: item.id,
+                        description: item.description || "",
+                        quantity: item.quantity || 1,
+                        unitPrice: item.unitPrice || 0,
+                        vatRate: item.vatRate || 0,
+                        order: item.order || 0,
+                    })),
+            })
+        } else {
+            form.reset({
+                quoteId: undefined,
+                clientId: "",
+                dueDate: undefined,
+                items: [],
+            })
         }
-    }, [invoice, form, isEdit, open])
+    }, [invoice, form, isEdit])
 
     const { control, handleSubmit, setValue } = form
     const { fields, append, move, remove } = useFieldArray({
@@ -259,6 +262,49 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 </FormItem>
                             )}
                         />
+
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={control}
+                                name="paymentMethod"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.label`)}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.placeholder`)}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.description`)}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="paymentDetails"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.label`)}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.placeholder`)}
+                                                className="max-h-40"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.description`)}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </section>
 
                         <FormItem>
                             <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.items.label`)}</FormLabel>

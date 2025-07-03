@@ -34,6 +34,7 @@ export interface Invoice {
     dueDate: string; // ISO date string
     paidAt?: string; // ISO date string
     paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
+    paymentDetails?: string; // Additional details for the payment method
     notes?: string;
     totalHT: number;
     totalVAT: number;
