@@ -6,10 +6,9 @@ import { useGetRaw, usePost } from "@/lib/utils"
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "../../../../components/ui/button"
 import type { Quote } from "@/types"
-import { QuoteCreate } from "@/pages/(app)/quotes/_components/quote-create"
 import { QuoteDeleteDialog } from "@/pages/(app)/quotes/_components/quote-delete"
-import { QuoteEdit } from "@/pages/(app)/quotes/_components/quote-edit"
 import { QuotePdfModal } from "@/pages/(app)/quotes/_components/quote-pdf-view"
+import { QuoteUpsert } from "@/pages/(app)/quotes/_components/quote-upsert"
 import { QuoteViewDialog } from "@/pages/(app)/quotes/_components/quote-view"
 import type React from "react"
 import { toast } from "sonner"
@@ -322,7 +321,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     )}
                 </Card>
 
-                <QuoteCreate
+                <QuoteUpsert
                     open={createQuoteDialog}
                     onOpenChange={(open) => {
                         setCreateQuoteDialog(open)
@@ -330,7 +329,8 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     }}
                 />
 
-                <QuoteEdit
+                <QuoteUpsert
+                    open={!!editQuoteDialog}
                     quote={editQuoteDialog}
                     onOpenChange={(open) => {
                         if (!open) setEditQuoteDialog(null)

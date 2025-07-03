@@ -7,10 +7,9 @@ import { useGetRaw, usePost } from "@/lib/utils"
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "@/components/ui/button"
 import type { Invoice } from "@/types"
-import { InvoiceCreate } from "./invoice-create"
 import { InvoiceDeleteDialog } from "./invoice-delete"
-import { InvoiceEdit } from "./invoice-edit"
 import { InvoicePdfModal } from "./invoice-pdf-view"
+import { InvoiceUpsert } from "./invoice-upsert"
 import { InvoiceViewDialog } from "./invoice-view"
 import type React from "react"
 import { toast } from "sonner"
@@ -320,7 +319,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     )}
                 </Card>
 
-                <InvoiceCreate
+                <InvoiceUpsert
                     open={createInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         setCreateInvoiceDialog(open)
@@ -328,7 +327,8 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     }}
                 />
 
-                <InvoiceEdit
+                <InvoiceUpsert
+                    open={!!editInvoiceDialog}
                     invoice={editInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setEditInvoiceDialog(null)

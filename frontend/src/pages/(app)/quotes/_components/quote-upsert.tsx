@@ -1,3 +1,6 @@
+"use client"
+
+import type { Client, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -5,63 +8,69 @@ import { GripVertical, Plus, Trash2 } from "lucide-react"
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
-import { useGet, usePost } from "@/lib/utils"
+import { useGet, usePatch, usePost } from "@/lib/utils"
 
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
-import type { Client } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
+import { Textarea } from "@/components/ui/textarea"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-interface QuoteCreateDialogProps {
+interface QuoteUpsertDialogProps {
+    quote?: Quote | null
     open: boolean
     onOpenChange: (open: boolean) => void
 }
 
-export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
+export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProps) {
     const { t } = useTranslation()
+    const isEdit = !!quote
 
     // Move schema inside component to access t function
     const quoteSchema = z.object({
         title: z.string().optional(),
         clientId: z
             .string()
-            .min(1, t("quotes.create.form.client.errors.required"))
+            .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.client.errors.required`))
             .refine((val) => val !== "", {
-                message: t("quotes.create.form.client.errors.required"),
+                message: t(`quotes.${isEdit ? "edit" : "create"}.form.client.errors.required`),
             }),
         currency: z.string().optional(),
         validUntil: z.date().optional(),
+        notes: z.string().optional(),
         items: z.array(
             z.object({
+                id: z.string().optional(),
                 description: z
                     .string()
-                    .min(1, t("quotes.create.form.items.description.errors.required"))
+                    .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.items.description.errors.required`))
                     .refine((val) => val !== "", {
-                        message: t("quotes.create.form.items.description.errors.required"),
+                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.description.errors.required`),
                     }),
                 quantity: z
-                    .number({ invalid_type_error: t("quotes.create.form.items.quantity.errors.required") })
-                    .min(1, t("quotes.create.form.items.quantity.errors.min"))
+                    .number({ invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.required`) })
+                    .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.min`))
                     .refine((val) => !isNaN(val), {
-                        message: t("quotes.create.form.items.quantity.errors.invalid"),
+                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.invalid`),
                     }),
                 unitPrice: z
-                    .number({ invalid_type_error: t("quotes.create.form.items.unitPrice.errors.required") })
-                    .min(0, t("quotes.create.form.items.unitPrice.errors.min"))
+                    .number({
+                        invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.required`),
+                    })
+                    .min(0, t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.min`))
                     .refine((val) => !isNaN(val), {
-                        message: t("quotes.create.form.items.unitPrice.errors.invalid"),
+                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.invalid`),
                     }),
                 vatRate: z
-                    .number({ invalid_type_error: t("quotes.create.form.items.vatRate.errors.required") })
-                    .min(0, t("quotes.create.form.items.vatRate.errors.min")),
+                    .number({ invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.required`) })
+                    .min(0, t(`quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.min`)),
                 order: z.number(),
             }),
         ),
@@ -69,7 +78,10 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
 
     const [searchTerm, setSearchTerm] = useState("")
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${searchTerm}`)
-    const { trigger } = usePost("/api/quotes")
+
+    // Use appropriate hook based on mode
+    const { trigger: createTrigger } = usePost("/api/quotes")
+    const { trigger: updateTrigger } = usePatch(`/api/quotes/${quote?.id}`)
 
     const form = useForm<z.infer<typeof quoteSchema>>({
         resolver: zodResolver(quoteSchema),
@@ -77,9 +89,41 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
             title: "",
             clientId: "",
             validUntil: undefined,
+            notes: "",
             items: [],
         },
     })
+
+    // Reset form when quote changes or dialog opens
+    useEffect(() => {
+        if (isEdit && quote) {
+            form.reset({
+                title: quote.title || "",
+                clientId: quote.clientId || "",
+                validUntil: quote.validUntil ? new Date(quote.validUntil) : undefined,
+                currency: quote.currency,
+                notes: quote.notes || "",
+                items: quote.items
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => ({
+                        id: item.id,
+                        description: item.description || "",
+                        quantity: item.quantity || 1,
+                        unitPrice: item.unitPrice || 0,
+                        vatRate: item.vatRate || 0,
+                        order: item.order || 0,
+                    })),
+            })
+        } else {
+            form.reset({
+                title: "",
+                clientId: "",
+                validUntil: undefined,
+                notes: "",
+                items: [],
+            })
+        }
+    }, [quote, form, isEdit])
 
     const { control, handleSubmit, setValue } = form
     const { fields, append, move, remove } = useFieldArray({
@@ -91,13 +135,10 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
 
     const onDragEnd = (event: any) => {
         const { active, over } = event
-
         if (active.id !== over?.id) {
             const oldIndex = fields.findIndex((f) => f.id === active.id)
             const newIndex = fields.findIndex((f) => f.id === over.id)
-
             move(oldIndex, newIndex)
-
             const reordered = arrayMove(fields, oldIndex, newIndex)
             reordered.forEach((_, index) => {
                 setValue(`items.${index}.order`, index)
@@ -117,6 +158,9 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
 
     const onSubmit = (data: z.infer<typeof quoteSchema>) => {
         console.debug("Submitting quote data:", data)
+
+        const trigger = isEdit ? updateTrigger : createTrigger
+
         trigger(data)
             .then(() => {
                 onOpenChange(false)
@@ -139,7 +183,7 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>{t("quotes.create.title")}</DialogTitle>
+                    <DialogTitle>{t(`quotes.${isEdit ? "edit" : "create"}.title`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -148,9 +192,9 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("quotes.create.form.title.label")}</FormLabel>
+                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.title.label`)}</FormLabel>
                                     <FormControl>
-                                        <Input {...field} placeholder={t("quotes.create.form.title.placeholder")} />
+                                        <Input {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.title.placeholder`)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -162,14 +206,14 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel required>{t("quotes.create.form.client.label")}</FormLabel>
+                                    <FormLabel required>{t(`quotes.${isEdit ? "edit" : "create"}.form.client.label`)}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
-                                            placeholder={t("quotes.create.form.client.placeholder")}
+                                            placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.client.placeholder`)}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -182,12 +226,9 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                             name="currency"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("quotes.create.form.currency.label")}</FormLabel>
+                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.currency.label`)}</FormLabel>
                                     <FormControl>
-                                        <CurrencySelect
-                                            value={field.value}
-                                            onChange={(value) => field.onChange(value)}
-                                        />
+                                        <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -199,13 +240,13 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                             name="validUntil"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("quotes.create.form.validUntil.label")}</FormLabel>
+                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.validUntil.label`)}</FormLabel>
                                     <FormControl>
                                         <DatePicker
                                             className="w-full"
                                             value={field.value || null}
                                             onChange={field.onChange}
-                                            placeholder={t("quotes.create.form.validUntil.placeholder")}
+                                            placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.validUntil.placeholder`)}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -213,8 +254,22 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                             )}
                         />
 
+                        <FormField
+                            control={control}
+                            name="notes"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
+                                    <FormControl>
+                                        <Textarea {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormItem>
-                            <FormLabel>{t("quotes.create.form.items.label")}</FormLabel>
+                            <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.items.label`)}</FormLabel>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                                 <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
@@ -233,7 +288,9 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                                                 <FormControl>
                                                                     <Input
                                                                         {...field}
-                                                                        placeholder={t("quotes.create.form.items.description.placeholder")}
+                                                                        placeholder={t(
+                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.description.placeholder`,
+                                                                        )}
                                                                     />
                                                                 </FormControl>
                                                                 <FormMessage />
@@ -248,10 +305,13 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                                             <FormItem>
                                                                 <FormControl>
                                                                     <BetterInput
-                                                                        postAdornment={t("quotes.create.form.items.quantity.unit")}
                                                                         {...field}
+                                                                        defaultValue={field.value || ""}
+                                                                        postAdornment={t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.unit`)}
                                                                         type="number"
-                                                                        placeholder={t("quotes.create.form.items.quantity.placeholder")}
+                                                                        placeholder={t(
+                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.quantity.placeholder`,
+                                                                        )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
                                                                         }
@@ -270,9 +330,12 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                                                 <FormControl>
                                                                     <BetterInput
                                                                         {...field}
+                                                                        defaultValue={field.value || ""}
                                                                         postAdornment="$"
                                                                         type="number"
-                                                                        placeholder={t("quotes.create.form.items.unitPrice.placeholder")}
+                                                                        placeholder={t(
+                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.placeholder`,
+                                                                        )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
                                                                         }
@@ -291,13 +354,18 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                                                 <FormControl>
                                                                     <BetterInput
                                                                         {...field}
+                                                                        defaultValue={field.value || ""}
                                                                         postAdornment="%"
                                                                         type="number"
                                                                         step="0.01"
-                                                                        placeholder={t("quotes.create.form.items.vatRate.placeholder")}
+                                                                        placeholder={t(
+                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.placeholder`,
+                                                                        )}
                                                                         onChange={(e) =>
                                                                             field.onChange(
-                                                                                e.target.value === "" ? undefined : Number.parseFloat(e.target.value),
+                                                                                e.target.value === ""
+                                                                                    ? undefined
+                                                                                    : Number.parseFloat(e.target.value.replace(",", ".")),
                                                                             )
                                                                         }
                                                                     />
@@ -331,15 +399,17 @@ export function QuoteCreate({ open, onOpenChange }: QuoteCreateDialogProps) {
                                 }
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t("quotes.create.form.items.addItem")}
+                                {t(`quotes.${isEdit ? "edit" : "create"}.form.items.addItem`)}
                             </Button>
                         </FormItem>
 
                         <div className="flex justify-end space-x-2">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t("quotes.create.actions.cancel")}
+                                {t(`quotes.${isEdit ? "edit" : "create"}.actions.cancel`)}
                             </Button>
-                            <Button type="submit">{t("quotes.create.actions.create")}</Button>
+                            <Button type="submit">
+                                {t(`quotes.${isEdit ? "edit" : "create"}.actions.${isEdit ? "save" : "create"}`)}
+                            </Button>
                         </div>
                     </form>
                 </Form>
