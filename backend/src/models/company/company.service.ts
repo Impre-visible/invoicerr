@@ -97,6 +97,10 @@ export class CompanyService {
                 validUntil: pdfConfig.labels.validUntil,
                 vat: pdfConfig.labels.vat,
                 vatRate: pdfConfig.labels.vatRate,
+
+                notes: pdfConfig.labels.notes,
+                paymentMethod: pdfConfig.labels.paymentMethod,
+                paymentDetails: pdfConfig.labels.paymentDetails,
             }
         });
     }
