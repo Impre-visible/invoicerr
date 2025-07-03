@@ -3,7 +3,7 @@
 import type { Client, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
@@ -45,6 +45,12 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         currency: z.string().optional(),
         validUntil: z.date().optional(),
         notes: z.string().optional(),
+        paymentMethod: z
+            .string()
+            .optional(),
+        paymentDetails: z
+            .string()
+            .optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -267,6 +273,49 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 </FormItem>
                             )}
                         />
+
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={control}
+                                name="paymentMethod"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.label`)}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.placeholder`)}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.description`)}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="paymentDetails"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.label`)}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.placeholder`)}
+                                                className="max-h-40"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.description`)}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </section>
 
                         <FormItem>
                             <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.items.label`)}</FormLabel>

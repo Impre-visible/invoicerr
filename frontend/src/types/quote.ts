@@ -31,6 +31,8 @@ export interface Quote {
     totalVAT: number;
     totalTTC: number;
     currency: string; // Currency code, e.g., "EUR", "USD"
+    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
+    paymentDetails?: string; // Additional details for the payment method
     isActive: boolean;
 }
 
