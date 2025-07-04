@@ -291,7 +291,7 @@ export class QuotesService {
             secondaryColor: config.secondaryColor,
             tableTextColor: this.getInvertColor(config.secondaryColor),
             includeLogo: config.includeLogo,
-            logoB64: config.logoB64 ? `data:image/png;base64,${config.logoB64}` : undefined,
+            logoB64: config?.logoB64 ?? '',
             noteExists: !!quote.notes,
             notes: (quote.notes || '').replace(/\n/g, '<br>'),
             labels: {
