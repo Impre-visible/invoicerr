@@ -283,7 +283,7 @@ export class InvoicesService {
             tableTextColor: this.getInvertColor(pdfConfig.secondaryColor),
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
-            logoUrl: pdfConfig?.logoB64 ?? '',
+            logoB64: pdfConfig?.logoB64 ?? '',
 
             noteExists: !!invoice.notes,
             notes: (invoice.notes || '').replace(/\n/g, '<br>'),
