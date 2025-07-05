@@ -138,6 +138,11 @@ export class CompanyService {
                                     type: 'VERIFICATION_CODE',
                                     subject: 'Your verification code',
                                     body: '<p>Hello,</p><p>Here is your verification code:</p><div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">  <div style="font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 4px; font-family: monospace;">{{OTP_CODE}}</div></div><p>This code will expire in 10 minutes. Please enter it in the application to complete your verification.</p><p>If you didn\'t request this code, please ignore this email.</p><p>Best regards,<br>The Invoicerr Team</p>'
+                                },
+                                {
+                                    type: 'INVOICE',
+                                    subject: 'Invoice #{{INVOICE_NUMBER}} from {{COMPANY_NAME}}',
+                                    body: '<p>Dear {{CLIENT_NAME}},</p><p>Please find attached the invoice #{{INVOICE_NUMBER}} from {{COMPANY_NAME}}.</p><p>Thank you for your business!</p><p>Best regards,<br>{{COMPANY_NAME}}</p><hr><p style="font-size: 12px; color: #666;">This email was sent from {{APP_URL}}</p>'
                                 }
                             ]
                         }
