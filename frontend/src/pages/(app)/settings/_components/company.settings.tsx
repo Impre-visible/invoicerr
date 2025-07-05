@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect, useState } from "react"
 import { useGet, usePost } from "@/lib/utils"
 
@@ -112,6 +113,14 @@ export default function CompanySettings() {
             .refine((val) => {
                 return validateNumberFormat(val)
             }, t("settings.company.form.invoiceNumberFormat.errors.format")),
+        invoicePDFFormat: z
+            .string()
+            .min(3, t("settings.company.form.invoicePDFFormat.errors.minLength"))
+            .max(10, t("settings.company.form.invoicePDFFormat.errors.maxLength"))
+            .refine((val) => {
+                const validFormats = ['pdf', 'facturx', 'zugferd', 'xrechnung', 'ubl', 'cii']
+                return validFormats.includes(val.toLowerCase())
+            }, t("settings.company.form.invoicePDFFormat.errors.format"))
     })
 
     const { data } = useGet<Company>("/api/company/info")
@@ -133,6 +142,7 @@ export default function CompanySettings() {
             country: "",
             phone: "",
             email: "",
+            invoicePDFFormat: "",
         },
     })
 
@@ -467,6 +477,41 @@ export default function CompanySettings() {
                                     />
                                 </div>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t("settings.company.other.title")}</CardTitle>
+                            <CardDescription>{t("settings.company.other.description")}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="invoicePDFFormat"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel required>{t("settings.company.form.invoicePDFFormat.label")}</FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={t("settings.company.form.invoicePDFFormat.placeholder")} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="pdf">{t("settings.company.form.invoicePDFFormat.options.pdf")}</SelectItem>
+                                                    <SelectItem value="facturx">{t("settings.company.form.invoicePDFFormat.options.facturx")}</SelectItem>
+                                                    <SelectItem value="zugferd">{t("settings.company.form.invoicePDFFormat.options.zugferd")}</SelectItem>
+                                                    <SelectItem value="xrechnung">{t("settings.company.form.invoicePDFFormat.options.xrechnung")}</SelectItem>
+                                                    <SelectItem value="ubl">{t("settings.company.form.invoicePDFFormat.options.ubl")}</SelectItem>
+                                                    <SelectItem value="cii">{t("settings.company.form.invoicePDFFormat.options.cii")}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormDescription>{t("settings.company.form.invoicePDFFormat.description")}</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </CardContent>
                     </Card>
 
