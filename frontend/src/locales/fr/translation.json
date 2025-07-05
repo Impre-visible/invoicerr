@@ -850,6 +850,10 @@
                 "title": "Formats de numéros",
                 "description": "Personnalisez les formats de numéros pour les devis et factures"
             },
+            "other": {
+                "title": "Autres paramètres",
+                "description": "Paramètres supplémentaires pour votre entreprise"
+            },
             "form": {
                 "company": {
                     "label": "Nom de l'entreprise",
@@ -987,6 +991,22 @@
                         "required": "Le format du numéro de facture est requis",
                         "maxLength": "Le format du numéro de facture doit faire moins de 100 caractères",
                         "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
+                    }
+                },
+                "invoicePDFFormat": {
+                    "label": "Format du PDF de la facture",
+                    "placeholder": "Sélectionner le format du PDF de la facture",
+                    "description": "Le format de fichier pour les factures PDF qui sera envoyé au client",
+                    "options": {
+                        "pdf": "PDF standard",
+                        "facturx": "Factur-X",
+                        "zugferd": "ZUGFeRD",
+                        "xrechnung": "XRechnung",
+                        "ubl": "UBL",
+                        "cii": "CII"
+                    },
+                    "errors": {
+                        "required": "Le format du PDF de la facture est requis"
                     }
                 },
                 "saving": "Enregistrement...",

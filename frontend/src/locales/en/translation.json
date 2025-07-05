@@ -850,6 +850,10 @@
                 "title": "Number Formats",
                 "description": "Customize the number formats for quotes and invoices"
             },
+            "other": {
+                "title": "Other Settings",
+                "description": "Additional settings for your company"
+            },
             "form": {
                 "company": {
                     "label": "Company Name",
@@ -987,6 +991,22 @@
                         "required": "Invoice number format is required",
                         "maxLength": "Invoice number format must be less than 100 characters",
                         "format": "Invoice number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
+                    }
+                },
+                "invoicePDFFormat": {
+                    "label": "Invoice PDF Format",
+                    "placeholder": "Select invoice PDF format",
+                    "description": "Choose the format for invoice PDFs that will be sent to clients",
+                    "options": {
+                        "pdf": "Standard PDF",
+                        "facturx": "Factur-X",
+                        "zugferd": "ZUGFeRD",
+                        "xrechnung": "XRechnung",
+                        "ubl": "UBL",
+                        "cii": "CII"
+                    },
+                    "errors": {
+                        "required": "Invoice PDF format is required"
                     }
                 },
                 "saving": "Saving...",
