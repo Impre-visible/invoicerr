@@ -1,4 +1,5 @@
 import * as Handlebars from 'handlebars';
+import * as nodemailer from 'nodemailer';
 import * as puppeteer from 'puppeteer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -11,7 +12,19 @@ import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 
 @Injectable()
 export class InvoicesService {
-    constructor(private readonly prisma: PrismaService) { }
+    private transporter: nodemailer.Transporter;
+    constructor(private readonly prisma: PrismaService) {
+
+        this.transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: 587,
+            secure: false, // true si port 465
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASSWORD,
+            },
+        });
+    }
 
     private getInvertColor(hex: string): string {
         let cleanHex = hex.replace(/^#/, '');
@@ -227,6 +240,7 @@ export class InvoicesService {
             data: { isActive: false },
         });
     }
+
     async getInvoicePdf(id: string): Promise<Uint8Array> {
         const invoice = await this.prisma.invoice.findUnique({
             where: { id },
@@ -331,13 +345,17 @@ export class InvoicesService {
         return pdfBuffer;
     }
 
-    async getInvoicePDFFormat(invoiceId: string, format: ExportFormat): Promise<Uint8Array> {
+    async getInvoicePDFFormat(invoiceId: string, format: 'pdf' | ExportFormat): Promise<Uint8Array> {
         const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
         if (!invRec) throw new BadRequestException('Invoice not found');
 
         const inv = new EInvoice();
 
         const pdfBuffer = await this.getInvoicePdf(invoiceId);
+
+        if (format === 'pdf') {
+            return pdfBuffer;
+        }
 
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
@@ -389,9 +407,7 @@ export class InvoicesService {
             });
         });
 
-        //const xml = await inv.exportXml(format);
-
-        return await inv.embedInPdf(Buffer.from(pdfBuffer))
+        return await inv.embedInPdf(Buffer.from(pdfBuffer), format)
     }
 
     async createInvoiceFromQuote(quoteId: string) {
@@ -421,5 +437,61 @@ export class InvoicesService {
             where: { id: invoiceId },
             data: { status: 'PAID', paidAt: new Date() }
         });
+    }
+
+    async sendInvoiceByEmail(invoiceId: string) {
+        const invoice = await this.prisma.invoice.findUnique({
+            where: { id: invoiceId },
+            include: {
+                client: true,
+                company: true,
+                items: true,
+            },
+        });
+
+        if (!invoice) {
+            throw new BadRequestException('Invoice not found');
+        }
+
+        const pdfBuffer = await this.getInvoicePDFFormat(invoiceId, (invoice.company.invoicePDFFormat as ExportFormat || 'pdf'));
+
+        const invoiceNumber = await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt);
+
+        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+            where: { type: 'INVOICE' },
+            select: { subject: true, body: true }
+        });
+
+        if (!mailTemplate) {
+            throw new BadRequestException('Email template for signature request not found.');
+        }
+
+        const envVariables = {
+            APP_URL: process.env.APP_URL,
+            INVOICE_NUMBER: invoiceNumber,
+            COMPANY_NAME: invoice.company.name,
+            CLIENT_NAME: invoice.client.name,
+        };
+
+        const mailOptions = {
+            from: `${invoice.company.name} <${invoice.company.email}>`,
+            to: invoice.client.contactEmail,
+            subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
+            html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
+            attachments: [{
+                filename: `invoice-${invoiceNumber}.pdf`,
+                content: pdfBuffer,
+                contentType: 'application/pdf',
+            }],
+        };
+
+        await this.transporter.sendMail(mailOptions)
+            .then(() => { })
+            .catch(error => {
+                console.error('Error sending invoice email:', error);
+                throw new BadRequestException('Failed to send invoice email.');
+            });
+
+        return { message: 'Invoice sent successfully' };
     }
 }
