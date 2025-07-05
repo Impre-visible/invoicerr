@@ -388,3 +388,13 @@ model Signature {
   quote     Quote     @relation(fields: [quoteId], references: [id])
   isActive  Boolean   @default(true)
 }
+
+model CurrencyConversion {
+  id           String   @id @default(cuid())
+  fromCurrency Currency
+  toCurrency   Currency
+  rate         Float
+  expiresAt    DateTime
+
+  @@unique([fromCurrency, toCurrency])
+}
