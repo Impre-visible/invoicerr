@@ -19,7 +19,7 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
 
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[95vw] lg:max-w-lg max-h-[90dvh] w-fit p-6">
+            <DialogContent className="max-w-[95vw] lg:max-w-5xl max-h-[90dvh] w-fit p-6">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">{t("clients.view.title")}</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
@@ -42,16 +42,14 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
-                        <div className="w-fit">
+                        <div className="w-fit max-w-full">
                             <p className="text-sm text-muted-foreground">{t("clients.view.fields.email")}</p>
-                            <p className="font-medium">{client?.contactEmail || "—"}</p>
+                            <p className="font-medium overflow-hidden text-ellipsis">{client?.contactEmail || "—"}</p>
                         </div>
-                        {client?.contactPhone && (
-                            <div className="w-fit">
-                                <p className="text-sm text-muted-foreground">{t("clients.view.fields.phone")}</p>
-                                <p className="font-medium">{client.contactPhone}</p>
-                            </div>
-                        )}
+                        <div className="w-fit max-w-full">
+                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.phone")}</p>
+                            <p className="font-medium">{client?.contactPhone || "—"}</p>
+                        </div>
                     </div>
 
                     {(client?.address || client?.postalCode || client?.city || client?.country) && (
