@@ -214,10 +214,19 @@ export class CompanyService {
             body: template.body,
             variables: {
                 APP_URL: process.env.APP_URL || 'http://localhost:3000',
-                SIGNATURE_ID: randomUUID(),
-                SIGNATURE_NUMBER: 'QUOTE-2025-0001',
-                SIGNATURE_URL: `${process.env.APP_URL || 'http://localhost:3000'}/signature/${randomUUID()}`,
-                OTP_CODE: '1234-5678'
+                ...template.type === MailTemplateType.SIGNATURE_REQUEST && {
+                    SIGNATURE_ID: randomUUID(),
+                    SIGNATURE_NUMBER: 'QUOTE-2025-0001',
+                    SIGNATURE_URL: `${process.env.APP_URL || 'http://localhost:3000'}/signature/${randomUUID()}`
+                },
+                ...template.type === MailTemplateType.VERIFICATION_CODE && {
+                    OTP_CODE: '1234-5678',
+                },
+                ...template.type === MailTemplateType.INVOICE && {
+                    INVOICE_NUMBER: 'INV-2025-0001',
+                    CLIENT_NAME: 'Acme',
+                    COMPANY_NAME: existingCompany.name,
+                }
             }
         }));
     }
