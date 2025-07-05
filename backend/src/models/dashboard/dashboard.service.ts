@@ -1,4 +1,4 @@
-import { Company, Invoice, Quote } from '@prisma/client';
+import { $Enums, Company, Invoice, Quote } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -54,25 +54,72 @@ export class DashboardService {
             by: ['status'],
             _count: true,
         });
-
         const clientsCount = await this.prisma.client.count({
             where: { isActive: true },
         });
+        const company = await this.prisma.company.findFirst();
+
+        const latestQuotes = await this.prisma.quote.findMany({
+            where: { isActive: true },
+            orderBy: { updatedAt: 'desc' },
+            include: { company: true, client: true },
+            take: 5,
+        });
+
+        const latestInvoices = await this.prisma.invoice.findMany({
+            where: { isActive: true },
+            orderBy: { updatedAt: 'desc' },
+            include: { company: true, client: true },
+            take: 5,
+        });
+
+        const last6Months = await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            return {
+                createdAt: new Date(date.getFullYear(), date.getMonth(), 1),
+                total: await this.getMonthlyRevenue(date),
+            };
+        }));
+
+        const currentMonthRevenue = await this.getMonthlyRevenue(new Date());
+
+        const previousMonthDate = new Date();
+        previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+        const previousMonthRevenue = await this.getMonthlyRevenue(previousMonthDate);
+
+        const monthlyChange = currentMonthRevenue - previousMonthRevenue;
+
+        const monthlyChangePercent = this.calculateChangePercent(currentMonthRevenue, previousMonthRevenue);
+
+        const last6Years = await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
+            const date = new Date();
+            date.setFullYear(date.getFullYear() - i);
+            return {
+                createdAt: new Date(date.getFullYear(), 0, 1),
+                total: await this.getYearlyRevenue(date),
+            };
+        }));
+
+        const currentYearRevenue = await this.getYearlyRevenue(new Date());
+
+        const previousYearDate = new Date();
+        previousYearDate.setFullYear(previousYearDate.getFullYear() - 1);
+        const previousYearRevenue = await this.getYearlyRevenue(previousYearDate);
+
+        const yearlyChange = currentYearRevenue - previousYearRevenue;
+
+        const yearlyChangePercent = this.calculateChangePercent(currentYearRevenue, previousYearRevenue);
 
         return {
-            company: await this.prisma.company.findFirst(),
+            company,
             quotes: {
                 total: quotes.reduce((acc, q) => acc + q._count, 0),
                 draft: quotes.find(q => q.status === 'DRAFT')?._count || 0,
                 sent: quotes.find(q => q.status === 'SENT')?._count || 0,
                 signed: quotes.find(q => q.status === 'SIGNED')?._count || 0,
                 expired: quotes.find(q => q.status === 'EXPIRED')?._count || 0,
-                latests: await this.prisma.quote.findMany({
-                    where: { isActive: true },
-                    orderBy: { updatedAt: 'desc' },
-                    include: { company: true, client: true },
-                    take: 5,
-                })
+                latests: latestQuotes,
             },
             invoices: {
                 total: invoices.reduce((acc, i) => acc + i._count, 0),
@@ -80,56 +127,43 @@ export class DashboardService {
                 sent: invoices.find(i => i.status === 'SENT')?._count || 0,
                 paid: invoices.find(i => i.status === 'PAID')?._count || 0,
                 overdue: invoices.find(i => i.status === 'OVERDUE')?._count || 0,
-                latests: await this.prisma.invoice.findMany({
-                    where: { isActive: true },
-                    orderBy: { updatedAt: 'desc' },
-                    include: { company: true, client: true },
-                    take: 5,
-                }),
+                latests: latestInvoices,
             },
             clients: {
                 total: clientsCount,
             },
             revenue: {
-                last6Months: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
-                    const date = new Date();
-                    date.setMonth(date.getMonth() - i);
-                    return {
-                        createdAt: new Date(date.getFullYear(), date.getMonth(), 1),
-                        total: await this.getMonthlyRevenue(date),
-                    };
-                })),
-                currentMonth: await this.getMonthlyRevenue(new Date()),
-                previousMonth: await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
-                monthlyChange: await this.getMonthlyRevenue(new Date()) - await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1))),
-                monthlyChangePercent: this.calculateChangePercent(
-                    await this.getMonthlyRevenue(new Date()),
-                    await this.getMonthlyRevenue(new Date(new Date().setMonth(new Date().getMonth() - 1)))
-                    ,
-                ),
-                last6Years: await Promise.all(Array.from({ length: 6 }).map(async (_, i) => {
-                    const date = new Date();
-                    date.setFullYear(date.getFullYear() - i);
-                    return {
-                        createdAt: new Date(date.getFullYear(), 0, 1),
-                        total: await this.getYearlyRevenue(date),
-                    };
-                })),
-                currentYear: await this.getYearlyRevenue(new Date()),
-                previousYear: await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
-                yearlyChange: await this.getYearlyRevenue(new Date()) - await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1))),
-                yearlyChangePercent: this.calculateChangePercent(
-                    await this.getYearlyRevenue(new Date()),
-                    await this.getYearlyRevenue(new Date(new Date().setFullYear(new Date().getFullYear() - 1)))
-                ),
-            },
+                last6Months,
+                currentMonth: currentMonthRevenue,
+                previousMonth: previousMonthRevenue,
+                monthlyChange,
+                monthlyChangePercent,
+                last6Years,
+                currentYear: currentYearRevenue,
+                previousYear: previousYearRevenue,
+                yearlyChange,
+                yearlyChangePercent,
+            }
         };
     }
 
-    async convertToMainCurrency(amount: number, fromCurrency: string, toCurrency: string): Promise<number> {
+
+    async convertToMainCurrency(amount: number, fromCurrency: $Enums.Currency, toCurrency: $Enums.Currency): Promise<number> {
         if (fromCurrency === toCurrency) {
             return amount;
         }
+
+        const currencyRate = await this.prisma.currencyConversion.findFirst({
+            where: {
+                fromCurrency,
+                toCurrency,
+            }
+        });
+
+        if (currencyRate && (currencyRate.expiresAt > new Date())) {
+            return amount * currencyRate.rate;
+        }
+
         const res = await fetch(`https://hexarate.paikama.co/api/rates/latest/${fromCurrency}?target=${toCurrency}`)
         const data = await res.json();
         if (!data || data.status_code !== 200 || !data.data || !data.data.mid) {
@@ -137,6 +171,26 @@ export class DashboardService {
             return 0;
         }
         const rate = data.data.mid;
+
+        await this.prisma.currencyConversion.upsert({
+            where: {
+                fromCurrency_toCurrency: {
+                    fromCurrency,
+                    toCurrency,
+                }
+            },
+            create: {
+                fromCurrency,
+                toCurrency,
+                rate,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            },
+            update: {
+                rate,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            }
+        });
+
         return amount * rate;
     }
 
