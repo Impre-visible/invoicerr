@@ -19,7 +19,7 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
 
     return (
         <Dialog open={client != null} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[95vw] lg:max-w-5xl max-h-[90dvh] w-fit p-6">
+            <DialogContent className="max-w-[95vw] md:max-w-2xl lg:max-w-5xl max-h-[90dvh] w-full p-6">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">{t("clients.view.title")}</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
