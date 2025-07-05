@@ -190,28 +190,32 @@ enum Currency {
 }
 
 model Company {
-  id                    String         @id @default(cuid())
-  name                  String
-  description           String
-  currency              Currency       @default(EUR)
-  legalId               String
-  foundedAt             DateTime
-  VAT                   String
-  address               String
-  postalCode            String
-  city                  String
-  country               String
-  phone                 String
-  email                 String
-  quoteStartingNumber   Int            @default(1) // Starting number for quotes
-  quoteNumberFormat     String         @default("Q-{year}-{number:4}") // Ex: "Q-2025-0001"
-  invoiceStartingNumber Int            @default(1) // Starting number for invoices
-  invoiceNumberFormat   String         @default("INV-{year}-{number:4}") // Ex: "INV-2025-0001"
-  pDFConfigId           String         @unique
-  pdfConfig             PDFConfig      @relation(fields: [pDFConfigId], references: [id])
-  Quote                 Quote[]
-  Invoice               Invoice[]
-  emailTemplates        MailTemplate[]
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  currency    Currency @default(EUR)
+  legalId     String
+  foundedAt   DateTime
+  VAT         String
+  address     String
+  postalCode  String
+  city        String
+  country     String
+  phone       String
+  email       String
+
+  quoteStartingNumber   Int    @default(1) // Starting number for quotes
+  quoteNumberFormat     String @default("Q-{year}-{number:4}") // Ex: "Q-2025-0001"
+  invoiceStartingNumber Int    @default(1) // Starting number for invoices
+  invoiceNumberFormat   String @default("INV-{year}-{number:4}") // Ex: "INV-2025-0001"
+
+  invoicePDFFormat String @default("facturx") // Ex: 'pdf' | 'facturx' | 'zugferd' | 'xrechnung' | 'ubl' | 'cii'
+
+  pDFConfigId    String         @unique
+  pdfConfig      PDFConfig      @relation(fields: [pDFConfigId], references: [id])
+  Quote          Quote[]
+  Invoice        Invoice[]
+  emailTemplates MailTemplate[]
 }
 
 model PDFConfig {
@@ -249,6 +253,7 @@ model PDFConfig {
 enum MailTemplateType {
   SIGNATURE_REQUEST
   VERIFICATION_CODE
+  INVOICE
 }
 
 model MailTemplate {

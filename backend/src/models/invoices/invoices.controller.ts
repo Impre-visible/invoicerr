@@ -56,6 +56,12 @@ export class InvoicesController {
         return this.invoicesService.createInvoice(body);
     }
 
+    @Post('send')
+    @LoginRequired()
+    sendInvoiceByEmail(@Body('id') id: string) {
+        return this.invoicesService.sendInvoiceByEmail(id);
+    }
+
     @Patch(':id')
     @LoginRequired()
     editInvoicesInfo(@Param('id') id: string, @Body() body: EditInvoicesDto) {
