@@ -1,4 +1,4 @@
-import { Banknote, Download, Edit, Eye, Plus, Receipt, Trash2 } from "lucide-react"
+import { Banknote, Download, Edit, Eye, Mail, Plus, Receipt, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
@@ -39,6 +39,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
     ) => {
         const { t } = useTranslation()
         const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
+        const { trigger: triggerSendInvoiceByEmail } = usePost(`/api/invoices/send`)
 
         const [createInvoiceDialog, setCreateInvoiceDialog] = useState<boolean>(false)
         const [editInvoiceDialog, setEditInvoiceDialog] = useState<Invoice | null>(null)
@@ -127,6 +128,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
 
         const getStatusLabel = (status: string) => {
             return t(`invoices.list.status.${status.toLowerCase()}`)
+        }
+
+        const handleSendInvoiceByEmail = (invoiceId: string) => {
+            triggerSendInvoiceByEmail({ id: invoiceId })
+                .then(() => {
+                    toast.success(t("invoices.list.messages.sendByEmailSuccess"))
+                })
+                .catch((error) => {
+                    console.error("Error sending invoice by email:", error)
+                    toast.error(t("invoices.list.messages.sendByEmailError"))
+                })
         }
 
         return (
@@ -276,6 +288,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         className="text-gray-600 hover:text-green-600"
                                                     >
                                                         <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+
+                                                {invoice.status !== "PAID" && (
+                                                    <Button
+                                                        tooltip={t("invoices.list.tooltips.sendByEmail")}
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => { handleSendInvoiceByEmail(invoice.id) }}
+                                                        className="text-gray-600 hover:text-purple-600"
+                                                    >
+                                                        <Mail className="h-4 w-4" />
                                                     </Button>
                                                 )}
 
