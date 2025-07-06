@@ -7,6 +7,7 @@ import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { format } from 'date-fns';
+import { formatDate } from 'src/utils/date';
 import { getPDF } from 'src/utils/pdf';
 
 @Injectable()
@@ -266,21 +267,10 @@ export class QuotesService {
         const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
 
-        const formatDate = (date: Date | null | undefined) => {
-            if (!date) return 'N/A';
-            const company = quote.company;
-            let dateFormat = company.dateFormat;
-            const allowedFormats = ['dd/mm/yyyy', 'mm/dd/yyyy', 'yyyy/mm/dd', 'dd.mm.yyyy', 'dd-mm-yyyy', 'yyyy-mm-dd', 'EEEE, dd MMM yyyy'];
-            if (!allowedFormats.includes(dateFormat)) {
-                dateFormat = 'dd/mm/yyyy'; // Default to dd/mm/yyyy if the format is not recognized
-            }
-            format(date, dateFormat);
-        };
-
         const html = template({
             number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
-            date: formatDate(quote.createdAt),
-            validUntil: formatDate(quote.validUntil),
+            date: formatDate(quote.company, quote.createdAt),
+            validUntil: formatDate(quote.company, quote.validUntil),
             company: quote.company,
             client: quote.client,
             currency: quote.currency,

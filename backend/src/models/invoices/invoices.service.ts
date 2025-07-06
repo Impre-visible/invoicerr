@@ -265,8 +265,8 @@ export class InvoicesService {
         const { pdfConfig } = invoice.company;
         const html = template({
             number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
-            date: formatDate(invoice.createdAt),
-            dueDate: formatDate(invoice.dueDate),
+            date: formatDate(invoice.company, invoice.createdAt),
+            dueDate: formatDate(invoice.company, invoice.dueDate),
             company: invoice.company,
             client: invoice.client,
             currency: invoice.currency,
