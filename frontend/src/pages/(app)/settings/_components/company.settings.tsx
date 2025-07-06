@@ -9,6 +9,7 @@ import type { Company } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { format } from "date-fns"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
@@ -19,6 +20,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 export default function CompanySettings() {
     const { t } = useTranslation()
     const navigate = useNavigate()
+
+    const ALLOWED_DATE_FORMATS = ['dd/LL/yyyy', 'LL/dd/yyyy', 'yyyy/LL/dd', 'dd.LL.yyyy', 'dd-LL-yyyy', 'yyyy-LL-dd', 'EEEE, dd MMM yyyy'];
 
     const validateNumberFormat = (pattern: string): boolean => {
         const patternRegex = /\{(\w+)(?::(\d+))?\}/g
@@ -120,7 +123,14 @@ export default function CompanySettings() {
             .refine((val) => {
                 const validFormats = ['pdf', 'facturx', 'zugferd', 'xrechnung', 'ubl', 'cii']
                 return validFormats.includes(val.toLowerCase())
-            }, t("settings.company.form.invoicePDFFormat.errors.format"))
+            }, t("settings.company.form.invoicePDFFormat.errors.format")),
+        dateFormat: z
+            .string()
+            .min(1, t("settings.company.form.dateFormat.errors.required"))
+            .max(50, t("settings.company.form.dateFormat.errors.maxLength"))
+            .refine((val) => {
+                return ALLOWED_DATE_FORMATS.includes(val)
+            }, t("settings.company.form.dateFormat.errors.format")),
     })
 
     const { data } = useGet<Company>("/api/company/info")
@@ -171,6 +181,10 @@ export default function CompanySettings() {
             .finally(() => {
                 setIsLoading(false)
             })
+    }
+
+    const getDateFormatOption = (dateFormat: string) => {
+        return `${format(new Date(), dateFormat)} - (${dateFormat})`
     }
 
     return (
@@ -485,7 +499,7 @@ export default function CompanySettings() {
                             <CardTitle>{t("settings.company.other.title")}</CardTitle>
                             <CardDescription>{t("settings.company.other.description")}</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField
                                 control={form.control}
                                 name="invoicePDFFormat"
@@ -508,6 +522,32 @@ export default function CompanySettings() {
                                             </Select>
                                         </FormControl>
                                         <FormDescription>{t("settings.company.form.invoicePDFFormat.description")}</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="dateFormat"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel required>{t("settings.company.form.dateFormat.label")}</FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={t("settings.company.form.dateFormat.placeholder")} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {ALLOWED_DATE_FORMATS.map((format) => (
+                                                        <SelectItem key={format} value={format}>
+                                                            {getDateFormatOption(format)}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormDescription>{t("settings.company.form.dateFormat.description")}</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
