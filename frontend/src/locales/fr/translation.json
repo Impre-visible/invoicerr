@@ -1009,6 +1009,14 @@
                         "required": "Le format du PDF de la facture est requis"
                     }
                 },
+                "dateFormat": {
+                    "label": "Format de date",
+                    "placeholder": "Sélectionner le format de date",
+                    "description": "Le format de date utilisé dans les devis et factures",
+                    "errors": {
+                        "required": "Le format de date est requis"
+                    }
+                },
                 "saving": "Enregistrement...",
                 "saveSettings": "Enregistrer les paramètres"
             },

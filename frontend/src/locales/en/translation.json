@@ -1009,6 +1009,14 @@
                         "required": "Invoice PDF format is required"
                     }
                 },
+                "dateFormat": {
+                    "label": "Date Format",
+                    "placeholder": "Select date format",
+                    "description": "Choose how dates will be displayed in quotes and invoices",
+                    "errors": {
+                        "required": "Date format is required"
+                    }
+                },
                 "saving": "Saving...",
                 "saveSettings": "Save Settings"
             },
