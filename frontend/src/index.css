@@ -119,6 +119,9 @@
   *::-webkit-scrollbar-thumb {
     @apply rounded-xl;
   }
+  html {
+    @apply overflow-hidden;
+  }
   body {
     @apply bg-background text-foreground;
   }
