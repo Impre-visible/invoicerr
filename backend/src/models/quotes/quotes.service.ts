@@ -6,6 +6,8 @@ import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
+import { format } from 'date-fns';
+import { getPDF } from 'src/utils/pdf';
 
 @Injectable()
 export class QuotesService {
@@ -263,10 +265,22 @@ export class QuotesService {
         const config = quote.company.pdfConfig;
         const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
+
+        const formatDate = (date: Date | null | undefined) => {
+            if (!date) return 'N/A';
+            const company = quote.company;
+            let dateFormat = company.dateFormat;
+            const allowedFormats = ['dd/mm/yyyy', 'mm/dd/yyyy', 'yyyy/mm/dd', 'dd.mm.yyyy', 'dd-mm-yyyy', 'yyyy-mm-dd', 'EEEE, dd MMM yyyy'];
+            if (!allowedFormats.includes(dateFormat)) {
+                dateFormat = 'dd/mm/yyyy'; // Default to dd/mm/yyyy if the format is not recognized
+            }
+            format(date, dateFormat);
+        };
+
         const html = template({
             number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
-            date: new Date(quote.createdAt).toLocaleDateString(),
-            validUntil: quote.validUntil ? new Date(quote.validUntil).toLocaleDateString() : 'N/A',
+            date: formatDate(quote.createdAt),
+            validUntil: formatDate(quote.validUntil),
             company: quote.company,
             client: quote.client,
             currency: quote.currency,
@@ -313,25 +327,7 @@ export class QuotesService {
             },
         });
 
-        let browser: puppeteer.Browser;
-        if (!process.env.PUPPETEER_EXECUTABLE_PATH) {
-            browser = await puppeteer.launch({
-                headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            })
-        } else {
-            browser = await puppeteer.launch({
-                headless: true,
-                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            });
-        }
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
-
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-
-        await browser.close();
+        const pdfBuffer = await getPDF(html);
 
         return pdfBuffer;
     }

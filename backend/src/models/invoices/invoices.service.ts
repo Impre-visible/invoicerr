@@ -9,6 +9,9 @@ import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
+import { format } from 'date-fns';
+import { formatDate } from 'src/utils/date';
+import { getPDF } from 'src/utils/pdf';
 
 @Injectable()
 export class InvoicesService {
@@ -259,23 +262,13 @@ export class InvoicesService {
 
         const template = Handlebars.compile(baseTemplate);
 
-        const formatDate = (date?: Date) =>
-            date ? new Date(date).toLocaleDateString('en-GB') : 'N/A';
-
         const { pdfConfig } = invoice.company;
         const html = template({
             number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.createdAt),
             dueDate: formatDate(invoice.dueDate),
-            company: {
-                ...invoice.company,
-                currency: invoice.company.currency,
-                foundedAt: formatDate(invoice.company.foundedAt),
-            },
-            client: {
-                ...invoice.client,
-                foundedAt: formatDate(invoice.client.foundedAt),
-            },
+            company: invoice.company,
+            client: invoice.client,
             currency: invoice.currency,
             items: invoice.items.map(i => ({
                 description: i.description,
@@ -322,25 +315,7 @@ export class InvoicesService {
             },
         });
 
-        let browser: puppeteer.Browser;
-        if (!process.env.PUPPETEER_EXECUTABLE_PATH) {
-            browser = await puppeteer.launch({
-                headless: true,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            })
-        } else {
-            browser = await puppeteer.launch({
-                headless: true,
-                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            });
-        }
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
-
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-
-        await browser.close();
+        const pdfBuffer = await getPDF(html);
 
         return pdfBuffer;
     }
