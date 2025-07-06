@@ -29,6 +29,7 @@
     "@types/pdfkit": "^0.14.0",
     "@types/stream-buffers": "^3.0.7",
     "bcrypt": "^6.0.0",
+    "date-fns": "^4.1.0",
     "handlebars": "^4.7.8",
     "nodemailer": "^7.0.3",
     "pdfkit": "^0.17.1",
