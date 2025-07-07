@@ -28,7 +28,7 @@ export const baseTemplate = `
             {{/if}}
             <h1>{{company.name}}</h1>
             <p>{{company.address}}<br>
-            {{company.city}}, {{company.zip}}<br>
+            {{company.city}}, {{company.postalCode}}<br>
             {{company.country}}<br>
             {{company.email}} | {{company.phone}}</p>
         </div>
@@ -43,7 +43,7 @@ export const baseTemplate = `
         <h3>{{labels.quoteFor}}</h3>
         <p>{{client.name}}<br>
         {{client.address}}<br>
-        {{client.city}}, {{client.zip}}<br>
+        {{client.city}}, {{client.postalCode}}<br>
         {{client.country}}<br>
         {{client.email}}</p>
     </div>
