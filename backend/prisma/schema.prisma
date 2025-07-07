@@ -213,11 +213,12 @@ model Company {
 
   dateFormat String @default("dd/LL/yyyy") // Date format for quotes and invoices
 
-  pDFConfigId    String         @unique
-  pdfConfig      PDFConfig      @relation(fields: [pDFConfigId], references: [id])
-  Quote          Quote[]
-  Invoice        Invoice[]
-  emailTemplates MailTemplate[]
+  pDFConfigId      String             @unique
+  pdfConfig        PDFConfig          @relation(fields: [pDFConfigId], references: [id])
+  Quote            Quote[]
+  Invoice          Invoice[]
+  emailTemplates   MailTemplate[]
+  RecurringInvoice RecurringInvoice[]
 }
 
 model PDFConfig {
@@ -273,7 +274,7 @@ model MailTemplate {
 }
 
 model Client {
-  id               String    @id @default(cuid())
+  id               String             @id @default(cuid())
   name             String
   description      String
   legalId          String? // Legal identification number (SIRET, EIN, etc.)
@@ -281,16 +282,17 @@ model Client {
   foundedAt        DateTime // Date when the client company was founded
   contactFirstname String
   contactLastname  String
-  contactEmail     String    @unique
+  contactEmail     String             @unique
   contactPhone     String?
   address          String
   postalCode       String
   city             String
   country          String
   currency         Currency?
-  isActive         Boolean   @default(true)
+  isActive         Boolean            @default(true)
   Quote            Quote[]
   Invoice          Invoice[]
+  RecurringInvoice RecurringInvoice[]
 }
 
 enum QuoteStatus {
@@ -347,6 +349,34 @@ enum InvoiceStatus {
   SENT
 }
 
+model RecurrenceRule {
+  id               String             @id @default(cuid())
+  invoiceId        String
+  interval         Int // e.g., every 1 week, every 2 months
+  unit             String // e.g., "day", "week", "month", "year"
+  count            Int? // Number of occurrences, null for infinite
+  until            DateTime? // End date for the recurrence
+  RecurringInvoice RecurringInvoice[]
+}
+
+model RecurringInvoice {
+  id               String         @id @default(uuid())
+  client           Client         @relation(fields: [clientId], references: [id])
+  clientId         String
+  company          Company        @relation(fields: [companyId], references: [id])
+  companyId        String
+  items            InvoiceItem[]
+  paymentMethod    String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails   String? // Details for the payment method (e.g., bank account number)
+  notes            String?        @default("")
+  totalHT          Float
+  totalVAT         Float
+  totalTTC         Float
+  currency         Currency
+  recurrenceRule   RecurrenceRule @relation(fields: [recurrenceRuleId], references: [id])
+  recurrenceRuleId String
+}
+
 model Invoice {
   id             String        @id @default(uuid())
   number         Int           @default(autoincrement())
@@ -373,14 +403,16 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id          String  @id @default(uuid())
-  invoice     Invoice @relation(fields: [invoiceId], references: [id])
-  invoiceId   String
-  description String
-  quantity    Int
-  unitPrice   Float
-  vatRate     Float // 20 for 20%
-  order       Int
+  id                 String            @id @default(uuid())
+  invoice            Invoice           @relation(fields: [invoiceId], references: [id])
+  invoiceId          String
+  description        String
+  quantity           Int
+  unitPrice          Float
+  vatRate            Float // 20 for 20%
+  order              Int
+  RecurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id])
+  recurringInvoiceId String?
 }
 
 model Signature {
