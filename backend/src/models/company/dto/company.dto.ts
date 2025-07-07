@@ -26,6 +26,9 @@ export interface PDFConfig {
         notes: string
         paymentMethod: string
         paymentDetails: string
+
+        legalId: string
+        VATId: string
     }
 }
 

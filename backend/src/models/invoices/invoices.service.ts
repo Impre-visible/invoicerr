@@ -312,6 +312,8 @@ export class InvoicesService {
                 notes: pdfConfig.notes,
                 paymentMethod: pdfConfig.paymentMethod,
                 paymentDetails: pdfConfig.paymentDetails,
+                legalId: pdfConfig.legalId,
+                VATId: pdfConfig.VATId,
             },
         });
 

@@ -98,6 +98,9 @@ export class CompanyService {
                 notes: existingCompany.pdfConfig.notes,
                 paymentMethod: existingCompany.pdfConfig.paymentMethod,
                 paymentDetails: existingCompany.pdfConfig.paymentDetails,
+
+                legalId: existingCompany.pdfConfig.legalId,
+                VATId: existingCompany.pdfConfig.VATId,
             }
         }
     }
@@ -140,6 +143,9 @@ export class CompanyService {
                 notes: pdfConfig.labels.notes,
                 paymentMethod: pdfConfig.labels.paymentMethod,
                 paymentDetails: pdfConfig.labels.paymentDetails,
+
+                legalId: pdfConfig.labels.legalId,
+                VATId: pdfConfig.labels.VATId,
             }
         });
     }
