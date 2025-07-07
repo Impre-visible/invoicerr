@@ -200,7 +200,7 @@ export class SignaturesService {
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: email,
             subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
-            text: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
+            html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
         };
 
         await this.transporter.sendMail(mailOptions)
