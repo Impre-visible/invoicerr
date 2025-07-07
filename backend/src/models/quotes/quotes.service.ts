@@ -314,6 +314,8 @@ export class QuotesService {
                 notes: config.notes,
                 paymentMethod: config.paymentMethod,
                 paymentDetails: config.paymentDetails,
+                legalId: config.legalId,
+                VAT: config.VATId,
             },
         });
 
