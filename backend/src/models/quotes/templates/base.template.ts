@@ -24,13 +24,15 @@ export const baseTemplate = `
     <div class="header">
         <div class="company-info">
             {{#if includeLogo}}
-            <img src="{{logoB64}}" alt="Logo" class="logo">
+                <img src="{{logoB64}}" alt="Logo" class="logo">
             {{/if}}
             <h1>{{company.name}}</h1>
             <p>{{company.address}}<br>
             {{company.city}}, {{company.postalCode}}<br>
             {{company.country}}<br>
-            {{company.email}} | {{company.phone}}</p>
+            {{company.email}} | {{company.phone}}<br>
+            {{#if company.legalId}}<strong>{{labels.legalId}}:</strong> {{company.legalId}}<br>{{/if}}
+            {{#if company.VAT}}<strong>{{labels.VAT}}:</strong> {{company.VAT}}{{/if}}</p>
         </div>
         <div class="quote-info">
             <h2>{{labels.quote}}</h2>
@@ -46,6 +48,8 @@ export const baseTemplate = `
         {{client.city}}, {{client.postalCode}}<br>
         {{client.country}}<br>
         {{client.email}}</p>
+        {{#if client.legalId}}<strong>{{labels.legalId}}:</strong> {{client.legalId}}<br>{{/if}}
+        {{#if client.VAT}}<strong>{{labels.VAT}}:</strong> {{client.VAT}}{{/if}}</p>
     </div>
     <table>
         <thead>
