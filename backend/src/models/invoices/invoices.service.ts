@@ -313,7 +313,7 @@ export class InvoicesService {
                 paymentMethod: pdfConfig.paymentMethod,
                 paymentDetails: pdfConfig.paymentDetails,
                 legalId: pdfConfig.legalId,
-                VAT: pdfConfig.VATId,
+                VATId: pdfConfig.VATId,
             },
         });
 

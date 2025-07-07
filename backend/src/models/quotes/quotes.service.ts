@@ -315,7 +315,7 @@ export class QuotesService {
                 paymentMethod: config.paymentMethod,
                 paymentDetails: config.paymentDetails,
                 legalId: config.legalId,
-                VAT: config.VATId,
+                VATId: config.VATId,
             },
         });
 
