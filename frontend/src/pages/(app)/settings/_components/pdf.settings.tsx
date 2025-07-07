@@ -49,7 +49,9 @@ const defaultInvoiceTemplate = `
             <p>{{company.address}}<br>
             {{company.city}}, {{company.postalCode}}<br>
             {{company.country}}<br>
-            {{company.email}} | {{company.phone}}</p>
+            {{company.email}} | {{company.phone}}</br>
+            {{#if company.legalId}}<strong>{{labels.legalId}}:</strong> {{company.legalId}}<br>{{/if}}
+            {{#if company.VAT}}<strong>{{labels.VATId}}:</strong> {{company.VAT}}{{/if}}</p>
         </div>
         <div class="invoice-info">
             <h2>{{labels.invoice}}</h2>
@@ -64,7 +66,9 @@ const defaultInvoiceTemplate = `
         {{client.address}}<br>
         {{client.city}}, {{client.postalCode}}<br>
         {{client.country}}<br>
-        {{client.email}}</p>
+        {{client.email}}</br>
+        {{#if client.legalId}}<strong>{{labels.legalId}}:</strong> {{client.legalId}}<br>{{/if}}
+        {{#if client.VAT}}<strong>{{labels.VATId}}:</strong> {{client.VAT}}{{/if}}</p>
     </div>
     <table>
         <thead>
@@ -154,7 +158,9 @@ const defaultQuoteTemplate = `
             <p>{{company.address}}<br>
             {{company.city}}, {{company.postalCode}}<br>
             {{company.country}}<br>
-            {{company.email}} | {{company.phone}}</p>
+            {{company.email}} | {{company.phone}}</br>
+            {{#if company.legalId}}<strong>{{labels.legalId}}:</strong> {{company.legalId}}<br>{{/if}}
+            {{#if company.VAT}}<strong>{{labels.VATId}}:</strong> {{company.VAT}}{{/if}}</p>
         </div>
         <div class="quote-info">
             <h2>{{labels.quote}}</h2>
@@ -169,7 +175,9 @@ const defaultQuoteTemplate = `
         {{client.address}}<br>
         {{client.city}}, {{client.postalCode}}<br>
         {{client.country}}<br>
-        {{client.email}}</p>
+        {{client.email}}</br>
+        {{#if client.legalId}}<strong>{{labels.legalId}}:</strong> {{client.legalId}}<br>{{/if}}
+        {{#if client.VAT}}<strong>{{labels.VATId}}:</strong> {{client.VAT}}{{/if}}</p>
     </div>
     <table>
         <thead>
@@ -253,6 +261,8 @@ interface TemplateSettings {
         notes: string
         paymentMethod: string
         paymentDetails: string
+        legalId: string
+        VATId: string
     }
     padding: number
 }
@@ -304,6 +314,8 @@ export default function PDFTemplatesSettings() {
             notes: t("settings.pdfTemplates.defaultLabels.notes"),
             paymentMethod: t("settings.pdfTemplates.defaultLabels.paymentMethod"),
             paymentDetails: t("settings.pdfTemplates.defaultLabels.paymentDetails"),
+            legalId: t("settings.pdfTemplates.defaultLabels.legalId"),
+            VATId: t("settings.pdfTemplates.defaultLabels.VATId"),
         },
         padding: 40,
     })
@@ -361,16 +373,22 @@ export default function PDFTemplatesSettings() {
                 address: "123 Business Street",
                 city: "New York",
                 postalCode: "10001",
+                country: "USA",
                 email: "contact@acme.com",
                 phone: "+1 234 567 890",
+                legalId: "123456789",
+                VAT: "US123456789",
             },
             client: {
                 name: "John Doe",
                 address: "456 Client Avenue",
                 city: "Los Angeles",
                 postalCode: "90001",
+                country: "USA",
                 email: "john.doe@acme.com",
                 phone: "+1 987 654 321",
+                legalId: "987654321",
+                VAT: "US987654321",
             },
             number: settings.templateType === "invoice" ? "INV-2024-001" : "QUO-2024-001",
             date: new Date().toLocaleDateString("en-US"),
@@ -645,6 +663,22 @@ export default function PDFTemplatesSettings() {
                                                         id="label-quote"
                                                         value={settings.labels.quote}
                                                         onChange={(e) => updateLabel("quote", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-legal-id">{t("settings.pdfTemplates.labels.legalId")}</Label>
+                                                    <Input
+                                                        id="label-legal-id"
+                                                        value={settings.labels.legalId}
+                                                        onChange={(e) => updateLabel("legalId", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-vat-id">{t("settings.pdfTemplates.labels.vatId")}</Label>
+                                                    <Input
+                                                        id="label-vat-id"
+                                                        value={settings.labels.VATId}
+                                                        onChange={(e) => updateLabel("VATId", e.target.value)}
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
