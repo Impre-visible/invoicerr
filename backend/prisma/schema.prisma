@@ -250,6 +250,9 @@ model PDFConfig {
   notes          String @default("Notes:")
   paymentMethod  String @default("Payment Method:")
   paymentDetails String @default("Payment Details:")
+
+  VATId   String @default("VAT")
+  legalId String @default("Legal ID")
 }
 
 enum MailTemplateType {
