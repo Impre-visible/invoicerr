@@ -42,3 +42,30 @@ export interface Invoice {
     currency: string; // Currency code, e.g., "EUR", "USD"
     isActive: boolean;
 }
+
+export interface RecurrenceRule {
+    id: string;
+    invoiceId: string;
+    invoice: RecurringInvoice;
+    interval: number; // e.g., every 1 week, every 2 months
+    unit: string; // e.g., "day", "week", "month", "year"
+    count?: number; // Number of occurrences, null for infinite
+    until?: Date | string; // ISO date string for end date of the recurrence
+}
+
+export interface RecurringInvoice {
+    id: string;
+    clientId: string;
+    client: Client;
+    companyId: string;
+    company: Company;
+    items: InvoiceItem[];
+    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal", "Cash"
+    paymentDetails?: string; // Details for the payment method (e.g., bank account number)
+    notes?: string;
+    totalHT: number;
+    totalVAT: number;
+    totalTTC: number;
+    currency: string; // Currency code, e.g., "EUR", "USD"
+    recurrenceRules: RecurrenceRule[];
+}
