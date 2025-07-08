@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Invoice } from "@/types"
 import { useTranslation } from "react-i18next"
+import { RecurringInvoiceList, type RecurringInvoiceListHandle } from "./_components/recurring-invoices/recurring-invoices-list"
 
 export default function Invoices() {
     const { t } = useTranslation()
     const invoiceListRef = useRef<InvoiceListHandle>(null)
+    const recurringInvoiceListRef = useRef<RecurringInvoiceListHandle>(null)
+
     const [page, setPage] = useState(1)
     const {
         data: invoices,
@@ -46,7 +49,7 @@ export default function Invoices() {
                 invoice.status.toLowerCase().includes(searchTerm.toLowerCase()),
         ) || []
 
-    const emptyState = (
+    const invoiceEmptyState = (
         <div className="text-center py-12">
             <Receipt className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-foreground">
@@ -63,6 +66,23 @@ export default function Invoices() {
                     </Button>
                 </div>
             )}
+        </div>
+    )
+    const recurringInvoiceEmptyState = (
+        <div className="text-center py-12">
+            <Receipt className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">
+                {t("recurringInvoices.emptyState.noInvoices")}
+            </h3>
+            <p className="mt-1 text-sm text-primary">
+                {t("recurringInvoices.emptyState.startAdding")}
+            </p>
+            <div className="mt-6">
+                <Button onClick={() => recurringInvoiceListRef.current?.handleAddClick()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t("recurringInvoices.actions.addNew")}
+                </Button>
+            </div>
         </div>
     )
 
@@ -153,6 +173,20 @@ export default function Invoices() {
                 </Card>
             </div>
 
+            <RecurringInvoiceList
+                ref={recurringInvoiceListRef}
+                recurringInvoices={[]}
+                loading={false}
+                title={t("recurringInvoices.list.title")}
+                description={t("recurringInvoices.list.description")}
+                page={1}
+                pageCount={1}
+                setPage={() => { }}
+                mutate={() => { }}
+                emptyState={recurringInvoiceEmptyState}
+                showCreateButton={true}
+            />
+
             <InvoiceList
                 ref={invoiceListRef}
                 invoices={filteredInvoices}
@@ -163,7 +197,7 @@ export default function Invoices() {
                 pageCount={invoices?.pageCount || 1}
                 setPage={setPage}
                 mutate={mutate}
-                emptyState={emptyState}
+                emptyState={invoiceEmptyState}
                 showCreateButton={true}
             />
         </div>
