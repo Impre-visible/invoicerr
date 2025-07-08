@@ -589,6 +589,9 @@
                         "required": "Veuillez sélectionner un client"
                     }
                 },
+                "currency": {
+                    "label": "Devise"
+                },
                 "notes": {
                     "label": "Notes",
                     "placeholder": "Saisir des notes ou conditions supplémentaires"

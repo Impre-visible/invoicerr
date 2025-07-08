@@ -573,6 +573,9 @@
                         "required": "Please select a client"
                     }
                 },
+                "currency": {
+                    "label": "Currency"
+                },
                 "notes": {
                     "label": "Notes",
                     "placeholder": "Additional notes or terms"
