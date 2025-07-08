@@ -88,7 +88,7 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                             emptyState
                         ) : (
                             <div className="divide-y">
-                                {recurringInvoices.map((recurringInvoice, index) => (
+                                {recurringInvoices && recurringInvoices.map((recurringInvoice, index) => (
                                     <div key={index} className="p-4 sm:p-6">
                                         <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                             <div className="flex flex-row items-center gap-4 w-full">
