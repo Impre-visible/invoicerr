@@ -24,7 +24,7 @@ export class RecurringInvoicesCronService {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Normaliser à minuit
 
-            console.log(await this.prisma.recurringInvoice.findMany())
+            this.logger.log('Recurring invoices fetched from database:', await this.prisma.recurringInvoice.findMany());
 
             const recurringInvoices = await this.prisma.recurringInvoice.findMany({
                 where: {
