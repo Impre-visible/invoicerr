@@ -375,6 +375,7 @@ model RecurringInvoice {
   currency         Currency
   recurrenceRule   RecurrenceRule @relation(fields: [recurrenceRuleId], references: [id])
   recurrenceRuleId String
+  createdAt        DateTime       @default(now())
 }
 
 model Invoice {
