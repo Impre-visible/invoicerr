@@ -1,4 +1,5 @@
-import { Currency } from '@prisma/client';
+import { Company, Currency } from '@prisma/client';
+
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpsertInvoicesDto } from './dto/invoices.dto';
@@ -46,13 +47,18 @@ export class RecurringInvoicesService {
         }
         totalTTC = totalHT + totalVAT;
 
-        // Calculate next invoice date based on frequency
-        const nextInvoiceDate = this.calculateNextInvoiceDate(new Date(), data.frequency);
+        const today = new Date();
+        const nextMonday = new Date(today);
+        const dayOfWeek = today.getDay();
+        const daysUntilNextMonday = (dayOfWeek === 0 ? 1 : 8) - dayOfWeek;
+        nextMonday.setDate(today.getDate() + daysUntilNextMonday);
+
+        const nextInvoiceDate = this.calculateNextInvoiceDate(nextMonday, data.frequency);
 
         const recurringInvoice = await this.prisma.recurringInvoice.create({
             data: {
                 clientId: data.clientId,
-                companyId: "company-id", // TODO: Get from context
+                companyId: (await this.prisma.company.findFirst())?.id || "1",
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
                 paymentDetails: data.paymentDetails,
