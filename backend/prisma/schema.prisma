@@ -361,27 +361,28 @@ enum RecurrenceFrequency {
 }
 
 model RecurringInvoice {
-  id              String                 @id @default(uuid())
-  client          Client                 @relation(fields: [clientId], references: [id])
-  clientId        String
-  company         Company                @relation(fields: [companyId], references: [id])
-  companyId       String
-  items           RecurringInvoiceItem[]
-  paymentMethod   String? // Ex: "Bank Transfer", "PayPal", "Cash"
-  paymentDetails  String? // Details for the payment method (e.g., bank account number)
-  notes           String?                @default("")
-  totalHT         Float
-  totalVAT        Float
-  totalTTC        Float
-  currency        Currency
-  frequency       RecurrenceFrequency // Simplified recurrence frequency
-  count           Int? // Number of occurrences, null for infinite
-  until           DateTime? // End date for the recurrence
-  autoSend        Boolean                @default(false) // Auto-send generated invoices
-  nextInvoiceDate DateTime? // Date for the next invoice generation
-  lastInvoiceDate DateTime? // Date of the last generated invoice
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
+  id                String                 @id @default(uuid())
+  client            Client                 @relation(fields: [clientId], references: [id])
+  clientId          String
+  company           Company                @relation(fields: [companyId], references: [id])
+  companyId         String
+  items             RecurringInvoiceItem[]
+  generatedInvoices Invoice[] // Relation inverse pour les factures générées
+  paymentMethod     String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails    String? // Details for the payment method (e.g., bank account number)
+  notes             String?                @default("")
+  totalHT           Float
+  totalVAT          Float
+  totalTTC          Float
+  currency          Currency
+  frequency         RecurrenceFrequency // Simplified recurrence frequency
+  count             Int? // Number of occurrences, null for infinite
+  until             DateTime? // End date for the recurrence
+  autoSend          Boolean                @default(false) // Auto-send generated invoices
+  nextInvoiceDate   DateTime? // Date for the next invoice generation
+  lastInvoiceDate   DateTime? // Date of the last generated invoice
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
 }
 
 model RecurringInvoiceItem {
@@ -396,28 +397,30 @@ model RecurringInvoiceItem {
 }
 
 model Invoice {
-  id             String        @id @default(uuid())
-  number         Int           @default(autoincrement())
-  quote          Quote?        @relation(fields: [quoteId], references: [id])
-  quoteId        String?
-  client         Client        @relation(fields: [clientId], references: [id]) // Client receiving the invoice
-  clientId       String
-  company        Company       @relation(fields: [companyId], references: [id]) // Company issuing the invoice
-  companyId      String
-  items          InvoiceItem[]
-  status         InvoiceStatus @default(UNPAID)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  dueDate        DateTime
-  paidAt         DateTime?
-  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
-  paymentDetails String? // Details for the payment method (e.g., bank account number)
-  notes          String?       @default("")
-  totalHT        Float
-  totalVAT       Float
-  totalTTC       Float
-  currency       Currency
-  isActive       Boolean       @default(true)
+  id                 String            @id @default(uuid())
+  number             Int               @default(autoincrement())
+  quote              Quote?            @relation(fields: [quoteId], references: [id])
+  quoteId            String?
+  recurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id])
+  recurringInvoiceId String?
+  client             Client            @relation(fields: [clientId], references: [id]) // Client receiving the invoice
+  clientId           String
+  company            Company           @relation(fields: [companyId], references: [id]) // Company issuing the invoice
+  companyId          String
+  items              InvoiceItem[]
+  status             InvoiceStatus     @default(UNPAID)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  dueDate            DateTime
+  paidAt             DateTime?
+  paymentMethod      String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails     String? // Details for the payment method (e.g., bank account number)
+  notes              String?           @default("")
+  totalHT            Float
+  totalVAT           Float
+  totalTTC           Float
+  currency           Currency
+  isActive           Boolean           @default(true)
 }
 
 model InvoiceItem {
