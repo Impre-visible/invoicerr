@@ -12,7 +12,7 @@ export class RecurringInvoicesCronService {
         private readonly invoicesService: InvoicesService,
     ) { }
 
-    // Every day at 9:00 AM Paris time
+    // Every day at 9:00 AM
     @Cron('0 9 * * *', {
         name: 'process-recurring-invoices',
         timeZone: 'Europe/Paris',
@@ -23,6 +23,8 @@ export class RecurringInvoicesCronService {
         try {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Normaliser à minuit
+
+            console.log(await this.prisma.recurringInvoice.findMany())
 
             const recurringInvoices = await this.prisma.recurringInvoice.findMany({
                 where: {
@@ -135,7 +137,11 @@ export class RecurringInvoicesCronService {
                 nextDate.setFullYear(nextDate.getFullYear() + 1);
                 break;
             default:
-                nextDate.setMonth(nextDate.getMonth() + 1); // Default to monthly
+                nextDate.setMonth(nextDate.getMonth() + 1);
+        }
+
+        while (nextDate.getDay() !== 1 || nextDate <= from) {
+            nextDate.setDate(nextDate.getDate() + 1);
         }
 
         return nextDate;
