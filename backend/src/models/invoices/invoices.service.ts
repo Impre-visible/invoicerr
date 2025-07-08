@@ -128,6 +128,7 @@ export class InvoicesService {
         return this.prisma.invoice.create({
             data: {
                 ...data,
+                recurringInvoiceId: body.recurringInvoiceId,
                 currency: body.currency || client.currency || company.currency,
                 companyId: company.id, // reuse the already fetched company object
                 totalHT: items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0),
@@ -189,6 +190,7 @@ export class InvoicesService {
         const updateInvoice = await this.prisma.invoice.update({
             where: { id },
             data: {
+                recurringInvoiceId: data.recurringInvoiceId,
                 paymentMethod: data.paymentMethod || existingInvoice.paymentMethod,
                 paymentDetails: data.paymentDetails || existingInvoice.paymentDetails,
                 quoteId: data.quoteId || existingInvoice.quoteId,

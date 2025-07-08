@@ -1,6 +1,6 @@
 import { Company, Currency } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpsertInvoicesDto } from './dto/invoices.dto';
 
@@ -139,6 +139,42 @@ export class RecurringInvoicesService {
         });
 
         return recurringInvoice;
+    }
+
+    async getRecurringInvoice(id: string) {
+        const recurringInvoice = await this.prisma.recurringInvoice.findUnique({
+            where: { id },
+            include: {
+                client: true,
+                company: true,
+                items: true,
+            },
+        });
+
+        if (!recurringInvoice) {
+            throw new BadRequestException('Recurring invoice not found');
+        }
+
+        return recurringInvoice;
+    }
+
+    async deleteRecurringInvoice(id: string) {
+        const existingRecurringInvoice = await this.prisma.recurringInvoice.findUnique({
+            where: { id }
+        });
+
+        if (!existingRecurringInvoice) {
+            throw new BadRequestException('Recurring invoice not found');
+        }
+
+        // Supprimer en cascade les items puis la facture récurrente
+        await this.prisma.recurringInvoiceItem.deleteMany({
+            where: { recurringInvoiceId: id }
+        });
+
+        return this.prisma.recurringInvoice.delete({
+            where: { id }
+        });
     }
 
     private calculateNextInvoiceDate(from: Date, frequency: string): Date {
