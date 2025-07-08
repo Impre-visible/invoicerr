@@ -112,6 +112,7 @@ export class RecurringInvoicesService {
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
                 paymentDetails: data.paymentDetails,
+                nextInvoiceDate: this.calculateNextInvoiceDate(new Date(), data.frequency),
                 frequency: data.frequency,
                 count: data.count,
                 until: data.until,
