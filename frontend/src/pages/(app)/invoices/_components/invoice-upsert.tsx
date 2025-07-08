@@ -11,6 +11,7 @@ import { useGet, usePatch, usePost } from "@/lib/utils"
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
+import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
@@ -48,6 +49,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         paymentDetails: z
             .string()
             .optional(),
+        currency: z.string().optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -199,7 +201,21 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                             value={field.value ?? ""}
                                             onValueChange={(val) => {
                                                 field.onChange(val || null)
-                                                if (val) form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
+                                                if (val) {
+                                                    form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
+                                                    form.setValue("notes", quotes?.find((q) => q.id === val)?.notes || "")
+                                                    form.setValue("paymentMethod", quotes?.find((q) => q.id === val)?.paymentMethod || "")
+                                                    form.setValue("paymentDetails", quotes?.find((q) => q.id === val)?.paymentDetails || "")
+                                                    form.setValue("currency", quotes?.find((q) => q.id === val)?.currency || "")
+                                                    form.setValue('items', quotes?.find((q) => q.id === val)?.items.map((item, index) => ({
+                                                        id: item.id,
+                                                        description: item.description || "",
+                                                        quantity: item.quantity || 1,
+                                                        unitPrice: item.unitPrice || 0,
+                                                        vatRate: item.vatRate || 0,
+                                                        order: index,
+                                                    })) || [])
+                                                }
                                             }}
                                             onSearchChange={setQuoteSearchTerm}
                                             placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.quote.placeholder`)}
@@ -224,6 +240,20 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                             onSearchChange={setClientsSearchTerm}
                                             placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.client.placeholder`)}
                                         />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="currency"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.currency.label`)}</FormLabel>
+                                    <FormControl>
+                                        <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
