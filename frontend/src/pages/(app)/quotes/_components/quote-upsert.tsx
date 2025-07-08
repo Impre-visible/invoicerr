@@ -38,9 +38,9 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         title: z.string().optional(),
         clientId: z
             .string()
-            .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.client.errors.required`))
+            .min(1, t("quotes.upsert.form.client.errors.required"))
             .refine((val) => val !== "", {
-                message: t(`quotes.${isEdit ? "edit" : "create"}.form.client.errors.required`),
+                message: t("quotes.upsert.form.client.errors.required"),
             }),
         currency: z.string().optional(),
         validUntil: z.date().optional(),
@@ -56,27 +56,27 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                 id: z.string().optional(),
                 description: z
                     .string()
-                    .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.items.description.errors.required`))
+                    .min(1, t("quotes.upsert.form.items.description.errors.required"))
                     .refine((val) => val !== "", {
-                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.description.errors.required`),
+                        message: t("quotes.upsert.form.items.description.errors.required"),
                     }),
                 quantity: z
-                    .number({ invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.required`) })
-                    .min(1, t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.min`))
+                    .number({ invalid_type_error: t("quotes.upsert.form.items.quantity.errors.required") })
+                    .min(1, t("quotes.upsert.form.items.quantity.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.errors.invalid`),
+                        message: t("quotes.upsert.form.items.quantity.errors.invalid"),
                     }),
                 unitPrice: z
                     .number({
-                        invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.required`),
+                        invalid_type_error: t("quotes.upsert.form.items.unitPrice.errors.required"),
                     })
-                    .min(0, t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.min`))
+                    .min(0, t("quotes.upsert.form.items.unitPrice.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t(`quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.invalid`),
+                        message: t("quotes.upsert.form.items.unitPrice.errors.invalid"),
                     }),
                 vatRate: z
-                    .number({ invalid_type_error: t(`quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.required`) })
-                    .min(0, t(`quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.min`)),
+                    .number({ invalid_type_error: t("quotes.upsert.form.items.vatRate.errors.required") })
+                    .min(0, t("quotes.upsert.form.items.vatRate.errors.min")),
                 order: z.number(),
             }),
         ),
@@ -189,7 +189,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>{t(`quotes.${isEdit ? "edit" : "create"}.title`)}</DialogTitle>
+                    <DialogTitle>{t(`quotes.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -198,9 +198,9 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.title.label`)}</FormLabel>
+                                    <FormLabel>{t("quotes.upsert.form.title.label")}</FormLabel>
                                     <FormControl>
-                                        <Input {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.title.placeholder`)} />
+                                        <Input {...field} placeholder={t("quotes.upsert.form.title.placeholder")} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -212,14 +212,14 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel required>{t(`quotes.${isEdit ? "edit" : "create"}.form.client.label`)}</FormLabel>
+                                    <FormLabel required>{t("quotes.upsert.form.client.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={handleClientChange}
                                             onSearchChange={setSearchTerm}
-                                            placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.client.placeholder`)}
+                                            placeholder={t("quotes.upsert.form.client.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -232,7 +232,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             name="currency"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.currency.label`)}</FormLabel>
+                                    <FormLabel>{t("quotes.upsert.form.currency.label")}</FormLabel>
                                     <FormControl>
                                         <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
                                     </FormControl>
@@ -246,13 +246,13 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             name="validUntil"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.validUntil.label`)}</FormLabel>
+                                    <FormLabel>{t("quotes.upsert.form.validUntil.label")}</FormLabel>
                                     <FormControl>
                                         <DatePicker
                                             className="w-full"
                                             value={field.value || null}
                                             onChange={field.onChange}
-                                            placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.validUntil.placeholder`)}
+                                            placeholder={t("quotes.upsert.form.validUntil.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -265,9 +265,9 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             name="notes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
+                                    <FormLabel>{t("quotes.upsert.form.notes.label")}</FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
+                                        <Textarea {...field} placeholder={t("quotes.upsert.form.notes.placeholder")} className="max-h-40" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -280,15 +280,15 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 name="paymentMethod"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.label`)}</FormLabel>
+                                        <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.placeholder`)}
+                                                placeholder={t("quotes.upsert.form.paymentMethod.placeholder")}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t(`quotes.${isEdit ? "edit" : "create"}.form.paymentMethod.description`)}
+                                            {t("quotes.upsert.form.paymentMethod.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -300,16 +300,16 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 name="paymentDetails"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.label`)}</FormLabel>
+                                        <FormLabel>{t("quotes.upsert.form.paymentDetails.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.placeholder`)}
+                                                placeholder={t("quotes.upsert.form.paymentDetails.placeholder")}
                                                 className="max-h-40"
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t(`quotes.${isEdit ? "edit" : "create"}.form.paymentDetails.description`)}
+                                            {t("quotes.upsert.form.paymentDetails.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -318,7 +318,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                         </section>
 
                         <FormItem>
-                            <FormLabel>{t(`quotes.${isEdit ? "edit" : "create"}.form.items.label`)}</FormLabel>
+                            <FormLabel>{t("quotes.upsert.form.items.label")}</FormLabel>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                                 <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
@@ -448,16 +448,16 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 }
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t(`quotes.${isEdit ? "edit" : "create"}.form.items.addItem`)}
+                                {t("quotes.upsert.form.items.addItem")}
                             </Button>
                         </FormItem>
 
                         <div className="flex justify-end space-x-2">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t(`quotes.${isEdit ? "edit" : "create"}.actions.cancel`)}
+                                {t("quotes.upsert.actions.cancel")}
                             </Button>
                             <Button type="submit">
-                                {t(`quotes.${isEdit ? "edit" : "create"}.actions.${isEdit ? "save" : "create"}`)}
+                                {t(`quotes.upsert.actions.${isEdit ? "save" : "create"}`)}
                             </Button>
                         </div>
                     </form>

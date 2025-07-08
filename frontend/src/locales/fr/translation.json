@@ -35,8 +35,11 @@
                 "delete": "Supprimer le client"
             }
         },
-        "create": {
-            "title": "Ajouter un nouveau client",
+        "upsert": {
+            "title": {
+                "create": "Ajouter un nouveau client",
+                "edit": "Modifier le client"
+            },
             "fields": {
                 "contactFirstname": {
                     "label": "Prénom",
@@ -145,119 +148,7 @@
             },
             "actions": {
                 "cancel": "Annuler",
-                "create": "Créer le client"
-            }
-        },
-        "edit": {
-            "title": "Modifier le client",
-            "fields": {
-                "contactFirstname": {
-                    "label": "Prénom",
-                    "placeholder": "Saisir le prénom"
-                },
-                "contactLastname": {
-                    "label": "Nom",
-                    "placeholder": "Saisir le nom"
-                },
-                "name": {
-                    "label": "Nom de l'entreprise",
-                    "placeholder": "Saisir le nom de l'entreprise"
-                },
-                "description": {
-                    "label": "Description",
-                    "placeholder": "Saisir la description de l'entreprise"
-                },
-                "legalId": {
-                    "label": "SIREN/SIRET",
-                    "placeholder": "Saisir le SIREN/SIRET de l'entreprise"
-                },
-                "vat": {
-                    "label": "Numéro de TVA",
-                    "placeholder": "Saisir le numéro de TVA (ex: FR12345678901)"
-                },
-                "currency": {
-                    "label": "Devise"
-                },
-                "foundedAt": {
-                    "label": "Date de création",
-                    "placeholder": "Sélectionner la date de création"
-                },
-                "contactEmail": {
-                    "label": "Email",
-                    "placeholder": "Saisir l'adresse email"
-                },
-                "contactPhone": {
-                    "label": "Téléphone",
-                    "placeholder": "Saisir le numéro de téléphone"
-                },
-                "address": {
-                    "label": "Adresse",
-                    "placeholder": "Saisir l'adresse"
-                },
-                "postalCode": {
-                    "label": "Code postal",
-                    "placeholder": "Saisir le code postal"
-                },
-                "city": {
-                    "label": "Ville",
-                    "placeholder": "Saisir la ville"
-                },
-                "country": {
-                    "label": "Pays",
-                    "placeholder": "Saisir le pays"
-                }
-            },
-            "validation": {
-                "name": {
-                    "required": "Le nom de l'entreprise est requis"
-                },
-                "description": {
-                    "required": "La description est requise",
-                    "maxLength": "La description doit faire moins de 500 caractères"
-                },
-                "legalId": {
-                    "required": "L'identifiant légal est requis",
-                    "empty": "L'identifiant légal ne peut pas être vide",
-                    "maxLength": "L'identifiant légal doit faire moins de 50 caractères"
-                },
-                "vat": {
-                    "required": "Le numéro de TVA est requis",
-                    "empty": "Le numéro de TVA ne peut pas être vide",
-                    "maxLength": "Le numéro de TVA doit faire moins de 15 caractères",
-                    "format": "Le format du numéro de TVA est invalide (ex: FR12345678901)"
-                },
-                "foundedAt": {
-                    "future": "La date de création ne peut pas être dans le futur"
-                },
-                "contactFirstname": {
-                    "required": "Le prénom est requis"
-                },
-                "contactLastname": {
-                    "required": "Le nom est requis"
-                },
-                "contactPhone": {
-                    "minLength": "Le numéro de téléphone doit faire au moins 8 caractères",
-                    "format": "Le format du numéro de téléphone est invalide"
-                },
-                "contactEmail": {
-                    "required": "L'email est requis",
-                    "format": "Le format de l'email est invalide"
-                },
-                "address": {
-                    "required": "L'adresse est requise"
-                },
-                "postalCode": {
-                    "format": "Le format du code postal est invalide"
-                },
-                "city": {
-                    "required": "La ville est requise"
-                },
-                "country": {
-                    "required": "Le pays est requis"
-                }
-            },
-            "actions": {
-                "cancel": "Annuler",
+                "create": "Créer le client",
                 "save": "Enregistrer les modifications"
             }
         },
@@ -344,8 +235,11 @@
                 "invoiceCreateError": "Échec de la création de la facture à partir du devis"
             }
         },
-        "create": {
-            "title": "Créer un nouveau devis",
+        "upsert": {
+            "title": {
+                "create": "Créer un nouveau devis",
+                "edit": "Modifier le devis"
+            },
             "form": {
                 "title": {
                     "label": "Titre",
@@ -416,81 +310,7 @@
             },
             "actions": {
                 "cancel": "Annuler",
-                "create": "Créer le devis"
-            }
-        },
-        "edit": {
-            "title": "Modifier le devis",
-            "form": {
-                "title": {
-                    "label": "Titre",
-                    "placeholder": "Saisir le titre du devis"
-                },
-                "client": {
-                    "label": "Client",
-                    "placeholder": "Sélectionner un client",
-                    "errors": {
-                        "required": "Veuillez sélectionner un client"
-                    }
-                },
-                "currency": {
-                    "label": "Devise"
-                },
-                "validUntil": {
-                    "label": "Valide jusqu'au",
-                    "placeholder": "Sélectionner la date d'expiration"
-                },
-                "items": {
-                    "label": "Articles du devis",
-                    "addItem": "Ajouter un article",
-                    "description": {
-                        "placeholder": "Description de l'article",
-                        "errors": {
-                            "required": "La description est requise"
-                        }
-                    },
-                    "quantity": {
-                        "placeholder": "Qté",
-                        "unit": "pcs",
-                        "errors": {
-                            "required": "La quantité est requise",
-                            "min": "La quantité doit être d'au moins 1",
-                            "invalid": "Quantité invalide"
-                        }
-                    },
-                    "unitPrice": {
-                        "placeholder": "Prix unitaire",
-                        "errors": {
-                            "required": "Le prix unitaire est requis",
-                            "min": "Le prix unitaire doit être positif",
-                            "invalid": "Prix unitaire invalide"
-                        }
-                    },
-                    "vatRate": {
-                        "placeholder": "TVA %",
-                        "errors": {
-                            "required": "Le taux de TVA est requis",
-                            "min": "Le taux de TVA doit être positif"
-                        }
-                    }
-                },
-                "notes": {
-                    "label": "Notes",
-                    "placeholder": "Saisir des notes ou conditions supplémentaires"
-                },
-                "paymentMethod": {
-                    "label": "Méthode de paiement",
-                    "placeholder": "Sélectionner la méthode de paiement",
-                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
-                },
-                "paymentDetails": {
-                    "label": "Détails de paiement",
-                    "placeholder": "Saisir les détails de paiement",
-                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
-                }
-            },
-            "actions": {
-                "cancel": "Annuler",
+                "create": "Créer le devis",
                 "save": "Enregistrer les modifications"
             }
         },
@@ -595,8 +415,11 @@
                 "markAsPaidError": "Échec du marquage de la facture comme payée"
             }
         },
-        "create": {
-            "title": "Créer une nouvelle facture",
+        "upsert": {
+            "title": {
+                "create": "Créer une nouvelle facture",
+                "edit": "Modifier la facture"
+            },
             "form": {
                 "quote": {
                     "label": "À partir d'un devis",
@@ -667,81 +490,7 @@
             },
             "actions": {
                 "cancel": "Annuler",
-                "create": "Créer la facture"
-            }
-        },
-        "edit": {
-            "title": "Modifier la facture",
-            "form": {
-                "quote": {
-                    "label": "À partir d'un devis",
-                    "placeholder": "Sélectionner un devis",
-                    "errors": {
-                        "required": "Veuillez sélectionner un devis"
-                    }
-                },
-                "client": {
-                    "label": "Client",
-                    "placeholder": "Sélectionner un client",
-                    "errors": {
-                        "required": "Veuillez sélectionner un client"
-                    }
-                },
-                "dueDate": {
-                    "label": "Date d'échéance",
-                    "placeholder": "Sélectionner la date d'échéance"
-                },
-                "items": {
-                    "label": "Articles de la facture",
-                    "addItem": "Ajouter un article",
-                    "description": {
-                        "placeholder": "Description de l'article",
-                        "errors": {
-                            "required": "La description est requise"
-                        }
-                    },
-                    "quantity": {
-                        "placeholder": "Qté",
-                        "unit": "pcs",
-                        "errors": {
-                            "required": "La quantité est requise",
-                            "min": "La quantité doit être d'au moins 1",
-                            "invalid": "Quantité invalide"
-                        }
-                    },
-                    "unitPrice": {
-                        "placeholder": "Prix unitaire",
-                        "errors": {
-                            "required": "Le prix unitaire est requis",
-                            "min": "Le prix unitaire doit être positif",
-                            "invalid": "Prix unitaire invalide"
-                        }
-                    },
-                    "vatRate": {
-                        "placeholder": "TVA %",
-                        "errors": {
-                            "required": "Le taux de TVA est requis",
-                            "min": "Le taux de TVA doit être positif"
-                        }
-                    }
-                },
-                "notes": {
-                    "label": "Notes",
-                    "placeholder": "Saisir des notes ou conditions supplémentaires"
-                },
-                "paymentMethod": {
-                    "label": "Méthode de paiement",
-                    "placeholder": "Sélectionner la méthode de paiement",
-                    "description": "La méthode de paiement préférée pour ce devis (Ex: Virement bancaire, Chèque, etc.)"
-                },
-                "paymentDetails": {
-                    "label": "Détails de paiement",
-                    "placeholder": "Saisir les détails de paiement",
-                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
-                }
-            },
-            "actions": {
-                "cancel": "Annuler",
+                "create": "Créer la facture",
                 "save": "Enregistrer les modifications"
             }
         },
@@ -783,6 +532,16 @@
         }
     },
     "recurringInvoices": {
+        "frequency": {
+            "weekly": "Chaque semaine",
+            "biweekly": "Toutes les 2 semaines",
+            "monthly": "Chaque mois",
+            "bimonthly": "Tous les 2 mois",
+            "quarterly": "Tous les 3 mois",
+            "quadmonthly": "Tous les 4 mois",
+            "semiannually": "Tous les 6 mois",
+            "annually": "Chaque année"
+        },
         "list": {
             "title": "Factures récurrentes",
             "description": "Gérez vos factures récurrentes pour automatiser la facturation",
@@ -797,8 +556,11 @@
         "actions": {
             "addNew": "Ajouter une nouvelle facture récurrente"
         },
-        "create": {
-            "title": "Créer une facture récurrente",
+        "upsert": {
+            "title": {
+                "create": "Créer une facture récurrente",
+                "edit": "Modifier la facture récurrente"
+            },
             "form": {
                 "quote": {
                     "label": "À partir d'un devis",
@@ -825,35 +587,23 @@
                     "placeholder": "Saisir les détails de paiement",
                     "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
                 },
-                "recurrenceRule": {
-                    "interval": {
-                        "label": "Intervalle",
-                        "placeholder": "Sélectionner l'intervalle de récurrence",
-                        "description": "Intervalle de récurrence pour la facturation pour l'unité sélectionnée (Ex: 1, 2, 3, etc.)",
-                        "errors": {
-                            "required": "L'intervalle est requis",
-                            "min": "L'intervalle doit être d'au moins 1",
-                            "invalid": "Intervalle invalide"
-                        }
-                    },
-                    "units": {
-                        "label": "Unités",
-                        "placeholder": "Sélectionner l'unité",
-                        "description": "Unités de temps pour l'intervalle (Ex: Jours, Semaines, Mois, Années)",
-                        "errors": {
-                            "required": "L'unité est requises"
-                        }
-                    },
-                    "count": {
-                        "label": "Nombre d'occurrences",
-                        "placeholder": "Saisir le nombre d'occurrences",
-                        "description": "Nombre total de factures à générer (vide pour illimité)"
-                    },
-                    "until": {
-                        "label": "Jusqu'à",
-                        "placeholder": "Sélectionner la date de fin",
-                        "description": "Date jusqu'à laquelle les factures seront générées (vide pour illimité)"
+                "frequency": {
+                    "label": "Fréquence",
+                    "placeholder": "Sélectionner la fréquence",
+                    "description": "Fréquence de génération des factures",
+                    "errors": {
+                        "required": "La fréquence est requise"
                     }
+                },
+                "count": {
+                    "label": "Nombre d'occurrences",
+                    "placeholder": "Saisir le nombre d'occurrences",
+                    "description": "Nombre total de factures à générer (vide pour illimité)"
+                },
+                "until": {
+                    "label": "Jusqu'à",
+                    "placeholder": "Sélectionner la date de fin",
+                    "description": "Date jusqu'à laquelle les factures seront générées (vide pour illimité)"
                 },
                 "autoSend": {
                     "label": "Envoi automatique",
@@ -896,108 +646,7 @@
             },
             "actions": {
                 "cancel": "Annuler",
-                "create": "Créer la facture récurrente"
-            }
-        },
-        "edit": {
-            "title": "Modifier la facture récurrente",
-            "form": {
-                "quote": {
-                    "label": "À partir d'un devis",
-                    "placeholder": "Sélectionner un devis"
-                },
-                "client": {
-                    "label": "Client",
-                    "placeholder": "Sélectionner un client",
-                    "errors": {
-                        "required": "Veuillez sélectionner un client"
-                    }
-                },
-                "notes": {
-                    "label": "Notes",
-                    "placeholder": "Saisir des notes ou conditions supplémentaires"
-                },
-                "paymentMethod": {
-                    "label": "Méthode de paiement",
-                    "placeholder": "Sélectionner la méthode de paiement",
-                    "description": "La méthode de paiement préférée pour cette facture récurrente (Ex: Virement bancaire, Chèque, etc.)"
-                },
-                "paymentDetails": {
-                    "label": "Détails de paiement",
-                    "placeholder": "Saisir les détails de paiement",
-                    "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
-                },
-                "recurrenceRule": {
-                    "interval": {
-                        "label": "Intervalle",
-                        "placeholder": "Sélectionner l'intervalle de récurrence",
-                        "description": "Intervalle de récurrence pour la facturation pour l'unité sélectionnée (Ex: 1, 2, 3, etc.)",
-                        "errors": {
-                            "required": "L'intervalle est requis",
-                            "min": "L'intervalle doit être d'au moins 1",
-                            "invalid": "Intervalle invalide"
-                        }
-                    },
-                    "units": {
-                        "label": "Unités",
-                        "placeholder": "Sélectionner l'unité",
-                        "description": "Unités de temps pour l'intervalle (Ex: Jours, Semaines, Mois, Années)",
-                        "errors": {
-                            "required": "L'unité est requises"
-                        }
-                    },
-                    "count": {
-                        "label": "Nombre d'occurrences",
-                        "placeholder": "Saisir le nombre d'occurrences",
-                        "description": "Nombre total de factures à générer (vide pour illimité)"
-                    },
-                    "until": {
-                        "label": "Jusqu'à",
-                        "placeholder": "Sélectionner la date de fin",
-                        "description": "Date jusqu'à laquelle les factures seront générées (vide pour illimité)"
-                    }
-                },
-                "autoSend": {
-                    "label": "Envoi automatique",
-                    "description": "Envoyer automatiquement les factures par email aux clients après leur création"
-                },
-                "items": {
-                    "label": "Articles de la facture",
-                    "addItem": "Ajouter un article",
-                    "description": {
-                        "placeholder": "Description de l'article",
-                        "errors": {
-                            "required": "La description est requise"
-                        }
-                    },
-                    "quantity": {
-                        "placeholder": "Qté",
-                        "unit": "pcs",
-                        "errors": {
-                            "required": "La quantité est requise",
-                            "min": "La quantité doit être d'au moins 1",
-                            "invalid": "Quantité invalide"
-                        }
-                    },
-                    "unitPrice": {
-                        "placeholder": "Prix unitaire",
-                        "errors": {
-                            "required": "Le prix unitaire est requis",
-                            "min": "Le prix unitaire doit être positif",
-                            "invalid": "Prix unitaire invalide"
-                        }
-                    },
-                    "vatRate": {
-                        "placeholder": "TVA %",
-                        "errors": {
-                            "required": "Le taux de TVA est requis",
-                            "min": "Le taux de TVA doit être positif"
-                        }
-                    }
-                }
-            },
-            "actions": {
-                "cancel": "Annuler",
+                "create": "Créer la facture récurrente",
                 "save": "Enregistrer les modifications"
             }
         }

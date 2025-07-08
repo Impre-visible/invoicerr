@@ -37,9 +37,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             .optional(),
         clientId: z
             .string()
-            .min(1, t(`invoices.${isEdit ? "edit" : "create"}.form.client.errors.required`))
+            .min(1, t("invoices.upsert.form.client.errors.required"))
             .refine((val) => val !== "", {
-                message: t(`invoices.${isEdit ? "edit" : "create"}.form.client.errors.required`),
+                message: t("invoices.upsert.form.client.errors.required"),
             }),
         dueDate: z.date().optional(),
         notes: z.string().optional(),
@@ -55,31 +55,31 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                 id: z.string().optional(),
                 description: z
                     .string()
-                    .min(1, t(`invoices.${isEdit ? "edit" : "create"}.form.items.description.errors.required`))
+                    .min(1, t("invoices.upsert.form.items.description.errors.required"))
                     .refine((val) => val !== "", {
-                        message: t(`invoices.${isEdit ? "edit" : "create"}.form.items.description.errors.required`),
+                        message: t("invoices.upsert.form.items.description.errors.required"),
                     }),
                 quantity: z
                     .number({
-                        invalid_type_error: t(`invoices.${isEdit ? "edit" : "create"}.form.items.quantity.errors.required`),
+                        invalid_type_error: t("invoices.upsert.form.items.quantity.errors.required"),
                     })
-                    .min(1, t(`invoices.${isEdit ? "edit" : "create"}.form.items.quantity.errors.min`))
+                    .min(1, t("invoices.upsert.form.items.quantity.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t(`invoices.${isEdit ? "edit" : "create"}.form.items.quantity.errors.invalid`),
+                        message: t("invoices.upsert.form.items.quantity.errors.invalid"),
                     }),
                 unitPrice: z
                     .number({
-                        invalid_type_error: t(`invoices.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.required`),
+                        invalid_type_error: t("invoices.upsert.form.items.unitPrice.errors.required"),
                     })
-                    .min(0, t(`invoices.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.min`))
+                    .min(0, t("invoices.upsert.form.items.unitPrice.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t(`invoices.${isEdit ? "edit" : "create"}.form.items.unitPrice.errors.invalid`),
+                        message: t("invoices.upsert.form.items.unitPrice.errors.invalid"),
                     }),
                 vatRate: z
                     .number({
-                        invalid_type_error: t(`invoices.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.required`),
+                        invalid_type_error: t("invoices.upsert.form.items.vatRate.errors.required"),
                     })
-                    .min(0, t(`invoices.${isEdit ? "edit" : "create"}.form.items.vatRate.errors.min`)),
+                    .min(0, t("invoices.upsert.form.items.vatRate.errors.min")),
                 order: z.number(),
             }),
         ),
@@ -182,7 +182,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>{t(`invoices.${isEdit ? "edit" : "create"}.title`)}</DialogTitle>
+                    <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -191,7 +191,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="quoteId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.quote.label`)}</FormLabel>
+                                    <FormLabel>{t("invoices.upsert.form.quote.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(quotes || []).map((c) => ({
@@ -218,7 +218,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                 }
                                             }}
                                             onSearchChange={setQuoteSearchTerm}
-                                            placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.quote.placeholder`)}
+                                            placeholder={t("invoices.upsert.form.quote.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -231,14 +231,14 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel required>{t(`invoices.${isEdit ? "edit" : "create"}.form.client.label`)}</FormLabel>
+                                    <FormLabel required>{t("invoices.upsert.form.client.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={(val) => field.onChange(val || null)}
                                             onSearchChange={setClientsSearchTerm}
-                                            placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.client.placeholder`)}
+                                            placeholder={t("invoices.upsert.form.client.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -251,7 +251,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="currency"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.currency.label`)}</FormLabel>
+                                    <FormLabel>{t("invoices.upsert.form.currency.label")}</FormLabel>
                                     <FormControl>
                                         <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
                                     </FormControl>
@@ -265,13 +265,13 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="dueDate"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.dueDate.label`)}</FormLabel>
+                                    <FormLabel>{t("invoices.upsert.form.dueDate.label")}</FormLabel>
                                     <FormControl>
                                         <DatePicker
                                             className="w-full"
                                             value={field.value || null}
                                             onChange={field.onChange}
-                                            placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.dueDate.placeholder`)}
+                                            placeholder={t("invoices.upsert.form.dueDate.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -284,9 +284,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="notes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.notes.label`)}</FormLabel>
+                                    <FormLabel>{t("invoices.upsert.form.notes.label")}</FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.notes.placeholder`)} className="max-h-40" />
+                                        <Textarea {...field} placeholder={t("invoices.upsert.form.notes.placeholder")} className="max-h-40" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -299,15 +299,15 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 name="paymentMethod"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.label`)}</FormLabel>
+                                        <FormLabel>{t("invoices.upsert.form.paymentMethod.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.placeholder`)}
+                                                placeholder={t("invoices.upsert.form.paymentMethod.placeholder")}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t(`invoices.${isEdit ? "edit" : "create"}.form.paymentMethod.description`)}
+                                            {t("invoices.upsert.form.paymentMethod.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -319,16 +319,16 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 name="paymentDetails"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.label`)}</FormLabel>
+                                        <FormLabel>{t("invoices.upsert.form.paymentDetails.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.placeholder`)}
+                                                placeholder={t("invoices.upsert.form.paymentDetails.placeholder")}
                                                 className="max-h-40"
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t(`invoices.${isEdit ? "edit" : "create"}.form.paymentDetails.description`)}
+                                            {t("invoices.upsert.form.paymentDetails.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -337,7 +337,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                         </section>
 
                         <FormItem>
-                            <FormLabel>{t(`invoices.${isEdit ? "edit" : "create"}.form.items.label`)}</FormLabel>
+                            <FormLabel>{t("invoices.upsert.form.items.label")}</FormLabel>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                                 <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
@@ -467,16 +467,16 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 }
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t(`invoices.${isEdit ? "edit" : "create"}.form.items.addItem`)}
+                                {t("invoices.upsert.form.items.addItem")}
                             </Button>
                         </FormItem>
 
                         <div className="flex justify-end space-x-2">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t(`invoices.${isEdit ? "edit" : "create"}.actions.cancel`)}
+                                {t("invoices.upsert.actions.cancel")}
                             </Button>
                             <Button type="submit">
-                                {t(`invoices.${isEdit ? "edit" : "create"}.actions.${isEdit ? "save" : "create"}`)}
+                                {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
                             </Button>
                         </div>
                     </form>
