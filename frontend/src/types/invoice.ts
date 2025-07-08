@@ -43,14 +43,25 @@ export interface Invoice {
     isActive: boolean;
 }
 
-export interface RecurrenceRule {
+export enum RecurrenceFrequency {
+    WEEKLY = 'WEEKLY',
+    BIWEEKLY = 'BIWEEKLY',
+    MONTHLY = 'MONTHLY',
+    BIMONTHLY = 'BIMONTHLY',
+    QUARTERLY = 'QUARTERLY',
+    QUADMONTHLY = 'QUADMONTHLY',
+    SEMIANNUALLY = 'SEMIANNUALLY',
+    ANNUALLY = 'ANNUALLY'
+}
+
+export interface RecurringInvoiceItem {
     id: string;
-    invoiceId: string;
-    invoice: RecurringInvoice;
-    interval: number; // e.g., every 1 week, every 2 months
-    unit: string; // e.g., "day", "week", "month", "year"
-    count?: number; // Number of occurrences, null for infinite
-    until?: Date | string; // ISO date string for end date of the recurrence
+    recurringInvoiceId: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    vatRate: number; // 20 for 20%
+    order: number;
 }
 
 export interface RecurringInvoice {
@@ -59,7 +70,7 @@ export interface RecurringInvoice {
     client: Client;
     companyId: string;
     company: Company;
-    items: InvoiceItem[];
+    items: RecurringInvoiceItem[];
     paymentMethod?: string; // Ex: "Bank Transfer", "PayPal", "Cash"
     paymentDetails?: string; // Details for the payment method (e.g., bank account number)
     notes?: string;
@@ -67,5 +78,12 @@ export interface RecurringInvoice {
     totalVAT: number;
     totalTTC: number;
     currency: string; // Currency code, e.g., "EUR", "USD"
-    recurrenceRules: RecurrenceRule[];
+    frequency: RecurrenceFrequency; // Simplified recurrence frequency
+    count?: number; // Number of occurrences, null for infinite
+    until?: Date | string; // ISO date string for end date of the recurrence
+    autoSend?: boolean; // Auto-send generated invoices
+    nextInvoiceDate?: Date | string; // Date for the next invoice generation
+    lastInvoiceDate?: Date | string; // Date of the last generated invoice
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
 }
