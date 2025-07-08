@@ -20,9 +20,13 @@ export default function Invoices() {
         mutate,
         loading,
     } = useGet<{ pageCount: number; invoices: Invoice[] }>(`/api/invoices?page=${page}`)
-    const { data: recurringInvoices } = useGet<{ recurringInvoices: RecurringInvoice[] }>("/api/recurring-invoices")
+    const { data: recurringInvoices } = useGet<{ pageCount: number; data: RecurringInvoice[] }>("/api/recurring-invoices")
     const [downloadInvoicePdf, setDownloadInvoicePdf] = useState<Invoice | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
+
+    useEffect(() => {
+        console.log(recurringInvoices)
+    }, [recurringInvoices])
 
     useEffect(() => {
         if (downloadInvoicePdf && pdf) {
@@ -176,7 +180,7 @@ export default function Invoices() {
 
             <RecurringInvoiceList
                 ref={recurringInvoiceListRef}
-                recurringInvoices={recurringInvoices?.recurringInvoices || []}
+                recurringInvoices={recurringInvoices?.data || []}
                 loading={false}
                 title={t("recurringInvoices.list.title")}
                 description={t("recurringInvoices.list.description")}
