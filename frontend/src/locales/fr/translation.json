@@ -546,7 +546,23 @@
             "title": "Factures récurrentes",
             "description": "Gérez vos factures récurrentes pour automatiser la facturation",
             "actions": {
-                "addNew": "Aucune facture récurrente trouvée"
+                "addNew": "Ajouter une nouvelle facture récurrente",
+                "triggerManual": "Déclencher génération"
+            },
+            "item": {
+                "client": "Client",
+                "payment": "Paiement",
+                "totalHT": "Total HT",
+                "totalTTC": "Total TTC"
+            },
+            "tooltips": {
+                "view": "Voir les détails",
+                "edit": "Modifier",
+                "delete": "Supprimer"
+            },
+            "messages": {
+                "manual_process_success": "Processus de génération déclenché avec succès",
+                "manual_process_error": "Erreur lors du déclenchement du processus"
             }
         },
         "emptyState": {

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import { useGet, useGetRaw } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { Invoice } from "@/types"
+import type { Invoice, RecurringInvoice } from "@/types"
 import { useTranslation } from "react-i18next"
 import { RecurringInvoiceList, type RecurringInvoiceListHandle } from "./_components/recurring-invoices/recurring-invoices-list"
 
@@ -20,6 +20,7 @@ export default function Invoices() {
         mutate,
         loading,
     } = useGet<{ pageCount: number; invoices: Invoice[] }>(`/api/invoices?page=${page}`)
+    const { data: recurringInvoices } = useGet<{ recurringInvoices: RecurringInvoice[] }>("/api/recurring-invoices")
     const [downloadInvoicePdf, setDownloadInvoicePdf] = useState<Invoice | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
 
@@ -175,7 +176,7 @@ export default function Invoices() {
 
             <RecurringInvoiceList
                 ref={recurringInvoiceListRef}
-                recurringInvoices={[]}
+                recurringInvoices={recurringInvoices?.recurringInvoices || []}
                 loading={false}
                 title={t("recurringInvoices.list.title")}
                 description={t("recurringInvoices.list.description")}
