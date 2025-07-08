@@ -19,7 +19,7 @@ interface RecurringInvoiceDeleteDialogProps {
 
 export function RecurringInvoiceDeleteDialog({ recurringInvoice, onOpenChange }: RecurringInvoiceDeleteDialogProps) {
     const { t } = useTranslation()
-    const { trigger } = useDelete(`/api/recurringInvoices/${recurringInvoice?.id}`)
+    const { trigger } = useDelete(`/api/recurring-invoices/${recurringInvoice?.id}`)
 
     const handleDelete = () => {
         if (!recurringInvoice) return
