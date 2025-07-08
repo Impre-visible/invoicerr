@@ -104,6 +104,11 @@ export class QuotesService {
                 orderBy: {
                     number: 'asc',
                 },
+                include: {
+                    items: true,
+                    company: true,
+                    client: true,
+                },
             });
         }
 
@@ -120,6 +125,8 @@ export class QuotesService {
                 number: 'asc',
             },
             include: {
+                items: true,
+                company: true,
                 client: true,
             },
         });

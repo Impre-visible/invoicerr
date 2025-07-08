@@ -10,9 +10,22 @@ import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { QuotesModule } from './models/quotes/quotes.module';
 import { SignaturesModule } from './models/signatures/signatures.module';
+import { RecurringInvoicesModule } from './models/recurring-invoices/recurring-invoices.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [AuthModule, CompanyModule, ClientsModule, QuotesModule, InvoicesModule, DashboardModule, SignaturesModule, DangerModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    AuthModule,
+    CompanyModule,
+    ClientsModule,
+    QuotesModule,
+    InvoicesModule,
+    DashboardModule,
+    SignaturesModule,
+    DangerModule,
+    RecurringInvoicesModule
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

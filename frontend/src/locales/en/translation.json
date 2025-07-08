@@ -35,8 +35,11 @@
                 "delete": "Delete client"
             }
         },
-        "create": {
-            "title": "Add New Client",
+        "upsert": {
+            "title": {
+                "create": "Add New Client",
+                "edit": "Edit Client"
+            },
             "fields": {
                 "contactFirstname": {
                     "label": "First Name",
@@ -145,119 +148,7 @@
             },
             "actions": {
                 "cancel": "Cancel",
-                "create": "Create Client"
-            }
-        },
-        "edit": {
-            "title": "Edit Client",
-            "fields": {
-                "contactFirstname": {
-                    "label": "First Name",
-                    "placeholder": "Enter first name"
-                },
-                "contactLastname": {
-                    "label": "Last Name",
-                    "placeholder": "Enter last name"
-                },
-                "name": {
-                    "label": "Company Name",
-                    "placeholder": "Enter company name"
-                },
-                "description": {
-                    "label": "Description",
-                    "placeholder": "Enter company description"
-                },
-                "legalId": {
-                    "label": "Legal ID",
-                    "placeholder": "Enter legal identifier"
-                },
-                "vat": {
-                    "label": "VAT Number",
-                    "placeholder": "Enter VAT number (e.g., FR12345678901)"
-                },
-                "currency": {
-                    "label": "Currency"
-                },
-                "foundedAt": {
-                    "label": "Founded Date",
-                    "placeholder": "Select founding date"
-                },
-                "contactEmail": {
-                    "label": "Email",
-                    "placeholder": "Enter email address"
-                },
-                "contactPhone": {
-                    "label": "Phone",
-                    "placeholder": "Enter phone number"
-                },
-                "address": {
-                    "label": "Address",
-                    "placeholder": "Enter street address"
-                },
-                "postalCode": {
-                    "label": "Postal Code",
-                    "placeholder": "Enter postal code"
-                },
-                "city": {
-                    "label": "City",
-                    "placeholder": "Enter city"
-                },
-                "country": {
-                    "label": "Country",
-                    "placeholder": "Enter country"
-                }
-            },
-            "validation": {
-                "name": {
-                    "required": "Company name is required"
-                },
-                "description": {
-                    "required": "Description is required",
-                    "maxLength": "Description must be less than 500 characters"
-                },
-                "legalId": {
-                    "required": "Legal ID is required",
-                    "empty": "Legal ID cannot be empty",
-                    "maxLength": "Legal ID must be less than 50 characters"
-                },
-                "vat": {
-                    "required": "VAT number is required",
-                    "empty": "VAT number cannot be empty",
-                    "maxLength": "VAT number must be less than 15 characters",
-                    "format": "VAT number format is invalid (e.g., FR12345678901)"
-                },
-                "foundedAt": {
-                    "future": "Founded date cannot be in the future"
-                },
-                "contactFirstname": {
-                    "required": "First name is required"
-                },
-                "contactLastname": {
-                    "required": "Last name is required"
-                },
-                "contactPhone": {
-                    "minLength": "Phone number must be at least 8 characters",
-                    "format": "Phone number format is invalid"
-                },
-                "contactEmail": {
-                    "required": "Email is required",
-                    "format": "Email format is invalid"
-                },
-                "address": {
-                    "required": "Address is required"
-                },
-                "postalCode": {
-                    "format": "Postal code format is invalid"
-                },
-                "city": {
-                    "required": "City is required"
-                },
-                "country": {
-                    "required": "Country is required"
-                }
-            },
-            "actions": {
-                "cancel": "Cancel",
+                "create": "Create Client",
                 "save": "Save Changes"
             }
         },
@@ -344,8 +235,11 @@
                 "invoiceCreateError": "Failed to create invoice from quote"
             }
         },
-        "create": {
-            "title": "Create New Quote",
+        "upsert": {
+            "title": {
+                "create": "Create New Quote",
+                "edit": "Edit Quote"
+            },
             "form": {
                 "title": {
                     "label": "Title",
@@ -416,81 +310,7 @@
             },
             "actions": {
                 "cancel": "Cancel",
-                "create": "Create Quote"
-            }
-        },
-        "edit": {
-            "title": "Edit Quote",
-            "form": {
-                "title": {
-                    "label": "Title",
-                    "placeholder": "Enter quote title"
-                },
-                "client": {
-                    "label": "Client",
-                    "placeholder": "Select a client",
-                    "errors": {
-                        "required": "Please select a client"
-                    }
-                },
-                "currency": {
-                    "label": "Currency"
-                },
-                "validUntil": {
-                    "label": "Valid Until",
-                    "placeholder": "Select expiration date"
-                },
-                "items": {
-                    "label": "Quote Items",
-                    "addItem": "Add Item",
-                    "description": {
-                        "placeholder": "Item description",
-                        "errors": {
-                            "required": "Description is required"
-                        }
-                    },
-                    "quantity": {
-                        "placeholder": "Qty",
-                        "unit": "pcs",
-                        "errors": {
-                            "required": "Quantity is required",
-                            "min": "Quantity must be at least 1",
-                            "invalid": "Invalid quantity"
-                        }
-                    },
-                    "unitPrice": {
-                        "placeholder": "Unit price",
-                        "errors": {
-                            "required": "Unit price is required",
-                            "min": "Unit price must be positive",
-                            "invalid": "Invalid unit price"
-                        }
-                    },
-                    "vatRate": {
-                        "placeholder": "VAT %",
-                        "errors": {
-                            "required": "VAT rate is required",
-                            "min": "VAT rate must be positive"
-                        }
-                    }
-                },
-                "notes": {
-                    "label": "Notes",
-                    "placeholder": "Additional notes or terms"
-                },
-                "paymentMethod": {
-                    "label": "Payment Method",
-                    "placeholder": "Select payment method",
-                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
-                },
-                "paymentDetails": {
-                    "label": "Payment Details",
-                    "placeholder": "Enter payment details",
-                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
-                }
-            },
-            "actions": {
-                "cancel": "Cancel",
+                "create": "Create Quote",
                 "save": "Save Changes"
             }
         },
@@ -595,8 +415,11 @@
                 "markAsPaidError": "Failed to mark invoice as paid"
             }
         },
-        "create": {
-            "title": "Create New Invoice",
+        "upsert": {
+            "title": {
+                "create": "Create New Invoice",
+                "edit": "Edit Invoice"
+            },
             "form": {
                 "quote": {
                     "label": "From Quote",
@@ -667,81 +490,7 @@
             },
             "actions": {
                 "cancel": "Cancel",
-                "create": "Create Invoice"
-            }
-        },
-        "edit": {
-            "title": "Edit Invoice",
-            "form": {
-                "quote": {
-                    "label": "From Quote",
-                    "placeholder": "Select a quote",
-                    "errors": {
-                        "required": "Please select a quote"
-                    }
-                },
-                "client": {
-                    "label": "Client",
-                    "placeholder": "Select a client",
-                    "errors": {
-                        "required": "Please select a client"
-                    }
-                },
-                "dueDate": {
-                    "label": "Due Date",
-                    "placeholder": "Select due date"
-                },
-                "items": {
-                    "label": "Invoice Items",
-                    "addItem": "Add Item",
-                    "description": {
-                        "placeholder": "Item description",
-                        "errors": {
-                            "required": "Description is required"
-                        }
-                    },
-                    "quantity": {
-                        "placeholder": "Qty",
-                        "unit": "pcs",
-                        "errors": {
-                            "required": "Quantity is required",
-                            "min": "Quantity must be at least 1",
-                            "invalid": "Invalid quantity"
-                        }
-                    },
-                    "unitPrice": {
-                        "placeholder": "Unit price",
-                        "errors": {
-                            "required": "Unit price is required",
-                            "min": "Unit price must be positive",
-                            "invalid": "Invalid unit price"
-                        }
-                    },
-                    "vatRate": {
-                        "placeholder": "VAT %",
-                        "errors": {
-                            "required": "VAT rate is required",
-                            "min": "VAT rate must be positive"
-                        }
-                    }
-                },
-                "notes": {
-                    "label": "Notes",
-                    "placeholder": "Additional notes or terms"
-                },
-                "paymentMethod": {
-                    "label": "Payment Method",
-                    "placeholder": "Select payment method",
-                    "description": "Preferred payment method for this quote (e.g., Bank Transfer, Check, etc.)"
-                },
-                "paymentDetails": {
-                    "label": "Payment Details",
-                    "placeholder": "Enter payment details",
-                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
-                }
-            },
-            "actions": {
-                "cancel": "Cancel",
+                "create": "Create Invoice",
                 "save": "Save Changes"
             }
         },
@@ -780,6 +529,129 @@
         },
         "pdf": {
             "title": "Invoice {{number}} - PDF"
+        }
+    },
+    "recurringInvoices": {
+        "frequency": {
+            "weekly": "Every week",
+            "biweekly": "Every 2 weeks",
+            "monthly": "Every month",
+            "bimonthly": "Every 2 months",
+            "quarterly": "Every 3 months",
+            "quadmonthly": "Every 4 months",
+            "semiannually": "Every 6 months",
+            "annually": "Every year"
+        },
+        "list": {
+            "title": "Recurring Invoices",
+            "description": "Manage your recurring invoices and automate billing.",
+            "actions": {
+                "addNew": "Add New Recurring Invoice"
+            }
+        },
+        "emptyState": {
+            "noInvoices": "No recurring invoices yet",
+            "startAdding": "Get started by creating your first recurring invoice."
+        },
+        "actions": {
+            "addNew": "Add New Recurring Invoice"
+        },
+        "upsert": {
+            "title": {
+                "create": "Create New Recurring Invoice",
+                "edit": "Edit Recurring Invoice"
+            },
+            "form": {
+                "quote": {
+                    "label": "From Quote",
+                    "placeholder": "Select a quote"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "currency": {
+                    "label": "Currency"
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this recurring invoice (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
+                },
+                "frequency": {
+                    "label": "Frequency",
+                    "placeholder": "Select frequency",
+                    "description": "How often invoices will be generated",
+                    "errors": {
+                        "required": "Frequency is required"
+                    }
+                },
+                "count": {
+                    "label": "Occurrences",
+                    "placeholder": "Enter number of occurrences",
+                    "description": "Total number of times the invoice will be generated (empty for infinite recurrence)"
+                },
+                "until": {
+                    "label": "End Date",
+                    "placeholder": "Select end date",
+                    "description": "Date when the recurring invoice will stop being generated (leave empty for infinite recurrence)"
+                },
+                "autoSend": {
+                    "label": "Auto Send",
+                    "description": "Automatically send the recurring invoice to the client when generated"
+                },
+                "items": {
+                    "label": "Recurring Invoice Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "create": "Create Recurring Invoice",
+                "save": "Save Changes"
+            }
         }
     },
     "dashboard": {
@@ -1347,6 +1219,14 @@
             "placeholder": "Select your currency",
             "searchPlaceholder": "Search currencies...",
             "noResults": "No currencies found"
+        }
+    },
+    "common": {
+        "units": {
+            "day": "Day",
+            "week": "Week",
+            "month": "Month",
+            "year": "Year"
         }
     }
 }

@@ -21,46 +21,46 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
     const { trigger } = usePost("/api/clients")
 
     const clientSchema = z.object({
-        name: z.string().min(1, t("clients.create.validation.name.required")),
+        name: z.string().min(1, t("clients.upsert.validation.name.required")),
         description: z
             .string()
-            .min(1, t("clients.create.validation.description.required"))
-            .max(500, t("clients.create.validation.description.maxLength")),
+            .min(1, t("clients.upsert.validation.description.required"))
+            .max(500, t("clients.upsert.validation.description.maxLength")),
         legalId: z
             .string()
-            .max(50, t("clients.create.validation.legalId.maxLength"))
+            .max(50, t("clients.upsert.validation.legalId.maxLength"))
             .optional(),
         VAT: z
             .string()
-            .max(15, t("clients.create.validation.vat.maxLength"))
+            .max(15, t("clients.upsert.validation.vat.maxLength"))
             .refine((val) => {
                 if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("clients.create.validation.vat.format"))
+            }, t("clients.upsert.validation.vat.format"))
             .optional(),
         currency: z.string().nullable().optional(),
-        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.create.validation.foundedAt.future")),
-        contactFirstname: z.string().min(1, t("clients.create.validation.contactFirstname.required")),
-        contactLastname: z.string().min(1, t("clients.create.validation.contactLastname.required")),
+        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
+        contactFirstname: z.string().min(1, t("clients.upsert.validation.contactFirstname.required")),
+        contactLastname: z.string().min(1, t("clients.upsert.validation.contactLastname.required")),
         contactPhone: z
             .string()
-            .min(8, t("clients.create.validation.contactPhone.minLength"))
+            .min(8, t("clients.upsert.validation.contactPhone.minLength"))
             .refine((val) => {
                 return /^[+]?[0-9\s\-()]{8,20}$/.test(val)
-            }, t("clients.create.validation.contactPhone.format")),
+            }, t("clients.upsert.validation.contactPhone.format")),
         contactEmail: z
             .string()
             .email()
-            .min(1, t("clients.create.validation.contactEmail.required"))
+            .min(1, t("clients.upsert.validation.contactEmail.required"))
             .refine((val) => {
                 return z.string().email().safeParse(val).success
-            }, t("clients.create.validation.contactEmail.format")),
-        address: z.string().min(1, t("clients.create.validation.address.required")),
+            }, t("clients.upsert.validation.contactEmail.format")),
+        address: z.string().min(1, t("clients.upsert.validation.address.required")),
         postalCode: z.string().refine((val) => {
             return /^[0-9A-Z\s-]{3,10}$/.test(val)
-        }, t("clients.create.validation.postalCode.format")),
-        city: z.string().min(1, t("clients.create.validation.city.required")),
-        country: z.string().min(1, t("clients.create.validation.country.required")),
+        }, t("clients.upsert.validation.postalCode.format")),
+        city: z.string().min(1, t("clients.upsert.validation.city.required")),
+        country: z.string().min(1, t("clients.upsert.validation.country.required")),
     })
 
     const form = useForm<z.infer<typeof clientSchema>>({
@@ -70,11 +70,12 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
             description: "",
             legalId: "",
             VAT: "",
+            currency: null,
             foundedAt: new Date(),
             contactFirstname: "",
             contactLastname: "",
-            contactEmail: "",
             contactPhone: "",
+            contactEmail: "",
             address: "",
             postalCode: "",
             city: "",
@@ -82,36 +83,35 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
         },
     })
 
-    const handleSubmit = (data: z.infer<typeof clientSchema>) => {
+    const onSubmit = (data: z.infer<typeof clientSchema>) => {
+        console.debug("Creating client with data:", data)
+
         trigger(data)
             .then(() => {
                 onOpenChange(false)
                 form.reset()
             })
-            .catch((error) => {
-                console.error("Failed to create client:", error)
-            })
+            .catch((err) => console.error(err))
     }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col">
-                <DialogHeader className="flex-shrink-0">
-                    <DialogTitle>{t("clients.create.title")}</DialogTitle>
-                </DialogHeader>
-
-                <div className="overflow-auto mt-2 flex-1">
+            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-auto">
+                    <DialogHeader>
+                        <DialogTitle>{t("clients.upsert.title.create")}</DialogTitle>
+                    </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="contactFirstname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.contactFirstname.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.contactFirstname.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactFirstname.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -122,9 +122,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="contactLastname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.contactLastname.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.contactLastname.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactLastname.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -137,9 +137,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.create.fields.name.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.name.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.create.fields.name.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.name.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -151,9 +151,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.create.fields.description.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.description.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.create.fields.description.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.description.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -166,9 +166,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("clients.create.fields.legalId.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.legalId.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.legalId.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.legalId.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -179,9 +179,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("clients.create.fields.vat.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.vat.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.vat.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.vat.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -189,41 +189,42 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                 />
                             </div>
 
-                            <FormField
-                                control={form.control}
-                                name="currency"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t("clients.create.fields.currency.label")}</FormLabel>
-                                        <FormControl>
-                                            <CurrencySelect
-                                                value={field.value}
-                                                onChange={(value) => field.onChange(value)}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="foundedAt"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel required>{t("clients.create.fields.foundedAt.label")}</FormLabel>
-                                        <FormControl>
-                                            <DatePicker
-                                                value={field.value || null}
-                                                onChange={(date) => field.onChange(date || new Date())}
-                                                placeholder={t("clients.create.fields.foundedAt.placeholder")}
-                                                className="w-full"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="currency"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("clients.upsert.fields.currency.label")}</FormLabel>
+                                            <FormControl>
+                                                <CurrencySelect
+                                                    value={field.value}
+                                                    onChange={(value) => field.onChange(value)}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="foundedAt"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel required>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
+                                            <FormControl>
+                                                <DatePicker
+                                                    className="w-full"
+                                                    value={field.value || null}
+                                                    onChange={field.onChange}
+                                                    placeholder={t("clients.upsert.fields.foundedAt.placeholder")}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
@@ -231,9 +232,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="contactEmail"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.contactEmail.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.contactEmail.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactEmail.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -244,9 +245,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="contactPhone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.contactPhone.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactPhone.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.contactPhone.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactPhone.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -259,9 +260,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.create.fields.address.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.address.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.create.fields.address.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.address.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -274,9 +275,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="postalCode"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.postalCode.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.postalCode.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.postalCode.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.postalCode.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -287,9 +288,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="city"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.city.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.city.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.city.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.city.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -300,9 +301,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="country"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.create.fields.country.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.country.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.create.fields.country.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.country.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -312,9 +313,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
 
                             <div className="flex justify-end space-x-2">
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                    {t("clients.create.actions.cancel")}
+                                    {t("clients.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">{t("clients.create.actions.create")}</Button>
+                                <Button type="submit">{t("clients.upsert.actions.create")}</Button>
                             </div>
                         </form>
                     </Form>

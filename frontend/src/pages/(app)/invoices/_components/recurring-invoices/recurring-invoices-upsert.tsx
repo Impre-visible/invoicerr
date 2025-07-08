@@ -1,8 +1,9 @@
-import type { Client, Invoice, Quote } from "@/types"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import type { Client, Quote, RecurringInvoice } from "@/types"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
@@ -16,32 +17,33 @@ import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-interface InvoiceUpsertDialogProps {
-    invoice?: Invoice | null
+interface RecurringInvoiceUpsertDialogProps {
+    recurringInvoice?: RecurringInvoice | null
     open: boolean
     onOpenChange: (open: boolean) => void
 }
 
-export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDialogProps) {
+export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }: RecurringInvoiceUpsertDialogProps) {
     const { t } = useTranslation()
-    const isEdit = !!invoice
+    const isEdit = !!recurringInvoice
 
-    const invoiceSchema = z.object({
+    const recurringInvoiceSchema = z.object({
         quoteId: z
             .string()
             .optional(),
         clientId: z
             .string()
-            .min(1, t("invoices.upsert.form.client.errors.required"))
+            .min(1, t("recurringInvoices.upsert.form.client.errors.required"))
             .refine((val) => val !== "", {
-                message: t("invoices.upsert.form.client.errors.required"),
+                message: t("recurringInvoices.upsert.form.client.errors.required"),
             }),
-        dueDate: z.date().optional(),
         notes: z.string().optional(),
         paymentMethod: z
             .string()
@@ -49,37 +51,45 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         paymentDetails: z
             .string()
             .optional(),
+        frequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY", "BIMONTHLY", "QUARTERLY", "QUADMONTHLY", "SEMIANNUALLY", "ANNUALLY"], {
+            errorMap: () => ({
+                message: t("recurringInvoices.upsert.form.frequency.errors.required"),
+            }),
+        }),
+        count: z.number().optional(),
+        until: z.date().optional(),
         currency: z.string().optional(),
+        autoSend: z.boolean().optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
                 description: z
                     .string()
-                    .min(1, t("invoices.upsert.form.items.description.errors.required"))
+                    .min(1, t("recurringInvoices.upsert.form.items.description.errors.required"))
                     .refine((val) => val !== "", {
-                        message: t("invoices.upsert.form.items.description.errors.required"),
+                        message: t("recurringInvoices.upsert.form.items.description.errors.required"),
                     }),
                 quantity: z
                     .number({
-                        invalid_type_error: t("invoices.upsert.form.items.quantity.errors.required"),
+                        invalid_type_error: t("recurringInvoices.upsert.form.items.quantity.errors.required"),
                     })
-                    .min(1, t("invoices.upsert.form.items.quantity.errors.min"))
+                    .min(1, t("recurringInvoices.upsert.form.items.quantity.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t("invoices.upsert.form.items.quantity.errors.invalid"),
+                        message: t("recurringInvoices.upsert.form.items.quantity.errors.invalid"),
                     }),
                 unitPrice: z
                     .number({
-                        invalid_type_error: t("invoices.upsert.form.items.unitPrice.errors.required"),
+                        invalid_type_error: t("recurringInvoices.upsert.form.items.unitPrice.errors.required"),
                     })
-                    .min(0, t("invoices.upsert.form.items.unitPrice.errors.min"))
+                    .min(0, t("recurringInvoices.upsert.form.items.unitPrice.errors.min"))
                     .refine((val) => !isNaN(val), {
-                        message: t("invoices.upsert.form.items.unitPrice.errors.invalid"),
+                        message: t("recurringInvoices.upsert.form.items.unitPrice.errors.invalid"),
                     }),
                 vatRate: z
                     .number({
-                        invalid_type_error: t("invoices.upsert.form.items.vatRate.errors.required"),
+                        invalid_type_error: t("recurringInvoices.upsert.form.items.vatRate.errors.required"),
                     })
-                    .min(0, t("invoices.upsert.form.items.vatRate.errors.min")),
+                    .min(0, t("recurringInvoices.upsert.form.items.vatRate.errors.min")),
                 order: z.number(),
             }),
         ),
@@ -90,30 +100,32 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
     const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
 
-    const { trigger: createTrigger } = usePost("/api/invoices")
-    const { trigger: updateTrigger } = usePatch(`/api/invoices/${invoice?.id}`)
+    const { trigger: createTrigger } = usePost("/api/recurring-invoices")
+    const { trigger: updateTrigger } = usePatch(`/api/recurring-invoices/${recurringInvoice?.id}`)
 
-    const form = useForm<z.infer<typeof invoiceSchema>>({
-        resolver: zodResolver(invoiceSchema),
+    const form = useForm<z.infer<typeof recurringInvoiceSchema>>({
+        resolver: zodResolver(recurringInvoiceSchema),
         defaultValues: {
             quoteId: undefined,
             clientId: "",
-            dueDate: undefined,
             items: [],
             notes: "",
+            frequency: "MONTHLY",
+            autoSend: false,
         },
     })
 
     useEffect(() => {
-        if (isEdit && invoice) {
+        if (isEdit && recurringInvoice) {
             form.reset({
-                quoteId: invoice.quoteId || "",
-                clientId: invoice.clientId || "",
-                dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-                notes: invoice.notes || "",
-                paymentMethod: invoice.paymentMethod || "",
-                paymentDetails: invoice.paymentDetails || "",
-                items: invoice.items
+                notes: recurringInvoice.notes || "",
+                paymentMethod: recurringInvoice.paymentMethod || "",
+                paymentDetails: recurringInvoice.paymentDetails || "",
+                frequency: recurringInvoice.frequency || "MONTHLY",
+                count: recurringInvoice.count,
+                until: recurringInvoice.until ? new Date(recurringInvoice.until) : undefined,
+                autoSend: recurringInvoice.autoSend || false,
+                items: recurringInvoice.items
                     .sort((a, b) => a.order - b.order)
                     .map((item) => ({
                         id: item.id,
@@ -128,11 +140,13 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             form.reset({
                 quoteId: undefined,
                 clientId: "",
-                dueDate: undefined,
                 items: [],
+                notes: "",
+                frequency: "MONTHLY",
+                autoSend: false,
             })
         }
-    }, [invoice, form, isEdit])
+    }, [recurringInvoice, form, isEdit])
 
     const { control, handleSubmit, setValue } = form
     const { fields, append, move, remove } = useFieldArray({
@@ -165,8 +179,8 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         remove(index)
     }
 
-    const onSubmit = (data: z.infer<typeof invoiceSchema>) => {
-        console.debug("Submitting invoice data:", data)
+    const onSubmit = (data: z.infer<typeof recurringInvoiceSchema>) => {
+        console.debug("Submitting recurringInvoice data:", data)
 
         const trigger = isEdit ? updateTrigger : createTrigger
 
@@ -178,20 +192,25 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             .catch((err) => console.error(err))
     }
 
+    const handleClose = (open: boolean) => {
+        onOpenChange(!!open)
+        form.reset()
+    }
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
+        <Dialog open={open} onOpenChange={handleClose}>
+            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    <DialogTitle>{t(`recurringInvoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1">
                         <FormField
                             control={control}
                             name="quoteId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.quote.label")}</FormLabel>
+                                    <FormLabel>{t("recurringInvoices.upsert.form.quote.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(quotes || []).map((c) => ({
@@ -202,23 +221,25 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                             onValueChange={(val) => {
                                                 field.onChange(val || null)
                                                 if (val) {
-                                                    form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
-                                                    form.setValue("notes", quotes?.find((q) => q.id === val)?.notes || "")
-                                                    form.setValue("paymentMethod", quotes?.find((q) => q.id === val)?.paymentMethod || "")
-                                                    form.setValue("paymentDetails", quotes?.find((q) => q.id === val)?.paymentDetails || "")
+                                                    const quote = quotes?.find((q) => q.id === val)
+                                                    if (!quote) return
+                                                    form.setValue("clientId", quote.clientId)
+                                                    form.setValue("notes", quote.notes)
+                                                    form.setValue("paymentMethod", quote.paymentMethod)
+                                                    form.setValue("paymentDetails", quote.paymentDetails)
                                                     form.setValue("currency", quotes?.find((q) => q.id === val)?.currency || "")
-                                                    form.setValue('items', quotes?.find((q) => q.id === val)?.items.map((item, index) => ({
+                                                    form.setValue('items', quote.items.map((item) => ({
                                                         id: item.id,
                                                         description: item.description || "",
                                                         quantity: item.quantity || 1,
                                                         unitPrice: item.unitPrice || 0,
-                                                        vatRate: item.vatRate || 0,
-                                                        order: index,
-                                                    })) || [])
+                                                        vatRate: item.vatRate ?? 0,
+                                                        order: item.order || 0,
+                                                    })))
                                                 }
                                             }}
                                             onSearchChange={setQuoteSearchTerm}
-                                            placeholder={t("invoices.upsert.form.quote.placeholder")}
+                                            placeholder={t("recurringInvoices.upsert.form.quote.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -231,14 +252,14 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="clientId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel required>{t("invoices.upsert.form.client.label")}</FormLabel>
+                                    <FormLabel required>{t("recurringInvoices.upsert.form.client.label")}</FormLabel>
                                     <FormControl>
                                         <SearchSelect
                                             options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
                                             value={field.value ?? ""}
                                             onValueChange={(val) => field.onChange(val || null)}
                                             onSearchChange={setClientsSearchTerm}
-                                            placeholder={t("invoices.upsert.form.client.placeholder")}
+                                            placeholder={t("recurringInvoices.upsert.form.client.placeholder")}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -251,28 +272,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="currency"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.currency.label")}</FormLabel>
+                                    <FormLabel>{t("recurringInvoices.upsert.form.currency.label")}</FormLabel>
                                     <FormControl>
                                         <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="dueDate"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.dueDate.label")}</FormLabel>
-                                    <FormControl>
-                                        <DatePicker
-                                            className="w-full"
-                                            value={field.value || null}
-                                            onChange={field.onChange}
-                                            placeholder={t("invoices.upsert.form.dueDate.placeholder")}
-                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -284,9 +286,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             name="notes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.notes.label")}</FormLabel>
+                                    <FormLabel>{t("recurringInvoices.upsert.form.notes.label")}</FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} placeholder={t("invoices.upsert.form.notes.placeholder")} className="max-h-40" />
+                                        <Textarea {...field} placeholder={t("recurringInvoices.upsert.form.notes.placeholder")} className="max-h-40" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -299,15 +301,15 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 name="paymentMethod"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("invoices.upsert.form.paymentMethod.label")}</FormLabel>
+                                        <FormLabel required>{t("recurringInvoices.upsert.form.paymentMethod.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t("invoices.upsert.form.paymentMethod.placeholder")}
+                                                placeholder={t("recurringInvoices.upsert.form.paymentMethod.placeholder")}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t("invoices.upsert.form.paymentMethod.description")}
+                                            {t("recurringInvoices.upsert.form.paymentMethod.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -319,16 +321,16 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 name="paymentDetails"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("invoices.upsert.form.paymentDetails.label")}</FormLabel>
+                                        <FormLabel required>{t("recurringInvoices.upsert.form.paymentDetails.label")}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder={t("invoices.upsert.form.paymentDetails.placeholder")}
+                                                placeholder={t("recurringInvoices.upsert.form.paymentDetails.placeholder")}
                                                 className="max-h-40"
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {t("invoices.upsert.form.paymentDetails.description")}
+                                            {t("recurringInvoices.upsert.form.paymentDetails.description")}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -336,8 +338,98 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             />
                         </section>
 
+                        <Separator className="my-4" />
+
+                        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormField
+                                control={control}
+                                name="frequency"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel required>
+                                            {t("recurringInvoices.upsert.form.frequency.label")}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Select value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder={t("recurringInvoices.upsert.form.frequency.placeholder")} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="WEEKLY">{t("recurringInvoices.frequency.weekly")}</SelectItem>
+                                                    <SelectItem value="BIWEEKLY">{t("recurringInvoices.frequency.biweekly")}</SelectItem>
+                                                    <SelectItem value="MONTHLY">{t("recurringInvoices.frequency.monthly")}</SelectItem>
+                                                    <SelectItem value="BIMONTHLY">{t("recurringInvoices.frequency.bimonthly")}</SelectItem>
+                                                    <SelectItem value="QUARTERLY">{t("recurringInvoices.frequency.quarterly")}</SelectItem>
+                                                    <SelectItem value="QUADMONTHLY">{t("recurringInvoices.frequency.quadmonthly")}</SelectItem>
+                                                    <SelectItem value="SEMIANNUALLY">{t("recurringInvoices.frequency.semiannually")}</SelectItem>
+                                                    <SelectItem value="ANNUALLY">{t("recurringInvoices.frequency.annually")}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                        <FormDescription>
+                                            {t("recurringInvoices.upsert.form.frequency.description")}
+                                        </FormDescription>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="count"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {t("recurringInvoices.upsert.form.count.label")}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <BetterInput
+                                                {...field}
+                                                type="number"
+                                                placeholder={t("recurringInvoices.upsert.form.count.placeholder")}
+                                                onChange={(e) =>
+                                                    field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                        <FormDescription>
+                                            {t("recurringInvoices.upsert.form.count.description")}
+                                        </FormDescription>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="until"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {t("recurringInvoices.upsert.form.until.label")}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <DatePicker
+                                                {...field}
+                                                className="w-full"
+                                                placeholder={t("recurringInvoices.upsert.form.until.placeholder")}
+                                                value={field.value || null}
+                                                onChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                        <FormDescription>
+                                            {t("recurringInvoices.upsert.form.until.description")}
+                                        </FormDescription>
+                                    </FormItem>
+                                )}
+                            />
+                        </section>
+
+                        <Separator className="my-4" />
+
                         <FormItem>
-                            <FormLabel>{t("invoices.upsert.form.items.label")}</FormLabel>
+                            <FormLabel>{t("recurringInvoices.upsert.form.items.label")}</FormLabel>
                             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                                 <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                                     <div className="space-y-2">
@@ -357,7 +449,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                     <Input
                                                                         {...field}
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.description.placeholder`,
+                                                                            "recurringInvoices.upsert.form.items.description.placeholder",
                                                                         )}
                                                                     />
                                                                 </FormControl>
@@ -375,10 +467,10 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                     <BetterInput
                                                                         {...field}
                                                                         defaultValue={field.value || ""}
-                                                                        postAdornment={t(`invoices.${isEdit ? "edit" : "create"}.form.items.quantity.unit`)}
+                                                                        postAdornment={t("recurringInvoices.upsert.form.items.quantity.unit")}
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.quantity.placeholder`,
+                                                                            "recurringInvoices.upsert.form.items.quantity.placeholder",
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -402,7 +494,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                         postAdornment="$"
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.unitPrice.placeholder`,
+                                                                            "recurringInvoices.upsert.form.items.unitPrice.placeholder",
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -422,12 +514,12 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                 <FormControl>
                                                                     <BetterInput
                                                                         {...field}
-                                                                        defaultValue={field.value || ""}
+                                                                        defaultValue={field.value}
                                                                         postAdornment="%"
                                                                         type="number"
                                                                         step="0.01"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.vatRate.placeholder`,
+                                                                            "recurringInvoices.upsert.form.items.vatRate.placeholder",
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(
@@ -467,20 +559,41 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 }
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                {t("invoices.upsert.form.items.addItem")}
+                                {t("recurringInvoices.upsert.form.items.addItem")}
                             </Button>
                         </FormItem>
 
-                        <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t("invoices.upsert.actions.cancel")}
-                            </Button>
-                            <Button type="submit">
-                                {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
-                            </Button>
-                        </div>
+                        <Separator className="my-4" />
+
+                        <FormField
+                            control={control}
+                            name="autoSend"
+                            render={({ field }) => (
+                                <FormItem className="mt-4">
+                                    <Switch
+                                        id="autoSend"
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                    <FormLabel className="ml-2" htmlFor="autoSend">
+                                        {t("recurringInvoices.upsert.form.autoSend.label")}
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {t("recurringInvoices.upsert.form.autoSend.description")}
+                                    </FormDescription>
+                                </FormItem>
+                            )}
+                        />
                     </form>
                 </Form>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => handleClose(false)}>
+                        {t(`recurringInvoices.upsert.actions.cancel`)}
+                    </Button>
+                    <Button type="submit" onClick={handleSubmit(onSubmit)} className="ml-2">
+                        {t(`recurringInvoices.upsert.actions.${isEdit ? "save" : "create"}`)}
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     )

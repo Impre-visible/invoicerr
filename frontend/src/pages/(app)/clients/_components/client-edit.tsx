@@ -23,46 +23,46 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
     const { trigger } = usePatch(`/api/clients/${client?.id}`)
 
     const clientSchema = z.object({
-        name: z.string().min(1, t("clients.edit.validation.name.required")),
+        name: z.string().min(1, t("clients.upsert.validation.name.required")),
         description: z
             .string()
-            .min(1, t("clients.edit.validation.description.required"))
-            .max(500, t("clients.edit.validation.description.maxLength")),
+            .min(1, t("clients.upsert.validation.description.required"))
+            .max(500, t("clients.upsert.validation.description.maxLength")),
         legalId: z
             .string()
-            .max(50, t("clients.create.validation.legalId.maxLength"))
+            .max(50, t("clients.upsert.validation.legalId.maxLength"))
             .optional(),
         VAT: z
             .string()
-            .max(15, t("clients.create.validation.vat.maxLength"))
+            .max(15, t("clients.upsert.validation.vat.maxLength"))
             .refine((val) => {
                 if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("clients.create.validation.vat.format"))
+            }, t("clients.upsert.validation.vat.format"))
             .optional(),
         currency: z.string().nullable().optional(),
-        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.edit.validation.foundedAt.future")),
-        contactFirstname: z.string().min(1, t("clients.edit.validation.contactFirstname.required")),
-        contactLastname: z.string().min(1, t("clients.edit.validation.contactLastname.required")),
+        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
+        contactFirstname: z.string().min(1, t("clients.upsert.validation.contactFirstname.required")),
+        contactLastname: z.string().min(1, t("clients.upsert.validation.contactLastname.required")),
         contactPhone: z
             .string()
-            .min(8, t("clients.edit.validation.contactPhone.minLength"))
+            .min(8, t("clients.upsert.validation.contactPhone.minLength"))
             .refine((val) => {
                 return /^[+]?[0-9\s\-()]{8,20}$/.test(val)
-            }, t("clients.edit.validation.contactPhone.format")),
+            }, t("clients.upsert.validation.contactPhone.format")),
         contactEmail: z
             .string()
             .email()
-            .min(1, t("clients.edit.validation.contactEmail.required"))
+            .min(1, t("clients.upsert.validation.contactEmail.required"))
             .refine((val) => {
                 return z.string().email().safeParse(val).success
-            }, t("clients.edit.validation.contactEmail.format")),
-        address: z.string().min(1, t("clients.edit.validation.address.required")),
+            }, t("clients.upsert.validation.contactEmail.format")),
+        address: z.string().min(1, t("clients.upsert.validation.address.required")),
         postalCode: z.string().refine((val) => {
             return /^[0-9A-Z\s-]{3,10}$/.test(val)
-        }, t("clients.edit.validation.postalCode.format")),
-        city: z.string().min(1, t("clients.edit.validation.city.required")),
-        country: z.string().min(1, t("clients.edit.validation.country.required")),
+        }, t("clients.upsert.validation.postalCode.format")),
+        city: z.string().min(1, t("clients.upsert.validation.city.required")),
+        country: z.string().min(1, t("clients.upsert.validation.country.required")),
     })
 
     const form = useForm<z.infer<typeof clientSchema>>({
@@ -109,7 +109,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
         <Dialog open={!!client} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col">
                 <DialogHeader>
-                    <DialogTitle>{t("clients.edit.title")}</DialogTitle>
+                    <DialogTitle>{t("clients.upsert.title.edit")}</DialogTitle>
                 </DialogHeader>
 
                 <div className="overflow-auto mt-2 flex-1">
@@ -121,9 +121,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="contactFirstname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.contactFirstname.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.contactFirstname.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactFirstname.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -134,9 +134,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="contactLastname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.contactLastname.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.contactLastname.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactLastname.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -149,9 +149,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.edit.fields.name.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.name.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.edit.fields.name.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.name.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -163,9 +163,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.edit.fields.description.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.description.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.edit.fields.description.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.description.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -178,9 +178,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("clients.edit.fields.legalId.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.legalId.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.legalId.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.legalId.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -191,9 +191,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("clients.edit.fields.vat.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.vat.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.vat.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.vat.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -206,7 +206,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="currency"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("clients.create.fields.currency.label")}</FormLabel>
+                                        <FormLabel>{t("clients.upsert.fields.currency.label")}</FormLabel>
                                         <FormControl>
                                             <CurrencySelect
                                                 value={field.value}
@@ -223,12 +223,12 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="foundedAt"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.edit.fields.foundedAt.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
                                         <FormControl>
                                             <DatePicker
                                                 value={field.value || null}
                                                 onChange={(date) => field.onChange(date || new Date())}
-                                                placeholder={t("clients.edit.fields.foundedAt.placeholder")}
+                                                placeholder={t("clients.upsert.fields.foundedAt.placeholder")}
                                                 className="w-full"
                                             />
                                         </FormControl>
@@ -243,9 +243,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="contactEmail"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.contactEmail.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.contactEmail.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactEmail.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -256,9 +256,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="contactPhone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.contactPhone.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactPhone.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.contactPhone.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.contactPhone.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -271,9 +271,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.edit.fields.address.label")}</FormLabel>
+                                        <FormLabel required>{t("clients.upsert.fields.address.label")}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.edit.fields.address.placeholder")} />
+                                            <Input {...field} placeholder={t("clients.upsert.fields.address.placeholder")} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -286,9 +286,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="postalCode"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.postalCode.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.postalCode.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.postalCode.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.postalCode.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -299,9 +299,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="city"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.city.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.city.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.city.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.city.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -312,9 +312,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                     name="country"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.edit.fields.country.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.country.label")}</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder={t("clients.edit.fields.country.placeholder")} />
+                                                <Input {...field} placeholder={t("clients.upsert.fields.country.placeholder")} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -324,9 +324,9 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
 
                             <div className="flex justify-end space-x-2">
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                    {t("clients.edit.actions.cancel")}
+                                    {t("clients.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">{t("clients.edit.actions.save")}</Button>
+                                <Button type="submit">{t("clients.upsert.actions.save")}</Button>
                             </div>
                         </form>
                     </Form>
