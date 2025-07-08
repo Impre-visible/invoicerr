@@ -782,6 +782,222 @@
             "title": "Invoice {{number}} - PDF"
         }
     },
+    "recurringInvoices": {
+        "list": {
+            "title": "Recurring Invoices",
+            "description": "Manage your recurring invoices and automate billing.",
+            "actions": {
+                "addNew": "Add New Recurring Invoice"
+            }
+        },
+        "emptyState": {
+            "noInvoices": "No recurring invoices yet",
+            "startAdding": "Get started by creating your first recurring invoice."
+        },
+        "actions": {
+            "addNew": "Add New Recurring Invoice"
+        },
+        "create": {
+            "title": "Create New Recurring Invoice",
+            "form": {
+                "quote": {
+                    "label": "From Quote",
+                    "placeholder": "Select a quote"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this recurring invoice (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
+                },
+                "recurrenceRule": {
+                    "interval": {
+                        "label": "Interval",
+                        "placeholder": "Enter interval",
+                        "description": "Number of units for the billing interval (e.g., 1, 2, 3, etc.)",
+                        "errors": {
+                            "required": "Interval is required",
+                            "min": "Interval must be at least 1",
+                            "invalid": "Invalid interval"
+                        }
+                    },
+                    "units": {
+                        "label": "Units",
+                        "placeholder": "Select units",
+                        "description": "Units for the billing interval (e.g., Days, Weeks, Months, Years)",
+                        "errors": {
+                            "required": "Units are required"
+                        }
+                    },
+                    "count": {
+                        "label": "Occurrences",
+                        "placeholder": "Enter number of occurrences",
+                        "description": "Total number of times the invoice will be generated (empty for infinite recurrence)"
+                    },
+                    "until": {
+                        "label": "End Date",
+                        "placeholder": "Select end date",
+                        "description": "Date when the recurring invoice will stop being generated (leave empty for infinite recurrence)"
+                    }
+                },
+                "autoSend": {
+                    "label": "Auto Send",
+                    "description": "Automatically send the recurring invoice to the client when generated"
+                },
+                "items": {
+                    "label": "Recurring Invoice Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "create": "Create Recurring Invoice"
+            }
+        },
+        "edit": {
+            "title": "Edit Recurring Invoice",
+            "form": {
+                "quote": {
+                    "label": "From Quote",
+                    "placeholder": "Select a quote"
+                },
+                "client": {
+                    "label": "Client",
+                    "placeholder": "Select a client",
+                    "errors": {
+                        "required": "Please select a client"
+                    }
+                },
+                "notes": {
+                    "label": "Notes",
+                    "placeholder": "Additional notes or terms"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Select payment method",
+                    "description": "Preferred payment method for this recurring invoice (e.g., Bank Transfer, Check, etc.)"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
+                },
+                "recurrenceRule": {
+                    "interval": {
+                        "label": "Interval",
+                        "placeholder": "Enter interval",
+                        "description": "Number of units for the billing interval (e.g., 1, 2, 3, etc.)",
+                        "errors": {
+                            "required": "Interval is required",
+                            "min": "Interval must be at least 1",
+                            "invalid": "Invalid interval"
+                        }
+                    },
+                    "units": {
+                        "label": "Units",
+                        "placeholder": "Select units",
+                        "description": "Units for the billing interval (e.g., Days, Weeks, Months, Years)",
+                        "errors": {
+                            "required": "Units are required"
+                        }
+                    },
+                    "count": {
+                        "label": "Occurrences",
+                        "placeholder": "Enter number of occurrences",
+                        "description": "Total number of times the invoice will be generated (empty for infinite recurrence)"
+                    },
+                    "until": {
+                        "label": "End Date",
+                        "placeholder": "Select end date",
+                        "description": "Date when the recurring invoice will stop being generated (leave empty for infinite recurrence)"
+                    }
+                },
+                "items": {
+                    "label": "Recurring Invoice Items",
+                    "addItem": "Add Item",
+                    "description": {
+                        "placeholder": "Item description",
+                        "errors": {
+                            "required": "Description is required"
+                        }
+                    },
+                    "quantity": {
+                        "placeholder": "Qty",
+                        "unit": "pcs",
+                        "errors": {
+                            "required": "Quantity is required",
+                            "min": "Quantity must be at least 1",
+                            "invalid": "Invalid quantity"
+                        }
+                    },
+                    "unitPrice": {
+                        "placeholder": "Unit price",
+                        "errors": {
+                            "required": "Unit price is required",
+                            "min": "Unit price must be positive",
+                            "invalid": "Invalid unit price"
+                        }
+                    },
+                    "vatRate": {
+                        "placeholder": "VAT %",
+                        "errors": {
+                            "required": "VAT rate is required",
+                            "min": "VAT rate must be positive"
+                        }
+                    }
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes"
+            }
+        }
+    },
     "dashboard": {
         "title": "Dashboard",
         "welcomeMessage": "Welcome back, {{firstname}}!",
@@ -1347,6 +1563,14 @@
             "placeholder": "Select your currency",
             "searchPlaceholder": "Search currencies...",
             "noResults": "No currencies found"
+        }
+    },
+    "common": {
+        "units": {
+            "day": "Day",
+            "week": "Week",
+            "month": "Month",
+            "year": "Year"
         }
     }
 }
