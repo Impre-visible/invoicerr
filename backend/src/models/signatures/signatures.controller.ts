@@ -20,13 +20,11 @@ export class SignaturesController {
     }
 
     @Post('/:id/otp')
-    @LoginRequired()
     async generateOTPCode(@Param('id') signatureId: string) {
         return this.signaturesService.generateOTPCode(signatureId);
     }
 
     @Post('/:id/sign')
-    @LoginRequired()
     async signQuote(@Param('id') signatureId: string, @Body('otpCode') otpCode: string) {
         return this.signaturesService.signQuote(signatureId, otpCode);
     }
