@@ -23,8 +23,6 @@ export interface Quote {
     updatedAt: Date;
     validUntil?: Date;
     signedAt?: Date;
-    viewedAt?: Date;
-    signedBy?: string;
     signatureSvg?: string;
     notes?: string; // Additional notes for the quote
     totalHT: number;

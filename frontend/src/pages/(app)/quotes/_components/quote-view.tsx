@@ -58,11 +58,6 @@ export function QuoteViewDialog({ quote, onOpenChange }: QuoteViewDialogProps) {
                             <p className="text-sm text-muted-foreground">{t("quotes.view.fields.signedAt")}</p>
                             <p className="font-medium">{formatDate(quote.signedAt)}</p>
                         </div>
-
-                        <div>
-                            <p className="text-sm text-muted-foreground">{t("quotes.view.fields.viewedAt")}</p>
-                            <p className="font-medium">{formatDate(quote.viewedAt)}</p>
-                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-4 rounded-lg">
@@ -71,10 +66,12 @@ export function QuoteViewDialog({ quote, onOpenChange }: QuoteViewDialogProps) {
                             <p className="font-medium">{quote.client.name}</p>
                         </div>
 
-                        <div>
-                            <p className="text-sm text-muted-foreground">{t("quotes.view.fields.signedBy")}</p>
-                            <p className="font-medium">{quote.signedBy || "—"}</p>
-                        </div>
+                        {!!quote.signedAt && (
+                            <div>
+                                <p className="text-sm text-muted-foreground">{t("quotes.view.fields.signedBy")}</p>
+                                <p className="font-medium">{quote.client.contactEmail || "—"}</p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-muted/50 p-4 rounded-lg">

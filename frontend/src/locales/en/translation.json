@@ -329,7 +329,6 @@
                 "createdAt": "Created",
                 "validUntil": "Valid Until",
                 "signedAt": "Signed At",
-                "viewedAt": "Viewed At",
                 "client": "Client",
                 "signedBy": "Signed By",
                 "totalHT": "Total (excl. VAT)",
