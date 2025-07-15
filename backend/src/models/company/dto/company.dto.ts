@@ -34,11 +34,11 @@ export interface PDFConfig {
 
 export class EditCompanyDto {
     description: string
-    legalId: string
+    legalId?: string
     foundedAt: Date
     name: string
     currency: finance.TCurrency
-    VAT: string
+    VAT?: string
     address: string
     postalCode: string
     city: string

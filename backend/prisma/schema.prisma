@@ -194,9 +194,9 @@ model Company {
   name        String
   description String
   currency    Currency @default(EUR)
-  legalId     String
+  legalId     String?
   foundedAt   DateTime
-  VAT         String
+  VAT         String?
   address     String
   postalCode  String
   city        String

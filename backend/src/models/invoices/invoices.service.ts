@@ -357,7 +357,7 @@ export class InvoicesService {
                 country: invRec.company.country,
                 countryCode: invRec.company.country
             },
-            registrationDetails: { vatId: invRec.company.VAT, registrationId: invRec.company.legalId, registrationName: invRec.company.name }
+            registrationDetails: { vatId: invRec.company.VAT || "N/A", registrationId: invRec.company.legalId || "N/A", registrationName: invRec.company.name }
         };
 
         inv.to = {
