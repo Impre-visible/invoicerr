@@ -69,14 +69,13 @@ export default function CompanySettings() {
         legalId: z
             .string({ required_error: t("settings.company.form.legalId.errors.required") })
             .min(1, t("settings.company.form.legalId.errors.empty"))
-            .max(50, t("settings.company.form.legalId.errors.maxLength")),
+            .max(50, t("settings.company.form.legalId.errors.maxLength"))
+            .optional(),
         VAT: z
             .string({ required_error: t("settings.company.form.vat.errors.required") })
             .min(1, t("settings.company.form.vat.errors.empty"))
             .max(15, t("settings.company.form.vat.errors.maxLength"))
-            .refine((val) => {
-                return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("settings.company.form.vat.errors.format")),
+            .optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("settings.company.form.foundedAt.errors.future")),
         currency: z
             .string({ required_error: t("settings.company.form.currency.errors.required") })
@@ -276,7 +275,7 @@ export default function CompanySettings() {
                                     name="legalId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("settings.company.form.legalId.label")}</FormLabel>
+                                            <FormLabel>{t("settings.company.form.legalId.label")}</FormLabel>
                                             <FormControl>
                                                 <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} />
                                             </FormControl>
@@ -291,7 +290,7 @@ export default function CompanySettings() {
                                     name="VAT"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("settings.company.form.vat.label")}</FormLabel>
+                                            <FormLabel>{t("settings.company.form.vat.label")}</FormLabel>
                                             <FormControl>
                                                 <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} />
                                             </FormControl>
