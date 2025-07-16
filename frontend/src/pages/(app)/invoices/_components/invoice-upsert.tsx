@@ -11,6 +11,7 @@ import { useGet, usePatch, usePost } from "@/lib/utils"
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
+import { ClientUpsert } from "../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
@@ -87,6 +88,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
 
     const [clientSearchTerm, setClientsSearchTerm] = useState("")
     const [quoteSearchTerm, setQuoteSearchTerm] = useState("")
+    const [clientDialogOpen, setClientDialogOpen] = useState(false)
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
     const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
 
@@ -178,137 +180,57 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             .catch((err) => console.error(err))
     }
 
+    const handleClientCreate = (newClient: Client) => {
+        setClientsSearchTerm("")
+        form.setValue("clientId", newClient.id)
+        clients?.push(newClient)
+        form.trigger("clientId")
+    }
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
-                <DialogHeader>
-                    <DialogTitle>{t(`invoices.upsert.title.upsert`)}</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={control}
-                            name="quoteId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.quote.label")}</FormLabel>
-                                    <FormControl>
-                                        <SearchSelect
-                                            options={(quotes || []).map((c) => ({
-                                                label: `${c.number}${c.title ? ` (${c.title})` : ""}`,
-                                                value: c.id,
-                                            }))}
-                                            value={field.value ?? ""}
-                                            onValueChange={(val) => {
-                                                field.onChange(val || null)
-                                                if (val) {
-                                                    form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
-                                                    form.setValue("notes", quotes?.find((q) => q.id === val)?.notes || "")
-                                                    form.setValue("paymentMethod", quotes?.find((q) => q.id === val)?.paymentMethod || "")
-                                                    form.setValue("paymentDetails", quotes?.find((q) => q.id === val)?.paymentDetails || "")
-                                                    form.setValue("currency", quotes?.find((q) => q.id === val)?.currency || "")
-                                                    form.setValue('items', quotes?.find((q) => q.id === val)?.items.map((item, index) => ({
-                                                        id: item.id,
-                                                        description: item.description || "",
-                                                        quantity: item.quantity || 1,
-                                                        unitPrice: item.unitPrice || 0,
-                                                        vatRate: item.vatRate || 0,
-                                                        order: index,
-                                                    })) || [])
-                                                }
-                                            }}
-                                            onSearchChange={setQuoteSearchTerm}
-                                            placeholder={t("invoices.upsert.form.quote.placeholder")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="clientId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel required>{t("invoices.upsert.form.client.label")}</FormLabel>
-                                    <FormControl>
-                                        <SearchSelect
-                                            options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
-                                            value={field.value ?? ""}
-                                            onValueChange={(val) => field.onChange(val || null)}
-                                            onSearchChange={setClientsSearchTerm}
-                                            placeholder={t("invoices.upsert.form.client.placeholder")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="currency"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.currency.label")}</FormLabel>
-                                    <FormControl>
-                                        <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="dueDate"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.dueDate.label")}</FormLabel>
-                                    <FormControl>
-                                        <DatePicker
-                                            className="w-full"
-                                            value={field.value || null}
-                                            onChange={field.onChange}
-                                            placeholder={t("invoices.upsert.form.dueDate.placeholder")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="notes"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("invoices.upsert.form.notes.label")}</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} placeholder={t("invoices.upsert.form.notes.placeholder")} className="max-h-40" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <>
+            <Dialog open={open} onOpenChange={onOpenChange}>
+                <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
+                    <DialogHeader>
+                        <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={control}
-                                name="paymentMethod"
+                                name="quoteId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("invoices.upsert.form.paymentMethod.label")}</FormLabel>
+                                        <FormLabel>{t("invoices.upsert.form.quote.label")}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                                placeholder={t("invoices.upsert.form.paymentMethod.placeholder")}
+                                            <SearchSelect
+                                                options={(quotes || []).map((c) => ({
+                                                    label: `${c.number}${c.title ? ` (${c.title})` : ""}`,
+                                                    value: c.id,
+                                                }))}
+                                                value={field.value ?? ""}
+                                                onValueChange={(val) => {
+                                                    field.onChange(val || null)
+                                                    if (val) {
+                                                        form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
+                                                        form.setValue("notes", quotes?.find((q) => q.id === val)?.notes || "")
+                                                        form.setValue("paymentMethod", quotes?.find((q) => q.id === val)?.paymentMethod || "")
+                                                        form.setValue("paymentDetails", quotes?.find((q) => q.id === val)?.paymentDetails || "")
+                                                        form.setValue("currency", quotes?.find((q) => q.id === val)?.currency || "")
+                                                        form.setValue('items', quotes?.find((q) => q.id === val)?.items.map((item, index) => ({
+                                                            id: item.id,
+                                                            description: item.description || "",
+                                                            quantity: item.quantity || 1,
+                                                            unitPrice: item.unitPrice || 0,
+                                                            vatRate: item.vatRate || 0,
+                                                            order: index,
+                                                        })) || [])
+                                                    }
+                                                }}
+                                                onSearchChange={setQuoteSearchTerm}
+                                                placeholder={t("invoices.upsert.form.quote.placeholder")}
                                             />
                                         </FormControl>
-                                        <FormDescription>
-                                            {t("invoices.upsert.form.paymentMethod.description")}
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -316,173 +238,276 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
 
                             <FormField
                                 control={control}
-                                name="paymentDetails"
+                                name="clientId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("invoices.upsert.form.paymentDetails.label")}</FormLabel>
+                                        <FormLabel required>{t("invoices.upsert.form.client.label")}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                                placeholder={t("invoices.upsert.form.paymentDetails.placeholder")}
-                                                className="max-h-40"
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {t("invoices.upsert.form.paymentDetails.description")}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </section>
-
-                        <FormItem>
-                            <FormLabel>{t("invoices.upsert.form.items.label")}</FormLabel>
-                            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                                    <div className="space-y-2">
-                                        {fields.map((fieldItem, index) => (
-                                            <SortableItem
-                                                key={fieldItem.id}
-                                                id={fieldItem.id}
-                                                dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}
-                                            >
-                                                <div className="flex gap-2 items-center">
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.description`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        {...field}
-                                                                        placeholder={t(
-                                                                            `invoices.upsert.form.items.description.placeholder`,
-                                                                        )}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.quantity`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || ""}
-                                                                        postAdornment={t(`invoices.upsert.form.items.quantity.unit`)}
-                                                                        type="number"
-                                                                        placeholder={t(
-                                                                            `invoices.upsert.form.items.quantity.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.unitPrice`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || ""}
-                                                                        postAdornment="$"
-                                                                        type="number"
-                                                                        placeholder={t(
-                                                                            `invoices.upsert.form.items.unitPrice.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.vatRate`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || 0}
-                                                                        postAdornment="%"
-                                                                        type="number"
-                                                                        step="0.01"
-                                                                        placeholder={t(
-                                                                            `invoices.upsert.form.items.vatRate.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(
-                                                                                e.target.value === ""
-                                                                                    ? undefined
-                                                                                    : Number.parseFloat(e.target.value.replace(",", ".")),
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <Button variant={"outline"} onClick={() => onRemove(index)}>
-                                                        <Trash2 className="h-4 w-4 text-red-700" />
+                                            <SearchSelect
+                                                options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
+                                                value={field.value ?? ""}
+                                                onValueChange={(val) => field.onChange(val || null)}
+                                                onSearchChange={setClientsSearchTerm}
+                                                placeholder={t("invoices.upsert.form.client.placeholder")}
+                                                noResultsComponent={
+                                                    <Button
+                                                        variant="link"
+                                                        onClick={() => setClientDialogOpen(true)}
+                                                    >
+                                                        {t("invoices.upsert.form.client.noOptions")}
                                                     </Button>
-                                                </div>
-                                            </SortableItem>
-                                        ))}
-                                    </div>
-                                </SortableContext>
-                            </DndContext>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() =>
-                                    append({
-                                        description: "",
-                                        quantity: Number.NaN,
-                                        unitPrice: Number.NaN,
-                                        vatRate: Number.NaN,
-                                        order: fields.length,
-                                    })
-                                }
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t("invoices.upsert.form.items.addItem")}
-                            </Button>
-                        </FormItem>
+                            <FormField
+                                control={form.control}
+                                name="currency"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("invoices.upsert.form.currency.label")}</FormLabel>
+                                        <FormControl>
+                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t("invoices.upsert.actions.cancel")}
-                            </Button>
-                            <Button type="submit">
-                                {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+                            <FormField
+                                control={control}
+                                name="dueDate"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("invoices.upsert.form.dueDate.label")}</FormLabel>
+                                        <FormControl>
+                                            <DatePicker
+                                                className="w-full"
+                                                value={field.value || null}
+                                                onChange={field.onChange}
+                                                placeholder={t("invoices.upsert.form.dueDate.placeholder")}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="notes"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("invoices.upsert.form.notes.label")}</FormLabel>
+                                        <FormControl>
+                                            <Textarea {...field} placeholder={t("invoices.upsert.form.notes.placeholder")} className="max-h-40" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={control}
+                                    name="paymentMethod"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("invoices.upsert.form.paymentMethod.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder={t("invoices.upsert.form.paymentMethod.placeholder")}
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("invoices.upsert.form.paymentMethod.description")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="paymentDetails"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("invoices.upsert.form.paymentDetails.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder={t("invoices.upsert.form.paymentDetails.placeholder")}
+                                                    className="max-h-40"
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("invoices.upsert.form.paymentDetails.description")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </section>
+
+                            <FormItem>
+                                <FormLabel>{t("invoices.upsert.form.items.label")}</FormLabel>
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                                    <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                                        <div className="space-y-2">
+                                            {fields.map((fieldItem, index) => (
+                                                <SortableItem
+                                                    key={fieldItem.id}
+                                                    id={fieldItem.id}
+                                                    dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}
+                                                >
+                                                    <div className="flex gap-2 items-center">
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.description`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            {...field}
+                                                                            placeholder={t(
+                                                                                `invoices.upsert.form.items.description.placeholder`,
+                                                                            )}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.quantity`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || ""}
+                                                                            postAdornment={t(`invoices.upsert.form.items.quantity.unit`)}
+                                                                            type="number"
+                                                                            placeholder={t(
+                                                                                `invoices.upsert.form.items.quantity.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.unitPrice`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || ""}
+                                                                            postAdornment="$"
+                                                                            type="number"
+                                                                            placeholder={t(
+                                                                                `invoices.upsert.form.items.unitPrice.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.vatRate`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || 0}
+                                                                            postAdornment="%"
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            placeholder={t(
+                                                                                `invoices.upsert.form.items.vatRate.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(
+                                                                                    e.target.value === ""
+                                                                                        ? undefined
+                                                                                        : Number.parseFloat(e.target.value.replace(",", ".")),
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <Button variant={"outline"} onClick={() => onRemove(index)}>
+                                                            <Trash2 className="h-4 w-4 text-red-700" />
+                                                        </Button>
+                                                    </div>
+                                                </SortableItem>
+                                            ))}
+                                        </div>
+                                    </SortableContext>
+                                </DndContext>
+
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() =>
+                                        append({
+                                            description: "",
+                                            quantity: Number.NaN,
+                                            unitPrice: Number.NaN,
+                                            vatRate: Number.NaN,
+                                            order: fields.length,
+                                        })
+                                    }
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t("invoices.upsert.form.items.addItem")}
+                                </Button>
+                            </FormItem>
+
+                            <div className="flex justify-end space-x-2">
+                                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                                    {t("invoices.upsert.actions.cancel")}
+                                </Button>
+                                <Button type="submit">
+                                    {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+
+            <ClientUpsert
+                open={clientDialogOpen}
+                onOpenChange={setClientDialogOpen}
+                onCreate={handleClientCreate}
+            />
+        </>
     )
 }
 

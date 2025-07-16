@@ -13,6 +13,7 @@ import { useGet, usePatch, usePost } from "@/lib/utils"
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { CSS } from "@dnd-kit/utilities"
+import { ClientUpsert } from "../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,8 @@ interface QuoteUpsertDialogProps {
 export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProps) {
     const { t } = useTranslation()
     const isEdit = !!quote
+
+    const [clientDialogOpen, setClientDialogOpen] = useState(false)
 
     // Move schema inside component to access t function
     const quoteSchema = z.object({
@@ -85,7 +88,6 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
     const [searchTerm, setSearchTerm] = useState("")
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${searchTerm}`)
 
-    // Use appropriate hook based on mode
     const { trigger: createTrigger } = usePost("/api/quotes")
     const { trigger: updateTrigger } = usePatch(`/api/quotes/${quote?.id}`)
 
@@ -100,7 +102,6 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         },
     })
 
-    // Reset form when quote changes or dialog opens
     useEffect(() => {
         if (isEdit && quote) {
             form.reset({
@@ -175,121 +176,31 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
             .catch((err) => console.error(err))
     }
 
-    const handleClientChange = (value: string | string[] | null) => {
-        if (value) {
-            const selectedClient = clients?.find((c) => c.id === value)
-            if (selectedClient) {
-                setValue("clientId", selectedClient.id)
-                if (selectedClient.currency) setValue("currency", selectedClient.currency)
-            }
-        }
+    const handleClientCreate = (newClient: Client) => {
+        setSearchTerm("")
+        form.setValue("clientId", newClient.id)
+        clients?.push(newClient)
+        form.trigger("clientId")
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
-                <DialogHeader>
-                    <DialogTitle>{t(`quotes.upsert.title.upsert`)}</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={control}
-                            name="title"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("quotes.upsert.form.title.label")}</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder={t("quotes.upsert.form.title.placeholder")} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="clientId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel required>{t("quotes.upsert.form.client.label")}</FormLabel>
-                                    <FormControl>
-                                        <SearchSelect
-                                            options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
-                                            value={field.value ?? ""}
-                                            onValueChange={handleClientChange}
-                                            onSearchChange={setSearchTerm}
-                                            placeholder={t("quotes.upsert.form.client.placeholder")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="currency"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("quotes.upsert.form.currency.label")}</FormLabel>
-                                    <FormControl>
-                                        <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="validUntil"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("quotes.upsert.form.validUntil.label")}</FormLabel>
-                                    <FormControl>
-                                        <DatePicker
-                                            className="w-full"
-                                            value={field.value || null}
-                                            onChange={field.onChange}
-                                            placeholder={t("quotes.upsert.form.validUntil.placeholder")}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={control}
-                            name="notes"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t("quotes.upsert.form.notes.label")}</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} placeholder={t("quotes.upsert.form.notes.placeholder")} className="max-h-40" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <>
+            <Dialog open={open} onOpenChange={onOpenChange}>
+                <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
+                    <DialogHeader>
+                        <DialogTitle>{t(`quotes.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={control}
-                                name="paymentMethod"
+                                name="title"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
+                                        <FormLabel>{t("quotes.upsert.form.title.label")}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                                placeholder={t("quotes.upsert.form.paymentMethod.placeholder")}
-                                            />
+                                            <Input {...field} placeholder={t("quotes.upsert.form.title.placeholder")} />
                                         </FormControl>
-                                        <FormDescription>
-                                            {t("quotes.upsert.form.paymentMethod.description")}
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -297,173 +208,276 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
 
                             <FormField
                                 control={control}
-                                name="paymentDetails"
+                                name="clientId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t("quotes.upsert.form.paymentDetails.label")}</FormLabel>
+                                        <FormLabel required>{t("quotes.upsert.form.client.label")}</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                {...field}
-                                                placeholder={t("quotes.upsert.form.paymentDetails.placeholder")}
-                                                className="max-h-40"
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {t("quotes.upsert.form.paymentDetails.description")}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </section>
-
-                        <FormItem>
-                            <FormLabel>{t("quotes.upsert.form.items.label")}</FormLabel>
-                            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                                    <div className="space-y-2">
-                                        {fields.map((fieldItem, index) => (
-                                            <SortableItem
-                                                key={fieldItem.id}
-                                                id={fieldItem.id}
-                                                dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}
-                                            >
-                                                <div className="flex gap-2 items-center">
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.description`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        {...field}
-                                                                        placeholder={t(
-                                                                            `quotes.upsert.form.items.description.placeholder`,
-                                                                        )}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.quantity`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || ""}
-                                                                        postAdornment={t(`quotes.upsert.form.items.quantity.unit`)}
-                                                                        type="number"
-                                                                        placeholder={t(
-                                                                            `quotes.upsert.form.items.quantity.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.unitPrice`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || ""}
-                                                                        postAdornment="$"
-                                                                        type="number"
-                                                                        placeholder={t(
-                                                                            `quotes.upsert.form.items.unitPrice.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={control}
-                                                        name={`items.${index}.vatRate`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <BetterInput
-                                                                        {...field}
-                                                                        defaultValue={field.value || ""}
-                                                                        postAdornment="%"
-                                                                        type="number"
-                                                                        step="0.01"
-                                                                        placeholder={t(
-                                                                            `quotes.upsert.form.items.vatRate.placeholder`,
-                                                                        )}
-                                                                        onChange={(e) =>
-                                                                            field.onChange(
-                                                                                e.target.value === ""
-                                                                                    ? undefined
-                                                                                    : Number.parseFloat(e.target.value.replace(",", ".")),
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <Button variant={"outline"} onClick={() => onRemove(index)}>
-                                                        <Trash2 className="h-4 w-4 text-red-700" />
+                                            <SearchSelect
+                                                options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
+                                                value={field.value ?? ""}
+                                                onValueChange={(val) => field.onChange(val || null)}
+                                                onSearchChange={setSearchTerm}
+                                                placeholder={t("quotes.upsert.form.client.placeholder")}
+                                                noResultsComponent={
+                                                    <Button
+                                                        variant="link"
+                                                        onClick={() => setClientDialogOpen(true)}
+                                                    >
+                                                        {t("quotes.upsert.form.client.noOptions")}
                                                     </Button>
-                                                </div>
-                                            </SortableItem>
-                                        ))}
-                                    </div>
-                                </SortableContext>
-                            </DndContext>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() =>
-                                    append({
-                                        description: "",
-                                        quantity: Number.NaN,
-                                        unitPrice: Number.NaN,
-                                        vatRate: Number.NaN,
-                                        order: fields.length,
-                                    })
-                                }
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t("quotes.upsert.form.items.addItem")}
-                            </Button>
-                        </FormItem>
+                            <FormField
+                                control={form.control}
+                                name="currency"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("quotes.upsert.form.currency.label")}</FormLabel>
+                                        <FormControl>
+                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                {t("quotes.upsert.actions.cancel")}
-                            </Button>
-                            <Button type="submit">
-                                {t(`quotes.upsert.actions.${isEdit ? "save" : "create"}`)}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+                            <FormField
+                                control={control}
+                                name="validUntil"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("quotes.upsert.form.validUntil.label")}</FormLabel>
+                                        <FormControl>
+                                            <DatePicker
+                                                className="w-full"
+                                                value={field.value || null}
+                                                onChange={field.onChange}
+                                                placeholder={t("quotes.upsert.form.validUntil.placeholder")}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="notes"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("quotes.upsert.form.notes.label")}</FormLabel>
+                                        <FormControl>
+                                            <Textarea {...field} placeholder={t("quotes.upsert.form.notes.placeholder")} className="max-h-40" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={control}
+                                    name="paymentMethod"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder={t("quotes.upsert.form.paymentMethod.placeholder")}
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("quotes.upsert.form.paymentMethod.description")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="paymentDetails"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("quotes.upsert.form.paymentDetails.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder={t("quotes.upsert.form.paymentDetails.placeholder")}
+                                                    className="max-h-40"
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                {t("quotes.upsert.form.paymentDetails.description")}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </section>
+
+                            <FormItem>
+                                <FormLabel>{t("quotes.upsert.form.items.label")}</FormLabel>
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                                    <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                                        <div className="space-y-2">
+                                            {fields.map((fieldItem, index) => (
+                                                <SortableItem
+                                                    key={fieldItem.id}
+                                                    id={fieldItem.id}
+                                                    dragHandle={<GripVertical className="cursor-grab text-muted-foreground" />}
+                                                >
+                                                    <div className="flex gap-2 items-center">
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.description`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            {...field}
+                                                                            placeholder={t(
+                                                                                `quotes.upsert.form.items.description.placeholder`,
+                                                                            )}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.quantity`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || ""}
+                                                                            postAdornment={t(`quotes.upsert.form.items.quantity.unit`)}
+                                                                            type="number"
+                                                                            placeholder={t(
+                                                                                `quotes.upsert.form.items.quantity.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.unitPrice`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || ""}
+                                                                            postAdornment="$"
+                                                                            type="number"
+                                                                            placeholder={t(
+                                                                                `quotes.upsert.form.items.unitPrice.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.vatRate`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <BetterInput
+                                                                            {...field}
+                                                                            defaultValue={field.value || ""}
+                                                                            postAdornment="%"
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            placeholder={t(
+                                                                                `quotes.upsert.form.items.vatRate.placeholder`,
+                                                                            )}
+                                                                            onChange={(e) =>
+                                                                                field.onChange(
+                                                                                    e.target.value === ""
+                                                                                        ? undefined
+                                                                                        : Number.parseFloat(e.target.value.replace(",", ".")),
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <Button variant={"outline"} onClick={() => onRemove(index)}>
+                                                            <Trash2 className="h-4 w-4 text-red-700" />
+                                                        </Button>
+                                                    </div>
+                                                </SortableItem>
+                                            ))}
+                                        </div>
+                                    </SortableContext>
+                                </DndContext>
+
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() =>
+                                        append({
+                                            description: "",
+                                            quantity: Number.NaN,
+                                            unitPrice: Number.NaN,
+                                            vatRate: Number.NaN,
+                                            order: fields.length,
+                                        })
+                                    }
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t("quotes.upsert.form.items.addItem")}
+                                </Button>
+                            </FormItem>
+
+                            <div className="flex justify-end space-x-2">
+                                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                                    {t("quotes.upsert.actions.cancel")}
+                                </Button>
+                                <Button type="submit">
+                                    {t(`quotes.upsert.actions.${isEdit ? "save" : "create"}`)}
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+
+            <ClientUpsert
+                open={clientDialogOpen}
+                onOpenChange={setClientDialogOpen}
+                onCreate={handleClientCreate}
+            />
+        </>
     )
 }
 
