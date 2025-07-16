@@ -23,6 +23,7 @@ interface SearchSelectProps {
     className?: string
     disabled?: boolean
     multiple?: boolean
+    noResultsComponent?: React.ReactNode // Ajout d'une propriété pour un composant personnalisé
 }
 
 export default function SearchSelect({
@@ -37,6 +38,7 @@ export default function SearchSelect({
     className,
     disabled = false,
     multiple = false,
+    noResultsComponent,
 }: SearchSelectProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [searchValue, setSearchValue] = useState("")
@@ -99,6 +101,11 @@ export default function SearchSelect({
         }
     }
 
+    const renderNoResults = () => {
+        if (noResultsComponent) return noResultsComponent
+        return <p className="text-muted-foreground text-center">{noResultsText}</p>
+    }
+
     return (
         <div ref={containerRef} className={cn("relative w-full", className)}>
             <Button
@@ -152,26 +159,21 @@ export default function SearchSelect({
                     </div>
 
                     <div className="max-h-60 overflow-auto p-1 flex flex-col gap-1">
-                        {options.length === 0 ? (
-                            <div className="py-2 px-3 text-sm text-muted-foreground">
-                                {noResultsText}
-                            </div>
-                        ) : (
-                            options.map((option) => (
-                                <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => handleOptionSelect(option.value)}
-                                    className={cn(
-                                        "w-full flex items-center justify-between px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground",
-                                        isSelected(option.value) && "bg-accent",
-                                    )}
-                                >
-                                    <span>{option.label}</span>
-                                    {isSelected(option.value) && <Check className="h-4 w-4" />}
-                                </button>
-                            ))
-                        )}
+                        {options.length === 0 && renderNoResults()}
+                        {options.map((option) => (
+                            <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => handleOptionSelect(option.value)}
+                                className={cn(
+                                    "w-full flex items-center justify-between px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground",
+                                    isSelected(option.value) && "bg-accent",
+                                )}
+                            >
+                                <span>{option.label}</span>
+                                {isSelected(option.value) && <Check className="h-4 w-4" />}
+                            </button>
+                        ))}
                     </div>
                 </div>
             )}
