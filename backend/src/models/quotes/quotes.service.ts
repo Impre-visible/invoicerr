@@ -1,68 +1,16 @@
 import * as Handlebars from 'handlebars';
-import * as puppeteer from 'puppeteer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
+import { formatPattern, getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
-import { format } from 'date-fns';
 import { formatDate } from 'src/utils/date';
-import { getPDF } from 'src/utils/pdf';
 
 @Injectable()
 export class QuotesService {
     constructor(private readonly prisma: PrismaService) { }
-
-    private async formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
-        const company = await this.prisma.company.findFirst();
-        if (!company) {
-            throw new BadRequestException('No company found. Please create a company first.');
-        }
-        return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
-            let value: number | string;
-
-            switch (key) {
-                case "year":
-                    value = date.getFullYear();
-                    break;
-                case "month":
-                    value = date.getMonth() + 1;
-                    break;
-                case "day":
-                    value = date.getDate();
-                    break;
-                case "number":
-                    value = number + company.quoteStartingNumber - 1; // Use the quote starting number from the company
-                    break;
-                default:
-                    return key;
-            }
-
-            const padLength = padding !== undefined
-                ? parseInt(padding, 10)
-                : key === "number"
-                    ? 4
-                    : 0;
-
-            return value.toString().padStart(padLength, "0");
-        });
-    }
-
-    private getInvertColor(hex: string): string {
-        let cleanHex = hex.replace(/^#/, '');
-        if (cleanHex.length === 3) {
-            cleanHex = cleanHex.split('').map(c => c + c).join('');
-        }
-
-        const r = parseInt(cleanHex.slice(0, 2), 16);
-        const g = parseInt(cleanHex.slice(2, 4), 16);
-        const b = parseInt(cleanHex.slice(4, 6), 16);
-
-        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        return luminance > 186 ? '#000000' : '#ffffff';
-    }
 
     async getQuotes(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -88,7 +36,7 @@ export class QuotesService {
         const returnedQuotes = await Promise.all(quotes.map(async (quote) => {
             return {
                 ...quote,
-                number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+                number: await formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
             }
         }));
 
@@ -254,6 +202,7 @@ export class QuotesService {
             data: { isActive: false },
         });
     }
+
     async getQuotePdf(id: string): Promise<Uint8Array> {
         const quote = await this.prisma.quote.findUnique({
             where: { id },
@@ -275,7 +224,7 @@ export class QuotesService {
         const template = Handlebars.compile(templateHtml);
 
         const html = template({
-            number: await this.formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+            number: await formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
             date: formatDate(quote.company, quote.createdAt),
             validUntil: formatDate(quote.company, quote.validUntil),
             company: quote.company,
@@ -300,7 +249,7 @@ export class QuotesService {
             padding: config.padding,
             primaryColor: config.primaryColor,
             secondaryColor: config.secondaryColor,
-            tableTextColor: this.getInvertColor(config.secondaryColor),
+            tableTextColor: getInvertColor(config.secondaryColor),
             includeLogo: config.includeLogo,
             logoB64: config?.logoB64 ?? '',
             noteExists: !!quote.notes,

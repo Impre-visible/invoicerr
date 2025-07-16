@@ -1,17 +1,15 @@
 import * as Handlebars from 'handlebars';
 import * as nodemailer from 'nodemailer';
-import * as puppeteer from 'puppeteer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
+import { formatPattern, getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
-import { format } from 'date-fns';
 import { formatDate } from 'src/utils/date';
-import { getPDF } from 'src/utils/pdf';
 
 @Injectable()
 export class InvoicesService {
@@ -26,56 +24,6 @@ export class InvoicesService {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD,
             },
-        });
-    }
-
-    private getInvertColor(hex: string): string {
-        let cleanHex = hex.replace(/^#/, '');
-        if (cleanHex.length === 3) {
-            cleanHex = cleanHex.split('').map(c => c + c).join('');
-        }
-
-        const r = parseInt(cleanHex.slice(0, 2), 16);
-        const g = parseInt(cleanHex.slice(2, 4), 16);
-        const b = parseInt(cleanHex.slice(4, 6), 16);
-
-        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        return luminance > 186 ? '#000000' : '#ffffff';
-    }
-
-    private async formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
-        const company = await this.prisma.company.findFirst();
-        if (!company) {
-            throw new BadRequestException('No company found. Please create a company first.');
-        }
-        return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
-            let value: number | string;
-
-            switch (key) {
-                case "year":
-                    value = date.getFullYear();
-                    break;
-                case "month":
-                    value = date.getMonth() + 1;
-                    break;
-                case "day":
-                    value = date.getDate();
-                    break;
-                case "number":
-                    value = number + company.invoiceStartingNumber - 1;
-                    break;
-                default:
-                    return key; // If the key is not recognized, return it as is
-            }
-
-            const padLength = padding !== undefined
-                ? parseInt(padding, 10)
-                : key === "number"
-                    ? 4
-                    : 0;
-
-            return value.toString().padStart(padLength, "0");
         });
     }
 
@@ -102,7 +50,7 @@ export class InvoicesService {
 
         const returnedInvoices = await Promise.all(invoices.map(async quote => ({
             ...quote,
-            number: await this.formatPattern(quote.company.invoiceNumberFormat, quote.number, quote.createdAt),
+            number: await formatPattern(quote.company.invoiceNumberFormat, quote.number, quote.createdAt),
         })));
 
         const totalInvoices = await this.prisma.invoice.count();
@@ -266,7 +214,7 @@ export class InvoicesService {
 
         const { pdfConfig } = invoice.company;
         const html = template({
-            number: await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
+            number: await formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
             date: formatDate(invoice.company, invoice.createdAt),
             dueDate: formatDate(invoice.company, invoice.dueDate),
             company: invoice.company,
@@ -289,7 +237,7 @@ export class InvoicesService {
             fontFamily: pdfConfig.fontFamily ?? 'Inter',
             primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
             secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',
-            tableTextColor: this.getInvertColor(pdfConfig.secondaryColor),
+            tableTextColor: getInvertColor(pdfConfig.secondaryColor),
             padding: pdfConfig?.padding ?? 40,
             includeLogo: !!pdfConfig?.logoB64,
             logoB64: pdfConfig?.logoB64 ?? '',
@@ -339,7 +287,7 @@ export class InvoicesService {
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
 
-        inv.id = await this.formatPattern(invRec.company.invoiceNumberFormat, invRec.number, invRec.createdAt);
+        inv.id = await formatPattern(invRec.company.invoiceNumberFormat, invRec.number, invRec.createdAt);
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 
@@ -434,7 +382,7 @@ export class InvoicesService {
 
         const pdfBuffer = await this.getInvoicePDFFormat(invoiceId, (invoice.company.invoicePDFFormat as ExportFormat || 'pdf'));
 
-        const invoiceNumber = await this.formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt);
+        const invoiceNumber = await formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt);
 
         const mailTemplate = await this.prisma.mailTemplate.findFirst({
             where: { type: 'INVOICE' },
