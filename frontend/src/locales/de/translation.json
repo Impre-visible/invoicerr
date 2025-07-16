@@ -1,0 +1,1235 @@
+{
+  "clients": {
+    "header": {
+      "subtitle": "Verwalten Sie Ihre Kunden",
+      "count": "{{count}} Kunden {{found}}",
+      "found": "gefunden"
+    },
+    "search": {
+      "placeholder": "Suche Kunden ..."
+    },
+    "actions": {
+      "addNew": "Neue Kunden hinzufügen"
+    },
+    "stats": {
+      "total": "Anzahl Kunden",
+      "active": "aktiv",
+      "inactive": "inaktiv"
+    },
+    "emptyState": {
+      "noClients": "Noch keine Kunden",
+      "noResults": "Keine Kunden gefunden",
+      "startAdding": "Beginnen Sie mit dem Erstellen Ihres ersten Kunden.",
+      "tryDifferentSearch": "Versuchen Sie, Ihre Suchbegriffe anzupassen."
+    },
+    "list": {
+      "title": "Alle Kunden",
+      "description": "Verwalten und sehen Sie alle Ihre Kunden an einem Ort.",
+      "status": {
+        "active": "aktiv",
+        "inactive": "inaktiv"
+      },
+      "tooltips": {
+        "view": "Kundendetails anzeigen",
+        "edit": "Kunden bearbeiten",
+        "delete": "Kunden löschen"
+      }
+    },
+    "upsert": {
+      "title": {
+        "create": "Neue Kunden hinzufügen",
+        "edit": "Kunden bearbeiten"
+      },
+      "fields": {
+        "contactFirstname": {
+          "label": "Vorname",
+          "placeholder": "Geben Sie den Vornamen ein"
+        },
+        "contactLastname": {
+          "label": "Nachname",
+          "placeholder": "Geben Sie den Nachnamen ein"
+        },
+        "name": {
+          "label": "Firmenname",
+          "placeholder": "Geben Sie den Firmennamen ein"
+        },
+        "description": {
+          "label": "Beschreibung",
+          "placeholder": "Beschreibung eingeben"
+        },
+        "legalId": {
+          "label": "Handelsregisternummer",
+          "placeholder": "Bitte geben Sie die HRB ein"
+        },
+        "vat": {
+          "label": "Umsatzsteuernummer",
+          "placeholder": "Geben Sie die Umsatzsteuernummer ein (z. B. DE12345678901)"
+        },
+        "currency": {
+          "label": "Währung"
+        },
+        "foundedAt": {
+          "label": "Gründungsdatum",
+          "placeholder": "Wählen Sie das Gründungsdatum"
+        },
+        "contactEmail": {
+          "label": "E-Mail",
+          "placeholder": "Geben Sie eine E -Mail Adresse ein"
+        },
+        "contactPhone": {
+          "label": "Telefon",
+          "placeholder": "Telefonnummer eingeben"
+        },
+        "address": {
+          "label": "Adresse",
+          "placeholder": "Geben Sie den Straßennamen ein"
+        },
+        "postalCode": {
+          "label": "Postleitzahl",
+          "placeholder": "Geben Sie die Postleitzahl ein"
+        },
+        "city": {
+          "label": "Stadt",
+          "placeholder": "Geben Sie der Stadt ein"
+        },
+        "country": {
+          "label": "Land",
+          "placeholder": "Geben Sie dem Land ein"
+        }
+      },
+      "validation": {
+        "name": {
+          "required": "Firmenname ist erforderlich"
+        },
+        "description": {
+          "required": "Beschreibung ist erforderlich",
+          "maxLength": "Die Beschreibung muss weniger als 500 Zeichen betragen"
+        },
+        "legalId": {
+          "required": "Handelsregisternummer ist erforderlich",
+          "empty": "Handelsregisternummer darf nicht leer sein",
+          "maxLength": "Die Handelsregisternummer muss weniger als 50 Zeichen betragen"
+        },
+        "vat": {
+          "required": "USt.-Nummer ist erforderlich",
+          "empty": "USt.-Nummer darf nicht leer sein",
+          "maxLength": "Die USt.-Nummer muss weniger als 15 Zeichen umfassen.",
+          "format": "Das Format der USt.-Nummer ist ungültig (z. B. FR12345678901)"
+        },
+        "foundedAt": {
+          "future": "Das Gründungsdatum darf nicht in der Zukunft liegen."
+        },
+        "contactFirstname": {
+          "required": "Vorname ist erforderlich"
+        },
+        "contactLastname": {
+          "required": "Nachname ist erforderlich"
+        },
+        "contactPhone": {
+          "minLength": "Die Telefonnummer muss aus mindestens 8 Zeichen bestehen.",
+          "format": "Das Format der Rufnummer ist ungültig"
+        },
+        "contactEmail": {
+          "required": "E-Mail ist erforderlich",
+          "format": "E-Mail-Format ist ungültig"
+        },
+        "address": {
+          "required": "Adresse ist erforderlich"
+        },
+        "postalCode": {
+          "format": "Das Format der Postleitzahl ist ungültig"
+        },
+        "city": {
+          "required": "Stadt ist notwendig"
+        },
+        "country": {
+          "required": "Land ist erforderlich"
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "create": "Kunden erstellen",
+        "save": "Änderungen speichern"
+      }
+    },
+    "view": {
+      "title": "Details für Kunden",
+      "description": "Alle relevanten Informationen über diesen Kunden anzeigen.",
+      "fields": {
+        "companyName": "Name des Unternehmens",
+        "contactPerson": "Kontaktperson",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "address": "Adresse",
+        "postalCode": "Postleitzahl",
+        "city": "Stadt",
+        "country": "Land"
+      }
+    },
+    "delete": {
+      "title": "Kunde  löschen",
+      "description": "Sind Sie sicher, dass Sie diesen Kunden löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "actions": {
+        "cancel": "Abbrechen",
+        "delete": "Kunden löschen"
+      }
+    }
+  },
+  "quotes": {
+    "header": {
+      "subtitle": "Verwalten Sie Ihre Angebote",
+      "count": "{{count}} Angebote {{found}}",
+      "found": "gefunden"
+    },
+    "search": {
+      "placeholder": "Angebot suchen..."
+    },
+    "actions": {
+      "addNew": "Neues Angebot hinzufügen"
+    },
+    "stats": {
+      "total": "Anzahl Angebote",
+      "draft": "Entwurf",
+      "signed": "Unterzeichnet"
+    },
+    "emptyState": {
+      "noQuotes": "Noch keine Angebote",
+      "noResults": "Keine Angebote gefunden",
+      "startAdding": "Beginnen Sie mit der Erstellung Ihres ersten Angebots.",
+      "tryDifferentSearch": "Versuchen Sie, Ihre Suchbegriffe anzupassen."
+    },
+    "list": {
+      "title": "Alle Angebote",
+      "description": "Verwalten und betrachten Sie alle Ihre Angebote an einem Ort.",
+      "status": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "expired": "Abgelaufen",
+        "signed": "Unterzeichnet"
+      },
+      "item": {
+        "title": "Zitat {{Nummer}} {{Titel}}",
+        "client": "Kunde",
+        "issued": "Ausgestellt",
+        "validUntil": "Gültig bis",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalTTC": "Gesamt (inkl. MwSt.)"
+      },
+      "tooltips": {
+        "view": "Details zum Angebot anzeigen",
+        "viewPdf": "PDF anzeigen",
+        "downloadPdf": "PDF herunterladen",
+        "edit": "Zitat bearbeiten",
+        "sendSignature": "Zur Unterschrift senden",
+        "resendSignature": "Erneut zur Unterschrift senden",
+        "createInvoice": "Rechnung aus Angebot erstellen",
+        "delete": "Zitat löschen"
+      },
+      "actions": {
+        "addNew": "Neues Angebot hinzufügen"
+      },
+      "messages": {
+        "sendSignatureError": "Kostenvoranschlag für Unterschrift konnte nicht gesendet werden",
+        "sendSignatureSuccess": "Angebot erfolgreich zur Unterschrift gesendet",
+        "invoiceCreated": "Rechnung erfolgreich aus Angebot erstellt",
+        "invoiceCreateError": "Rechnung kann nicht aus Angebot erstellt werden"
+      }
+    },
+    "upsert": {
+      "title": {
+        "create": "Neues Angebot erstellen",
+        "edit": "Zitat bearbeiten"
+      },
+      "form": {
+        "title": {
+          "label": "Titel",
+          "placeholder": "Titel des Angebots eingeben"
+        },
+        "client": {
+          "label": "Kunde",
+          "placeholder": "Wählen Sie einen Kunden",
+          "errors": {
+            "required": "Bitte wählen Sie einen Kunden"
+          }
+        },
+        "currency": {
+          "label": "Währung"
+        },
+        "validUntil": {
+          "label": "Gültig bis",
+          "placeholder": "Verfallsdatum auswählen"
+        },
+        "items": {
+          "label": "Artikel zitieren",
+          "addItem": "Artikel hinzufügen",
+          "description": {
+            "placeholder": "Beschreibung des Artikels",
+            "errors": {
+              "required": "Beschreibung ist erforderlich"
+            }
+          },
+          "quantity": {
+            "placeholder": "Menge",
+            "unit": "Stück",
+            "errors": {
+              "required": "Menge ist erforderlich",
+              "min": "Die Menge muss mindestens 1 betragen.",
+              "invalid": "Ungültige Menge"
+            }
+          },
+          "unitPrice": {
+            "placeholder": "Preis pro Einheit",
+            "errors": {
+              "required": "Stückpreis ist erforderlich",
+              "min": "Stückpreis muss positiv sein",
+              "invalid": "Ungültiger Preis je Maßeinheit"
+            }
+          },
+          "vatRate": {
+            "placeholder": "MEHRWERTSTEUER %",
+            "errors": {
+              "required": "Mehrwertsteuersatz ist erforderlich",
+              "min": "Der Mehrwertsteuersatz muss positiv sein"
+            }
+          }
+        },
+        "notes": {
+          "label": "Anmerkungen",
+          "placeholder": "Zusätzliche Hinweise oder Begriffe"
+        },
+        "paymentMethod": {
+          "label": "Zahlungsmethode",
+          "placeholder": "Zahlungsmethode auswählen",
+          "description": "Bevorzugte Zahlungsmethode für dieses Angebot (z.B. Banküberweisung, Scheck, etc.)"
+        },
+        "paymentDetails": {
+          "label": "Details zur Bezahlung",
+          "placeholder": "Zahlungsdaten eingeben",
+          "description": "Zusätzliche Informationen für die Zahlung (z. B. IBAN, Anweisungen usw.)"
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "create": "Angebot erstellen",
+        "save": "Änderungen speichern"
+      }
+    },
+    "view": {
+      "title": "Zitat {{Nummer}}",
+      "description": "Alle Details zu diesem Angebot anzeigen.",
+      "status": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "expired": "Abgelaufen",
+        "signed": "Unterzeichnet"
+      },
+      "fields": {
+        "title": "Titel",
+        "status": "Status",
+        "createdAt": "Erstellt",
+        "validUntil": "Gültig bis",
+        "signedAt": "Unterzeichnet am",
+        "client": "Kunde",
+        "signedBy": "Unterzeichnet von",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalVAT": "MwSt.-Betrag",
+        "totalTTC": "Gesamt (inkl. MwSt.)",
+        "signature": "Unterschrift"
+      }
+    },
+    "delete": {
+      "title": "Zitat löschen",
+      "description": "Sind Sie sicher, dass Sie dieses Zitat löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "actions": {
+        "cancel": "Abbrechen",
+        "delete": "Zitat löschen"
+      }
+    },
+    "pdf": {
+      "title": "Zitat {{Nummer}} - PDF"
+    }
+  },
+  "invoices": {
+    "header": {
+      "subtitle": "Verwalten Sie Ihre Rechnungen",
+      "count": "Rechnungen {{count}} Rechnungen {{found}}",
+      "found": "gefunden"
+    },
+    "search": {
+      "placeholder": "Rechnungen suchen..."
+    },
+    "actions": {
+      "addNew": "Neue Rechnung hinzufügen"
+    },
+    "stats": {
+      "total": "Total Rechnungen",
+      "sent": "Gesendet",
+      "paid": "Bezahlt"
+    },
+    "emptyState": {
+      "noInvoices": "Noch keine Rechnungen",
+      "noResults": "Keine Rechnungen gefunden",
+      "startAdding": "Beginnen Sie mit der Erstellung Ihrer ersten Rechnung.",
+      "tryDifferentSearch": "Versuchen Sie, Ihre Suchbegriffe anzupassen."
+    },
+    "list": {
+      "title": "Alle Rechnungen",
+      "description": "Verwalten und betrachten Sie alle Ihre Rechnungen an einem Ort.",
+      "status": {
+        "sent": "Gesendet",
+        "unpaid": "Unbezahlt",
+        "overdue": "Überfällig",
+        "paid": "Bezahlt"
+      },
+      "item": {
+        "title": "Rechnung {{Nummer}} {{Titel}}",
+        "client": "Kunde",
+        "issued": "Ausgestellt",
+        "due": ".",
+        "payment": "Zahlung",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalTTC": "Gesamt (inkl. MwSt.)"
+      },
+      "tooltips": {
+        "view": "Rechnungsdetails anzeigen",
+        "viewPdf": "PDF anzeigen",
+        "downloadPdf": "PDF herunterladen",
+        "edit": "Rechnung bearbeiten",
+        "markAsPaid": "Als bezahlt markieren",
+        "delete": "Rechnung löschen"
+      },
+      "actions": {
+        "addNew": "Neue Rechnung hinzufügen"
+      },
+      "downloadFormats": {
+        "pdf": "Standard-PDF",
+        "facturx": "Faktur-X",
+        "zugferd": "ZUGFeRD",
+        "xrechnung": "XRechnung",
+        "ubl": "UBL",
+        "cii": "CII"
+      },
+      "messages": {
+        "markAsPaidSuccess": "Rechnung als erfolgreich bezahlt markiert",
+        "markAsPaidError": "Rechnung konnte nicht als bezahlt markiert werden"
+      }
+    },
+    "upsert": {
+      "title": {
+        "create": "Neue Rechnung erstellen",
+        "edit": "Rechnung bearbeiten"
+      },
+      "form": {
+        "quote": {
+          "label": "Von Zitat",
+          "placeholder": "Wählen Sie ein Angebot",
+          "errors": {
+            "required": "Bitte wählen Sie ein Angebot"
+          }
+        },
+        "client": {
+          "label": "Kunde",
+          "placeholder": "Wählen Sie einen Kunden",
+          "errors": {
+            "required": "Bitte wählen Sie einen Kunden"
+          }
+        },
+        "dueDate": {
+          "label": "Fälligkeitsdatum",
+          "placeholder": "Fälligkeitsdatum auswählen"
+        },
+        "items": {
+          "label": "Positionen der Rechnung",
+          "addItem": "Artikel hinzufügen",
+          "description": {
+            "placeholder": "Beschreibung des Artikels",
+            "errors": {
+              "required": "Beschreibung ist erforderlich"
+            }
+          },
+          "quantity": {
+            "placeholder": "Menge",
+            "unit": "Stück",
+            "errors": {
+              "required": "Menge ist erforderlich",
+              "min": "Die Menge muss mindestens 1 betragen.",
+              "invalid": "Ungültige Menge"
+            }
+          },
+          "unitPrice": {
+            "placeholder": "Preis pro Einheit",
+            "errors": {
+              "required": "Stückpreis ist erforderlich",
+              "min": "Stückpreis muss positiv sein",
+              "invalid": "Ungültiger Preis je Maßeinheit"
+            }
+          },
+          "vatRate": {
+            "placeholder": "MEHRWERTSTEUER %",
+            "errors": {
+              "required": "Mehrwertsteuersatz ist erforderlich",
+              "min": "Der Mehrwertsteuersatz muss positiv sein"
+            }
+          }
+        },
+        "notes": {
+          "label": "Anmerkungen",
+          "placeholder": "Zusätzliche Hinweise oder Begriffe"
+        },
+        "paymentMethod": {
+          "label": "Zahlungsmethode",
+          "placeholder": "Zahlungsmethode auswählen",
+          "description": "Bevorzugte Zahlungsmethode für dieses Angebot (z.B. Banküberweisung, Scheck, etc.)"
+        },
+        "paymentDetails": {
+          "label": "Details zur Bezahlung",
+          "placeholder": "Zahlungsdaten eingeben",
+          "description": "Zusätzliche Informationen für die Zahlung (z. B. IBAN, Anweisungen usw.)"
+        },
+        "currency": {
+          "label": "Währung"
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "create": "Rechnung erstellen",
+        "save": "Änderungen speichern"
+      }
+    },
+    "view": {
+      "title": "Rechnung {{Rechnungsnummer}}",
+      "description": "Alle Details zu dieser Rechnung anzeigen.",
+      "status": {
+        "sent": "Gesendet",
+        "unpaid": "Unbezahlt",
+        "overdue": "Überfällig",
+        "paid": "Bezahlt"
+      },
+      "fields": {
+        "number": "Rechnungsnummer",
+        "title": "Titel",
+        "status": "Status",
+        "createdAt": "Erstellt",
+        "dueDate": "Fälligkeitsdatum",
+        "paidAt": "Bezahlt am",
+        "updatedAt": "Aktualisiert",
+        "client": "Kunde",
+        "paymentMethod": "Zahlungsmethode",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalVAT": "MwSt.-Betrag",
+        "totalTTC": "Gesamt (inkl. MwSt.)",
+        "notes": "Anmerkungen"
+      }
+    },
+    "delete": {
+      "title": "Rechnung löschen",
+      "description": "Sind Sie sicher, dass Sie diese Rechnung löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "actions": {
+        "cancel": "Abbrechen",
+        "delete": "Rechnung löschen"
+      }
+    },
+    "pdf": {
+      "title": "Rechnung {{Nummer}} - PDF"
+    }
+  },
+  "recurringInvoices": {
+    "frequency": {
+      "weekly": "Jede Woche",
+      "biweekly": "Alle 2 Wochen",
+      "monthly": "Jeden Monat",
+      "bimonthly": "Alle 2 Monate",
+      "quarterly": "Alle 3 Monate",
+      "quadmonthly": "Alle 4 Monate",
+      "semiannually": "Alle 6 Monate",
+      "annually": "Jedes Jahr"
+    },
+    "list": {
+      "title": "Wiederkehrende Rechnungen",
+      "description": "Verwalten Sie Ihre wiederkehrenden Rechnungen und automatisieren Sie die Rechnungsstellung.",
+      "actions": {
+        "addNew": "Neue wiederkehrende Rechnung hinzufügen"
+      }
+    },
+    "emptyState": {
+      "noInvoices": "Noch keine wiederkehrenden Rechnungen",
+      "startAdding": "Beginnen Sie mit der Erstellung Ihrer ersten wiederkehrenden Rechnung."
+    },
+    "actions": {
+      "addNew": "Neue wiederkehrende Rechnung hinzufügen"
+    },
+    "upsert": {
+      "title": {
+        "create": "Neue wiederkehrende Rechnung erstellen",
+        "edit": "Wiederkehrende Rechnung bearbeiten"
+      },
+      "form": {
+        "quote": {
+          "label": "Von Zitat",
+          "placeholder": "Wählen Sie ein Angebot"
+        },
+        "client": {
+          "label": "Kunde",
+          "placeholder": "Wählen Sie einen Kunden",
+          "errors": {
+            "required": "Bitte wählen Sie einen Kunden"
+          }
+        },
+        "currency": {
+          "label": "Währung"
+        },
+        "notes": {
+          "label": "Anmerkungen",
+          "placeholder": "Zusätzliche Hinweise oder Begriffe"
+        },
+        "paymentMethod": {
+          "label": "Zahlungsmethode",
+          "placeholder": "Zahlungsmethode auswählen",
+          "description": "Bevorzugte Zahlungsmethode für diese wiederkehrende Rechnung (z.B. Banküberweisung, Scheck, etc.)"
+        },
+        "paymentDetails": {
+          "label": "Details zur Bezahlung",
+          "placeholder": "Zahlungsdaten eingeben",
+          "description": "Zusätzliche Informationen für die Zahlung (z. B. IBAN, Anweisungen usw.)"
+        },
+        "frequency": {
+          "label": "Frequenz",
+          "placeholder": "Frequenz wählen",
+          "description": "Wie oft Rechnungen erstellt werden sollen",
+          "errors": {
+            "required": "Häufigkeit ist erforderlich"
+          }
+        },
+        "count": {
+          "label": "Vorkommnisse",
+          "placeholder": "Anzahl der Vorkommnisse eingeben",
+          "description": "Gesamtzahl der Wiederholungen der Rechnung (leer für unendliche Wiederholungen)"
+        },
+        "until": {
+          "label": "Enddatum",
+          "placeholder": "Enddatum auswählen",
+          "description": "Datum, an dem die wiederkehrende Rechnung nicht mehr erstellt wird (leer lassen für unendliche Wiederholungen)"
+        },
+        "autoSend": {
+          "label": "Automatisch senden",
+          "description": "Senden Sie die wiederkehrende Rechnung automatisch an den Kunden, wenn sie erstellt wurde."
+        },
+        "items": {
+          "label": "Wiederkehrende Rechnungspositionen",
+          "addItem": "Artikel hinzufügen",
+          "description": {
+            "placeholder": "Beschreibung des Artikels",
+            "errors": {
+              "required": "Beschreibung ist erforderlich"
+            }
+          },
+          "quantity": {
+            "placeholder": "Menge",
+            "unit": "Stück",
+            "errors": {
+              "required": "Menge ist erforderlich",
+              "min": "Die Menge muss mindestens 1 betragen.",
+              "invalid": "Ungültige Menge"
+            }
+          },
+          "unitPrice": {
+            "placeholder": "Preis pro Einheit",
+            "errors": {
+              "required": "Stückpreis ist erforderlich",
+              "min": "Stückpreis muss positiv sein",
+              "invalid": "Ungültiger Preis je Maßeinheit"
+            }
+          },
+          "vatRate": {
+            "placeholder": "MEHRWERTSTEUER %",
+            "errors": {
+              "required": "Mehrwertsteuersatz ist erforderlich",
+              "min": "Der Mehrwertsteuersatz muss positiv sein"
+            }
+          }
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "create": "Wiederkehrende Rechnungen erstellen",
+        "save": "Änderungen speichern"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeMessage": "Willkommen zurück, {{Vorname}}!",
+    "revenue": {
+      "title": "Überblick über die Einnahmen",
+      "description": "Verfolgen Sie Ihre finanzielle Leistung im Laufe der Zeit",
+      "thisMonth": "Dieser Monat",
+      "thisYear": "Dieses Jahr",
+      "chartLabel": "Einnahmen"
+    },
+    "quotes": {
+      "title": "Angebote Übersicht",
+      "description": "Überwachen Sie Ihre Angebotspipeline und Konversionsraten",
+      "stats": {
+        "total": "Gesamt Angebote",
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "signed": "Unterzeichnet",
+        "expired": "Abgelaufen"
+      },
+      "latestTitle": "Neueste Angebote",
+      "noRecent": "Keine aktuellen Angebote"
+    },
+    "invoices": {
+      "title": "Übersicht der Rechnungen",
+      "description": "Behalten Sie den Überblick über Ihre Rechnungen und Zahlungen",
+      "stats": {
+        "total": "Total Rechnungen",
+        "unpaid": "Unbezahlt",
+        "sent": "Gesendet",
+        "paid": "Bezahlt",
+        "overdue": "Überfällig"
+      },
+      "latestTitle": "Neueste Rechnungen",
+      "noRecent": "Keine aktuellen Rechnungen"
+    },
+    "clients": {
+      "title": "Kunden Überblick",
+      "stats": {
+        "total": "Kunden insgesamt"
+      }
+    }
+  },
+  "settings": {
+    "tabs": {
+      "company": "Unternehmen",
+      "pdfTemplates": "PDF-Vorlagen",
+      "emailTemplates": "E-Mail-Vorlagen",
+      "account": "Konto",
+      "dangerZone": "Gefahrenzone"
+    },
+    "company": {
+      "title": "Unternehmenseinstellungen",
+      "description": "Verwalten Sie Ihre Unternehmensinformationen und Geschäftsdetails",
+      "basicInfo": "Grundlegende Informationen",
+      "basicInfoDescription": "Wesentliche Angaben zu Ihrem Unternehmen",
+      "address": {
+        "title": "Informationen zur Adresse",
+        "description": "Der Standort Ihres Unternehmens"
+      },
+      "contact": {
+        "title": "Kontaktinformationen",
+        "description": "Wie Kunden Ihr Unternehmen erreichen können"
+      },
+      "numberFormats": {
+        "title": "Zahlenformate",
+        "description": "Anpassen der Zahlenformate für Angebote und Rechnungen"
+      },
+      "other": {
+        "title": "Andere Einstellungen",
+        "description": "Zusätzliche Einstellungen für Ihr Unternehmen"
+      },
+      "form": {
+        "company": {
+          "label": "Name des Unternehmens",
+          "placeholder": "Geben Sie den Namen Ihres Unternehmens ein",
+          "description": "Der rechtliche Name Ihres Unternehmens",
+          "errors": {
+            "required": "Firmenname ist erforderlich",
+            "empty": "Der Firmenname darf nicht leer sein",
+            "maxLength": "Der Firmenname muss weniger als 100 Zeichen umfassen"
+          }
+        },
+        "description": {
+          "label": "Beschreibung",
+          "placeholder": "Kurze Beschreibung Ihres Unternehmens",
+          "description": "Eine kurze Beschreibung Ihrer Geschäftstätigkeit",
+          "errors": {
+            "maxLength": "Die Beschreibung muss weniger als 500 Zeichen umfassen"
+          }
+        },
+        "legalId": {
+          "label": "Rechtlicher Ausweis",
+          "placeholder": "Juristische Kennung eingeben",
+          "description": "Die gesetzliche Registrierungsnummer Ihres Unternehmens",
+          "errors": {
+            "required": "Ein gültiger Ausweis ist erforderlich",
+            "empty": "Legal ID kann nicht leer sein",
+            "maxLength": "Legal ID muss weniger als 50 Zeichen umfassen"
+          }
+        },
+        "vat": {
+          "label": "Umsatzsteuer-Identifikationsnummer",
+          "placeholder": "Mehrwertsteuernummer eingeben (z. B. FR12345678901)",
+          "description": "Die Umsatzsteuer-Identifikationsnummer Ihres Unternehmens",
+          "errors": {
+            "required": "MwSt.-Nummer ist erforderlich",
+            "empty": "Die Mehrwertsteuernummer darf nicht leer sein.",
+            "maxLength": "Die Mehrwertsteuernummer muss weniger als 15 Zeichen umfassen.",
+            "format": "Das Format der Mehrwertsteuernummer ist ungültig (z. B. FR12345678901)"
+          }
+        },
+        "foundedAt": {
+          "label": "Datum der Gründung",
+          "placeholder": "Gründungsdatum auswählen",
+          "description": "Wann wurde Ihr Unternehmen gegründet?",
+          "errors": {
+            "future": "Das Gründungsdatum darf nicht in der Zukunft liegen."
+          }
+        },
+        "currency": {
+          "label": "Währung",
+          "description": "Standardwährung für Rechnungen und Angebote",
+          "errors": {
+            "required": "Währung ist erforderlich",
+            "select": "Bitte wählen Sie eine Währung"
+          }
+        },
+        "address": {
+          "label": "Adresse",
+          "placeholder": "Straße und Hausnummer eingeben",
+          "description": "Die Adresse Ihres Unternehmens",
+          "errors": {
+            "empty": "Adresse ist erforderlich"
+          }
+        },
+        "postalCode": {
+          "label": "Postleitzahl",
+          "placeholder": "Postleitzahl eingeben",
+          "errors": {
+            "format": "Das Format der Postleitzahl ist ungültig"
+          }
+        },
+        "city": {
+          "label": "Stadt",
+          "placeholder": "Stadt eingeben",
+          "errors": {
+            "empty": "Stadt ist erforderlich"
+          }
+        },
+        "country": {
+          "label": "Land",
+          "placeholder": "Land eingeben",
+          "errors": {
+            "empty": "Land ist erforderlich"
+          }
+        },
+        "phone": {
+          "label": "Telefon",
+          "placeholder": "Rufnummer eingeben",
+          "description": "Die Haupttelefonnummer Ihres Unternehmens",
+          "errors": {
+            "minLength": "Die Telefonnummer muss aus mindestens 8 Zeichen bestehen.",
+            "format": "Das Format der Rufnummer ist ungültig"
+          }
+        },
+        "email": {
+          "label": "E-Mail",
+          "placeholder": "E-Mail Adresse eingeben",
+          "description": "Die Haupt-E-Mail-Adresse Ihres Unternehmens",
+          "errors": {
+            "required": "E-Mail ist erforderlich",
+            "format": "E-Mail-Format ist ungültig"
+          }
+        },
+        "quoteStartingNumber": {
+          "label": "Angebot Startnummer",
+          "placeholder": "Startnummer für Angebote eingeben",
+          "description": "Anfangsnummer für die Angebotsnummerierung",
+          "errors": {
+            "min": "Die Startnummer des Angebots muss mindestens 1 sein."
+          }
+        },
+        "quoteNumberFormat": {
+          "label": "Format der Angebotsnummer",
+          "placeholder": "Geben Sie das Format der Angebotsnummer ein (z. B. Q-{Jahr}-{Nummer})",
+          "description": "Format für Kursnummern",
+          "errors": {
+            "required": "Das Format der Angebotsnummer ist erforderlich",
+            "maxLength": "Das Format der Angebotsnummer muss weniger als 100 Zeichen umfassen.",
+            "format": "Das Zahlenformat ist ungültig. Verwenden Sie {Jahr}, {Monat}, {Tag}, {Zahl} mit optionaler Auffüllung (z. B. {Zahl:4})"
+          }
+        },
+        "invoiceStartingNumber": {
+          "label": "Startnummer der Rechnung",
+          "placeholder": "Startnummer für Rechnungen eingeben",
+          "description": "Anfangsnummer für die Rechnungsnummerierung",
+          "errors": {
+            "min": "Die Anfangsnummer der Rechnung muss mindestens 1 sein."
+          }
+        },
+        "invoiceNumberFormat": {
+          "label": "Format der Rechnungsnummer",
+          "placeholder": "Format der Rechnungsnummer eingeben (z. B. INV-{Jahr}-{Nummer})",
+          "description": "Format für Rechnungsnummern",
+          "errors": {
+            "required": "Das Format der Rechnungsnummer ist erforderlich",
+            "maxLength": "Das Format der Rechnungsnummer muss weniger als 100 Zeichen umfassen.",
+            "format": "Das Format der Rechnungsnummer ist ungültig. Verwenden Sie {Jahr}, {Monat}, {Tag}, {Zahl} mit optionaler Auffüllung (z. B. {Zahl:4})"
+          }
+        },
+        "invoicePDFFormat": {
+          "label": "Rechnung im PDF-Format",
+          "placeholder": "PDF-Format der Rechnung auswählen",
+          "description": "Wählen Sie das Format für Rechnungs-PDFs, die an Kunden gesendet werden",
+          "options": {
+            "pdf": "Standard-PDF",
+            "facturx": "Faktur-X",
+            "zugferd": "ZUGFeRD",
+            "xrechnung": "XRechnung",
+            "ubl": "UBL",
+            "cii": "CII"
+          },
+          "errors": {
+            "required": "Rechnung im PDF-Format ist erforderlich"
+          }
+        },
+        "dateFormat": {
+          "label": "Datums Format",
+          "placeholder": "Datumsformat auswählen",
+          "description": "Wählen Sie, wie das Datum in Angeboten und Rechnungen angezeigt werden sollen",
+          "errors": {
+            "required": "Datumsformat ist erforderlich"
+          }
+        },
+        "saving": "Speichern...",
+        "saveSettings": "Einstellungen speichern"
+      },
+      "messages": {
+        "updateSuccess": "Unternehmenseinstellungen erfolgreich aktualisiert",
+        "updateError": "Aktualisierung der Unternehmenseinstellungen fehlgeschlagen"
+      }
+    },
+    "account": {
+      "title": "Kontoeinstellungen",
+      "description": "Verwalten Sie Ihre persönlichen Kontoinformationen und Sicherheit",
+      "profile": {
+        "title": "Profil-Informationen",
+        "description": "Aktualisieren Sie Ihre persönlichen Daten"
+      },
+      "password": {
+        "title": "Passwort & Sicherheit",
+        "description": "Ändern Sie Ihr Passwort und Ihre Sicherheitseinstellungen"
+      },
+      "form": {
+        "firstname": {
+          "label": "Vorname",
+          "placeholder": "Geben Sie Ihren Vornamen ein",
+          "errors": {
+            "required": "Vorname ist erforderlich"
+          }
+        },
+        "lastname": {
+          "label": "Nachname",
+          "placeholder": "Geben Sie Ihren Nachnamen ein",
+          "errors": {
+            "required": "Nachname ist erforderlich"
+          }
+        },
+        "email": {
+          "label": "E-Mail",
+          "placeholder": "Ihre E-Mail eingeben",
+          "errors": {
+            "invalid": "E-Mail-Format ist ungültig"
+          }
+        },
+        "currentPassword": {
+          "label": "Aktuelles Passwort",
+          "placeholder": "Aktuelles Passwort eingeben",
+          "errors": {
+            "required": "Aktuelles Passwort ist erforderlich"
+          }
+        },
+        "password": {
+          "label": "Neues Passwort",
+          "placeholder": "Neues Passwort eingeben",
+          "errors": {
+            "minLength": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+            "letter": "Das Passwort muss mindestens einen Buchstaben enthalten",
+            "number": "Das Passwort muss mindestens eine Zahl enthalten",
+            "special": "Das Passwort muss mindestens ein Sonderzeichen enthalten"
+          }
+        },
+        "confirmPassword": {
+          "label": "Bestätigen Sie Ihr Passwort",
+          "placeholder": "Bestätigen Sie das neue Passwort",
+          "errors": {
+            "match": "Passwörter stimmen nicht überein"
+          }
+        },
+        "errors": {
+          "fieldsEmpty": "Alle Felder sind erforderlich"
+        },
+        "updatingProfile": "Aktualisiere...",
+        "updateProfile": "Profil aktualisieren",
+        "updatingPassword": "Aktualisiere...",
+        "updatePassword": "Passwort aktualisieren"
+      },
+      "messages": {
+        "profileUpdateSuccess": "Profil erfolgreich aktualisiert",
+        "profileUpdateError": "Profil kann nicht aktualisiert werden",
+        "passwordUpdateSuccess": "Passwort erfolgreich aktualisiert",
+        "passwordUpdateError": "Passwort kann nicht aktualisiert werden"
+      }
+    },
+    "dangerZone": {
+      "title": "Gefahrenzone",
+      "description": "Unumkehrbare und zerstörerische Handlungen",
+      "resetApp": {
+        "title": "Anwendungsdaten zurücksetzen",
+        "description": "Entfernen Sie alle Angebote, Rechnungen und Kunden, aber behalten Sie Ihr Konto",
+        "button": "App-Daten zurücksetzen"
+      },
+      "resetDatabase": {
+        "title": "Alles zurücksetzen",
+        "description": "Ihr Konto und alle damit verbundenen Daten dauerhaft zu löschen",
+        "button": "Datenbank zurücksetzen"
+      },
+      "modal": {
+        "title": "Bestätigen Sie die gefährliche Aktion",
+        "description": "Bitte geben Sie den Verifizierungscode ein, den Sie per E-Mail erhalten haben, um diese Aktion zu bestätigen.",
+        "otpLabel": "Verifizierungscode",
+        "otpPlaceholder": "0000-0000",
+        "warningApp": "Dadurch werden alle Ihre Anwendungsdaten zurückgesetzt",
+        "warningAppDescription": "Alle Angebote, Rechnungen und Kunden werden dauerhaft gelöscht.",
+        "warningDatabase": "Dadurch wird Ihr gesamtes Konto gelöscht.",
+        "warningDatabaseDescription": "Ihr Konto und alle Daten werden endgültig gelöscht",
+        "cancel": "Abbrechen",
+        "confirm": "Bestätigen Sie die Aktion"
+      },
+      "messages": {
+        "otpSentSuccess": "Verifizierungscode wird an Ihre E-Mail gesendet",
+        "otpSentError": "Überprüfungscode konnte nicht gesendet werden",
+        "actionSuccess": "Aktion erfolgreich abgeschlossen",
+        "actionError": "Aktion konnte nicht abgeschlossen werden",
+        "actionFailed": "Aktion gescheitert",
+        "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      }
+    },
+    "pdfTemplates": {
+      "title": "PDF-Vorlagen",
+      "description": "Passen Sie das Erscheinungsbild Ihrer Rechnungen und Angebote an",
+      "templateType": {
+        "title": "Vorlagen Typ",
+        "description": "Wählen Sie eine Vorlage zum Anpassen",
+        "label": "Vorlagen Typ",
+        "options": {
+          "invoice": "Rechnungsvorlage",
+          "quote": "Angebotsvorlage"
+        }
+      },
+      "typography": {
+        "title": "Typografie",
+        "description": "Schrift- und Textgestaltungsoptionen",
+        "fontFamily": "Schriftfamilie"
+      },
+      "colors": {
+        "title": "Farben",
+        "description": "Markenfarben und Farbgebung",
+        "primaryColor": "Primärfarbe",
+        "secondaryColor": "Sekundärfarbe"
+      },
+      "logo": {
+        "title": "Logo",
+        "description": "Einstellungen für das Firmenlogo",
+        "includeLogo": "Logo anzeigen",
+        "logoPreview": "Logo-Vorschau",
+        "uploadText": "Zum Hochladen des Logos klicken"
+      },
+      "spacing": {
+        "title": "Abstände & Layout",
+        "description": "Abstände und Ränder kontrollieren",
+        "padding": "Abstände"
+      },
+      "labels": {
+        "title": "Etiketten & Text",
+        "invoice": "Rechnung",
+        "quote": "Angebot",
+        "billTo": "Rechnung an",
+        "quoteFor": "Angebot für",
+        "validUntil": "Gültig bis",
+        "dueDate": "Fälligkeitsdatum",
+        "date": "Datum",
+        "description": "Beschreibung",
+        "quantity": "Menge",
+        "unitPrice": "Preis pro Einheit",
+        "total": "Insgesamt",
+        "subtotal": "Zwischensumme",
+        "vat": "MwSt.",
+        "grandTotal": "Gesamtbetrag",
+        "vatRate": "MwSt.-Satz",
+        "paymentMethod": "Zahlungsmethode",
+        "paymentDetails": "Details zur Bezahlung",
+        "notes": "Anmerkungen"
+      },
+      "defaultLabels": {
+        "invoice": "Rechnung",
+        "quote": "Angebot",
+        "billTo": "Rechnung an",
+        "quoteFor": "Angebot für",
+        "validUntil": "Gültig bis",
+        "date": "Datum",
+        "dueDate": "Fälligkeitsdatum",
+        "description": "Beschreibung",
+        "quantity": "Menge",
+        "unitPrice": "Preis pro Einheit",
+        "total": "Insgesamt",
+        "subtotal": "Zwischensumme",
+        "vat": "MwSt.",
+        "grandTotal": "Gesamtbetrag",
+        "vatRate": "MwSt.-Satz",
+        "paymentMethod": "Zahlungsmethode",
+        "paymentDetails": "Details zur Bezahlung",
+        "notes": "Anmerkungen"
+      },
+      "preview": {
+        "title": "Vorschau",
+        "description": "Live-Vorschau auf Ihre {{templateType}}-Vorlage",
+        "iframeTitle": "Vorschau der Vorlage"
+      },
+      "saveButton": "Vorlageneinstellungen speichern",
+      "messages": {
+        "updateSuccess": "Vorlageneinstellungen erfolgreich aktualisiert",
+        "updateError": "Aktualisierung der Vorlageneinstellungen fehlgeschlagen"
+      }
+    },
+    "emailTemplates": {
+      "title": "E-Mail-Vorlagen",
+      "description": "Anpassen von E-Mail-Vorlagen für Rechnungen und Angebote",
+      "editor": {
+        "subject": "Betreff",
+        "subjectPlaceholder": "E-Mail-Betreff eingeben",
+        "body": "E-Mail Körper",
+        "htmlPlaceholder": "HTML-Inhalt eingeben...",
+        "htmlTip": "Sie können HTML-Tags zur Formatierung verwenden",
+        "availableVariables": "Verfügbare Variablen",
+        "variablesTip": "Verwenden Sie diese Variablen in Ihrer Vorlage, indem Sie sie in doppelte geschweifte Klammern einschließen"
+      },
+      "preview": {
+        "from": "Von",
+        "to": "An",
+        "subject": "Betreff",
+        "reply": "Antwort",
+        "forward": "Weiterleiten",
+        "archive": "Archiv"
+      },
+      "saveButton": "Vorlage speichern",
+      "messages": {
+        "saveSuccess": "Vorlage {{Name}} erfolgreich gespeichert",
+        "saveError": "Vorlage konnte nicht gespeichert werden"
+      }
+    }
+  },
+  "sidebar": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "quotes": "Angebote",
+      "invoices": "Rechnungen",
+      "clients": "Kunden",
+      "settings": "Einstellungen"
+    },
+    "company": {
+      "plan": "Unternehmen"
+    },
+    "menu": "Menü",
+    "theme": {
+      "toggleTheme": "Thema umschalten",
+      "light": "Licht",
+      "dark": "Dunkelheit",
+      "system": "System"
+    },
+    "userMenu": {
+      "account": "Konto",
+      "logout": "Abmelden"
+    },
+    "companyDialog": {
+      "title": "Vervollständige die Unternehmenseinstellungen",
+      "description": "Bitte vervollständigen Sie Ihre Unternehmensdaten, um die Anwendung weiter nutzen zu können.",
+      "goButton": "Gehen Sie zu Unternehmenseinstellungen"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "description": "Geben Sie Ihre Anmeldedaten ein, um auf Ihr Konto zuzugreifen",
+      "form": {
+        "email": {
+          "label": "E-Mail"
+        },
+        "password": {
+          "label": "Passwort"
+        },
+        "loggingIn": "Anmelden...",
+        "loginButton": "Anmelden"
+      },
+      "noAccount": "Sie haben noch kein Konto?",
+      "signUpLink": "Registrieren Sie sich",
+      "errors": {
+        "invalidEmail": "Bitte geben Sie eine gültige E-Mail Adresse ein",
+        "passwordRequired": "Passwort ist erforderlich"
+      },
+      "messages": {
+        "loginSuccess": "Erfolgreich eingeloggt",
+        "loginError": "Ungültige Berechtigungsnachweise"
+      }
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "description": "Erstellen Sie ein neues Konto, um loszulegen",
+      "form": {
+        "firstname": {
+          "label": "Vorname",
+          "placeholder": "Geben Sie Ihren Vornamen ein"
+        },
+        "lastname": {
+          "label": "Nachname",
+          "placeholder": "Geben Sie Ihren Nachnamen ein"
+        },
+        "email": {
+          "label": "E-Mail",
+          "placeholder": "Ihre E-Mail eingeben"
+        },
+        "password": {
+          "label": "Passwort",
+          "placeholder": "Ein Passwort erstellen",
+          "requirements": "Passwort-Anforderungen:"
+        },
+        "creatingAccount": "Konto erstellen...",
+        "createButton": "Konto erstellen"
+      },
+      "hasAccount": "Sie haben bereits ein Konto?",
+      "signInLink": "Anmelden",
+      "errors": {
+        "firstnameMinLength": "Der Vorname muss aus mindestens 2 Zeichen bestehen",
+        "lastnameMinLength": "Nachname muss aus mindestens 2 Zeichen bestehen",
+        "invalidEmail": "Bitte geben Sie eine gültige E-Mail Adresse ein",
+        "passwordMinLength": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+        "passwordLetter": "Das Passwort muss mindestens einen Buchstaben enthalten",
+        "passwordNumber": "Das Passwort muss mindestens eine Zahl enthalten",
+        "passwordSpecial": "Das Passwort muss mindestens ein Sonderzeichen enthalten"
+      },
+      "messages": {
+        "accountCreated": "Konto erfolgreich erstellt"
+      }
+    }
+  },
+  "unavailable": {
+    "title": "Nicht verfügbar auf Handy/Tablet",
+    "description": "Diese Funktion ist für eine optimale Nutzung nur auf Desktop-Geräten verfügbar."
+  },
+  "component": {
+    "currency-select": {
+      "placeholder": "Wählen Sie Ihre Währung",
+      "searchPlaceholder": "Währungen suchen...",
+      "noResults": "Keine Währungen gefunden"
+    }
+  },
+  "common": {
+    "units": {
+      "day": "Tag",
+      "week": "Woche",
+      "month": "Monat",
+      "year": "Jahr"
+    }
+  },
+  "noOptions": "Keine Optionen vorhanden. Erstellen Sie einen neuen Kunden."
+}
