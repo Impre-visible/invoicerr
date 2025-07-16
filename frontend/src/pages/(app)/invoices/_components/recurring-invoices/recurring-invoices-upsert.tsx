@@ -201,7 +201,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>{t(`recurringInvoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    <DialogTitle>{t(`recurringInvoices.upsert.title.upsert`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1">

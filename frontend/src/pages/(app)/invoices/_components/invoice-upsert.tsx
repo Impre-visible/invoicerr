@@ -182,7 +182,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    <DialogTitle>{t(`invoices.upsert.title.upsert`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -357,7 +357,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                     <Input
                                                                         {...field}
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.description.placeholder`,
+                                                                            `invoices.upsert.form.items.description.placeholder`,
                                                                         )}
                                                                     />
                                                                 </FormControl>
@@ -375,10 +375,10 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                     <BetterInput
                                                                         {...field}
                                                                         defaultValue={field.value || ""}
-                                                                        postAdornment={t(`invoices.${isEdit ? "edit" : "create"}.form.items.quantity.unit`)}
+                                                                        postAdornment={t(`invoices.upsert.form.items.quantity.unit`)}
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.quantity.placeholder`,
+                                                                            `invoices.upsert.form.items.quantity.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -402,7 +402,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                         postAdornment="$"
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.unitPrice.placeholder`,
+                                                                            `invoices.upsert.form.items.unitPrice.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -422,12 +422,12 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                 <FormControl>
                                                                     <BetterInput
                                                                         {...field}
-                                                                        defaultValue={field.value || ""}
+                                                                        defaultValue={field.value || 0}
                                                                         postAdornment="%"
                                                                         type="number"
                                                                         step="0.01"
                                                                         placeholder={t(
-                                                                            `invoices.${isEdit ? "edit" : "create"}.form.items.vatRate.placeholder`,
+                                                                            `invoices.upsert.form.items.vatRate.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(
