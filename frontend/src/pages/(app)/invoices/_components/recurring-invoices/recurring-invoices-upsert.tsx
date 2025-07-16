@@ -514,7 +514,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                                                 <FormControl>
                                                                     <BetterInput
                                                                         {...field}
-                                                                        defaultValue={field.value}
+                                                                        defaultValue={field.value || 0}
                                                                         postAdornment="%"
                                                                         type="number"
                                                                         step="0.01"
