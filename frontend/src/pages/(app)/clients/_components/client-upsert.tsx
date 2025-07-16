@@ -39,7 +39,7 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
             }, t("clients.upsert.validation.vat.format"))
             .optional(),
         currency: z.string().nullable().optional(),
-        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
+        foundedAt: z.date().optional().refine((date) => !date || date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.upsert.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.upsert.validation.contactLastname.required")),
         contactPhone: z
@@ -87,7 +87,7 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
         if (isEditing && client) {
             form.reset({
                 ...client,
-                foundedAt: new Date(client.foundedAt),
+                foundedAt: client.foundedAt ? new Date(client.foundedAt) : undefined,
             })
         } else if (!isEditing) {
             form.reset({
@@ -96,7 +96,7 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
                 legalId: "",
                 VAT: "",
                 currency: null,
-                foundedAt: new Date(),
+                foundedAt: undefined,
                 contactFirstname: "",
                 contactLastname: "",
                 contactPhone: "",
@@ -236,7 +236,7 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
                                     name="foundedAt"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
                                             <FormControl>
                                                 <DatePicker
                                                     className="w-full"
