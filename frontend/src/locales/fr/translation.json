@@ -173,7 +173,8 @@
                 "cancel": "Annuler",
                 "delete": "Supprimer le client"
             }
-        }
+        },
+        "noOptions": "Aucune option disponible. Créez un nouveau client."
     },
     "quotes": {
         "header": {
@@ -485,6 +486,9 @@
                     "label": "Détails de paiement",
                     "placeholder": "Saisir les détails de paiement",
                     "description": "Informations supplémentaires pour le paiement (Ex: IBAN, instructions, etc.)"
+                },
+                "currency": {
+                    "label": "Devise"
                 }
             },
             "actions": {

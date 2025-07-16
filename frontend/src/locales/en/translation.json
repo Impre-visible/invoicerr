@@ -485,6 +485,9 @@
                     "label": "Payment Details",
                     "placeholder": "Enter payment details",
                     "description": "Additional information for payment (e.g., IBAN, instructions, etc.)"
+                },
+                "currency": {
+                    "label": "Currency"
                 }
             },
             "actions": {
@@ -1227,5 +1230,6 @@
             "month": "Month",
             "year": "Year"
         }
-    }
+    },
+    "noOptions": "No options available. Create a new client."
 }
