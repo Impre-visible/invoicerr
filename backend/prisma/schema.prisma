@@ -421,6 +421,7 @@ model Invoice {
   totalTTC           Float
   currency           Currency
   isActive           Boolean           @default(true)
+  receipts           Receipt[]
 }
 
 model InvoiceItem {
@@ -453,4 +454,14 @@ model CurrencyConversion {
   expiresAt    DateTime
 
   @@unique([fromCurrency, toCurrency])
+}
+
+model Receipt {
+  id        String   @id @default(cuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  items     Json
+  totalPaid Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
