@@ -345,7 +345,7 @@ export class InvoicesService {
 
         inv.from = {
             name: invRec.company.name,
-            description: invRec.company.description,
+            description: invRec.company.description || "N/A",
             status: 'active',
             foundedDate: { day: companyFoundedDate.getDay(), month: companyFoundedDate.getMonth() + 1, year: companyFoundedDate.getFullYear() },
             type: 'company',
@@ -362,7 +362,7 @@ export class InvoicesService {
 
         inv.to = {
             name: invRec.client.name,
-            description: invRec.client.description,
+            description: invRec.client.description || "N/A",
             type: 'company',
             foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
             status: invRec.client.isActive ? 'active' : 'planned',
