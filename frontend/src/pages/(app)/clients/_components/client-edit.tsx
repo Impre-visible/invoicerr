@@ -26,8 +26,8 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
         name: z.string().min(1, t("clients.upsert.validation.name.required")),
         description: z
             .string()
-            .min(1, t("clients.upsert.validation.description.required"))
-            .max(500, t("clients.upsert.validation.description.maxLength")),
+            .max(500, t("clients.upsert.validation.description.maxLength"))
+            .optional(),
         legalId: z
             .string()
             .max(50, t("clients.upsert.validation.legalId.maxLength"))
@@ -163,7 +163,7 @@ export function ClientEdit({ client, onOpenChange }: ClientEditDialogProps) {
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.upsert.fields.description.label")}</FormLabel>
+                                        <FormLabel>{t("clients.upsert.fields.description.label")}</FormLabel>
                                         <FormControl>
                                             <Input {...field} placeholder={t("clients.upsert.fields.description.placeholder")} />
                                         </FormControl>
