@@ -17,9 +17,10 @@ interface ClientUpsertProps {
     client?: Client | null
     open: boolean
     onOpenChange: (open: boolean) => void
+    onCreate?: (client: Client) => void
 }
 
-export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) {
+export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUpsertProps) {
     const { t } = useTranslation()
     const isEditing = !!client
 
@@ -115,7 +116,10 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
         console.debug(isEditing ? "Updating client with data:" : "Creating client with data:", data)
 
         trigger(data)
-            .then(() => {
+            .then((createdClient) => {
+                if (!isEditing && onCreate) {
+                    onCreate(createdClient)
+                }
                 onOpenChange(false)
                 form.reset()
             })
@@ -127,7 +131,7 @@ export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) 
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-auto">
                     <DialogHeader>
-                        <DialogTitle>{isEditing ? t("clients.upsert.title.edit") : t("clients.upsert.title.create")}</DialogTitle>
+                        <DialogTitle>{`clients.upsert.title.${isEditing ? "edit" : "create"}`}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
