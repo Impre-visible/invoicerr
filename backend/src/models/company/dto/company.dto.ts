@@ -33,7 +33,7 @@ export interface PDFConfig {
 }
 
 export class EditCompanyDto {
-    description: string
+    description?: string
     legalId?: string
     foundedAt: Date
     name: string

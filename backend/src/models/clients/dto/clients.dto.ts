@@ -1,7 +1,7 @@
 import { Currency } from "@prisma/client";
 
 export class EditClientsDto {
-    description: string
+    description?: string
     legalId?: string
     VAT?: string
     foundedAt: Date
