@@ -24,7 +24,6 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
         name: z.string().min(1, t("clients.upsert.validation.name.required")),
         description: z
             .string()
-            .min(1, t("clients.upsert.validation.description.required"))
             .max(500, t("clients.upsert.validation.description.maxLength"))
             .optional(),
         legalId: z
