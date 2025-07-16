@@ -1,7 +1,7 @@
 export interface Client {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     legalId?: string;
     VAT?: string;
     foundedAt: Date;
