@@ -5,7 +5,7 @@ import {
     LayoutDashboard,
     LogOut,
     Moon,
-    Receipt,
+    ReceiptText,
     Settings,
     Sun,
     User,
@@ -62,7 +62,7 @@ export function Sidebar() {
         },
         {
             title: t("sidebar.navigation.invoices"),
-            icon: <Receipt className="w-4 h-4" />,
+            icon: <ReceiptText className="w-4 h-4" />,
             url: "/invoices",
         },
         {

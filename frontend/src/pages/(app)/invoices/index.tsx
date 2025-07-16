@@ -1,4 +1,4 @@
-import { Receipt, Plus, Search } from "lucide-react"
+import { ReceiptText, Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { InvoiceList, type InvoiceListHandle } from "@/pages/(app)/invoices/_components/invoice-list"
 import { useEffect, useRef, useState } from "react"
@@ -56,7 +56,7 @@ export default function Invoices() {
 
     const invoiceEmptyState = (
         <div className="text-center py-12">
-            <Receipt className="mx-auto h-12 w-12 text-gray-400" />
+            <ReceiptText className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-foreground">
                 {searchTerm ? t("invoices.emptyState.noResults") : t("invoices.emptyState.noInvoices")}
             </h3>
@@ -75,7 +75,7 @@ export default function Invoices() {
     )
     const recurringInvoiceEmptyState = (
         <div className="text-center py-12">
-            <Receipt className="mx-auto h-12 w-12 text-gray-400" />
+            <ReceiptText className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-foreground">
                 {t("recurringInvoices.emptyState.noInvoices")}
             </h3>
@@ -96,7 +96,7 @@ export default function Invoices() {
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
-                        <Receipt className="h-5 w-5 text-blue-600" />
+                        <ReceiptText className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
                         <div className="text-sm text-primary">{t("invoices.header.subtitle")}</div>
@@ -131,7 +131,7 @@ export default function Invoices() {
                     <CardContent>
                         <div className="flex items-center space-x-4">
                             <div className="p-3 bg-blue-100 rounded-lg">
-                                <Receipt className="h-6 w-6 text-blue-600" />
+                                <ReceiptText className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
                                 <p className="text-2xl font-semibold text-foreground">{invoices?.invoices.length || 0}</p>
