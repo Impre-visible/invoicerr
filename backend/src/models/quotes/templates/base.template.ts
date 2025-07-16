@@ -26,7 +26,8 @@ export const baseTemplate = `
             {{#if includeLogo}}
                 <img src="{{logoB64}}" alt="Logo" class="logo">
             {{/if}}
-            <h1>{{company.name}}</h1>
+            <h1>{{company.name}}</h1><br>
+            {{#if company.description}}<strong>{{labels.description}}</strong> {{company.description}}<br>{{/if}}
             <p>{{company.address}}<br>
             {{company.city}}, {{company.postalCode}}<br>
             {{company.country}}<br>
@@ -44,6 +45,7 @@ export const baseTemplate = `
     <div class="client-info">
         <h3>{{labels.quoteFor}}</h3>
         <p>{{client.name}}<br>
+        {{#if client.description}}<strong>{{labels.description}}</strong> {{client.description}}<br>{{/if}}
         {{client.address}}<br>
         {{client.city}}, {{client.postalCode}}<br>
         {{client.country}}<br>
