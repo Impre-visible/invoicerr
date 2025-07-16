@@ -189,7 +189,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
                 <DialogHeader>
-                    <DialogTitle>{t(`quotes.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
+                    <DialogTitle>{t(`quotes.upsert.title.upsert`)}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -338,7 +338,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                     <Input
                                                                         {...field}
                                                                         placeholder={t(
-                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.description.placeholder`,
+                                                                            `quotes.upsert.form.items.description.placeholder`,
                                                                         )}
                                                                     />
                                                                 </FormControl>
@@ -356,10 +356,10 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                     <BetterInput
                                                                         {...field}
                                                                         defaultValue={field.value || ""}
-                                                                        postAdornment={t(`quotes.${isEdit ? "edit" : "create"}.form.items.quantity.unit`)}
+                                                                        postAdornment={t(`quotes.upsert.form.items.quantity.unit`)}
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.quantity.placeholder`,
+                                                                            `quotes.upsert.form.items.quantity.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -383,7 +383,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                         postAdornment="$"
                                                                         type="number"
                                                                         placeholder={t(
-                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.unitPrice.placeholder`,
+                                                                            `quotes.upsert.form.items.unitPrice.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(e.target.value === "" ? undefined : Number(e.target.value))
@@ -408,7 +408,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                         type="number"
                                                                         step="0.01"
                                                                         placeholder={t(
-                                                                            `quotes.${isEdit ? "edit" : "create"}.form.items.vatRate.placeholder`,
+                                                                            `quotes.upsert.form.items.vatRate.placeholder`,
                                                                         )}
                                                                         onChange={(e) =>
                                                                             field.onChange(
