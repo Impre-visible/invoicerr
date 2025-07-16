@@ -4,7 +4,7 @@ export interface Client {
     description?: string;
     legalId?: string;
     VAT?: string;
-    foundedAt: Date;
+    foundedAt?: Date;
     contactFirstname: string;
     contactLastname: string;
     contactEmail: string;

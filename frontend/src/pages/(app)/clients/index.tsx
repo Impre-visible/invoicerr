@@ -4,9 +4,8 @@ import { Edit, Eye, Mail, MapPin, Phone, Plus, Search, Trash2, User, Users } fro
 import BetterPagination from "@/components/pagination"
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
-import { ClientCreate } from "./_components/client-create"
 import { ClientDeleteDialog } from "./_components/client-delete"
-import { ClientEdit } from "./_components/client-edit"
+import { ClientUpsert } from "./_components/client-upsert"
 import { ClientViewDialog } from "./_components/client-view"
 import { Input } from "@/components/ui/input"
 import { useGet } from "@/lib/utils"
@@ -260,7 +259,7 @@ export default function Clients() {
                 </CardFooter>
             </Card>
 
-            <ClientCreate
+            <ClientUpsert
                 open={createClientDialog}
                 onOpenChange={(open) => {
                     setCreateClientDialog(open)
@@ -268,7 +267,8 @@ export default function Clients() {
                 }}
             />
 
-            <ClientEdit
+            <ClientUpsert
+                open={!!editClientDialog}
                 client={editClientDialog}
                 onOpenChange={(open) => {
                     if (!open) setEditClientDialog(null)

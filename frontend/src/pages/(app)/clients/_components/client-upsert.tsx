@@ -1,35 +1,35 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { usePatch, usePost } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
+import type { Client } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { usePost } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-interface ClientCreateDialogProps {
+interface ClientUpsertProps {
+    client?: Client | null
     open: boolean
     onOpenChange: (open: boolean) => void
 }
 
-export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
+export function ClientUpsert({ client, open, onOpenChange }: ClientUpsertProps) {
     const { t } = useTranslation()
-    const { trigger } = usePost("/api/clients")
+    const isEditing = !!client
+
+    const { trigger: createClient } = usePost("/api/clients")
+    const { trigger: updateClient } = usePatch(`/api/clients/${client?.id}`)
 
     const clientSchema = z.object({
         name: z.string().min(1, t("clients.upsert.validation.name.required")),
-        description: z
-            .string()
-            .max(500, t("clients.upsert.validation.description.maxLength"))
-            .optional(),
-        legalId: z
-            .string()
-            .max(50, t("clients.upsert.validation.legalId.maxLength"))
-            .optional(),
+        description: z.string().max(500, t("clients.upsert.validation.description.maxLength")).optional(),
+        legalId: z.string().max(50, t("clients.upsert.validation.legalId.maxLength")).optional(),
         VAT: z
             .string()
             .max(15, t("clients.upsert.validation.vat.maxLength"))
@@ -39,7 +39,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
             }, t("clients.upsert.validation.vat.format"))
             .optional(),
         currency: z.string().nullable().optional(),
-        foundedAt: z.date().refine((date) => date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
+        foundedAt: z.date().optional().refine((date) => !date || date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
         contactFirstname: z.string().min(1, t("clients.upsert.validation.contactFirstname.required")),
         contactLastname: z.string().min(1, t("clients.upsert.validation.contactLastname.required")),
         contactPhone: z
@@ -83,8 +83,36 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
         },
     })
 
+    useEffect(() => {
+        if (isEditing && client) {
+            form.reset({
+                ...client,
+                foundedAt: client.foundedAt ? new Date(client.foundedAt) : undefined,
+            })
+        } else if (!isEditing) {
+            form.reset({
+                name: "",
+                description: "",
+                legalId: "",
+                VAT: "",
+                currency: null,
+                foundedAt: undefined,
+                contactFirstname: "",
+                contactLastname: "",
+                contactPhone: "",
+                contactEmail: "",
+                address: "",
+                postalCode: "",
+                city: "",
+                country: "",
+            })
+        }
+    }, [client, isEditing, form])
+
     const onSubmit = (data: z.infer<typeof clientSchema>) => {
-        console.debug("Creating client with data:", data)
+        const trigger = isEditing ? updateClient : createClient
+
+        console.debug(isEditing ? "Updating client with data:" : "Creating client with data:", data)
 
         trigger(data)
             .then(() => {
@@ -99,7 +127,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-auto">
                     <DialogHeader>
-                        <DialogTitle>{t("clients.upsert.title.create")}</DialogTitle>
+                        <DialogTitle>{isEditing ? t("clients.upsert.title.edit") : t("clients.upsert.title.create")}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
@@ -197,10 +225,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                         <FormItem>
                                             <FormLabel>{t("clients.upsert.fields.currency.label")}</FormLabel>
                                             <FormControl>
-                                                <CurrencySelect
-                                                    value={field.value}
-                                                    onChange={(value) => field.onChange(value)}
-                                                />
+                                                <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -211,7 +236,7 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                     name="foundedAt"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.foundedAt.label")}</FormLabel>
                                             <FormControl>
                                                 <DatePicker
                                                     className="w-full"
@@ -315,7 +340,9 @@ export function ClientCreate({ open, onOpenChange }: ClientCreateDialogProps) {
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                     {t("clients.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">{t("clients.upsert.actions.create")}</Button>
+                                <Button type="submit">
+                                    {isEditing ? t("clients.upsert.actions.save") : t("clients.upsert.actions.create")}
+                                </Button>
                             </div>
                         </form>
                     </Form>

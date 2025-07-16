@@ -4,7 +4,7 @@ export class EditClientsDto {
     description?: string
     legalId?: string
     VAT?: string
-    foundedAt: Date
+    foundedAt?: Date;
     id: string;
     name: string;
     contactFirstname: string;
