@@ -28,6 +28,7 @@ export class ClientsService {
     async searchClients(query: string) {
         if (!query) {
             return this.prisma.client.findMany({
+                where: { isActive: true },
                 take: 10,
                 orderBy: {
                     name: 'asc',
