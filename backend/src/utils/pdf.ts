@@ -1,12 +1,15 @@
 import * as puppeteer from 'puppeteer';
 
 import { BadRequestException } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 export async function formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
-    const company = await this.prisma.company.findFirst();
+    const prisma = new PrismaClient();
+    const company = await prisma.company.findFirst();
     if (!company) {
         throw new BadRequestException('No company found. Please create a company first.');
     }
+    prisma.$disconnect();
     return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
         let value: number | string;
 
