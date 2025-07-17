@@ -40,6 +40,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
         const { t } = useTranslation()
         const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
         const { trigger: triggerSendInvoiceByEmail } = usePost(`/api/invoices/send`)
+        const { trigger: triggerCreateReceipt } = usePost(`/api/receipts/create-from-invoice`)
 
         const [createInvoiceDialog, setCreateInvoiceDialog] = useState<boolean>(false)
         const [editInvoiceDialog, setEditInvoiceDialog] = useState<Invoice | null>(null)
@@ -109,6 +110,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
 
         function handleDownloadPdf({ invoice, format }: { invoice: Invoice; format: string }) {
             setDownloadTrigger({ invoice, format, id: Date.now() })
+        }
+
+        function handleCreateReceiptFromInvoice(invoiceId: string) {
+            triggerCreateReceipt({ id: invoiceId })
+                .then(() => {
+                    toast.success(t("invoices.list.messages.createReceiptSuccess"))
+                    mutate()
+                })
+                .catch((error) => {
+                    console.error("Error creating receipt from invoice:", error)
+                    toast.error(t("invoices.list.messages.createReceiptError"))
+                })
         }
 
         const getStatusColor = (status: string) => {
@@ -324,6 +337,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         className="text-gray-600 hover:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+
+                                                {invoice.status === "PAID" && (
+                                                    <Button
+                                                        tooltip={t("invoices.list.tooltips.createReceipt")}
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
+                                                        className="text-gray-600 hover:text-green-600"
+                                                    >
+                                                        <Plus className="h-4 w-4" />
                                                     </Button>
                                                 )}
                                             </div>
