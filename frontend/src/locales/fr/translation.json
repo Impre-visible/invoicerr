@@ -397,7 +397,8 @@
                 "downloadPdf": "Télécharger le PDF",
                 "edit": "Modifier la facture",
                 "markAsPaid": "Marquer comme payée",
-                "delete": "Supprimer la facture"
+                "delete": "Supprimer la facture",
+                "createReceipt": "Créer un reçu à partir de cette facture"
             },
             "actions": {
                 "addNew": "Ajouter une nouvelle facture"
@@ -412,7 +413,8 @@
             },
             "messages": {
                 "markAsPaidSuccess": "Facture marquée comme payée avec succès",
-                "markAsPaidError": "Échec du marquage de la facture comme payée"
+                "markAsPaidError": "Échec du marquage de la facture comme payée",
+                "createReceiptSuccess": "Reçu créé avec succès à partir de la facture"
             }
         },
         "upsert": {
@@ -1141,6 +1143,7 @@
             "dashboard": "Tableau de bord",
             "quotes": "Devis",
             "invoices": "Factures",
+            "receipts": "Reçus",
             "clients": "Clients",
             "settings": "Paramètres"
         },
@@ -1246,6 +1249,104 @@
             "week": "Semaine",
             "month": "Mois",
             "year": "Année"
+        }
+    },
+    "receipts": {
+        "header": {
+            "subtitle": "Gérez vos reçus",
+            "count": "{{count}} reçus {{found}}",
+            "found": "trouvés"
+        },
+        "search": {
+            "placeholder": "Rechercher des reçus..."
+        },
+        "actions": {
+            "addNew": "Ajouter un nouveau reçu"
+        },
+        "stats": {
+            "total": "Total des reçus",
+            "draft": "Brouillon",
+            "sent": "Envoyé",
+            "signed": "Signé"
+        },
+        "emptyState": {
+            "noReceipts": "Aucun reçu pour le moment",
+            "noResults": "Aucun reçu trouvé",
+            "startAdding": "Commencez par créer votre premier reçu.",
+            "tryDifferentSearch": "Essayez d'ajuster vos termes de recherche."
+        },
+        "list": {
+            "title": "Tous les reçus",
+            "description": "Gérez et consultez tous vos reçus en un seul endroit.",
+            "status": {
+                "draft": "Brouillon",
+                "sent": "Envoyé",
+                "signed": "Signé"
+            },
+            "item": {
+                "client": "Client",
+                "issued": "Émis",
+                "validUntil": "Valide jusqu'à",
+                "totalHT": "Total (HT)",
+                "totalTTC": "Total (TTC)"
+            },
+            "tooltips": {
+                "view": "Voir le reçu",
+                "viewPdf": "Voir le PDF",
+                "downloadPdf": "Télécharger le PDF",
+                "edit": "Modifier le reçu",
+                "sendToClient": "Envoyer au client",
+                "delete": "Supprimer le reçu"
+            },
+            "messages": {
+                "emailSent": "Reçu envoyé au client avec succès.",
+                "emailError": "Échec de l'envoi du reçu au client."
+            },
+            "actions": {
+                "addNew": "Ajouter un nouveau reçu"
+            }
+        },
+        "upsert": {
+            "title": {
+                "edit": "Modifier le reçu",
+                "create": "Créer un reçu"
+            },
+            "form": {
+                "client": {
+                    "label": "Client",
+                    "errors": {
+                        "required": "Le client est requis."
+                    }
+                },
+                "items": {
+                    "label": "Articles",
+                    "description": {
+                        "errors": {
+                            "required": "La description est requise."
+                        }
+                    },
+                    "quantity": {
+                        "errors": {
+                            "required": "La quantité est requise.",
+                            "min": "La quantité doit être d'au moins 1.",
+                            "invalid": "Quantité invalide."
+                        }
+                    },
+                    "unitPrice": {
+                        "errors": {
+                            "required": "Le prix unitaire est requis.",
+                            "min": "Le prix unitaire doit être d'au moins 0.",
+                            "invalid": "Prix unitaire invalide."
+                        }
+                    },
+                    "vatRate": {
+                        "errors": {
+                            "required": "Le taux de TVA est requis.",
+                            "min": "Le taux de TVA doit être d'au moins 0."
+                        }
+                    }
+                }
+            }
         }
     }
 }

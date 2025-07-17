@@ -396,7 +396,8 @@
                 "downloadPdf": "Download PDF",
                 "edit": "Edit invoice",
                 "markAsPaid": "Mark as paid",
-                "delete": "Delete invoice"
+                "delete": "Delete invoice",
+                "createReceipt": "Create a receipt from this invoice"
             },
             "actions": {
                 "addNew": "Add New Invoice"
@@ -411,7 +412,8 @@
             },
             "messages": {
                 "markAsPaidSuccess": "Invoice marked as paid successfully",
-                "markAsPaidError": "Failed to mark invoice as paid"
+                "markAsPaidError": "Failed to mark invoice as paid",
+                "createReceiptSuccess": "Receipt created successfully from invoice"
             }
         },
         "upsert": {
@@ -1124,6 +1126,7 @@
             "dashboard": "Dashboard",
             "quotes": "Quotes",
             "invoices": "Invoices",
+            "receipts": "Receipts",
             "clients": "Clients",
             "settings": "Settings"
         },
@@ -1231,5 +1234,103 @@
             "year": "Year"
         }
     },
-    "noOptions": "No options available. Create a new client."
+    "noOptions": "No options available. Create a new client.",
+    "receipts": {
+        "header": {
+            "subtitle": "Manage your receipts",
+            "count": "{{count}} receipts {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search receipts..."
+        },
+        "actions": {
+            "addNew": "Add New Receipt"
+        },
+        "stats": {
+            "total": "Total Receipts",
+            "draft": "Draft",
+            "sent": "Sent",
+            "signed": "Signed"
+        },
+        "emptyState": {
+            "noReceipts": "No receipts yet",
+            "noResults": "No receipts found",
+            "startAdding": "Get started by creating your first receipt.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Receipts",
+            "description": "Manage and view all your receipts in one place.",
+            "status": {
+                "draft": "Draft",
+                "sent": "Sent",
+                "signed": "Signed"
+            },
+            "item": {
+                "client": "Client",
+                "issued": "Issued",
+                "validUntil": "Valid Until",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)"
+            },
+            "tooltips": {
+                "view": "View receipt",
+                "viewPdf": "View PDF",
+                "downloadPdf": "Download PDF",
+                "edit": "Edit receipt",
+                "sendToClient": "Send to client",
+                "delete": "Delete receipt"
+            },
+            "messages": {
+                "emailSent": "Receipt sent to client successfully.",
+                "emailError": "Failed to send receipt to client."
+            },
+            "actions": {
+                "addNew": "Add New Receipt"
+            }
+        },
+        "upsert": {
+            "title": {
+                "edit": "Edit Receipt",
+                "create": "Create Receipt"
+            },
+            "form": {
+                "client": {
+                    "label": "Client",
+                    "errors": {
+                        "required": "Client is required."
+                    }
+                },
+                "items": {
+                    "label": "Items",
+                    "description": {
+                        "errors": {
+                            "required": "Description is required."
+                        }
+                    },
+                    "quantity": {
+                        "errors": {
+                            "required": "Quantity is required.",
+                            "min": "Quantity must be at least 1.",
+                            "invalid": "Invalid quantity."
+                        }
+                    },
+                    "unitPrice": {
+                        "errors": {
+                            "required": "Unit price is required.",
+                            "min": "Unit price must be at least 0.",
+                            "invalid": "Invalid unit price."
+                        }
+                    },
+                    "vatRate": {
+                        "errors": {
+                            "required": "VAT rate is required.",
+                            "min": "VAT rate must be at least 0."
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
