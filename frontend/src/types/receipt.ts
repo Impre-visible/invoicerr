@@ -11,20 +11,12 @@ interface ReceiptItem {
 
 export interface Receipt {
     id: string;
-    number: string;
+    number: number;
+    rawNumber?: string; // Optional raw number for custom formats
     invoiceId: string;
     invoice?: Invoice;
     items: ReceiptItem[];
     totalPaid: number;
     createdAt: string; // ISO date string
     updatedAt: string; // ISO date string
-    title?: string; // Titre du reçu
-    status?: string; // Statut du reçu (DRAFT, SENT, etc.)
-    client?: {
-        name: string; // Nom du client
-    };
-    validUntil?: string; // Date de validité
-    totalHT?: number; // Total hors taxes
-    totalTTC?: number; // Total toutes taxes comprises
-    currency?: string; // Devise utilisée
 }

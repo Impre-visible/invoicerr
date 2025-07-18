@@ -20,7 +20,8 @@ export interface InvoiceItem {
 
 export interface Invoice {
     id: string;
-    number: string; // Ex: "INV-2025-0001"
+    number: number; // Ex: "INV-2025-0001"
+    rawNumber?: string; // Optional raw number for custom formats
     title?: string; // Optional title from DTOs
     quoteId?: string;
     clientId: string;
