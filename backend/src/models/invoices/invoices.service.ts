@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 import { formatDate } from 'src/utils/date';
+import { parseAddress } from 'src/utils/adresse';
 
 @Injectable()
 export class InvoicesService {
@@ -291,6 +292,8 @@ export class InvoicesService {
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 
+        const fromAdress = parseAddress(invRec.company.address || '');
+
         inv.from = {
             name: invRec.company.name,
             description: invRec.company.description || "N/A",
@@ -298,8 +301,8 @@ export class InvoicesService {
             foundedDate: { day: companyFoundedDate.getDay(), month: companyFoundedDate.getMonth() + 1, year: companyFoundedDate.getFullYear() },
             type: 'company',
             address: {
-                streetName: invRec.company.address,
-                houseNumber: '',
+                streetName: fromAdress.streetName,
+                houseNumber: fromAdress.houseNumber,
                 city: invRec.company.city,
                 postalCode: invRec.company.postalCode,
                 country: invRec.company.country,
@@ -308,6 +311,8 @@ export class InvoicesService {
             registrationDetails: { vatId: invRec.company.VAT || "N/A", registrationId: invRec.company.legalId || "N/A", registrationName: invRec.company.name }
         };
 
+        const toAdress = parseAddress(invRec.client.address || '');
+
         inv.to = {
             name: invRec.client.name,
             description: invRec.client.description || "N/A",
@@ -315,8 +320,8 @@ export class InvoicesService {
             foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
             status: invRec.client.isActive ? 'active' : 'planned',
             address: {
-                streetName: invRec.client.address,
-                houseNumber: '',
+                streetName: toAdress.streetName,
+                houseNumber: toAdress.houseNumber,
                 city: invRec.client.city,
                 postalCode: invRec.client.postalCode,
                 country: invRec.client.country || 'FR',
