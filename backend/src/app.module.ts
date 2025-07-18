@@ -9,9 +9,10 @@ import { InvoicesModule } from './models/invoices/invoices.module';
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { QuotesModule } from './models/quotes/quotes.module';
-import { SignaturesModule } from './models/signatures/signatures.module';
+import { ReceiptsModule } from './models/receipts/receipts.module';
 import { RecurringInvoicesModule } from './models/recurring-invoices/recurring-invoices.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SignaturesModule } from './models/signatures/signatures.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ClientsModule,
     QuotesModule,
     InvoicesModule,
+    ReceiptsModule,
     DashboardModule,
     SignaturesModule,
     DangerModule,
