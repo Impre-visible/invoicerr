@@ -29,7 +29,13 @@ export class ReceiptsService {
                 createdAt: 'desc',
             },
             include: {
-                items: true
+                items: true,
+                invoice: {
+                    include: {
+                        client: true,
+                        quote: true,
+                    }
+                }
             },
         });
 
@@ -53,7 +59,13 @@ export class ReceiptsService {
                     number: 'asc',
                 },
                 include: {
-                    items: true
+                    items: true,
+                    invoice: {
+                        include: {
+                            client: true,
+                            quote: true,
+                        }
+                    }
                 },
             });
         }
@@ -70,12 +82,49 @@ export class ReceiptsService {
                 number: 'asc',
             },
             include: {
-                items: true
+                items: true,
+                invoice: {
+                    include: {
+                        client: true,
+                        quote: true,
+                    }
+                }
             },
         });
     }
 
     async createReceipt(body: CreateReceiptDto) {
+        const invoice = await this.prisma.invoice.findUnique({
+            where: { id: body.invoiceId },
+            include: {
+                company: true,
+                client: true,
+                items: true,
+            },
+        });
+
+        if (!invoice) {
+            throw new BadRequestException('Invoice not found');
+        }
+
+        const receipt = await this.prisma.receipt.create({
+            data: {
+                invoiceId: body.invoiceId,
+                items: {
+                    create: body.items.map(item => ({
+                        id: item.id,
+                        invoiceId: body.invoiceId,
+                        amountPaid: item.amount_paid,
+                    })),
+                },
+                totalPaid: body.items.reduce((sum, item) => sum + item.amount_paid, 0),
+            },
+            include: {
+                items: true,
+            },
+        });
+
+        return receipt;
     }
 
     async editReceipt(body: EditReceiptDto) {
