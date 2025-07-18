@@ -308,6 +308,7 @@ enum QuoteStatus {
 model Quote {
   id             String      @id @default(uuid())
   number         Int         @default(autoincrement())
+  rawNumber      String? // Raw number for custom formats
   title          String?
   client         Client      @relation(fields: [clientId], references: [id])
   clientId       String
@@ -401,6 +402,7 @@ model RecurringInvoiceItem {
 model Invoice {
   id                 String            @id @default(uuid())
   number             Int               @default(autoincrement())
+  rawNumber          String? // Raw number for custom formats
   quote              Quote?            @relation(fields: [quoteId], references: [id])
   quoteId            String?
   recurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id])
@@ -471,6 +473,7 @@ model ReceiptItem {
 model Receipt {
   id        String        @id @default(cuid())
   number    Int           @default(autoincrement())
+  rawNumber String? // Raw number for custom formats
   invoiceId String
   invoice   Invoice       @relation(fields: [invoiceId], references: [id])
   items     ReceiptItem[]
