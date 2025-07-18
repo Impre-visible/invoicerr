@@ -19,6 +19,15 @@ export class ReceiptsController {
         return await this.receiptsService.searchReceipts(query);
     }
 
+    @Post('create-from-invoice')
+    @LoginRequired()
+    async createReceiptFromInvoice(@Body('id') invoiceId: string) {
+        if (!invoiceId) {
+            throw new Error('Invoice ID is required');
+        }
+        return await this.receiptsService.createReceipt({ invoiceId, items: [] });
+    }
+
     /*
     @Get(':id/pdf')
     @LoginRequired()
