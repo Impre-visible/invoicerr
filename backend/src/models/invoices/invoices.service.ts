@@ -292,7 +292,15 @@ export class InvoicesService {
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 
-        const fromAdress = parseAddress(invRec.company.address || '');
+        let fromAdress;
+        try {
+            fromAdress = parseAddress(invRec.company.address || '');
+        } catch (error) {
+            fromAdress = {
+                streetName: invRec.company.address || 'N/A',
+                houseNumber: 'N/A',
+            };
+        }
 
         inv.from = {
             name: invRec.company.name,
@@ -311,7 +319,15 @@ export class InvoicesService {
             registrationDetails: { vatId: invRec.company.VAT || "N/A", registrationId: invRec.company.legalId || "N/A", registrationName: invRec.company.name }
         };
 
-        const toAdress = parseAddress(invRec.client.address || '');
+        let toAdress;
+        try {
+            toAdress = parseAddress(invRec.client.address || '');
+        } catch (error) {
+            toAdress = {
+                streetName: invRec.client.address || 'N/A',
+                houseNumber: 'N/A',
+            };
+        }
 
         inv.to = {
             name: invRec.client.name,
