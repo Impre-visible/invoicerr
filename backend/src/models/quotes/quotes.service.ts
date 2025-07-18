@@ -2,7 +2,7 @@ import * as Handlebars from 'handlebars';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
-import { formatPattern, getInvertColor, getPDF } from 'src/utils/pdf';
+import { getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
@@ -33,16 +33,9 @@ export class QuotesService {
             },
         });
 
-        const returnedQuotes = await Promise.all(quotes.map(async (quote) => {
-            return {
-                ...quote,
-                number: await formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
-            }
-        }));
-
         const totalQuotes = await this.prisma.quote.count();
 
-        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes: returnedQuotes };
+        return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
     }
 
     async searchQuotes(query: string) {
@@ -224,7 +217,7 @@ export class QuotesService {
         const template = Handlebars.compile(templateHtml);
 
         const html = template({
-            number: await formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt),
+            number: quote.rawNumber || quote.number.toString(),
             date: formatDate(quote.company, quote.createdAt),
             validUntil: formatDate(quote.company, quote.validUntil),
             company: quote.company,

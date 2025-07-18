@@ -39,16 +39,9 @@ export class ReceiptsService {
             },
         });
 
-        const returnedReceipts = await Promise.all(receipts.map(async (receipt) => {
-            return {
-                ...receipt,
-                number: await formatPattern(company.receiptNumberFormat, receipt.number, receipt.createdAt),
-            }
-        }));
-
         const totalReceipts = await this.prisma.receipt.count();
 
-        return { pageCount: Math.ceil(totalReceipts / pageSize), receipts: returnedReceipts };
+        return { pageCount: Math.ceil(totalReceipts / pageSize), receipts };
     }
 
     async searchReceipts(query: string) {

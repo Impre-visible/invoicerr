@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
-import { formatPattern, getInvertColor, getPDF } from 'src/utils/pdf';
+import { getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
@@ -49,14 +49,9 @@ export class InvoicesService {
             },
         });
 
-        const returnedInvoices = await Promise.all(invoices.map(async quote => ({
-            ...quote,
-            number: await formatPattern(quote.company.invoiceNumberFormat, quote.number, quote.createdAt),
-        })));
-
         const totalInvoices = await this.prisma.invoice.count();
 
-        return { pageCount: Math.ceil(totalInvoices / pageSize), invoices: returnedInvoices };
+        return { pageCount: Math.ceil(totalInvoices / pageSize), invoices };
     }
 
     async createInvoice(body: CreateInvoiceDto) {
@@ -215,7 +210,7 @@ export class InvoicesService {
 
         const { pdfConfig } = invoice.company;
         const html = template({
-            number: await formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt),
+            number: invoice.rawNumber || invoice.number.toString(),
             date: formatDate(invoice.company, invoice.createdAt),
             dueDate: formatDate(invoice.company, invoice.dueDate),
             company: invoice.company,
@@ -288,7 +283,7 @@ export class InvoicesService {
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
 
-        inv.id = await formatPattern(invRec.company.invoiceNumberFormat, invRec.number, invRec.createdAt);
+        inv.id = invRec.rawNumber || invRec.number.toString();
         inv.issueDate = new Date(invRec.createdAt.toISOString().split('T')[0]);
         inv.currency = invRec.company.currency as finance.TCurrency || 'EUR';
 
@@ -403,8 +398,6 @@ export class InvoicesService {
 
         const pdfBuffer = await this.getInvoicePDFFormat(invoiceId, (invoice.company.invoicePDFFormat as ExportFormat || 'pdf'));
 
-        const invoiceNumber = await formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt);
-
         const mailTemplate = await this.prisma.mailTemplate.findFirst({
             where: { type: 'INVOICE' },
             select: { subject: true, body: true }
@@ -416,7 +409,7 @@ export class InvoicesService {
 
         const envVariables = {
             APP_URL: process.env.APP_URL,
-            INVOICE_NUMBER: invoiceNumber,
+            INVOICE_NUMBER: invoice.rawNumber || invoice.number.toString(),
             COMPANY_NAME: invoice.company.name,
             CLIENT_NAME: invoice.client.name,
         };
@@ -427,7 +420,7 @@ export class InvoicesService {
             subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
             html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
             attachments: [{
-                filename: `invoice-${invoiceNumber}.pdf`,
+                filename: `invoice-${invoice.rawNumber || invoice.number}.pdf`,
                 content: pdfBuffer,
                 contentType: 'application/pdf',
             }],
