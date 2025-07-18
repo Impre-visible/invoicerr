@@ -115,6 +115,14 @@ export default function CompanySettings() {
             .refine((val) => {
                 return validateNumberFormat(val)
             }, t("settings.company.form.invoiceNumberFormat.errors.format")),
+        receiptStartingNumber: z.number().min(1, t("settings.company.form.receiptStartingNumber.errors.min")),
+        receiptNumberFormat: z
+            .string()
+            .min(1, t("settings.company.form.receiptNumberFormat.errors.required"))
+            .max(100, t("settings.company.form.receiptNumberFormat.errors.maxLength"))
+            .refine((val) => {
+                return validateNumberFormat(val)
+            }, t("settings.company.form.receiptNumberFormat.errors.format")),
         invoicePDFFormat: z
             .string()
             .min(3, t("settings.company.form.invoicePDFFormat.errors.minLength"))
@@ -484,6 +492,43 @@ export default function CompanySettings() {
                                                     <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} />
                                                 </FormControl>
                                                 <FormDescription>{t("settings.company.form.invoiceNumberFormat.description")}</FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="receiptStartingNumber"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.receiptStartingNumber.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder={t("settings.company.form.receiptStartingNumber.placeholder")}
+                                                        {...field}
+                                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    {t("settings.company.form.receiptStartingNumber.description")}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="receiptNumberFormat"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel required>{t("settings.company.form.receiptNumberFormat.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder={t("settings.company.form.receiptNumberFormat.placeholder")} {...field} />
+                                                </FormControl>
+                                                <FormDescription>{t("settings.company.form.receiptNumberFormat.description")}</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
