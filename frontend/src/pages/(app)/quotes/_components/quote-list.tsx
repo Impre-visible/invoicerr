@@ -211,11 +211,17 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                             )}
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.totalHT")}:</span>{" "}
-                                                                {quote.totalHT.toFixed(2)} {quote.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: quote.currency,
+                                                                    amount: quote.totalHT.toFixed(2),
+                                                                })}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.totalTTC")}:</span>{" "}
-                                                                {quote.totalTTC.toFixed(2)} {quote.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: quote.currency,
+                                                                    amount: quote.totalTTC.toFixed(2),
+                                                                })}
                                                             </span>
                                                         </div>
                                                     </div>

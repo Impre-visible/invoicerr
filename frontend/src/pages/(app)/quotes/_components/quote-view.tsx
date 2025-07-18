@@ -77,17 +77,26 @@ export function QuoteViewDialog({ quote, onOpenChange }: QuoteViewDialogProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-muted/50 p-4 rounded-lg">
                         <div>
                             <p className="text-sm text-muted-foreground">{t("quotes.view.fields.totalHT")}</p>
-                            <p className="font-medium">{quote.totalHT.toFixed(2)} {quote.currency}</p>
+                            <p className="font-medium">{t("common.valueWithCurrency", {
+                                currency: quote.currency,
+                                amount: quote.totalHT.toFixed(2)
+                            })}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-muted-foreground">{t("quotes.view.fields.totalVAT")}</p>
-                            <p className="font-medium">{quote.totalVAT.toFixed(2)} {quote.currency}</p>
+                            <p className="font-medium">{t("common.valueWithCurrency", {
+                                currency: quote.currency,
+                                amount: quote.totalVAT.toFixed(2)
+                            })}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-muted-foreground">{t("quotes.view.fields.totalTTC")}</p>
-                            <p className="font-medium">{quote.totalTTC.toFixed(2)} {quote.currency}</p>
+                            <p className="font-medium">{t("common.valueWithCurrency", {
+                                currency: quote.currency,
+                                amount: quote.totalTTC.toFixed(2)
+                            })}</p>
                         </div>
                     </div>
 

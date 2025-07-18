@@ -112,11 +112,17 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                                                             )}
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("recurringInvoices.list.item.totalHT")}:</span>{" "}
-                                                                {recurringInvoice.totalHT.toFixed(2)} {recurringInvoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: recurringInvoice.currency,
+                                                                    amount: recurringInvoice.totalHT.toFixed(2),
+                                                                })}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("recurringInvoices.list.item.totalTTC")}:</span>{" "}
-                                                                {recurringInvoice.totalTTC.toFixed(2)} {recurringInvoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: recurringInvoice.currency,
+                                                                    amount: recurringInvoice.totalTTC.toFixed(2),
+                                                                })}
                                                             </span>
                                                         </div>
                                                     </div>

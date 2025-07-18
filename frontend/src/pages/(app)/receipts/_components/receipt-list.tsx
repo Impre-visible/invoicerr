@@ -152,10 +152,21 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
                                                         </h3>
                                                     </div>
                                                     <div className="mt-2 flex flex-col gap-2 text-sm text-muted-foreground">
-                                                        <div className="hidden sm:grid sm:grid-cols-1 lg:grid-cols-1 gap-1">
+                                                        <div className="hidden sm:grid sm:grid-cols-1 lg:grid-cols-2 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("receipts.list.item.invoice")}:</span>{" "}
                                                                 {receipt.invoice?.rawNumber || receipt.invoice?.number || t("receipts.list.item.noInvoice")}
+                                                            </span>
+                                                            <span>
+                                                                <span className="font-medium text-foreground">{t("receipts.list.item.totalItemCount")}:</span>{" "}
+                                                                {receipt.items.length}
+                                                            </span>
+                                                            <span>
+                                                                <span className="font-medium text-foreground">{t("receipts.list.item.totalPaid")}:</span>{" "}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: receipt.invoice?.currency || "USD",
+                                                                    amount: receipt.totalPaid.toFixed(2),
+                                                                })}
                                                             </span>
                                                         </div>
                                                     </div>

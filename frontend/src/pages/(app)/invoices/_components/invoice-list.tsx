@@ -227,11 +227,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             )}
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.totalHT")}:</span>{" "}
-                                                                {invoice.totalHT.toFixed(2)} {invoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: invoice.currency,
+                                                                    amount: invoice.totalHT.toFixed(2),
+                                                                })}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.totalTTC")}:</span>{" "}
-                                                                {invoice.totalTTC.toFixed(2)} {invoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: invoice.currency,
+                                                                    amount: invoice.totalTTC.toFixed(2),
+                                                                })}
                                                             </span>
                                                         </div>
                                                     </div>
