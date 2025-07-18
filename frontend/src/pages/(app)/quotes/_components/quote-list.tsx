@@ -183,7 +183,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                 <div className="flex-1">
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <h3 className="font-medium text-foreground break-words">
-                                                            {t("quotes.list.item.title", { number: quote.number, title: quote.title })}
+                                                            {t("quotes.list.item.title", { number: quote.rawNumber || quote.number, title: quote.title })}
                                                         </h3>
                                                         <span
                                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(quote.status)}`}

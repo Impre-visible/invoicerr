@@ -193,7 +193,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <h3 className="font-medium text-foreground break-words">
                                                             {t("invoices.list.item.title", {
-                                                                number: invoice.number,
+                                                                number: invoice.rawNumber || invoice.number,
                                                                 title: invoice.title,
                                                             })}
                                                         </h3>
