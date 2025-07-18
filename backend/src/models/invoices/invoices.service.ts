@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 import { formatDate } from 'src/utils/date';
-import { parseAddress } from 'src/utils/adresse';
+import { parseAddress } from 'src/utils/adress';
 
 @Injectable()
 export class InvoicesService {
