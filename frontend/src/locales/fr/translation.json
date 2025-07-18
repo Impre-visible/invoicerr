@@ -1249,7 +1249,8 @@
             "week": "Semaine",
             "month": "Mois",
             "year": "Année"
-        }
+        },
+        "valueWithCurrency": "{{amount}} {{currency}}"
     },
     "receipts": {
         "header": {
@@ -1284,6 +1285,7 @@
                 "signed": "Signé"
             },
             "item": {
+                "title": "Reçu {{number}}",
                 "client": "Client",
                 "issued": "Émis",
                 "validUntil": "Valide jusqu'à",

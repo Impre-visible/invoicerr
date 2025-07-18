@@ -1232,7 +1232,8 @@
             "week": "Week",
             "month": "Month",
             "year": "Year"
-        }
+        },
+        "valueWithCurrency": "{{amount}}{{currency}}"
     },
     "noOptions": "No options available. Create a new client.",
     "receipts": {
