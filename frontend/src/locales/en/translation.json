@@ -1269,6 +1269,7 @@
                 "signed": "Signed"
             },
             "item": {
+                "title": "Receipt {{number}}",
                 "client": "Client",
                 "issued": "Issued",
                 "validUntil": "Valid Until",
@@ -1310,6 +1311,7 @@
                     "label": "Items",
                     "placeholder": "Add items to the receipt",
                     "noResults": "No items found",
+                    "addButton": "Add Item",
                     "description": {
                         "errors": {
                             "required": "Description is required."

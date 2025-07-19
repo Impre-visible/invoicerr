@@ -1327,6 +1327,7 @@
                     "label": "Articles",
                     "placeholder": "Ajoutez un article",
                     "noResults": "Aucun article ajouté",
+                    "addButton": "Ajouter un article",
                     "description": {
                         "errors": {
                             "required": "La description est requise."
