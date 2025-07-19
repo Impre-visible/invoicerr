@@ -54,6 +54,26 @@ export class InvoicesService {
         return { pageCount: Math.ceil(totalInvoices / pageSize), invoices };
     }
 
+    async searchInvoices(query: string) {
+        if (query === '') {
+            return this.getInvoices('1'); // Return first page if query is empty
+        }
+
+        return this.prisma.invoice.findMany({
+            where: {
+                OR: [
+                    { client: { name: { contains: query } } },
+                    { items: { some: { description: { contains: query } } } },
+                ],
+            },
+            include: {
+                items: true,
+                client: true,
+                company: true
+            },
+        });
+    }
+
     async createInvoice(body: CreateInvoiceDto) {
         const { items, ...data } = body;
 
