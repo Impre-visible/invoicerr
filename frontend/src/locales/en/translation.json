@@ -1338,7 +1338,8 @@
                 },
                 "invoice": {
                     "label": "Invoice",
-                    "placeholder": "Select an invoice"
+                    "placeholder": "Select an invoice",
+                    "noResults": "No invoices found"
                 },
                 "paymentMethod": {
                     "label": "Payment Method",
@@ -1350,6 +1351,10 @@
                     "placeholder": "Enter payment details",
                     "description": "Additional information about the payment"
                 }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes"
             }
         }
     }
