@@ -11,6 +11,7 @@ export type Path =
   | `/login`
   | `/logout`
   | `/quotes`
+  | `/receipts`
   | `/settings/:tab?`
   | `/signature/:id`
   | `/signup`
