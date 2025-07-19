@@ -1273,7 +1273,10 @@
                 "issued": "Issued",
                 "validUntil": "Valid Until",
                 "totalHT": "Total (excl. VAT)",
-                "totalTTC": "Total (incl. VAT)"
+                "totalTTC": "Total (incl. VAT)",
+                "invoice": "Invoice",
+                "totalItemCount": "Total Item Count",
+                "totalPaid": "Total Paid"
             },
             "tooltips": {
                 "view": "View receipt",
@@ -1305,6 +1308,8 @@
                 },
                 "items": {
                     "label": "Items",
+                    "placeholder": "Add items to the receipt",
+                    "noResults": "No items found",
                     "description": {
                         "errors": {
                             "required": "Description is required."
@@ -1330,6 +1335,20 @@
                             "min": "VAT rate must be at least 0."
                         }
                     }
+                },
+                "invoice": {
+                    "label": "Invoice",
+                    "placeholder": "Select an invoice"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Enter the payment method",
+                    "description": "The method used to make the payment"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information about the payment"
                 }
             }
         }
