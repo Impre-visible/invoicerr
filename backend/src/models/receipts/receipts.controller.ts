@@ -25,7 +25,7 @@ export class ReceiptsController {
         if (!invoiceId) {
             throw new Error('Invoice ID is required');
         }
-        return await this.receiptsService.createReceipt({ invoiceId, items: [] });
+        return await this.receiptsService.createReceiptFromInvoice(invoiceId);
     }
 
     /*

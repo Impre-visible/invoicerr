@@ -120,7 +120,55 @@ export class ReceiptsService {
         return receipt;
     }
 
+    async createReceiptFromInvoice(invoiceId: string) {
+        const invoice = await this.prisma.invoice.findUnique({
+            where: { id: invoiceId }
+        });
+        if (!invoice) {
+            throw new BadRequestException('Invoice not found');
+        }
+
+        return await this.createReceipt({
+            invoiceId: invoice.id,
+            items: [],
+            paymentMethod: invoice.paymentMethod || '',
+            paymentDetails: invoice.paymentDetails || '',
+        });
+    }
+
     async editReceipt(body: EditReceiptDto) {
+        const existingReceipt = await this.prisma.receipt.findUnique({
+            where: { id: body.id },
+            include: {
+                items: true,
+            },
+        });
+
+        if (!existingReceipt) {
+            throw new BadRequestException('Receipt not found');
+        }
+
+        const updatedReceipt = await this.prisma.receipt.update({
+            where: { id: body.id },
+            data: {
+                items: {
+                    deleteMany: {},
+                    create: body.items.map(item => ({
+                        id: item.id,
+                        invoiceId: existingReceipt.invoiceId,
+                        amountPaid: item.amount_paid,
+                    })),
+                },
+                totalPaid: body.items.reduce((sum, item) => sum + item.amount_paid, 0),
+                paymentMethod: body.paymentMethod,
+                paymentDetails: body.paymentDetails,
+            },
+            include: {
+                items: true,
+            },
+        });
+
+        return updatedReceipt;
     }
 
     async deleteReceipt(id: string) {
