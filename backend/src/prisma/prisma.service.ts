@@ -17,8 +17,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 return next(params);
             }
 
-            console.log(`Prisma action: ${params.action} on model: ${params.model}`);
-
             let toUpdate: any = await this.quote.findMany({
                 where: {
                     rawNumber: null
