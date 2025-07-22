@@ -37,8 +37,8 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
         ref,
     ) => {
         const { t } = useTranslation()
-        const { trigger: triggerSendForSignature } = usePost<{ message: string; signature: { id: string } }>(
-            `/api/signatures`,
+        const { trigger: triggerSendToClient } = usePost<{ message: string; }>(
+            `/api/receipts/send`,
         )
 
         const [createReceiptDialog, setCreateReceiptDialog] = useState<boolean>(false)
@@ -94,7 +94,7 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
         }
 
         function handleSendToClient(receipt: Receipt) {
-            triggerSendForSignature({ receiptId: receipt.id })
+            triggerSendToClient({ id: receipt.id })
                 .then(() => {
                     toast.success(t("receipts.list.messages.emailSent"))
                     mutate()
