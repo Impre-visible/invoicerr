@@ -31,29 +31,28 @@ export const baseTemplate = `
     </div>
   </div>
 
-  <p><strong>{{labels.receivedFrom}}:</strong><br>
+  <p><strong>{{labels.receivedFrom}}</strong><br>
   {{client.name}}<br>
   {{client.address}}<br>
   {{client.city}} {{client.postalCode}}<br>
   {{client.country}}</p>
 
-  <p><strong>{{labels.invoiceRefer}}:</strong> {{invoiceNumber}}</p>
+  <p><strong>{{labels.invoiceRefer}}</strong> {{invoiceNumber}}</p>
 
   <table>
     <thead><tr><th>{{labels.description}}</th><th>{{labels.totalReceived}}</th></tr></thead>
     <tbody>
-      <tr><td>{{item.description}}</td><td>{{currency}} {{item.amount}}</td></tr>
+    {{#each items}}
+      <tr>
+        <td>{{description}}</td>
+        <td>{{currency}} {{amount}}</td>
+      </tr>
+    {{/each}}
     </tbody>
   </table>
 
-  <p><strong>{{labels.totalReceived}}:</strong> {{currency}} {{amount}}</p>
-  <p><strong>{{labels.paymentMethod}}:</strong> {{paymentMethod}}</p>
-
-  {{#if noteExists}}
-  <div class="notes"><strong>{{labels.notes}}</strong><p>{{{notes}}}</p></div>
-  {{/if}}
-
-  <p>— End of receipt —</p>
+  <p><strong>{{labels.totalReceived}}</strong> {{currency}} {{amount}}</p>
+  <p><strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}</p>
 </body>
 </html>
 `;
