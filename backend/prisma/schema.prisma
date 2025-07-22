@@ -262,6 +262,7 @@ enum MailTemplateType {
   SIGNATURE_REQUEST
   VERIFICATION_CODE
   INVOICE
+  RECEIPT
 }
 
 model MailTemplate {
