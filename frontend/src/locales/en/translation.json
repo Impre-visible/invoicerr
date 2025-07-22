@@ -1384,6 +1384,9 @@
                 "cancel": "Cancel",
                 "delete": "Delete"
             }
+        },
+        "pdf": {
+            "title": "Receipt {{number}} - PDF"
         }
     }
 }

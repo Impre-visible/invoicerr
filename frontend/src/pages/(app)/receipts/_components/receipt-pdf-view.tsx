@@ -37,7 +37,7 @@ export function ReceiptPdfModal({ receipt, onOpenChange }: ReceiptPdfModalProps)
     >
       <DialogContent className="!max-w-none w-fit min-w-[90vw] md:min-w-128 h-[90dvh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>{t("receipts.pdf.title", { number: receipt })}</DialogTitle>
+          <DialogTitle>{t("receipts.pdf.title", { number: receipt.rawNumber || receipt.number })}</DialogTitle>
         </DialogHeader>
 
         <section className="h-full overflow-auto">
@@ -46,7 +46,7 @@ export function ReceiptPdfModal({ receipt, onOpenChange }: ReceiptPdfModalProps)
               <iframe
                 className="w-full h-full"
                 src={`data:application/pdf;base64,${btoa(String.fromCharCode(...pdfData))}`}
-                title={t("receipts.pdf.title", { number: receipt })}
+                title={t("receipts.pdf.title", { number: receipt.rawNumber || receipt.number })}
               />
             </div>
           ) : (
