@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Edit, Eye, Mail, Plus, Receipt as ReceiptIcon, Trash2 } from "lucide-react"
+import { Download, Edit, Mail, Plus, Receipt as ReceiptIcon, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
@@ -10,7 +10,6 @@ import type { Receipt } from "@/types"
 import { ReceiptDeleteDialog } from "@/pages/(app)/receipts/_components/receipt-delete"
 import { ReceiptPdfModal } from "@/pages/(app)/receipts/_components/receipt-pdf-view"
 import { ReceiptUpsert } from "@/pages/(app)/receipts/_components/receipt-upsert"
-import { ReceiptViewDialog } from "@/pages/(app)/receipts/_components/receipt-view"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
@@ -43,7 +42,6 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
 
         const [createReceiptDialog, setCreateReceiptDialog] = useState<boolean>(false)
         const [editReceiptDialog, setEditReceiptDialog] = useState<Receipt | null>(null)
-        const [viewReceiptDialog, setViewReceiptDialog] = useState<Receipt | null>(null)
         const [viewReceiptPdfDialog, setViewReceiptPdfDialog] = useState<Receipt | null>(null)
         const [deleteReceiptDialog, setDeleteReceiptDialog] = useState<Receipt | null>(null)
         const [downloadReceiptPdf, setDownloadReceiptPdf] = useState<Receipt | null>(null)
@@ -79,10 +77,6 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
 
         function handleEdit(receipt: Receipt) {
             setEditReceiptDialog(receipt)
-        }
-
-        function handleView(receipt: Receipt) {
-            setViewReceiptDialog(receipt)
         }
 
         function handleViewPdf(receipt: Receipt) {
@@ -175,16 +169,6 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
 
                                             <div className="grid grid-cols-2 lg:flex justify-start sm:justify-end gap-1 md:gap-2">
                                                 <Button
-                                                    tooltip={t("receipts.list.tooltips.view")}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleView(receipt)}
-                                                    className="text-gray-600 hover:text-blue-600"
-                                                >
-                                                    <Eye className="h-4 w-4" />
-                                                </Button>
-
-                                                <Button
                                                     tooltip={t("receipts.list.tooltips.viewPdf")}
                                                     variant="ghost"
                                                     size="icon"
@@ -267,12 +251,6 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
                     }}
                 />
 
-                <ReceiptViewDialog
-                    receipt={viewReceiptDialog}
-                    onOpenChange={(open) => {
-                        if (!open) setViewReceiptDialog(null)
-                    }}
-                />
 
                 <ReceiptPdfModal
                     receipt={viewReceiptPdfDialog}
