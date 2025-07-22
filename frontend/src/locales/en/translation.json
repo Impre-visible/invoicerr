@@ -397,7 +397,8 @@
                 "edit": "Edit invoice",
                 "markAsPaid": "Mark as paid",
                 "delete": "Delete invoice",
-                "createReceipt": "Create a receipt from this invoice"
+                "createReceipt": "Create a receipt from this invoice",
+                "sendByEmail": "Send invoice by email"
             },
             "actions": {
                 "addNew": "Add New Invoice"
@@ -1359,6 +1360,14 @@
                 "save": "Save Changes",
                 "create": "Create Receipt",
                 "edit": "Edit Receipt"
+            }
+        },
+        "delete": {
+            "title": "Delete Receipt",
+            "description": "Are you sure you want to delete this receipt? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete"
             }
         }
     }

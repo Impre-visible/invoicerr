@@ -398,7 +398,8 @@
                 "edit": "Modifier la facture",
                 "markAsPaid": "Marquer comme payée",
                 "delete": "Supprimer la facture",
-                "createReceipt": "Créer un reçu à partir de cette facture"
+                "createReceipt": "Créer un reçu à partir de cette facture",
+                "sendByEmail": "Envoyer la facture par email"
             },
             "actions": {
                 "addNew": "Ajouter une nouvelle facture"
@@ -1375,6 +1376,14 @@
                 "save": "Enregistrer les modifications",
                 "create": "Créer un reçu",
                 "edit": "Modifier le reçu"
+            }
+        },
+        "delete": {
+            "title": "Supprimer le reçu",
+            "description": "Êtes-vous sûr de vouloir supprimer ce reçu ? Cette action ne peut pas être annulée.",
+            "actions": {
+                "cancel": "Annuler",
+                "delete": "Supprimer"
             }
         }
     }
