@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 
 import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
 import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { ReceiptsService } from './receipts.service';
+import { Response } from 'express';
 
 @Controller('receipts')
 export class ReceiptsController {
@@ -28,7 +29,6 @@ export class ReceiptsController {
         return await this.receiptsService.createReceiptFromInvoice(invoiceId);
     }
 
-    /*
     @Get(':id/pdf')
     @LoginRequired()
     async getReceiptPdf(@Param('id') id: string, @Res() res: Response) {
@@ -45,7 +45,15 @@ export class ReceiptsController {
         });
         res.send(pdfBuffer);
     }
-        */
+
+    @Post('send')
+    @LoginRequired()
+    sendReceiptByEmail(@Body('id') id: string) {
+        if (!id) {
+            throw new Error('Receipt ID is required');
+        }
+        return this.receiptsService.sendReceiptByEmail(id);
+    }
 
     @Post()
     @LoginRequired()
