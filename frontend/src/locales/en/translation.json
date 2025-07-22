@@ -552,6 +552,21 @@
             "description": "Manage your recurring invoices and automate billing.",
             "actions": {
                 "addNew": "Add New Recurring Invoice"
+            },
+            "item": {
+                "client": "Client",
+                "payment": "Payment Method",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)"
+            },
+            "tooltips": {
+                "view": "View Details",
+                "edit": "Edit",
+                "delete": "Delete"
+            },
+            "messages": {
+                "manual_process_success": "Manual process triggered successfully",
+                "manual_process_error": "Error triggering manual process"
             }
         },
         "emptyState": {
