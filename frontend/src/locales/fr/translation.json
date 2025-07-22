@@ -1372,7 +1372,9 @@
             },
             "actions": {
                 "cancel": "Annuler",
-                "save": "Enregistrer les modifications"
+                "save": "Enregistrer les modifications",
+                "create": "Créer un reçu",
+                "edit": "Modifier le reçu"
             }
         }
     }

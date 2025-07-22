@@ -1356,7 +1356,9 @@
             },
             "actions": {
                 "cancel": "Cancel",
-                "save": "Save Changes"
+                "save": "Save Changes",
+                "create": "Create Receipt",
+                "edit": "Edit Receipt"
             }
         }
     }
