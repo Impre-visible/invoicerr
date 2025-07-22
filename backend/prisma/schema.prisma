@@ -238,7 +238,6 @@ model PDFConfig {
   invoice        String @default("Invoice")
   quote          String @default("Quote")
   receipt        String @default("Receipt")
-  receiptNumber  String @default("Receipt number:")
   description    String @default("Description:")
   date           String @default("Date:")
   dueDate        String @default("Due date:")
