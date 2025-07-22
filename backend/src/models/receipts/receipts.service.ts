@@ -195,18 +195,19 @@ export class ReceiptsService {
             where: { id },
         });
     }
-
-    async getReceiptPdf(id: string): Promise<Uint8Array> {
+    async getReceiptPdf(receiptId: string): Promise<Uint8Array> {
         const receipt = await this.prisma.receipt.findUnique({
-            where: { id },
+            where: { id: receiptId },
             include: {
                 items: true,
                 invoice: {
                     include: {
                         items: true,
                         client: true,
-                        company: true,
-                    }
+                        company: {
+                            include: { pdfConfig: true },
+                        },
+                    },
                 }
             },
         });
@@ -215,76 +216,49 @@ export class ReceiptsService {
             throw new BadRequestException('Receipt not found');
         }
 
-        const template = Handlebars.compile(baseTemplate);
-        const date = formatDate(receipt.invoice.company, receipt.createdAt);
-        const formattedNumber = await formatPattern('RECEIPT-{{number}}', receipt.number, new Date(receipt.createdAt));
+        const { pdfConfig } = receipt.invoice.company;
+        const template = Handlebars.compile(baseTemplate); // ton template reçu ici
 
-        const pdfContent = template({
-            receipt,
-            date,
-            formattedNumber,
+        const html = template({
+            number: receipt.rawNumber || receipt.number.toString(),
+            paymentDate: formatDate(receipt.invoice.company, new Date()), // TODO: Add a payment date
+            invoiceNumber: receipt.invoice?.rawNumber || receipt.invoice?.number?.toString() || '',
+            client: receipt.invoice.client,
+            company: receipt.invoice.company,
+            currency: receipt.invoice.currency,
+            paymentMethod: receipt.paymentMethod,
+            amount: receipt.totalPaid.toFixed(2),
+
+            items: receipt.items.map(item => ({
+                description: receipt.invoice.items.find(i => i.id === item.id)?.description || 'N/A',
+                amount: item.amountPaid.toFixed(2),
+            })),
+
+            fontFamily: pdfConfig.fontFamily ?? 'Inter',
+            primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
+            secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',
+            includeLogo: !!pdfConfig.logoB64,
+            logoB64: pdfConfig.logoB64 ?? '',
+            padding: pdfConfig.padding ?? 40,
+
+            labels: {
+                receipt: pdfConfig.receipt,
+                receiptNumber: pdfConfig.receiptNumber,
+                paymentDate: pdfConfig.paymentDate,
+                receivedFrom: pdfConfig.receivedFrom,
+                invoiceRefer: pdfConfig.invoiceRefer,
+                description: pdfConfig.description,
+                totalReceived: pdfConfig.totalReceived,
+                paymentMethod: pdfConfig.paymentMethod,
+                legalId: pdfConfig.legalId,
+                VATId: pdfConfig.VATId,
+            },
         });
 
-        return getPDF(pdfContent);
+        const pdfBuffer = await getPDF(html);
+        return pdfBuffer;
     }
 
-    /*
-    
-    
-        async sendInvoiceByEmail(invoiceId: string) {
-            const invoice = await this.prisma.invoice.findUnique({
-                where: { id: invoiceId },
-                include: {
-                    client: true,
-                    company: true,
-                    items: true,
-                },
-            });
-    
-            if (!invoice) {
-                throw new BadRequestException('Invoice not found');
-            }
-    
-            const pdfBuffer = await this.getInvoicePDFFormat(invoiceId, (invoice.company.invoicePDFFormat as ExportFormat || 'pdf'));
-    
-            const mailTemplate = await this.prisma.mailTemplate.findFirst({
-                where: { type: 'INVOICE' },
-                select: { subject: true, body: true }
-            });
-    
-            if (!mailTemplate) {
-                throw new BadRequestException('Email template for signature request not found.');
-            }
-    
-            const envVariables = {
-                APP_URL: process.env.APP_URL,
-                INVOICE_NUMBER: invoice.rawNumber || invoice.number.toString(),
-                COMPANY_NAME: invoice.company.name,
-                CLIENT_NAME: invoice.client.name,
-            };
-    
-            const mailOptions = {
-                from: `${invoice.company.name} <${invoice.company.email}>`,
-                to: invoice.client.contactEmail,
-                subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
-                html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
-                attachments: [{
-                    filename: `invoice-${invoice.rawNumber || invoice.number}.pdf`,
-                    content: pdfBuffer,
-                    contentType: 'application/pdf',
-                }],
-            };
-    
-            await this.transporter.sendMail(mailOptions)
-                .then(() => { })
-                .catch(error => {
-                    console.error('Error sending invoice email:', error);
-                    throw new BadRequestException('Failed to send invoice email.');
-                });
-    
-            return { message: 'Invoice sent successfully' };
-        }
-    */
 
     async sendReceiptByEmail(id: string) {
         const receipt = await this.prisma.receipt.findUnique({
