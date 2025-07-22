@@ -19,7 +19,7 @@ interface ReceiptDeleteDialogProps {
 
 export function ReceiptDeleteDialog({ receipt, onOpenChange }: ReceiptDeleteDialogProps) {
     const { t } = useTranslation()
-    const { trigger } = useDelete(`/api/receipts/${receipt}`)
+    const { trigger } = useDelete(`/api/receipts/${receipt?.id}`)
 
     const handleDelete = () => {
         if (!receipt) return

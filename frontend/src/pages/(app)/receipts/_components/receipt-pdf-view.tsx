@@ -12,7 +12,7 @@ type ReceiptPdfModalProps = {
 
 export function ReceiptPdfModal({ receipt, onOpenChange }: ReceiptPdfModalProps) {
   const { t } = useTranslation()
-  const { data } = useGetRaw<Response>(`/api/receipts/${receipt}/pdf`)
+  const { data } = useGetRaw<Response>(`/api/receipts/${receipt?.id}/pdf`)
   const [pdfData, setPdfData] = useState<Uint8Array | null>(null)
 
   useEffect(() => {
