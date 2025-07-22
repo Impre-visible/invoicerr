@@ -3,7 +3,7 @@ import * as nodemailer from 'nodemailer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
-import { formatPattern, getPDF } from 'src/utils/pdf';
+import { getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
@@ -227,7 +227,7 @@ export class ReceiptsService {
             company: receipt.invoice.company,
             currency: receipt.invoice.currency,
             paymentMethod: receipt.paymentMethod,
-            amount: receipt.totalPaid.toFixed(2),
+            totalAmount: receipt.totalPaid.toFixed(2),
 
             items: receipt.items.map(item => ({
                 description: receipt.invoice.items.find(i => i.id === item.id)?.description || 'N/A',
@@ -237,13 +237,13 @@ export class ReceiptsService {
             fontFamily: pdfConfig.fontFamily ?? 'Inter',
             primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
             secondaryColor: pdfConfig.secondaryColor ?? '#f3f4f6',
+            tableTextColor: getInvertColor(pdfConfig.secondaryColor),
             includeLogo: !!pdfConfig.logoB64,
             logoB64: pdfConfig.logoB64 ?? '',
             padding: pdfConfig.padding ?? 40,
 
             labels: {
                 receipt: pdfConfig.receipt,
-                receiptNumber: pdfConfig.receiptNumber,
                 paymentDate: pdfConfig.paymentDate,
                 receivedFrom: pdfConfig.receivedFrom,
                 invoiceRefer: pdfConfig.invoiceRefer,
