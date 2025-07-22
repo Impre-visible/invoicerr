@@ -32,6 +32,7 @@ export class ReceiptsService {
                 items: true,
                 invoice: {
                     include: {
+                        items: true,
                         client: true,
                         quote: true,
                     }
@@ -107,10 +108,10 @@ export class ReceiptsService {
                     create: body.items.map(item => ({
                         id: item.id,
                         invoiceId: body.invoiceId,
-                        amountPaid: item.amount_paid,
+                        amountPaid: +item.amountPaid,
                     })),
                 },
-                totalPaid: body.items.reduce((sum, item) => sum + item.amount_paid, 0),
+                totalPaid: body.items.reduce((sum, item) => sum + +item.amountPaid, 0),
             },
             include: {
                 items: true,
@@ -156,10 +157,10 @@ export class ReceiptsService {
                     create: body.items.map(item => ({
                         id: item.id,
                         invoiceId: existingReceipt.invoiceId,
-                        amountPaid: item.amount_paid,
+                        amountPaid: +item.amountPaid,
                     })),
                 },
-                totalPaid: body.items.reduce((sum, item) => sum + item.amount_paid, 0),
+                totalPaid: body.items.reduce((sum, item) => sum + +item.amountPaid, 0),
                 paymentMethod: body.paymentMethod,
                 paymentDetails: body.paymentDetails,
             },
