@@ -1,7 +1,7 @@
 export class CreateReceiptDto {
     invoiceId: string;
     items: {
-        id: string;
+        invoiceItemId: string;
         amountPaid: number | string;
     }[];
     paymentMethod: string;

@@ -68,12 +68,10 @@ export default function CompanySettings() {
         description: z.string().max(500, t("settings.company.form.description.errors.maxLength")),
         legalId: z
             .string({ required_error: t("settings.company.form.legalId.errors.required") })
-            .min(1, t("settings.company.form.legalId.errors.empty"))
             .max(50, t("settings.company.form.legalId.errors.maxLength"))
             .optional(),
         VAT: z
             .string({ required_error: t("settings.company.form.vat.errors.required") })
-            .min(1, t("settings.company.form.vat.errors.empty"))
             .max(15, t("settings.company.form.vat.errors.maxLength"))
             .optional(),
         foundedAt: z.date().refine((date) => date <= new Date(), t("settings.company.form.foundedAt.errors.future")),
@@ -160,6 +158,12 @@ export default function CompanySettings() {
             phone: "",
             email: "",
             invoicePDFFormat: "",
+            quoteStartingNumber: 1,
+            quoteNumberFormat: "Q-{year}-{number}",
+            invoiceStartingNumber: 1,
+            invoiceNumberFormat: "INV-{year}-{number}",
+            receiptStartingNumber: 1,
+            receiptNumberFormat: "REC-{year}-{number}",
         },
     })
 

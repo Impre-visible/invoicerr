@@ -346,17 +346,15 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                     </Button>
                                                 )}
 
-                                                {invoice.status === "PAID" && (
-                                                    <Button
-                                                        tooltip={t("invoices.list.tooltips.createReceipt")}
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
-                                                        className="text-gray-600 hover:text-green-600"
-                                                    >
-                                                        <Plus className="h-4 w-4" />
-                                                    </Button>
-                                                )}
+                                                <Button
+                                                    tooltip={t("invoices.list.tooltips.createReceipt")}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

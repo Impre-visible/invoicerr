@@ -2,6 +2,7 @@ import type { Invoice } from "./invoice";
 
 interface ReceiptItem {
     id: string;
+    invoiceItemId: string; // ID of the invoice item this receipt item corresponds to
     invoiceId: string;
     invoice?: Invoice;
     amountPaid: number;

@@ -24,7 +24,7 @@ interface ReceiptUpsertDialogProps {
 }
 
 interface Item {
-    id: string
+    invoiceItemId: string
     description: string
     amountPaid: number
 }
@@ -38,7 +38,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
     const [selectedItem, setSelectedItem] = useState<InvoiceItem | null>(null)
     const [items, setItems] = useState<Item[]>(receipt?.items.map(item => ({
-        id: item.id,
+        invoiceItemId: item.id,
         description: receipt.invoice?.items.find(invItem => invItem.id === item.id)?.description || "",
         amountPaid: item.amountPaid
     })) || [])
@@ -68,8 +68,8 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                 paymentDetails: receipt.paymentDetails || ""
             })
             setItems(receipt.items.map(item => ({
-                id: item.id,
-                description: receipt.invoice?.items.find(invItem => invItem.id === item.id)?.description || "",
+                invoiceItemId: item.id,
+                description: receipt.invoice?.items.find(invItem => invItem.id === item.invoiceItemId)?.description || "",
                 amountPaid: item.amountPaid
             })))
             setSelectedInvoice(receipt.invoice || null)
@@ -99,7 +99,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
         trigger({
             ...data,
             items: items.map(item => ({
-                id: item.id,
+                invoiceItemId: item.invoiceItemId,
                 invoiceId: selectedInvoice?.id || "",
                 amountPaid: item.amountPaid,
                 receiptId: receipt?.id || ""
@@ -115,7 +115,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
     const onAddItem = () => {
         if (selectedItem) {
             setItems([...items, {
-                id: selectedItem.id,
+                invoiceItemId: selectedItem.id,
                 description: selectedItem.description,
                 amountPaid: selectedItem.unitPrice * selectedItem.quantity
             }])
@@ -213,7 +213,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                                         <FormControl>
                                             <SearchSelect
                                                 options={(selectedInvoice?.items || [])
-                                                    .filter(item => !items.some(i => i.id === item.id))
+                                                    .filter(item => !items.some(i => i.invoiceItemId === item.id))
                                                     .map(item => ({ label: item.description, value: item.id }))}
                                                 value={selectedItem?.id || undefined}
                                                 onValueChange={(val) => {
