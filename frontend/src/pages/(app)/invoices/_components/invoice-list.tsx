@@ -1,6 +1,6 @@
-import { Banknote, Download, Edit, Eye, Mail, Plus, ReceiptText, Trash2 } from "lucide-react"
+import { Banknote, Code, Download, Edit, Eye, FileText, Mail, Plus, ReceiptText, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { useGetRaw, usePost } from "@/lib/utils"
 
@@ -53,8 +53,8 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
             id: number
         } | null>(null)
 
-        const { data: pdf } = useGetRaw<Response>(
-            `/api/invoices/${downloadTrigger?.invoice?.id}/pdf?format=${downloadTrigger?.format}`,
+        const { data: file } = useGetRaw<Response>(
+            `/api/invoices/${downloadTrigger?.invoice?.id}/download?format=${downloadTrigger?.format}`,
         )
 
         useImperativeHandle(ref, () => ({
@@ -64,21 +64,24 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
         }))
 
         useEffect(() => {
-            if (downloadTrigger && pdf) {
-                pdf.arrayBuffer().then((buffer) => {
-                    const blob = new Blob([buffer], { type: "application/pdf" })
+            if (downloadTrigger && file) {
+                const fileFormat = (downloadTrigger.format || "pdf-").split('-')[0]
+                const format = (downloadTrigger.format || "pdf-").split('-')[1] || "default"
+                file.arrayBuffer().then((buffer) => {
+                    const blob = new Blob([buffer], { type: `application/${fileFormat}` })
                     const url = URL.createObjectURL(blob)
                     const link = document.createElement("a")
                     link.href = url
-                    link.download = `invoice-${downloadTrigger.invoice.number}-${downloadTrigger.format || "default"}.pdf`
+                    link.download = `invoice-${downloadTrigger.invoice.number}-${format}.${fileFormat}`
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
                     URL.revokeObjectURL(url)
                     setDownloadTrigger(null) // Reset
+                }).catch(() => {
                 })
             }
-        }, [downloadTrigger, pdf])
+        }, [downloadTrigger, file])
 
         function handleEdit(invoice: Invoice) {
             setEditInvoiceDialog(invoice)
@@ -108,7 +111,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                 })
         }
 
-        function handleDownloadPdf({ invoice, format }: { invoice: Invoice; format: string }) {
+        function handleDownload({ invoice, format }: { invoice: Invoice; format: string }) {
             setDownloadTrigger({ invoice, format, id: Date.now() })
         }
 
@@ -276,25 +279,35 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             <Download className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="center" className="[&>*]:cursor-pointer">
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "" })}>
-                                                            {t("invoices.list.downloadFormats.pdf")}
+                                                    <DropdownMenuContent align="center" className="[&>*]:cursor-pointer w-48">
+                                                        <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                                                            <FileText className="h-3 w-3" />
+                                                            {t("invoices.list.actions.downloadPdf")}
+                                                        </DropdownMenuLabel>
+
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "" })}>Standard</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-facturx" })}>Factur-X</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-zugferd" })}>ZUGFeRD</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-xrechnung" })}>
+                                                            XRechnung
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "facturx" })}>
-                                                            {t("invoices.list.downloadFormats.facturx")}
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-ubl" })}>UBL</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-cii" })}>CII</DropdownMenuItem>
+
+                                                        <DropdownMenuSeparator />
+
+                                                        <DropdownMenuLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                                                            <Code className="h-3 w-3" />
+                                                            {t("invoices.list.actions.downloadXml")}
+                                                        </DropdownMenuLabel>
+
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-facturx" })}>Factur-X</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-zugferd" })}>ZUGFeRD</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-xrechnung" })}>
+                                                            XRechnung
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "zugferd" })}>
-                                                            {t("invoices.list.downloadFormats.zugferd")}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "xrechnung" })}>
-                                                            {t("invoices.list.downloadFormats.xrechnung")}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "ubl" })}>
-                                                            {t("invoices.list.downloadFormats.ubl")}
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownloadPdf({ invoice, format: "cii" })}>
-                                                            {t("invoices.list.downloadFormats.cii")}
-                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-ubl" })}>UBL</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-cii" })}>CII</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
 
@@ -370,7 +383,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                             )}
                         </CardFooter>
                     )}
-                </Card>
+                </Card >
 
                 <InvoiceUpsert
                     open={createInvoiceDialog}
