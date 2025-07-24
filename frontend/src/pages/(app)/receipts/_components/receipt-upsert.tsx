@@ -254,7 +254,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                                                     <BetterInput
                                                         defaultValue={item.amountPaid || ""}
                                                         placeholder={t("receipts.upsert.form.items.amountPaid.placeholder")}
-                                                        onChange={(e) => onEditItem(index, "amountPaid")(e.target.value)}
+                                                        onChange={(e) => onEditItem(index, "amountPaid")(parseFloat(e.target.value))}
                                                         type="number"
                                                         min={0}
                                                         step="0.01"
