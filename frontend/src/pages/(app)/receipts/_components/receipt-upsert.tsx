@@ -38,8 +38,8 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
     const [selectedItem, setSelectedItem] = useState<InvoiceItem | null>(null)
     const [items, setItems] = useState<Item[]>(receipt?.items.map(item => ({
-        invoiceItemId: item.id,
-        description: receipt.invoice?.items.find(invItem => invItem.id === item.id)?.description || "",
+        invoiceItemId: item.invoiceItemId,
+        description: receipt.invoice?.items.find(invItem => invItem.id === item.invoiceItemId)?.description || "",
         amountPaid: item.amountPaid
     })) || [])
 
