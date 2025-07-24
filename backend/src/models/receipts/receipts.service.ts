@@ -150,7 +150,6 @@ export class ReceiptsService {
                 items: {
                     create: body.items.map(item => ({
                         invoiceItemId: item.invoiceItemId,
-                        invoiceId: body.invoiceId,
                         amountPaid: +item.amountPaid,
                     })),
                 },
@@ -168,7 +167,10 @@ export class ReceiptsService {
 
     async createReceiptFromInvoice(invoiceId: string) {
         const invoice = await this.prisma.invoice.findUnique({
-            where: { id: invoiceId }
+            where: { id: invoiceId },
+            include: {
+                items: true
+            },
         });
         if (!invoice) {
             throw new BadRequestException('Invoice not found');
@@ -176,7 +178,10 @@ export class ReceiptsService {
 
         return await this.createReceipt({
             invoiceId: invoice.id,
-            items: [],
+            items: invoice.items.map(item => ({
+                invoiceItemId: item.id,
+                amountPaid: (item.quantity * item.unitPrice * (1 + item.vatRate / 100)).toFixed(2),
+            })),
             paymentMethod: invoice.paymentMethod || '',
             paymentDetails: invoice.paymentDetails || '',
         });
@@ -278,7 +283,7 @@ export class ReceiptsService {
             totalAmount: receipt.totalPaid.toFixed(2),
 
             items: receipt.items.map(item => ({
-                description: receipt.invoice.items.find(i => i.id === item.id)?.description || 'N/A',
+                description: receipt.invoice.items.find(i => i.id === item.invoiceItemId)?.description || 'N/A',
                 amount: item.amountPaid.toFixed(2),
             })),
 
