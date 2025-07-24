@@ -68,7 +68,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                 paymentDetails: receipt.paymentDetails || ""
             })
             setItems(receipt.items.map(item => ({
-                invoiceItemId: item.id,
+                invoiceItemId: item.invoiceItemId,
                 description: receipt.invoice?.items.find(invItem => invItem.id === item.invoiceItemId)?.description || "",
                 amountPaid: item.amountPaid
             })))
