@@ -396,7 +396,9 @@
                 "downloadPdf": "Download PDF",
                 "edit": "Edit invoice",
                 "markAsPaid": "Mark as paid",
-                "delete": "Delete invoice"
+                "delete": "Delete invoice",
+                "createReceipt": "Create a receipt from this invoice",
+                "sendByEmail": "Send invoice by email"
             },
             "actions": {
                 "addNew": "Add New Invoice"
@@ -411,7 +413,8 @@
             },
             "messages": {
                 "markAsPaidSuccess": "Invoice marked as paid successfully",
-                "markAsPaidError": "Failed to mark invoice as paid"
+                "markAsPaidError": "Failed to mark invoice as paid",
+                "createReceiptSuccess": "Receipt created successfully from invoice"
             }
         },
         "upsert": {
@@ -549,6 +552,21 @@
             "description": "Manage your recurring invoices and automate billing.",
             "actions": {
                 "addNew": "Add New Recurring Invoice"
+            },
+            "item": {
+                "client": "Client",
+                "payment": "Payment Method",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)"
+            },
+            "tooltips": {
+                "view": "View Details",
+                "edit": "Edit",
+                "delete": "Delete"
+            },
+            "messages": {
+                "manual_process_success": "Manual process triggered successfully",
+                "manual_process_error": "Error triggering manual process"
             }
         },
         "emptyState": {
@@ -867,6 +885,24 @@
                         "format": "Invoice number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
                     }
                 },
+                "receiptStartingNumber": {
+                    "label": "Receipt Starting Number",
+                    "placeholder": "Enter starting number for receipts",
+                    "description": "Initial number for receipt numbering",
+                    "errors": {
+                        "min": "Receipt starting number must be at least 1"
+                    }
+                },
+                "receiptNumberFormat": {
+                    "label": "Receipt Number Format",
+                    "placeholder": "Enter receipt number format (e.g., REC-{year}-{number})",
+                    "description": "Format for receipt numbers",
+                    "errors": {
+                        "required": "Receipt number format is required",
+                        "maxLength": "Receipt number format must be less than 100 characters",
+                        "format": "Receipt number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
+                    }
+                },
                 "invoicePDFFormat": {
                     "label": "Invoice PDF Format",
                     "placeholder": "Select invoice PDF format",
@@ -1124,6 +1160,7 @@
             "dashboard": "Dashboard",
             "quotes": "Quotes",
             "invoices": "Invoices",
+            "receipts": "Receipts",
             "clients": "Clients",
             "settings": "Settings"
         },
@@ -1229,7 +1266,145 @@
             "week": "Week",
             "month": "Month",
             "year": "Year"
-        }
+        },
+        "valueWithCurrency": "{{amount}}{{currency}}"
     },
-    "noOptions": "No options available. Create a new client."
+    "noOptions": "No options available. Create a new client.",
+    "receipts": {
+        "header": {
+            "subtitle": "Manage your receipts",
+            "count": "{{count}} receipts {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search receipts..."
+        },
+        "actions": {
+            "addNew": "Add New Receipt"
+        },
+        "stats": {
+            "total": "Total Receipts",
+            "draft": "Draft",
+            "sent": "Sent",
+            "signed": "Signed"
+        },
+        "emptyState": {
+            "noReceipts": "No receipts yet",
+            "noResults": "No receipts found",
+            "startAdding": "Get started by creating your first receipt.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Receipts",
+            "description": "Manage and view all your receipts in one place.",
+            "status": {
+                "draft": "Draft",
+                "sent": "Sent",
+                "signed": "Signed"
+            },
+            "item": {
+                "title": "Receipt {{number}}",
+                "client": "Client",
+                "issued": "Issued",
+                "validUntil": "Valid Until",
+                "totalHT": "Total (excl. VAT)",
+                "totalTTC": "Total (incl. VAT)",
+                "invoice": "Invoice",
+                "totalItemCount": "Total Item Count",
+                "totalPaid": "Total Paid"
+            },
+            "tooltips": {
+                "view": "View receipt",
+                "viewPdf": "View PDF",
+                "downloadPdf": "Download PDF",
+                "edit": "Edit receipt",
+                "sendToClient": "Send to client",
+                "delete": "Delete receipt"
+            },
+            "messages": {
+                "emailSent": "Receipt sent to client successfully.",
+                "emailError": "Failed to send receipt to client."
+            },
+            "actions": {
+                "addNew": "Add New Receipt"
+            }
+        },
+        "upsert": {
+            "title": {
+                "edit": "Edit Receipt",
+                "create": "Create Receipt"
+            },
+            "form": {
+                "client": {
+                    "label": "Client",
+                    "errors": {
+                        "required": "Client is required."
+                    }
+                },
+                "items": {
+                    "label": "Items",
+                    "placeholder": "Add items to the receipt",
+                    "noResults": "No items found",
+                    "addButton": "Add Item",
+                    "description": {
+                        "errors": {
+                            "required": "Description is required."
+                        }
+                    },
+                    "quantity": {
+                        "errors": {
+                            "required": "Quantity is required.",
+                            "min": "Quantity must be at least 1.",
+                            "invalid": "Invalid quantity."
+                        }
+                    },
+                    "unitPrice": {
+                        "errors": {
+                            "required": "Unit price is required.",
+                            "min": "Unit price must be at least 0.",
+                            "invalid": "Invalid unit price."
+                        }
+                    },
+                    "vatRate": {
+                        "errors": {
+                            "required": "VAT rate is required.",
+                            "min": "VAT rate must be at least 0."
+                        }
+                    }
+                },
+                "invoice": {
+                    "label": "Invoice",
+                    "placeholder": "Select an invoice",
+                    "noResults": "No invoices found"
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "Enter the payment method",
+                    "description": "The method used to make the payment"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "Enter payment details",
+                    "description": "Additional information about the payment"
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save Changes",
+                "create": "Create Receipt",
+                "edit": "Edit Receipt"
+            }
+        },
+        "delete": {
+            "title": "Delete Receipt",
+            "description": "Are you sure you want to delete this receipt? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete"
+            }
+        },
+        "pdf": {
+            "title": "Receipt {{number}} - PDF"
+        }
+    }
 }

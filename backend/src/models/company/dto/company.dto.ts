@@ -50,4 +50,6 @@ export class EditCompanyDto {
     quoteNumberFormat: string
     invoiceStartingNumber: number
     invoiceNumberFormat: string
+    receiptStartingNumber: number
+    receiptNumberFormat: string
 }

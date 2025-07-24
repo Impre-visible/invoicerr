@@ -16,6 +16,12 @@ export class InvoicesController {
         return await this.invoicesService.getInvoices(page);
     }
 
+    @Get('search')
+    @LoginRequired()
+    async searchInvoices(@Param('query') query: string) {
+        return await this.invoicesService.searchInvoices(query);
+    }
+
     @Get(':id/pdf')
     @LoginRequired()
     async getInvoicePdf(@Param('id') id: string, @Query('format') format: ExportFormat | undefined, @Res() res: Response) {

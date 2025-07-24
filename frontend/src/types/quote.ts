@@ -11,7 +11,8 @@ export enum QuoteStatus {
 
 export interface Quote {
     id: string;
-    number: string; // Ex: "Q-2025-0001"
+    number: number; // Ex: "Q-2025-0001"
+    rawNumber?: string; // Optional raw number for custom formats
     title?: string;
     clientId: string;
     client: Client;

@@ -208,6 +208,8 @@ model Company {
   quoteNumberFormat     String @default("Q-{year}-{number:4}") // Ex: "Q-2025-0001"
   invoiceStartingNumber Int    @default(1) // Starting number for invoices
   invoiceNumberFormat   String @default("INV-{year}-{number:4}") // Ex: "INV-2025-0001"
+  receiptStartingNumber Int    @default(1) // Starting number for receipts
+  receiptNumberFormat   String @default("REC-{year}-{number:4}") // Ex: "REC-2025-0001"
 
   invoicePDFFormat String @default("facturx") // Ex: 'pdf' | 'facturx' | 'zugferd' | 'xrechnung' | 'ubl' | 'cii'
 
@@ -235,12 +237,16 @@ model PDFConfig {
 
   invoice        String @default("Invoice")
   quote          String @default("Quote")
+  receipt        String @default("Receipt")
   description    String @default("Description:")
   date           String @default("Date:")
   dueDate        String @default("Due date:")
   validUntil     String @default("Valid until:")
+  paymentDate    String @default("Payment date:")
   billTo         String @default("Bill to:")
   quoteFor       String @default("Quote for:")
+  receivedFrom   String @default("Received from:")
+  invoiceRefer   String @default("Invoice reference:")
   quantity       String @default("Qty")
   vatRate        String @default("VAT (%)")
   unitPrice      String @default("Unit price")
@@ -248,6 +254,7 @@ model PDFConfig {
   total          String @default("Total:")
   vat            String @default("VAT:")
   grandTotal     String @default("Grand total:")
+  totalReceived  String @default("Total received:")
   notes          String @default("Notes:")
   paymentMethod  String @default("Payment Method:")
   paymentDetails String @default("Payment Details:")
@@ -260,6 +267,7 @@ enum MailTemplateType {
   SIGNATURE_REQUEST
   VERIFICATION_CODE
   INVOICE
+  RECEIPT
 }
 
 model MailTemplate {
@@ -306,6 +314,7 @@ enum QuoteStatus {
 model Quote {
   id             String      @id @default(uuid())
   number         Int         @default(autoincrement())
+  rawNumber      String? // Raw number for custom formats
   title          String?
   client         Client      @relation(fields: [clientId], references: [id])
   clientId       String
@@ -399,6 +408,7 @@ model RecurringInvoiceItem {
 model Invoice {
   id                 String            @id @default(uuid())
   number             Int               @default(autoincrement())
+  rawNumber          String? // Raw number for custom formats
   quote              Quote?            @relation(fields: [quoteId], references: [id])
   quoteId            String?
   recurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id])
@@ -421,17 +431,42 @@ model Invoice {
   totalTTC           Float
   currency           Currency
   isActive           Boolean           @default(true)
+  receipts           Receipt[]
 }
 
 model InvoiceItem {
-  id          String  @id @default(uuid())
-  invoice     Invoice @relation(fields: [invoiceId], references: [id])
-  invoiceId   String
-  description String
-  quantity    Int
-  unitPrice   Float
-  vatRate     Float // 20 for 20%
-  order       Int
+  id           String        @id @default(uuid())
+  invoice      Invoice       @relation(fields: [invoiceId], references: [id])
+  invoiceId    String
+  description  String
+  quantity     Int
+  unitPrice    Float
+  vatRate      Float // 20 for 20%
+  order        Int
+  receiptItems ReceiptItem[]
+}
+
+model ReceiptItem {
+  id            String      @id @default(uuid())
+  invoiceItem   InvoiceItem @relation(fields: [invoiceItemId], references: [id])
+  invoiceItemId String
+  amountPaid    Float // Amount paid for this item
+  Receipt       Receipt     @relation(fields: [receiptId], references: [id])
+  receiptId     String
+}
+
+model Receipt {
+  id             String        @id @default(cuid())
+  number         Int           @default(autoincrement())
+  rawNumber      String? // Raw number for custom formats
+  invoiceId      String
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id])
+  items          ReceiptItem[]
+  totalPaid      Float
+  paymentMethod  String        @default("") // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String        @default("") // Details for the payment method (e.g., bank account number)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Signature {

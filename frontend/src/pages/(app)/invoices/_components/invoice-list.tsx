@@ -1,4 +1,4 @@
-import { Banknote, Download, Edit, Eye, Mail, Plus, Receipt, Trash2 } from "lucide-react"
+import { Banknote, Download, Edit, Eye, Mail, Plus, ReceiptText, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
@@ -40,6 +40,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
         const { t } = useTranslation()
         const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
         const { trigger: triggerSendInvoiceByEmail } = usePost(`/api/invoices/send`)
+        const { trigger: triggerCreateReceipt } = usePost(`/api/receipts/create-from-invoice`)
 
         const [createInvoiceDialog, setCreateInvoiceDialog] = useState<boolean>(false)
         const [editInvoiceDialog, setEditInvoiceDialog] = useState<Invoice | null>(null)
@@ -111,6 +112,18 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
             setDownloadTrigger({ invoice, format, id: Date.now() })
         }
 
+        function handleCreateReceiptFromInvoice(invoiceId: string) {
+            triggerCreateReceipt({ id: invoiceId })
+                .then(() => {
+                    toast.success(t("invoices.list.messages.createReceiptSuccess"))
+                    mutate()
+                })
+                .catch((error) => {
+                    console.error("Error creating receipt from invoice:", error)
+                    toast.error(t("invoices.list.messages.createReceiptError"))
+                })
+        }
+
         const getStatusColor = (status: string) => {
             switch (status) {
                 case "SENT":
@@ -147,7 +160,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     <CardHeader className="border-b flex flex-row items-center justify-between">
                         <div>
                             <CardTitle className="flex items-center space-x-2">
-                                <Receipt className="h-5 w-5 " />
+                                <ReceiptText className="h-5 w-5 " />
                                 <span>{title}</span>
                             </CardTitle>
                             <CardDescription>{description}</CardDescription>
@@ -174,13 +187,13 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                         <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                             <div className="flex flex-row items-center gap-4 w-full">
                                                 <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
-                                                    <Receipt className="h-5 w-5 text-blue-600" />
+                                                    <ReceiptText className="h-5 w-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <h3 className="font-medium text-foreground break-words">
                                                             {t("invoices.list.item.title", {
-                                                                number: invoice.number,
+                                                                number: invoice.rawNumber || invoice.number,
                                                                 title: invoice.title,
                                                             })}
                                                         </h3>
@@ -214,11 +227,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             )}
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.totalHT")}:</span>{" "}
-                                                                {invoice.totalHT.toFixed(2)} {invoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: invoice.currency,
+                                                                    amount: invoice.totalHT.toFixed(2),
+                                                                })}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.totalTTC")}:</span>{" "}
-                                                                {invoice.totalTTC.toFixed(2)} {invoice.currency}
+                                                                {t("common.valueWithCurrency", {
+                                                                    currency: invoice.currency,
+                                                                    amount: invoice.totalTTC.toFixed(2),
+                                                                })}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -243,7 +262,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                     onClick={() => handleViewPdf(invoice)}
                                                     className="text-gray-600 hover:text-pink-600"
                                                 >
-                                                    <Receipt className="h-4 w-4" />
+                                                    <ReceiptText className="h-4 w-4" />
                                                 </Button>
 
                                                 <DropdownMenu>
@@ -326,6 +345,16 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 )}
+
+                                                <Button
+                                                    tooltip={t("invoices.list.tooltips.createReceipt")}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

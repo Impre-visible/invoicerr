@@ -8,7 +8,7 @@ import {
     DollarSign,
     FileText,
     LayoutDashboard,
-    Receipt,
+    ReceiptText,
     TrendingUp,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -127,10 +127,10 @@ export default function Dashboard() {
                                                     )}
                                                     <span
                                                         className={`text-sm ml-1 ${(dashboardData?.revenue.monthlyChangePercent || 0) > 0
-                                                                ? "text-emerald-600"
-                                                                : (dashboardData?.revenue.monthlyChangePercent || 0) < 0
-                                                                    ? "text-red-600"
-                                                                    : "text-gray-400"
+                                                            ? "text-emerald-600"
+                                                            : (dashboardData?.revenue.monthlyChangePercent || 0) < 0
+                                                                ? "text-red-600"
+                                                                : "text-gray-400"
                                                             }`}
                                                     >
                                                         {formatChangePercent(dashboardData?.revenue.monthlyChangePercent)}
@@ -203,10 +203,10 @@ export default function Dashboard() {
                                                     )}
                                                     <span
                                                         className={`text-sm ml-1 ${(dashboardData?.revenue.yearlyChangePercent || 0) > 0
-                                                                ? "text-emerald-600"
-                                                                : (dashboardData?.revenue.yearlyChangePercent || 0) < 0
-                                                                    ? "text-red-600"
-                                                                    : "text-gray-400"
+                                                            ? "text-emerald-600"
+                                                            : (dashboardData?.revenue.yearlyChangePercent || 0) < 0
+                                                                ? "text-red-600"
+                                                                : "text-gray-400"
                                                             }`}
                                                     >
                                                         {formatChangePercent(dashboardData?.revenue.yearlyChangePercent)}
@@ -325,7 +325,7 @@ export default function Dashboard() {
             <section className="space-y-6">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-emerald-500 rounded-lg">
-                        <Receipt className="h-5 w-5 text-white" />
+                        <ReceiptText className="h-5 w-5 text-white" />
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold text-foreground">{t("dashboard.invoices.title")}</h2>
@@ -338,7 +338,7 @@ export default function Dashboard() {
                         count={dashboardData?.invoices.total}
                         label={t("dashboard.invoices.stats.total")}
                         color="green"
-                        icon={<Receipt />}
+                        icon={<ReceiptText />}
                         className="lg:col-span-2"
                     />
                     <DashboardStat

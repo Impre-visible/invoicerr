@@ -59,7 +59,18 @@ export class CompanyService {
             });
         }
 
-        return await this.prisma.company.findFirst();;
+        if (!company.emailTemplates.find(template => template.type === MailTemplateType.RECEIPT)) {
+            await this.prisma.mailTemplate.create({
+                data: {
+                    type: MailTemplateType.RECEIPT,
+                    subject: 'Receipt #{{RECEIPT_NUMBER}} from {{COMPANY_NAME}}',
+                    body: '<p>Dear {{CLIENT_NAME}},</p><p>Please find attached the receipt #{{RECEIPT_NUMBER}} from {{COMPANY_NAME}}.</p><p>Thank you for your business!</p><p>Best regards,<br>{{COMPANY_NAME}}</p><hr><p style="font-size: 12px; color: #666;">This email was sent from {{APP_URL}}</p>',
+                    companyId: company.id
+                }
+            });
+        }
+
+        return await this.prisma.company.findFirst();
     }
 
     async getPDFTemplateConfig(): Promise<PDFConfig> {
@@ -230,6 +241,11 @@ export class CompanyService {
                 },
                 ...template.type === MailTemplateType.INVOICE && {
                     INVOICE_NUMBER: 'INV-2025-0001',
+                    CLIENT_NAME: 'Acme',
+                    COMPANY_NAME: existingCompany.name,
+                },
+                ...template.type === MailTemplateType.RECEIPT && {
+                    RECEIPT_NUMBER: 'REC-2025-0001',
                     CLIENT_NAME: 'Acme',
                     COMPANY_NAME: existingCompany.name,
                 }
