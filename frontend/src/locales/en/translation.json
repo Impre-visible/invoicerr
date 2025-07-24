@@ -885,6 +885,24 @@
                         "format": "Invoice number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
                     }
                 },
+                "receiptStartingNumber": {
+                    "label": "Receipt Starting Number",
+                    "placeholder": "Enter starting number for receipts",
+                    "description": "Initial number for receipt numbering",
+                    "errors": {
+                        "min": "Receipt starting number must be at least 1"
+                    }
+                },
+                "receiptNumberFormat": {
+                    "label": "Receipt Number Format",
+                    "placeholder": "Enter receipt number format (e.g., REC-{year}-{number})",
+                    "description": "Format for receipt numbers",
+                    "errors": {
+                        "required": "Receipt number format is required",
+                        "maxLength": "Receipt number format must be less than 100 characters",
+                        "format": "Receipt number format is invalid. Use {year}, {month}, {day}, {number} with optional padding (e.g., {number:4})"
+                    }
+                },
                 "invoicePDFFormat": {
                     "label": "Invoice PDF Format",
                     "placeholder": "Select invoice PDF format",

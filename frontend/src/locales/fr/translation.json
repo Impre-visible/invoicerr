@@ -887,6 +887,24 @@
                         "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
                     }
                 },
+                "receiptStartingNumber": {
+                    "label": "Numéro de départ des reçus",
+                    "placeholder": "Saisir le numéro de départ des reçus",
+                    "description": "Le numéro à partir duquel les reçus commenceront",
+                    "errors": {
+                        "min": "Le numéro de départ doit être au moins 1."
+                    }
+                },
+                "receiptNumberFormat": {
+                    "label": "Format du numéro de reçu",
+                    "placeholder": "Entrez le format du numéro de reçu (ex: RECEIPT-{year}-{number})",
+                    "description": "Format pour les numéros de reçu",
+                    "errors": {
+                        "required": "Le format du numéro de reçu est requis",
+                        "maxLength": "Le format du numéro de reçu doit faire moins de 100 caractères",
+                        "format": "Format invalide. Utilisez {year}, {month}, {day}, {number} avec un padding optionnel (ex: {number:4})"
+                    }
+                },
                 "invoicePDFFormat": {
                     "label": "Format du PDF de la facture",
                     "placeholder": "Sélectionner le format du PDF de la facture",
