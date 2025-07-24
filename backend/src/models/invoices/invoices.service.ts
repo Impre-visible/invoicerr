@@ -1,11 +1,11 @@
 import * as Handlebars from 'handlebars';
-import * as nodemailer from 'nodemailer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { getInvertColor, getPDF } from 'src/utils/pdf';
 
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
@@ -14,19 +14,8 @@ import { parseAddress } from 'src/utils/adress';
 
 @Injectable()
 export class InvoicesService {
-    private transporter: nodemailer.Transporter;
-    constructor(private readonly prisma: PrismaService) {
+    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) { }
 
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: 587,
-            secure: false, // true si port 465
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
-        });
-    }
 
     async getInvoices(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -435,7 +424,6 @@ export class InvoicesService {
         };
 
         const mailOptions = {
-            from: `${invoice.company.name} <${invoice.company.email}>`,
             to: invoice.client.contactEmail,
             subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
             html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
@@ -446,12 +434,11 @@ export class InvoicesService {
             }],
         };
 
-        await this.transporter.sendMail(mailOptions)
-            .then(() => { })
-            .catch(error => {
-                console.error('Error sending invoice email:', error);
-                throw new BadRequestException('Failed to send invoice email.');
-            });
+        try {
+            await this.mailService.sendMail(mailOptions);
+        } catch (error) {
+            throw new BadRequestException('Failed to send invoice email. Please check your SMTP configuration.');
+        }
 
         return { message: 'Invoice sent successfully' };
     }

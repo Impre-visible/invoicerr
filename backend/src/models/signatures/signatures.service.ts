@@ -1,24 +1,11 @@
-import * as nodemailer from 'nodemailer';
-
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SignaturesService {
-    private transporter: nodemailer.Transporter;
-
-    constructor(private readonly prisma: PrismaService) {
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: 587,
-            secure: false, // true si port 465
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
-        });
-    }
+    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) { }
 
     async getSignature(signatureId: string) {
         const signature = await this.prisma.signature.findUnique({
@@ -163,12 +150,11 @@ export class SignaturesService {
             html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
         };
 
-        await this.transporter.sendMail(mailOptions)
-            .then(() => { })
-            .catch(error => {
-                console.error('Error sending signature email:', error);
-                throw new BadRequestException('Failed to send signature email.');
-            });
+        try {
+            await this.mailService.sendMail(mailOptions)
+        } catch (error) {
+            throw new BadRequestException('Failed to send signature email. Please check your SMTP configuration.');
+        }
 
         return { message: 'Signature email sent successfully.' };
     }
@@ -197,17 +183,16 @@ export class SignaturesService {
         };
 
         const mailOptions = {
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: email,
             subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
             html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
         };
 
-        await this.transporter.sendMail(mailOptions)
-            .catch(error => {
-                console.error('Error sending OTP:', error);
-                throw new BadRequestException('Failed to send OTP code.');
-            });
+        try {
+            await this.mailService.sendMail(mailOptions)
+        } catch (error) {
+            throw new BadRequestException('Failed to send OTP email. Please check your SMTP configuration.');
+        }
 
         return true;
     }

@@ -1,6 +1,6 @@
-import { Company, Currency } from '@prisma/client';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { Currency } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpsertInvoicesDto } from './dto/invoices.dto';
 

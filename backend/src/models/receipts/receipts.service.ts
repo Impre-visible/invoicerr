@@ -1,10 +1,10 @@
 import * as Handlebars from 'handlebars';
-import * as nodemailer from 'nodemailer';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
 import { getInvertColor, getPDF } from 'src/utils/pdf';
 
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { formatDate } from 'src/utils/date';
@@ -12,18 +12,7 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ReceiptsService {
-    private transporter: nodemailer.Transporter;
-    constructor(private readonly prisma: PrismaService) {
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: 587,
-            secure: false, // true si port 465
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
-        });
-    }
+    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) { }
 
     async getReceipts(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -349,7 +338,6 @@ export class ReceiptsService {
         };
 
         const mailOptions = {
-            from: `${receipt.invoice.company.name} <${receipt.invoice.company.email}>`,
             to: receipt.invoice.client.contactEmail,
             subject: mailTemplate.subject.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
             html: mailTemplate.body.replace(/{{(\w+)}}/g, (_, key) => envVariables[key] || ''),
@@ -360,12 +348,11 @@ export class ReceiptsService {
             }],
         };
 
-        await this.transporter.sendMail(mailOptions)
-            .then(() => { })
-            .catch(error => {
-                console.error('Error sending receipt email:', error);
-                throw new BadRequestException('Failed to send receipt email.');
-            });
+        try {
+            await this.mailService.sendMail(mailOptions);
+        } catch (error) {
+            throw new BadRequestException('Failed to send receipt email. Please check your SMTP configuration.');
+        }
 
         return { message: 'Receipt sent successfully' };
     }

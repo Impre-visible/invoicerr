@@ -6,6 +6,7 @@ import { CompanyModule } from './models/company/company.module';
 import { DangerModule } from './models/danger/danger.module';
 import { DashboardModule } from './models/dashboard/dashboard.module';
 import { InvoicesModule } from './models/invoices/invoices.module';
+import { MailService } from './mail/mail.service';
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import { QuotesModule } from './models/quotes/quotes.module';
@@ -29,6 +30,6 @@ import { SignaturesModule } from './models/signatures/signatures.module';
     RecurringInvoicesModule
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService, MailService],
 })
 export class AppModule { }

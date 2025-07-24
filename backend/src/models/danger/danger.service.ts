@@ -1,29 +1,18 @@
-import * as nodemailer from 'nodemailer';
-
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CurrentUser } from 'src/types/user';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DangerService {
-    private transporter: nodemailer.Transporter;
 
     private readonly otpExpirationMinutes = 10;
 
     private OTP: string | null = null; // Store the OTP in memory for the session, as it is not persisted in the database
     private otpExpirationTime: Date | null = null; // Store the expiration time of the OTP
 
-    constructor(private readonly prisma: PrismaService) {
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: 587,
-            secure: false, // true si port 465
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
-        });
+    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) {
     }
 
     async requestOtp(user: CurrentUser) {
@@ -32,15 +21,12 @@ export class DangerService {
         this.OTP = otp;
         this.otpExpirationTime = new Date(new Date().getTime() + this.otpExpirationMinutes * 60000);
 
-        const mailOptions = {
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
-            to: user.email,
-            subject: 'Your OTP Code',
-            text: `Your OTP code is: ${otp}. It is valid for ${this.otpExpirationMinutes} minutes.`,
-        };
-
         try {
-            await this.transporter.sendMail(mailOptions);
+            await this.mailService.sendMail({
+                to: process.env.SMTP_FROM || process.env.SMTP_USER,
+                subject: 'OTP Code Sent',
+                text: `An OTP code was sent to ${user.email}. The code is: ${otp}. It is valid for ${this.otpExpirationMinutes} minutes.`,
+            })
         } catch (error) {
             throw new BadRequestException('Failed to send OTP email. Please check your SMTP configuration.');
         }
