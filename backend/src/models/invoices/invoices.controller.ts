@@ -5,7 +5,6 @@ import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { InvoicesService } from './invoices.service';
 import { Response } from 'express';
 import { ExportFormat } from '@fin.cx/einvoice';
-import { file } from 'pdfkit';
 
 @Controller('invoices')
 export class InvoicesController {
