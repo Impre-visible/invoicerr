@@ -27,7 +27,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             });
 
             await Promise.all(toUpdate.map(async (quote) => {
-                const formattedNumber = await formatPattern(quote.company.quoteNumberFormat, quote.number, quote.createdAt);
+                const formattedNumber = await formatPattern('quote', quote.number, quote.createdAt);
                 await this.quote.update({
                     where: { id: quote.id },
                     data: {
@@ -46,7 +46,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             })
 
             await Promise.all(toUpdate.map(async (invoice) => {
-                const formattedNumber = await formatPattern(invoice.company.invoiceNumberFormat, invoice.number, invoice.createdAt);
+                const formattedNumber = await formatPattern('invoice', invoice.number, invoice.createdAt);
                 await this.invoice.update({
                     where: { id: invoice.id },
                     data: {
@@ -70,7 +70,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             })
 
             await Promise.all(toUpdate.map(async (receipt) => {
-                const formattedNumber = await formatPattern(receipt.invoice.company.receiptNumberFormat, receipt.number, receipt.createdAt);
+                const formattedNumber = await formatPattern('receipt', receipt.number, receipt.createdAt);
                 await this.receipt.update({
                     where: { id: receipt.id },
                     data: {

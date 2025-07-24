@@ -3,13 +3,31 @@ import * as puppeteer from 'puppeteer';
 import { BadRequestException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
-export async function formatPattern(pattern: string, number: number, date: Date = new Date()): Promise<string> {
+type PatternType = "receipt" | "invoice" | "quote";
+
+export async function formatPattern(type: PatternType, number: number, date: Date = new Date()): Promise<string> {
     const prisma = new PrismaClient();
     const company = await prisma.company.findFirst();
     if (!company) {
         throw new BadRequestException('No company found. Please create a company first.');
     }
     prisma.$disconnect();
+    let pattern = '';
+    let startingNumber = 1;
+    switch (type) {
+        case "receipt":
+            pattern = company.receiptNumberFormat;
+            startingNumber = company.receiptStartingNumber;
+            break;
+        case "invoice":
+            pattern = company.invoiceNumberFormat;
+            startingNumber = company.invoiceStartingNumber;
+            break;
+        case "quote":
+            pattern = company.quoteNumberFormat;
+            startingNumber = company.quoteStartingNumber;
+            break;
+    }
     return pattern.replace(/\{(\w+)(?::(\d+))?\}/g, (_, key, padding) => {
         let value: number | string;
 
@@ -24,7 +42,7 @@ export async function formatPattern(pattern: string, number: number, date: Date 
                 value = date.getDate();
                 break;
             case "number":
-                value = number + company.receiptStartingNumber - 1; // Use the receipt starting number from the company
+                value = number + startingNumber - 1; // Use the starting number from the company
                 break;
             default:
                 return key;
