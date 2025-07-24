@@ -277,17 +277,23 @@ export class InvoicesService {
         return pdfBuffer;
     }
 
-    async getInvoicePDFFormat(invoiceId: string, format: 'pdf' | ExportFormat): Promise<Uint8Array> {
-        const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
-        if (!invRec) throw new BadRequestException('Invoice not found');
+    async getInvoiceXMLFormat(id: string): Promise<EInvoice> {
+        const invRec = await this.prisma.invoice.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: {
+                    include: { pdfConfig: true },
+                },
+            },
+        });
+
+        if (!invRec) {
+            throw new BadRequestException('Invoice not found');
+        }
 
         const inv = new EInvoice();
-
-        const pdfBuffer = await this.getInvoicePdf(invoiceId);
-
-        if (format === 'pdf') {
-            return pdfBuffer;
-        }
 
         const companyFoundedDate = new Date(invRec.company.foundedAt || new Date())
         const clientFoundedDate = new Date(invRec.client.foundedAt || new Date());
@@ -358,6 +364,30 @@ export class InvoicesService {
                 vatPercentage: item.vatRate || 0
             });
         });
+
+        invRec.items.forEach(item => {
+            inv.addItem({
+                name: item.description,
+                unitQuantity: item.quantity,
+                unitNetPrice: item.unitPrice,
+                vatPercentage: item.vatRate || 0
+            });
+        });
+
+        return inv;
+    }
+
+    async getInvoicePDFFormat(invoiceId: string, format: '' | 'pdf' | ExportFormat): Promise<Uint8Array> {
+        const invRec = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { items: true, client: true, company: true, quote: true } });
+        if (!invRec) throw new BadRequestException('Invoice not found');
+
+        const pdfBuffer = await this.getInvoicePdf(invoiceId);
+
+        if (format === 'pdf' || format === '') {
+            return pdfBuffer;
+        }
+
+        const inv = await this.getInvoiceXMLFormat(invoiceId);
 
         return await inv.embedInPdf(Buffer.from(pdfBuffer), format)
     }
