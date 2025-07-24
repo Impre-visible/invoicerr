@@ -59,7 +59,6 @@ export class InvoicesController {
         if (fileFormat === "pdf") {
             fileBuffer = await this.invoicesService.getInvoicePDFFormat(id, format?.split('-')[1] as ExportFormat);
         } else if (fileFormat === "xml") {
-            console.log("XML format requested");
             const xmlInvoice = await this.invoicesService.getInvoiceXMLFormat(id);
             const xmlString = await xmlInvoice.exportXml(format?.split('-')[1] as ExportFormat);
             fileBuffer = Buffer.from(xmlString, 'utf-8');
