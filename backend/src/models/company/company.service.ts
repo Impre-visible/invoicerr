@@ -243,6 +243,11 @@ export class CompanyService {
                     INVOICE_NUMBER: 'INV-2025-0001',
                     CLIENT_NAME: 'Acme',
                     COMPANY_NAME: existingCompany.name,
+                },
+                ...template.type === MailTemplateType.RECEIPT && {
+                    RECEIPT_NUMBER: 'REC-2025-0001',
+                    CLIENT_NAME: 'Acme',
+                    COMPANY_NAME: existingCompany.name,
                 }
             }
         }));
