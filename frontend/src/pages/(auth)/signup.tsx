@@ -147,16 +147,27 @@ export default function SignupPage() {
                             {loading ? t("auth.signup.form.creatingAccount") : t("auth.signup.form.createButton")}
                         </Button>
                     </form>
-                    <div className="mt-4 text-center text-sm">
-                        {t("auth.signup.hasAccount")}{" "}
-                        <button
-                            type="button"
-                            onClick={() => navigate("/login")}
-                            className="underline hover:text-primary cursor-pointer"
-                        >
-                            {t("auth.signup.signInLink")}
-                        </button>
-                    </div>
+                    <section className="flex flex-col mt-4 gap-1">
+                        <div className="text-center text-sm">
+                            {t("auth.signup.hasAccount")}{" "}
+                            <a
+                                href="/login"
+                                className="underline hover:text-primary cursor-pointer"
+                            >
+                                {t("auth.signup.signInLink")}
+                            </a>
+                        </div>
+                        <div className="text-center text-sm">
+                            {import.meta.env.VITE_OIDC_ENDPOINT && (
+                                <div className="text-center text-sm">
+                                    {t("auth.signup.oidc")}{" "}
+                                    <a href={import.meta.env.VITE_OIDC_ENDPOINT} className="underline hover:text-primary">
+                                        {t("auth.signup.oidcLink")}
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    </section>
                 </CardContent>
             </Card>
         </div>
