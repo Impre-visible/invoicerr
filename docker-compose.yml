@@ -13,6 +13,8 @@ services:
       - SMTP_USER="username@example.com"
       - SMTP_FROM="user-from@example.com" # Not required if SMTP_USER is the same as SMTP_FROM
       - SMTP_PASSWORD="your_smtp_password"
+      - SMTP_PORT=587 # Change this to your SMTP port (default is 587 for TLS)
+      - SMTP_SECURE=false # Set to true if your SMTP server requires a secure connection (default is false)
 
       # OIDC Configuration (example for Authentik)
       - OIDC_ISSUER="https://auth.chevrier.dev"
