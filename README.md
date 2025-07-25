@@ -25,6 +25,17 @@ Invoicerr is a simple, open-source invoicing application designed to help freela
 
 ## 🐳 Docker Installation (Recommended)
 
+#### Supported Architectures
+
+The images are built for the following architectures:
+
+- `linux/amd64` (x86_64)
+- `linux/arm64/v8` (ARMv8)
+
+#### Why not `linux/arm/v7`?
+
+The `linux/arm/v7` architecture is not supported due to the use of prisma, which does not provide prebuilt binaries for this architecture. This means that the application will not run on 32-bit ARM devices.
+
 The fastest way to run Invoicerr is using Docker Compose. A prebuilt image is available at [ghcr.io/impre-visible/invoicerr](https://ghcr.io/impre-visible/invoicerr).
 
 ### 🚀 Quick Start
