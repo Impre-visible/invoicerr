@@ -1,27 +1,25 @@
-FROM node:current-alpine3.22 AS backend-builder
+FROM node:22-bullseye AS backend-builder
 
 WORKDIR /app
 
-COPY backend/package*.json ./
+COPY backend/ .
+
+RUN rm -rf node_modules package-lock.json
 
 RUN npm install
-
-COPY backend/ .
 
 RUN npx prisma generate
 RUN npm run build
 
-FROM node:current-alpine3.22 AS frontend-builder
+FROM node:22-bullseye AS frontend-builder
 
 WORKDIR /app
 
-COPY frontend/package*.json ./frontend/
+COPY frontend/ .
 
-WORKDIR /app/frontend
+RUN rm -rf node_modules package-lock.json
 
 RUN npm install
-
-COPY frontend/ .
 
 RUN npm run build
 
@@ -43,7 +41,7 @@ RUN apk add --no-cache \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 
-COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
 COPY --from=backend-builder /app/dist /usr/share/nginx/backend
 COPY --from=backend-builder /app/node_modules /usr/share/nginx/backend/node_modules
