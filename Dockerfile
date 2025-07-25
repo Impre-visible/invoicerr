@@ -23,13 +23,11 @@ RUN npm install
 
 RUN npm run build
 
-FROM nginx:bullseye
+FROM debian:bookworm AS final
 
 RUN apt-get update && apt-get install -y \
-    nodejs \
-    npm
-
-RUN apt-get install -y \
+    nginx \
+    curl \
     chromium \
     libnss3 \
     libfreetype6 \
@@ -38,6 +36,10 @@ RUN apt-get install -y \
     chromium-driver \
     bash \
     dumb-init
+
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+RUN apt-get install -y nsolid
+RUN nsolid -v
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PLUGIN_DIR=/usr/share/nginx/plugins
@@ -56,6 +58,5 @@ COPY entrypoint.sh /usr/share/nginx/entrypoint.sh
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-
 
 CMD ["/bin/sh", "-c", "chmod +x /usr/share/nginx/entrypoint.sh && /usr/share/nginx/entrypoint.sh"]
