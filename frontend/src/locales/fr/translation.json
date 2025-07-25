@@ -402,7 +402,9 @@
                 "sendByEmail": "Envoyer la facture par email"
             },
             "actions": {
-                "addNew": "Ajouter une nouvelle facture"
+                "addNew": "Ajouter une nouvelle facture",
+                "downloadPdf": "Télécharger le PDF",
+                "downloadXml": "Télécharger le XML"
             },
             "downloadFormats": {
                 "pdf": "PDF standard",
@@ -725,7 +727,8 @@
             "pdfTemplates": "Modèles PDF",
             "emailTemplates": "Modèles d'email",
             "account": "Compte",
-            "dangerZone": "Zone de danger"
+            "dangerZone": "Zone de danger",
+            "plugins": "Plugins"
         },
         "company": {
             "title": "Paramètres de l'entreprise",

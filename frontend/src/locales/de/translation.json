@@ -399,7 +399,9 @@
         "delete": "Rechnung löschen"
       },
       "actions": {
-        "addNew": "Neue Rechnung hinzufügen"
+        "addNew": "Neue Rechnung hinzufügen",
+        "downloadPdf": "PDF herunterladen",
+        "downloadXml": "XML herunterladen"
       },
       "downloadFormats": {
         "pdf": "Standard-PDF",
@@ -705,7 +707,8 @@
       "pdfTemplates": "PDF-Vorlagen",
       "emailTemplates": "E-Mail-Vorlagen",
       "account": "Konto",
-      "dangerZone": "Gefahrenzone"
+      "dangerZone": "Gefahrenzone",
+      "plugins": "Plugins"
     },
     "company": {
       "title": "Unternehmenseinstellungen",
