@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
@@ -14,13 +15,17 @@ import { RequestWithUser } from 'src/types/request';
 
 @Injectable()
 export class LoginRequiredGuard implements CanActivate {
-  private jwks: ReturnType<typeof createRemoteJWKSet>;
+  private jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
   constructor(
     private readonly jwt: JwtService,
     private readonly prisma: PrismaService,
   ) {
-    this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+    try {
+      this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+    } catch (error) {
+      Logger.error('Failed to create JWKS set:', error);
+    }
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -52,6 +57,9 @@ export class LoginRequiredGuard implements CanActivate {
         throw new UnauthorizedException('Invalid JWT payload');
       }
     } catch (err) {
+      if (!this.jwks) {
+        throw new UnauthorizedException('No JWT and the OIDC_JWKS_URI is not set');
+      }
       try {
         const result = await jwtVerify(token, this.jwks, {
           issuer: process.env.OIDC_ISSUER,
