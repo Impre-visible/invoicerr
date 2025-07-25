@@ -401,9 +401,7 @@
                 "sendByEmail": "Send invoice by email"
             },
             "actions": {
-                "addNew": "Add New Invoice",
-                "downloadPdf": "Download PDF",
-                "downloadXml": "Download XML"
+                "addNew": "Add New Invoice"
             },
             "downloadFormats": {
                 "pdf": "Standard PDF",
@@ -1209,7 +1207,9 @@
             "messages": {
                 "loginSuccess": "Successfully signed in",
                 "loginError": "Invalid credentials"
-            }
+            },
+            "oidc": "Sign in with OIDC.",
+            "oidcLink": "OIDC Login"
         },
         "signup": {
             "title": "Create Account",
@@ -1248,7 +1248,9 @@
             },
             "messages": {
                 "accountCreated": "Account created successfully"
-            }
+            },
+            "oidc": "Sign up with OIDC.",
+            "oidcLink": "OIDC Signup"
         }
     },
     "unavailable": {

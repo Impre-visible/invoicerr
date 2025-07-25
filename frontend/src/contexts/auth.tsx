@@ -11,79 +11,36 @@ interface User {
 }
 
 const AuthContext = createContext<{
-    accessToken: string | null;
-    refreshToken: string | null;
     user: User | null;
     loading: boolean;
     logout: () => void;
-    setAccessToken: (t: string | null) => void;
-    setRefreshToken: (t: string | null) => void;
 }>({
-    accessToken: null,
-    refreshToken: null,
     user: null,
     loading: true,
     logout: () => { },
-    setAccessToken: () => { },
-    setRefreshToken: () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [accessToken, setAccessToken_] = useState(localStorage.getItem("accessToken"));
-    const [refreshToken, setRefreshToken_] = useState(localStorage.getItem("refreshToken"));
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const logout = () => {
-        setAccessToken_(null);
-        setRefreshToken_(null);
-        setUser(null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-    };
-
-    const setAccessToken = (t: string | null) => {
-        setAccessToken_(t);
-        if (t) {
-            localStorage.setItem("accessToken", t);
-        } else {
-            localStorage.removeItem("accessToken");
-        }
-    };
-    const setRefreshToken = (t: string | null) => {
-        setRefreshToken_(t);
-        if (t) {
-            localStorage.setItem("refreshToken", t);
-        } else {
-            localStorage.removeItem("refreshToken");
+    const logout = async () => {
+        try {
+            await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/logout`, {
+                method: "POST",
+            });
+            setUser(null);
+        } catch (error) {
+            console.error("Erreur lors de la déconnexion", error);
         }
     };
 
     useEffect(() => {
-        if (accessToken) {
-            localStorage.setItem("accessToken", accessToken);
-        } else {
-            localStorage.removeItem("accessToken");
-        }
-    }, [accessToken]);
-
-    useEffect(() => {
-        if (refreshToken) {
-            localStorage.setItem("refreshToken", refreshToken);
-        } else {
-            localStorage.removeItem("refreshToken");
-        }
-    }, [refreshToken]);
-
-    useEffect(() => {
-        const defaultHeaders: Record<string, string> = {};
-        if (accessToken) defaultHeaders["Authorization"] = `Bearer ${accessToken}`;
-
         async function fetchMe() {
             try {
                 const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/me`, {
-                    method: "GET"
-                }, true, null, setAccessToken);
+                    method: "GET",
+                });
                 if (!res.ok) throw new Error("Non authentifié");
                 const payload = await res.json();
                 setUser(payload);
@@ -94,19 +51,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
         }
         fetchMe();
-    }, [accessToken]);
+    }, []);
 
     const value = useMemo(
         () => ({
-            accessToken,
-            refreshToken,
             user,
             loading,
             logout,
-            setAccessToken,
-            setRefreshToken,
         }),
-        [accessToken, refreshToken, user, loading]
+        [user, loading]
     );
 
     return <AuthContext.Provider value={value}>{loading ? <Loading /> : children}</AuthContext.Provider>;

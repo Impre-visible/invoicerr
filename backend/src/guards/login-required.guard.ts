@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 import { AuthService } from 'src/models/auth/auth.service';
 import { CurrentUser } from 'src/types/user';
@@ -8,65 +14,84 @@ import { RequestWithUser } from 'src/types/request';
 
 @Injectable()
 export class LoginRequiredGuard implements CanActivate {
+  private jwks: ReturnType<typeof createRemoteJWKSet>;
 
-  constructor(private readonly jwt: JwtService, private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly jwt: JwtService,
+    private readonly prisma: PrismaService,
+  ) {
+    this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const response = context.switchToHttp().getResponse();
-    const token = request.headers['authorization'];
+    let authHeader = request.headers['authorization'];
 
-    if (!token || typeof token !== 'string' || !token.startsWith('Bearer ')) {
+    if (!authHeader) {
+      const accessTokenCookie = request.cookies?.['access_token'];
+      if (accessTokenCookie) {
+        authHeader = `Bearer ${accessTokenCookie}`;
+      }
+    }
+
+    if (!authHeader || typeof authHeader !== 'string') {
       throw new UnauthorizedException('Missing or invalid authorization header');
     }
 
-    const accessToken = token.slice(7); // remove "Bearer "
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
 
-    if (!accessToken) {
-      throw new UnauthorizedException('Access token is required');
-    }
+    let payload: { sub: string; email: string; name?: string };
 
     try {
-      let payload: { sub: string, email: string, iat: number, exp: number };
-
-      try {
-        payload = this.jwt.verify<typeof payload>(accessToken, {
-          secret: AuthService.getJWTSecret(),
-        });
-        if (payload && payload.exp < Math.floor(Date.now() / 1000)) {
-          response.setHeader('WWW-Authenticate', 'expired_token');
-          throw new UnauthorizedException('Access token has expired');
-        }
-      } catch (error) {
-        response.setHeader('WWW-Authenticate', 'expired_token');
-        throw new UnauthorizedException('Invalid access token');
-      }
-
-      if (!payload || !payload.sub || !payload.email) {
-        throw new UnauthorizedException('Invalid access token payload');
-      }
-
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-        select: {
-          id: true,
-          firstname: true,
-          lastname: true,
-          email: true,
-        },
+      payload = this.jwt.verify(token, {
+        secret: AuthService.getJWTSecret(),
       });
 
-      if (!user) {
-        throw new UnauthorizedException('User not found');
+      if (!payload.sub || !payload.email) {
+        throw new UnauthorizedException('Invalid JWT payload');
       }
+    } catch (err) {
+      try {
+        const result = await jwtVerify(token, this.jwks, {
+          issuer: process.env.OIDC_ISSUER,
+          audience: process.env.OIDC_CLIENT_ID,
+        });
 
-      request.user = {
-        ...user,
-        accessToken,
-      } as CurrentUser;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid access token');
+        const claims = result.payload;
+        if (!claims.sub || !claims.email) {
+          throw new UnauthorizedException('Invalid OIDC token claims');
+        }
+
+        payload = {
+          sub: claims.sub as string,
+          email: claims.email as string,
+          name: claims.name as string,
+        };
+      } catch (err) {
+        response.setHeader('WWW-Authenticate', 'expired_token');
+        throw new UnauthorizedException('Invalid or expired token');
+      }
     }
+
+    const user = await this.prisma.user.findFirst({
+      where: { email: payload.email },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    request.user = {
+      ...user,
+      accessToken: token,
+    } as CurrentUser;
 
     return true;
   }

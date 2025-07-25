@@ -402,9 +402,7 @@
                 "sendByEmail": "Envoyer la facture par email"
             },
             "actions": {
-                "addNew": "Ajouter une nouvelle facture",
-                "downloadPdf": "Télécharger le PDF",
-                "downloadXml": "Télécharger le XML"
+                "addNew": "Ajouter une nouvelle facture"
             },
             "downloadFormats": {
                 "pdf": "PDF standard",
@@ -1211,7 +1209,9 @@
             "messages": {
                 "loginSuccess": "Connexion réussie",
                 "loginError": "Identifiants invalides"
-            }
+            },
+            "oidc": "Se connecter avec OIDC.",
+            "oidcLink": "Connexion OIDC"
         },
         "signup": {
             "title": "Créer un compte",
@@ -1250,7 +1250,9 @@
             },
             "messages": {
                 "accountCreated": "Compte créé avec succès"
-            }
+            },
+            "oidc": "Créer un compte avec OIDC.",
+            "oidcLink": "Inscription OIDC"
         }
     },
     "unavailable": {

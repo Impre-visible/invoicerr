@@ -19,6 +19,7 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
 
   const res = await fetch(input, {
     ...init,
+    credentials: "include",
     headers: {
       ...(init.headers || {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

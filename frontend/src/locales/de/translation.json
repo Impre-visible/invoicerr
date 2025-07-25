@@ -399,9 +399,7 @@
         "delete": "Rechnung löschen"
       },
       "actions": {
-        "addNew": "Neue Rechnung hinzufügen",
-        "downloadPdf": "PDF herunterladen",
-        "downloadXml": "XML herunterladen"
+        "addNew": "Neue Rechnung hinzufügen"
       },
       "downloadFormats": {
         "pdf": "Standard-PDF",
@@ -1172,7 +1170,9 @@
       "messages": {
         "loginSuccess": "Erfolgreich eingeloggt",
         "loginError": "Ungültige Berechtigungsnachweise"
-      }
+      },
+      "oidc": "Mit OIDC anmelden.",
+      "oidcLink": "OIDC Login"
     },
     "signup": {
       "title": "Konto erstellen",
@@ -1211,7 +1211,9 @@
       },
       "messages": {
         "accountCreated": "Konto erfolgreich erstellt"
-      }
+      },
+      "oidc": "Mit OIDC registrieren.",
+      "oidcLink": "OIDC Registrierung"
     }
   },
   "unavailable": {

@@ -8,11 +8,11 @@ generator client {
 }
 
 model User {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   firstname String
   lastname  String
-  email     String @unique
-  password  String
+  email     String  @unique
+  password  String? // If null, user is authenticated via OIDC
 }
 
 enum Currency {
