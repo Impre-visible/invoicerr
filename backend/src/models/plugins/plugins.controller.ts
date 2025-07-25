@@ -7,6 +7,12 @@ import { PluginsService } from '../plugins/plugins.service';
 export class PluginsController {
     constructor(private readonly pluginsService: PluginsService) { }
 
+    @Get()
+    @LoginRequired()
+    async getPlugins() {
+        return this.pluginsService.getPlugins();
+    }
+
     @Get('formats')
     @LoginRequired()
     async getFormats() {
