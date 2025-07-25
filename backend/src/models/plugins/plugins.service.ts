@@ -11,6 +11,7 @@ export interface PdfFormatInfo {
 }
 
 export interface Plugin {
+  __filepath: string;
   name: string;
   description: string;
   init?: () => void;
@@ -79,6 +80,7 @@ export class PluginsService {
     const plugin: Plugin = new PluginClass();
 
     plugin.init?.();
+    plugin.__filepath = pluginFile;
 
     this.plugins.push(plugin);
     this.logger.log(`Plugin "${plugin.name}" loaded.`);
