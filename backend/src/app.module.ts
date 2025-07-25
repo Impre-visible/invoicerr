@@ -8,6 +8,7 @@ import { DashboardModule } from './models/dashboard/dashboard.module';
 import { InvoicesModule } from './models/invoices/invoices.module';
 import { MailService } from './mail/mail.service';
 import { Module } from '@nestjs/common';
+import { PluginsModule } from './models/plugins/plugins.module';
 import { PrismaService } from './prisma/prisma.service';
 import { QuotesModule } from './models/quotes/quotes.module';
 import { ReceiptsModule } from './models/receipts/receipts.module';
@@ -27,9 +28,11 @@ import { SignaturesModule } from './models/signatures/signatures.module';
     DashboardModule,
     SignaturesModule,
     DangerModule,
+    PluginsModule,
     RecurringInvoicesModule
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, MailService],
 })
-export class AppModule { }
+export class AppModule {
+}
