@@ -14,15 +14,13 @@ type UseGetResult<T> = {
   mutate: () => void;
 };
 
-export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true, accessToken = null, setAccessToken?: (s: string) => any): Promise<Response> {
-  const token = accessToken || localStorage.getItem("accessToken");
+export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true, accessToken = null): Promise<Response> {
 
   const res = await fetch(input, {
     ...init,
     credentials: "include",
     headers: {
-      ...(init.headers || {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init.headers || {})
     },
   });
 
@@ -31,7 +29,6 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
     console.warn("Access token expired, attempting to refresh...");
     let refreshRes: Response;
     refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/refresh`, {
-      body: JSON.stringify({ refreshToken: localStorage.getItem("refreshToken") }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -44,10 +41,8 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
     }
 
     if (refreshRes.ok) {
-      const { access_token } = await refreshRes.json();
-      if (setAccessToken) setAccessToken(access_token);
-      localStorage.setItem("accessToken", access_token);
-      return authenticatedFetch(input, init, false, access_token);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return authenticatedFetch(input, init, false);
     } else {
       throw new Error("Token refresh failed");
     }
