@@ -14,8 +14,7 @@ type UseGetResult<T> = {
   mutate: () => void;
 };
 
-export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true, accessToken = null): Promise<Response> {
-
+export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true): Promise<Response> {
   const res = await fetch(input, {
     ...init,
     credentials: "include",
