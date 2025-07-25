@@ -1170,7 +1170,9 @@
       "messages": {
         "loginSuccess": "Erfolgreich eingeloggt",
         "loginError": "Ungültige Berechtigungsnachweise"
-      }
+      },
+      "oidc": "Mit OIDC anmelden.",
+      "oidcLink": "OIDC Login"
     },
     "signup": {
       "title": "Konto erstellen",
@@ -1209,7 +1211,9 @@
       },
       "messages": {
         "accountCreated": "Konto erfolgreich erstellt"
-      }
+      },
+      "oidc": "Mit OIDC registrieren.",
+      "oidcLink": "OIDC Registrierung"
     }
   },
   "unavailable": {

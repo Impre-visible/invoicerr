@@ -1209,7 +1209,9 @@
             "messages": {
                 "loginSuccess": "Connexion réussie",
                 "loginError": "Identifiants invalides"
-            }
+            },
+            "oidc": "Se connecter avec OIDC.",
+            "oidcLink": "Connexion OIDC"
         },
         "signup": {
             "title": "Créer un compte",
@@ -1248,7 +1250,9 @@
             },
             "messages": {
                 "accountCreated": "Compte créé avec succès"
-            }
+            },
+            "oidc": "Créer un compte avec OIDC.",
+            "oidcLink": "Inscription OIDC"
         }
     },
     "unavailable": {
