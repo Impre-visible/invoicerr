@@ -402,7 +402,9 @@
                 "sendByEmail": "Envoyer la facture par email"
             },
             "actions": {
-                "addNew": "Ajouter une nouvelle facture"
+                "addNew": "Ajouter une nouvelle facture",
+                "downloadPdf": "Télécharger le PDF",
+                "downloadXml": "Télécharger le XML"
             },
             "downloadFormats": {
                 "pdf": "PDF standard",
@@ -725,7 +727,8 @@
             "pdfTemplates": "Modèles PDF",
             "emailTemplates": "Modèles d'email",
             "account": "Compte",
-            "dangerZone": "Zone de danger"
+            "dangerZone": "Zone de danger",
+            "plugins": "Plugins"
         },
         "company": {
             "title": "Paramètres de l'entreprise",
@@ -1041,6 +1044,33 @@
                 "actionError": "Échec de l'action",
                 "actionFailed": "L'action a échoué",
                 "unexpectedError": "Une erreur inattendue s'est produite"
+            }
+        },
+        "plugins": {
+            "title": "Plugins ({{count}})",
+            "description": "Installez et gérez des plugins pour étendre les fonctionnalités de l'application",
+            "add": {
+                "title": "Ajouter un plugin",
+                "description": "Installez un plugin à partir d'un dépôt Git",
+                "gitUrl": {
+                    "label": "URL du dépôt Git",
+                    "placeholder": "https://github.com/username/repo"
+                }
+            },
+            "actions": {
+                "add": "Ajouter",
+                "addLoading": "Ajout en cours...",
+                "delete": "Supprimer",
+                "deleting": "Suppression en cours..."
+            },
+            "emptyState": {
+                "noPlugins": "Aucun plugin n'est installé. Ajoutez un plugin pour étendre les fonctionnalités."
+            },
+            "messages": {
+                "addSuccess": "Plugin ajouté avec succès",
+                "addError": "Erreur lors de l'ajout du plugin",
+                "deleteSuccess": "Plugin supprimé avec succès",
+                "deleteError": "Erreur lors de la suppression du plugin"
             }
         },
         "pdfTemplates": {

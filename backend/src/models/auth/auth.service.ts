@@ -7,7 +7,7 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-const ACCESS_DURATION = '15m';
+const ACCESS_DURATION = '20s';
 const REFRESH_DURATION = '7d';
 
 @Injectable()
@@ -26,7 +26,6 @@ export class AuthService {
     }
 
     async getMe(userId: string) {
-        console.log('Fetching user with ID:', userId);
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -118,7 +117,6 @@ export class AuthService {
     }
 
     async signIn(email: string, password: string) {
-        console.log('Signing in user with email:', email);
         const user = await this.prisma.user.findUnique({ where: { email } });
 
         if (!user || !bcrypt.compareSync(password, user.password || '')) {

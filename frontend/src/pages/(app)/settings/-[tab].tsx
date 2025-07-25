@@ -1,4 +1,4 @@
-import { AlertTriangle, Building2, FileText, Mail, User } from "lucide-react"
+import { AlertTriangle, Building2, FileText, Mail, Plug, User } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useNavigate, useParams } from "react-router"
@@ -8,6 +8,7 @@ import CompanySettings from "./_components/company.settings"
 import DangerZoneSettings from "./_components/danger.settings"
 import EmailTemplatesSettings from "./_components/templates.settings"
 import PDFTemplatesSettings from "./_components/pdf.settings"
+import PluginsSettings from "./_components/plugins.settings"
 import { useTranslation } from "react-i18next"
 
 export default function Settings() {
@@ -15,7 +16,7 @@ export default function Settings() {
     const { tab } = useParams()
     const navigate = useNavigate()
 
-    const validTabs = ["company", "template", "email", "account", "danger"]
+    const validTabs = ["company", "template", "email", "account", "plugins", "danger"]
     const currentTab = validTabs.includes(tab!) ? tab! : "company"
 
     const handleTabChange = (newTab: string) => {
@@ -42,6 +43,11 @@ export default function Settings() {
             value: "account",
             label: t("settings.tabs.account"),
             icon: User,
+        },
+        {
+            value: "plugins",
+            label: t("settings.tabs.plugins"),
+            icon: Plug,
         },
         {
             value: "danger",
@@ -101,6 +107,9 @@ export default function Settings() {
                     </TabsContent>
                     <TabsContent value="account" className="h-full">
                         <AccountSettings />
+                    </TabsContent>
+                    <TabsContent value="plugins" className="h-full">
+                        <PluginsSettings />
                     </TabsContent>
                     <TabsContent value="danger" className="h-full">
                         <DangerZoneSettings />

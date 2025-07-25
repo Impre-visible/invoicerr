@@ -401,7 +401,9 @@
                 "sendByEmail": "Send invoice by email"
             },
             "actions": {
-                "addNew": "Add New Invoice"
+                "addNew": "Add New Invoice",
+                "downloadPdf": "Download PDF",
+                "downloadXml": "Download XML"
             },
             "downloadFormats": {
                 "pdf": "Standard PDF",
@@ -723,7 +725,8 @@
             "pdfTemplates": "PDF Templates",
             "emailTemplates": "Email Templates",
             "account": "Account",
-            "dangerZone": "Danger Zone"
+            "dangerZone": "Danger Zone",
+            "plugins": "Plugins"
         },
         "company": {
             "title": "Company Settings",
@@ -1039,6 +1042,33 @@
                 "actionError": "Failed to complete action",
                 "actionFailed": "Action failed",
                 "unexpectedError": "An unexpected error occurred"
+            }
+        },
+        "plugins": {
+            "title": "Plugins ({{count}})",
+            "description": "Install and manage plugins to extend the application's functionality",
+            "add": {
+                "title": "Add Plugin",
+                "description": "Install a plugin from a Git repository",
+                "gitUrl": {
+                    "label": "Git Repository URL",
+                    "placeholder": "https://github.com/username/repo"
+                }
+            },
+            "actions": {
+                "add": "Add",
+                "addLoading": "Adding...",
+                "delete": "Delete",
+                "deleting": "Deleting..."
+            },
+            "emptyState": {
+                "noPlugins": "No plugins are installed. Add a plugin to extend functionality."
+            },
+            "messages": {
+                "addSuccess": "Plugin added successfully",
+                "addError": "Failed to add plugin",
+                "deleteSuccess": "Plugin deleted successfully",
+                "deleteError": "Failed to delete plugin"
             }
         },
         "pdfTemplates": {

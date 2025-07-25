@@ -399,7 +399,9 @@
         "delete": "Rechnung löschen"
       },
       "actions": {
-        "addNew": "Neue Rechnung hinzufügen"
+        "addNew": "Neue Rechnung hinzufügen",
+        "downloadPdf": "PDF herunterladen",
+        "downloadXml": "XML herunterladen"
       },
       "downloadFormats": {
         "pdf": "Standard-PDF",
@@ -705,7 +707,8 @@
       "pdfTemplates": "PDF-Vorlagen",
       "emailTemplates": "E-Mail-Vorlagen",
       "account": "Konto",
-      "dangerZone": "Gefahrenzone"
+      "dangerZone": "Gefahrenzone",
+      "plugins": "Plugins"
     },
     "company": {
       "title": "Unternehmenseinstellungen",
@@ -1003,6 +1006,33 @@
         "actionError": "Aktion konnte nicht abgeschlossen werden",
         "actionFailed": "Aktion gescheitert",
         "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      }
+    },
+    "plugins": {
+      "title": "Plugins ({{count}})",
+      "description": "Installieren und verwalten Sie Plugins, um die Funktionalität der Anwendung zu erweitern",
+      "add": {
+        "title": "Plugin hinzufügen",
+        "description": "Installieren Sie ein Plugin aus einem Git-Repository",
+        "gitUrl": {
+          "label": "Git-Repository-URL",
+          "placeholder": "https://github.com/benutzername/repo"
+        }
+      },
+      "actions": {
+        "add": "Hinzufügen",
+        "addLoading": "Wird hinzugefügt...",
+        "delete": "Löschen",
+        "deleting": "Wird gelöscht..."
+      },
+      "emptyState": {
+        "noPlugins": "Keine Plugins installiert. Fügen Sie ein Plugin hinzu, um die Funktionalität zu erweitern."
+      },
+      "messages": {
+        "addSuccess": "Plugin erfolgreich hinzugefügt",
+        "addError": "Fehler beim Hinzufügen des Plugins",
+        "deleteSuccess": "Plugin erfolgreich gelöscht",
+        "deleteError": "Fehler beim Löschen des Plugins"
       }
     },
     "pdfTemplates": {
