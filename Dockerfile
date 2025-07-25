@@ -37,8 +37,7 @@ RUN apt-get install -y \
     ttf-freefont \
     chromium-chromedriver \
     bash \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
+    dumb-init
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PLUGIN_DIR=/usr/share/nginx/plugins
