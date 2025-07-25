@@ -35,6 +35,7 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       method: "POST"
     });
 
