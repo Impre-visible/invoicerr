@@ -23,11 +23,13 @@ RUN npm install
 
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:bullseye
 
-RUN apk add --no-cache nodejs npm
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm
 
-RUN apk add --no-cache \
+RUN apt-get install -y \
     chromium \
     nss \
     freetype \
