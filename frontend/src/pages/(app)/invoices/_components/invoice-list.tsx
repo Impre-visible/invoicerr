@@ -2,7 +2,7 @@ import { Banknote, Code, Download, Edit, Eye, FileText, Mail, Plus, ReceiptText,
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
-import { useGetRaw, usePost } from "@/lib/utils"
+import { useGet, useGetRaw, usePost } from "@/lib/utils"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "@/components/ui/button"
@@ -32,12 +32,18 @@ export interface InvoiceListHandle {
     handleAddClick: () => void
 }
 
+interface PluginPdfFormat {
+    format_name: string
+    format_key: string
+}
+
 export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
     (
         { invoices, loading, title, description, page, pageCount, setPage, mutate, emptyState, showCreateButton = false },
         ref,
     ) => {
         const { t } = useTranslation()
+        const { data: pdf_formats } = useGet<PluginPdfFormat[]>('/api/plugins/formats')
         const { trigger: triggerMarkAsPaid } = usePost(`/api/invoices/mark-as-paid`)
         const { trigger: triggerSendInvoiceByEmail } = usePost(`/api/invoices/send`)
         const { trigger: triggerCreateReceipt } = usePost(`/api/receipts/create-from-invoice`)
@@ -50,11 +56,12 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
         const [downloadTrigger, setDownloadTrigger] = useState<{
             invoice: Invoice
             format: string
+            file_format: 'pdf' | 'xml'
             id: number
         } | null>(null)
 
         const { data: file } = useGetRaw<Response>(
-            `/api/invoices/${downloadTrigger?.invoice?.id}/download?format=${downloadTrigger?.format}`,
+            `/api/invoices/${downloadTrigger?.invoice?.id}/download/${downloadTrigger?.file_format}?format=${downloadTrigger?.format}`,
         )
 
         useImperativeHandle(ref, () => ({
@@ -65,14 +72,12 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
 
         useEffect(() => {
             if (downloadTrigger && file) {
-                const fileFormat = (downloadTrigger.format || "pdf-").split('-')[0]
-                const format = (downloadTrigger.format || "pdf-").split('-')[1] || "default"
                 file.arrayBuffer().then((buffer) => {
-                    const blob = new Blob([buffer], { type: `application/${fileFormat}` })
+                    const blob = new Blob([buffer], { type: `application/${downloadTrigger.file_format}` })
                     const url = URL.createObjectURL(blob)
                     const link = document.createElement("a")
                     link.href = url
-                    link.download = `invoice-${downloadTrigger.invoice.number}-${format}.${fileFormat}`
+                    link.download = `invoice-${downloadTrigger.invoice.number}-${downloadTrigger.format}.${downloadTrigger.file_format}`
                     document.body.appendChild(link)
                     link.click()
                     document.body.removeChild(link)
@@ -111,8 +116,8 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                 })
         }
 
-        function handleDownload({ invoice, format }: { invoice: Invoice; format: string }) {
-            setDownloadTrigger({ invoice, format, id: Date.now() })
+        function handleDownload({ invoice, format, file_format }: { invoice: Invoice; format: string; file_format: 'pdf' | 'xml' }) {
+            setDownloadTrigger({ invoice, format, file_format, id: Date.now() })
         }
 
         function handleCreateReceiptFromInvoice(invoiceId: string) {
@@ -285,14 +290,14 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             {t("invoices.list.actions.downloadPdf")}
                                                         </DropdownMenuLabel>
 
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "" })}>Standard</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-facturx" })}>Factur-X</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-zugferd" })}>ZUGFeRD</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-xrechnung" })}>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "", file_format: "pdf" })}>Standard</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "facturx", file_format: "pdf" })}>Factur-X</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "zugferd", file_format: "pdf" })}>ZUGFeRD</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xrechnung", file_format: "pdf" })}>
                                                             XRechnung
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-ubl" })}>UBL</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "pdf-cii" })}>CII</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "ubl", file_format: "pdf" })}>UBL</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "cii", file_format: "pdf" })}>CII</DropdownMenuItem>
 
                                                         <DropdownMenuSeparator />
 
@@ -301,13 +306,29 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             {t("invoices.list.actions.downloadXml")}
                                                         </DropdownMenuLabel>
 
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-facturx" })}>Factur-X</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-zugferd" })}>ZUGFeRD</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-xrechnung" })}>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "facturx", file_format: "xml" })}>
+                                                            Factur-X
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "zugferd", file_format: "xml" })}>
+                                                            ZUGFeRD
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xrechnung", file_format: "xml" })}>
                                                             XRechnung
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-ubl" })}>UBL</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "xml-cii" })}>CII</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "ubl", file_format: "xml" })}>
+                                                            UBL
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDownload({ invoice, format: "cii", file_format: "xml" })}>
+                                                            CII
+                                                        </DropdownMenuItem>
+                                                        {pdf_formats?.map((format) => (
+                                                            <DropdownMenuItem
+                                                                key={format.format_key}
+                                                                onClick={() => handleDownload({ invoice, format: format.format_key, file_format: "xml" })}
+                                                            >
+                                                                {format.format_name}
+                                                            </DropdownMenuItem>
+                                                        ))}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
 
