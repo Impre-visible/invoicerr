@@ -5,10 +5,11 @@ import { LoginRequired } from 'src/decorators/login-required.decorator';
 import { InvoicesService } from './invoices.service';
 import { Response } from 'express';
 import { ExportFormat } from '@fin.cx/einvoice';
+import { PluginsService } from '../plugins/plugins.service';
 
 @Controller('invoices')
 export class InvoicesController {
-    constructor(private readonly invoicesService: InvoicesService) { }
+    constructor(private readonly invoicesService: InvoicesService, private readonly pluginService: PluginsService) { }
 
     @Get()
     @LoginRequired()
@@ -44,37 +45,55 @@ export class InvoicesController {
         res.send(pdfBuffer);
     }
 
-    @Get(':id/download')
+    @Get(':id/download/xml')
     @LoginRequired()
-    async downloadInvoice(@Param('id') id: string, @Query('format') format: string | undefined, @Res() res: Response) {
+    async downloadInvoiceXml(@Param('id') id: string, @Query('format') format: string | ExportFormat, @Res() res: Response) {
         if (id === 'undefined') return res.status(400).send('Invalid invoice ID');
         let fileBuffer: Uint8Array | null = null;
-        let fileFormat = "pdf"
-        if (format === "") {
-            fileBuffer = await this.invoicesService.getInvoicePdf(id);
-        } else if (format) {
-            fileFormat = format.split('-')[0]
-        }
 
-        if (fileFormat === "pdf") {
-            fileBuffer = await this.invoicesService.getInvoicePDFFormat(id, format?.split('-')[1] as ExportFormat);
-        } else if (fileFormat === "xml") {
-            const xmlInvoice = await this.invoicesService.getInvoiceXMLFormat(id);
-            const xmlString = await xmlInvoice.exportXml(format?.split('-')[1] as ExportFormat);
-            fileBuffer = Buffer.from(xmlString, 'utf-8');
+        const xmlInvoice = await this.invoicesService.getInvoiceXMLFormat(id);
+        let xmlString = '';
+        if (this.pluginService.canGenerateXml(format)) {
+            xmlString = await this.pluginService.generateXml(format, xmlInvoice);
+        } else {
+            xmlString = await xmlInvoice.exportXml(format as ExportFormat);
         }
+        fileBuffer = Buffer.from(xmlString, 'utf-8');
 
         if (!fileBuffer) {
             res.status(404).send('Invoice not found or file generation failed');
             return;
         }
         res.set({
-            'Content-Type': `application/${fileFormat}`,
-            'Content-Disposition': `attachment; filename="invoice-${id}.${fileFormat}"`,
+            'Content-Type': `application/xml`,
+            'Content-Disposition': `attachment; filename="invoice-${id}-${format}.xml"`,
             'Content-Length': fileBuffer.length.toString(),
         });
         res.send(fileBuffer);
     }
+
+    @Get(':id/download/pdf')
+    @LoginRequired()
+    async downloadInvoicePdf(@Param('id') id: string, @Query('format') format: ExportFormat | undefined, @Res() res: Response) {
+        if (id === 'undefined') return res.status(400).send('Invalid invoice ID');
+        let pdfBuffer: Uint8Array | null = null;
+        if (format) {
+            pdfBuffer = await this.invoicesService.getInvoicePDFFormat(id, format);
+        } else {
+            pdfBuffer = await this.invoicesService.getInvoicePdf(id);
+        }
+        if (!pdfBuffer) {
+            res.status(404).send('Invoice not found or PDF generation failed');
+            return;
+        }
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="invoice-${id}-${format || 'default'}.pdf"`,
+            'Content-Length': pdfBuffer.length.toString(),
+        });
+        res.send(pdfBuffer);
+    }
+
 
     @Post('create-from-quote')
     @LoginRequired()
