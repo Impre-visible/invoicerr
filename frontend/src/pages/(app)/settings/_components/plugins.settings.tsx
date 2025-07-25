@@ -21,7 +21,7 @@ interface Plugin {
 export default function PluginsSettings() {
     const { t } = useTranslation()
 
-    const { data: plugins, mutate } = useGet("/api/plugins")
+    const { data: plugins, mutate } = useGet<Plugin[]>("/api/plugins")
 
     const { trigger: addPlugin, loading: addLoading } = usePost("/api/plugins")
     const { trigger: deletePlugin, loading: deleteLoading } = useDelete("/api/plugins")
@@ -32,16 +32,19 @@ export default function PluginsSettings() {
     const handleDeletePlugin = async (uuid: string) => {
         setIsDeleting(uuid)
         try {
-            deletePlugin(uuid)
+            deletePlugin({ uuid })
                 .then((response) => {
-                    if (!response.ok) {
+                    if (!response.success) {
                         throw new Error("Failed to delete plugin");
                     }
-                    toast.success(t("plugins.delete.success"));
+                    toast.success(t("settings.plugins.messages.deleteSuccess"));
                     mutate();
                 })
+                .catch((_error) => {
+                    toast.error(t("settings.plugins.messages.deleteError"));
+                });
         } catch (error) {
-            toast.error(t("plugins.delete.error"));
+            toast.error(t("settings.plugins.messages.deleteError"));
         } finally {
             setIsDeleting(null)
         }
@@ -57,24 +60,27 @@ export default function PluginsSettings() {
 
             addPlugin({ gitUrl: cleanUrl })
                 .then((response) => {
-                    if (!response.ok) {
+                    if (!response) {
                         throw new Error("Failed to add plugin");
                     }
-                    toast.success(t("plugins.add.success"));
+                    toast.success(t("settings.plugins.messages.addSuccess"));
                     setGitUrl("")
                     mutate();
                 })
+                .catch((_error) => {
+                    toast.error(t("settings.plugins.messages.addError"));
+                });
         } catch (error) {
-            toast.error(t("plugins.add.error"));
+            toast.error(t("settings.plugins.messages.addError"));
         }
     }
 
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold mb-2">{t("settings.tabs.plugins", { count: plugins?.length || 0 })}</h1>
+                <h1 className="text-2xl font-bold mb-2">{t("settings.plugins.title", { count: plugins?.length || 0 })}</h1>
                 <p className="text-muted-foreground">
-                    {t("settings.tabs.plugins.description")}
+                    {t("settings.plugins.description")}
                 </p>
             </div>
 
@@ -82,27 +88,27 @@ export default function PluginsSettings() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Plus className="h-5 w-5" />
-                        {t("settings.tabs.plugins.add.title")}
+                        {t("settings.plugins.add.title")}
                     </CardTitle>
-                    <CardDescription>{t("settings.tabs.plugins.add.description")}</CardDescription>
+                    <CardDescription>{t("settings.plugins.add.description")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleAddPlugin} className="flex gap-2">
                         <div className="flex-1">
                             <Label htmlFor="git-url" className="sr-only">
-                                {t("settings.tabs.plugins.add.gitUrl.label")}
+                                {t("settings.plugins.add.gitUrl.label")}
                             </Label>
                             <Input
                                 id="git-url"
                                 type="url"
-                                placeholder={t("settings.tabs.plugins.add.gitUrl.placeholder")}
+                                placeholder={t("settings.plugins.add.gitUrl.placeholder")}
                                 value={gitUrl}
                                 onChange={(e) => setGitUrl(e.target.value)}
                                 disabled={addLoading}
                             />
                         </div>
                         <Button type="submit" disabled={addLoading || !gitUrl.trim()}>
-                            {addLoading ? t("settings.tabs.plugins.actions.addLoading") : t("settings.tabs.plugins.actions.add")}
+                            {addLoading ? t("settings.plugins.actions.addLoading") : t("settings.plugins.actions.add")}
                         </Button>
                     </form>
                 </CardContent>
@@ -114,7 +120,7 @@ export default function PluginsSettings() {
                         <CardContent className="flex flex-col items-center justify-center py-8">
                             <GitBranch className="h-12 w-12 text-muted-foreground mb-4" />
                             <p className="text-muted-foreground text-center">
-                                {t("settings.tabs.plugins.emptyState.noPlugins")}
+                                {t("settings.plugins.emptyState.noPlugins")}
                             </p>
                         </CardContent>
                     </Card>
@@ -138,8 +144,8 @@ export default function PluginsSettings() {
                                         <Trash2 className="h-4 w-4" />
                                         <span className="sr-only">
                                             {deleteLoading && isDeleting === plugin.uuid
-                                                ? t("settings.tabs.plugins.actions.deleting")
-                                                : t("settings.tabs.plugins.actions.delete")}
+                                                ? t("settings.plugins.actions.deleting")
+                                                : t("settings.plugins.actions.delete")}
                                         </span>
                                     </Button>
                                 </div>
