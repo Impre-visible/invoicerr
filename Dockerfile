@@ -31,11 +31,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN apt-get install -y \
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ttf-freefont \
-    chromium-chromedriver \
+    libnss3 \
+    libfreetype6 \
+    libharfbuzz0b \
+    fonts-freefont-ttf \
+    chromium-driver \
     bash \
     dumb-init
 
