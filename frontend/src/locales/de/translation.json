@@ -399,9 +399,7 @@
         "delete": "Rechnung löschen"
       },
       "actions": {
-        "addNew": "Neue Rechnung hinzufügen",
-        "downloadPdf": "PDF herunterladen",
-        "downloadXml": "XML herunterladen"
+        "addNew": "Neue Rechnung hinzufügen"
       },
       "downloadFormats": {
         "pdf": "Standard-PDF",

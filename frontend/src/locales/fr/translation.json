@@ -402,9 +402,7 @@
                 "sendByEmail": "Envoyer la facture par email"
             },
             "actions": {
-                "addNew": "Ajouter une nouvelle facture",
-                "downloadPdf": "Télécharger le PDF",
-                "downloadXml": "Télécharger le XML"
+                "addNew": "Ajouter une nouvelle facture"
             },
             "downloadFormats": {
                 "pdf": "PDF standard",

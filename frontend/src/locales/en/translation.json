@@ -401,9 +401,7 @@
                 "sendByEmail": "Send invoice by email"
             },
             "actions": {
-                "addNew": "Add New Invoice",
-                "downloadPdf": "Download PDF",
-                "downloadXml": "Download XML"
+                "addNew": "Add New Invoice"
             },
             "downloadFormats": {
                 "pdf": "Standard PDF",
