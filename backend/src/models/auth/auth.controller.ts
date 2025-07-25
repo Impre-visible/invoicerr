@@ -93,9 +93,9 @@ export class AuthController {
     }
 
     @Post('refresh')
-    async refreshTokens(@Res() res: Response, @Body() body: { refreshToken?: string }) {
-        const refreshToken = body.refreshToken || res.req.cookies['refresh_token'];
-        console.log('Refresh token:', refreshToken);
+    async refreshTokens(@Res() res: Response) {
+        const refreshToken = res.req.cookies['refresh_token'];
+
         if (!refreshToken) {
             throw new UnauthorizedException('Token de rafraîchissement manquant');
         }
