@@ -10,7 +10,11 @@ export class PluginsController {
     @Get()
     @LoginRequired()
     async getPlugins() {
-        return this.pluginsService.getPlugins();
+        return this.pluginsService.getPlugins().map(plugin => ({
+            uuid: plugin.__uuid,
+            name: plugin.name,
+            description: plugin.description
+        }));
     }
 
     @Get('formats')
