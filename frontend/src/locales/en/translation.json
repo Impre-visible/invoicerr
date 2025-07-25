@@ -1044,6 +1044,33 @@
                 "unexpectedError": "An unexpected error occurred"
             }
         },
+        "plugins": {
+            "title": "Plugins ({{count}})",
+            "description": "Install and manage plugins to extend the application's functionality",
+            "add": {
+                "title": "Add Plugin",
+                "description": "Install a plugin from a Git repository",
+                "gitUrl": {
+                    "label": "Git Repository URL",
+                    "placeholder": "https://github.com/username/repo"
+                }
+            },
+            "actions": {
+                "add": "Add",
+                "addLoading": "Adding...",
+                "delete": "Delete",
+                "deleting": "Deleting..."
+            },
+            "emptyState": {
+                "noPlugins": "No plugins are installed. Add a plugin to extend functionality."
+            },
+            "messages": {
+                "addSuccess": "Plugin added successfully",
+                "addError": "Failed to add plugin",
+                "deleteSuccess": "Plugin deleted successfully",
+                "deleteError": "Failed to delete plugin"
+            }
+        },
         "pdfTemplates": {
             "title": "PDF Templates",
             "description": "Customize the appearance of your invoices and quotes",
