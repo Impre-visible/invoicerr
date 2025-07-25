@@ -86,6 +86,7 @@ export class PluginsService {
     while (this.plugins.some((p) => p.__uuid === uuid)) {
       uuid = randomUUID();
     }
+    plugin.__uuid = uuid;
     plugin.__filepath = pluginFile;
 
     this.plugins.push(plugin);
