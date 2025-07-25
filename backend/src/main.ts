@@ -15,6 +15,6 @@ async function bootstrap() {
     res.header('Access-Control-Expose-Headers', 'WWW-Authenticate');
     next();
   })
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
