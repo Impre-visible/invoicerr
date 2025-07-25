@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, rmSync, statSync } from 'fs';
 import { extname, join } from 'path';
 
 import { EInvoice } from '@fin.cx/einvoice';
@@ -66,7 +66,7 @@ export class PluginsService {
 
   async loadPluginFromPath(pluginPath: string): Promise<Plugin> {
     if (pluginPath.startsWith('http')) {
-      pluginPath = await this.cloneRepo(pluginPath, pluginPath.split('/').pop() || 'unknown-plugin');
+      pluginPath = await this.cloneRepo(pluginPath, pluginPath.split('/').pop() || `unknown-plugin-${Date.now()}`);
     }
     const files = readdirSync(pluginPath);
     const jsFile = files.find((f) => extname(f) === '.js');
@@ -112,6 +112,24 @@ export class PluginsService {
 
   getFormats(): PdfFormatInfo[] {
     return this.plugins.map((p) => p.pdf_format_info());
+  }
+
+  async deletePlugin(uuid: string): Promise<boolean> {
+    const index = this.plugins.findIndex((p) => p.__uuid === uuid);
+    if (index === -1) {
+      throw new Error(`Plugin with UUID "${uuid}" not found`);
+    }
+    const plugin = this.plugins[index];
+    this.plugins.splice(index, 1);
+    if (existsSync(plugin.__filepath)) {
+      let pluginDir = plugin.__filepath;
+      pluginDir = join(pluginDir, '..');
+      this.logger.log(`Deleting plugin files at ${pluginDir}`);
+      rmSync(pluginDir, { recursive: true, force: true });
+    }
+    this.logger.log(`Plugin "${plugin.name}" deleted.`);
+
+    return true
   }
 
   canGenerateXml(formatKey: string): boolean {
