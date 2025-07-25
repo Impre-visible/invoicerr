@@ -6,15 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type React from "react"
 import { toast } from "sonner"
-import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
 import { usePost } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 interface LoginResponse {
-    access_token: string
-    refresh_token: string
     user: {
         id: string
         firstname: string
@@ -25,7 +22,6 @@ interface LoginResponse {
 
 export default function LoginPage() {
     const { t } = useTranslation()
-    const { setAccessToken, setRefreshToken } = useAuth()
     const navigate = useNavigate()
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
@@ -66,17 +62,17 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (data && !error && !hasToasted) {
-            setAccessToken(data.access_token)
-            setRefreshToken(data.refresh_token)
             setHasToasted(true)
             setTimeout(() => {
-                navigate("/")
+                console.log("Login successful, redirecting to home")
+                window.location.href = "/"
+                console.log("Data received:", data)
             }, 1000)
             toast.success(t("auth.login.messages.loginSuccess"))
         } else if (error) {
             toast.error(t("auth.login.messages.loginError"))
         }
-    }, [data, error, navigate, setAccessToken, setRefreshToken, t, hasToasted])
+    }, [data, error, navigate, t, hasToasted])
 
     return (
         <div className="min-h-screen flex items-center justify-center">
