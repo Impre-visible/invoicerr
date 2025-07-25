@@ -25,7 +25,7 @@ RUN npm run build
 
 FROM nginx:bookworm
 
-ENV NODE_VERSION=22.2.0
+ENV NODE_VERSION=22.13.1
 
 RUN apt-get update && apt-get install -y \
     curl \
