@@ -3,6 +3,7 @@ import { existsSync, readdirSync, statSync } from 'fs';
 import { extname, join } from 'path';
 
 import { EInvoice } from '@fin.cx/einvoice';
+import { randomUUID } from 'crypto';
 import { simpleGit } from 'simple-git';
 
 export interface PdfFormatInfo {
@@ -11,6 +12,7 @@ export interface PdfFormatInfo {
 }
 
 export interface Plugin {
+  __uuid: string;
   __filepath: string;
   name: string;
   description: string;
@@ -80,6 +82,10 @@ export class PluginsService {
     const plugin: Plugin = new PluginClass();
 
     plugin.init?.();
+    let uuid = randomUUID();
+    while (this.plugins.some((p) => p.__uuid === uuid)) {
+      uuid = randomUUID();
+    }
     plugin.__filepath = pluginFile;
 
     this.plugins.push(plugin);
