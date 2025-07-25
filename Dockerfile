@@ -39,7 +39,7 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
+ENV PLUGIN_DIR=/usr/share/nginx/plugins
 
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 

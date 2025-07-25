@@ -21,7 +21,7 @@ export interface Plugin {
   pdf_format: (invoice: EInvoice) => Promise<string>;
 }
 
-const PLUGIN_DIR = process.env.PLUGIN_DIR || '/home/impre/invoicerr-plugins';
+const PLUGIN_DIR = process.env.PLUGIN_DIR || '/root/invoicerr-plugins';
 
 @Injectable()
 export class PluginsService {
