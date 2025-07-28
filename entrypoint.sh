@@ -11,6 +11,4 @@ while ! nc -z localhost 3000; do
     sleep 1
 done
 
-echo "Backend is up, starting Nginx..."
-
-nginx -g "daemon off;"
+nginx -g "daemon off;" >/dev/null 2>&1
