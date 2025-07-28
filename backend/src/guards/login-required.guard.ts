@@ -33,12 +33,10 @@ export class LoginRequiredGuard implements CanActivate {
     const response = context.switchToHttp().getResponse();
     let authHeader = request.headers['authorization'];
 
-    if (!authHeader) {
-      const accessTokenCookie = request.cookies?.['access_token'];
-      if (accessTokenCookie) {
-        authHeader = `Bearer ${accessTokenCookie}`;
-      }
+    if (!authHeader && request.cookies && request.cookies['access_token']) {
+      authHeader = request.cookies['access_token'];
     }
+
 
     if (!authHeader || typeof authHeader !== 'string') {
       throw new UnauthorizedException('Missing or invalid authorization header');
@@ -54,10 +52,12 @@ export class LoginRequiredGuard implements CanActivate {
       });
 
       if (!payload.sub || !payload.email) {
+        response.setHeader('WWW-Authenticate', 'expired_token');
         throw new UnauthorizedException('Invalid JWT payload');
       }
     } catch (err) {
       if (!this.jwks) {
+        response.setHeader('WWW-Authenticate', 'expired_token');
         throw new UnauthorizedException('No JWT and the OIDC_JWKS_URI is not set');
       }
       try {
@@ -68,6 +68,7 @@ export class LoginRequiredGuard implements CanActivate {
 
         const claims = result.payload;
         if (!claims.sub || !claims.email) {
+          response.setHeader('WWW-Authenticate', 'expired_token');
           throw new UnauthorizedException('Invalid OIDC token claims');
         }
 
