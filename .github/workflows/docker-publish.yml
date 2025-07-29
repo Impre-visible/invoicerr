@@ -3,6 +3,9 @@ name: Publish Docker Image to GitHub Container Registry
 on:
   release:
     types: [ "created" ]
+  push:
+    branches:
+      - test/workflow
 
 jobs:
   build-and-push:
@@ -22,6 +25,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set image tag
+        id: set_tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "IMAGE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+            # Remplacer les slashs par des tirets
+            SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
+            echo "IMAGE_TAG=${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -36,11 +53,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure Docker cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Lowercase repo name
+        run: echo "REPO_NAME_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
