@@ -2,11 +2,11 @@ FROM node:22-bullseye AS backend-builder
 
 WORKDIR /app
 
-COPY backend/ .
-
-RUN rm -rf node_modules package-lock.json
+COPY backend/package*.json ./
 
 RUN npm install
+
+COPY backend/ .
 
 RUN npx prisma generate
 RUN npm run build
@@ -15,11 +15,11 @@ FROM node:22-bullseye AS frontend-builder
 
 WORKDIR /app
 
-COPY frontend/ .
-
-RUN rm -rf node_modules package-lock.json
+COPY frontend/package*.json ./
 
 RUN npm install
+
+COPY frontend/ .
 
 RUN npm run build
 
