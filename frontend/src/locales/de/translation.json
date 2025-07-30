@@ -208,7 +208,7 @@
         "signed": "Unterzeichnet"
       },
       "item": {
-        "title": "Zitat {{Nummer}} {{Titel}}",
+        "title": "Zitat {{number}} {{title}}",
         "client": "Kunde",
         "issued": "Ausgestellt",
         "validUntil": "Gültig bis",
@@ -315,7 +315,7 @@
       }
     },
     "view": {
-      "title": "Zitat {{Nummer}}",
+      "title": "Zitat {{number}}",
       "description": "Alle Details zu diesem Angebot anzeigen.",
       "status": {
         "draft": "Entwurf",
@@ -346,13 +346,13 @@
       }
     },
     "pdf": {
-      "title": "Zitat {{Nummer}} - PDF"
+      "title": "Zitat {{number}} - PDF"
     }
   },
   "invoices": {
     "header": {
       "subtitle": "Verwalten Sie Ihre Rechnungen",
-      "count": "Rechnungen {{count}} Rechnungen {{found}}",
+      "count": "{{count}} Rechnungen {{found}}",
       "found": "gefunden"
     },
     "search": {
@@ -382,7 +382,7 @@
         "paid": "Bezahlt"
       },
       "item": {
-        "title": "Rechnung {{Nummer}} {{Titel}}",
+        "title": "Rechnung {{number}} {{title}}",
         "client": "Kunde",
         "issued": "Ausgestellt",
         "due": ".",
@@ -396,7 +396,9 @@
         "downloadPdf": "PDF herunterladen",
         "edit": "Rechnung bearbeiten",
         "markAsPaid": "Als bezahlt markieren",
-        "delete": "Rechnung löschen"
+        "delete": "Rechnung löschen",
+        "createReceipt": "Create a receipt from this invoice",
+        "sendByEmail": "Send invoice by email"
       },
       "actions": {
         "addNew": "Neue Rechnung hinzufügen",
@@ -413,7 +415,8 @@
       },
       "messages": {
         "markAsPaidSuccess": "Rechnung als erfolgreich bezahlt markiert",
-        "markAsPaidError": "Rechnung konnte nicht als bezahlt markiert werden"
+        "markAsPaidError": "Rechnung konnte nicht als bezahlt markiert werden",
+        "createReceiptSuccess": "Beleg erfolgreich aus Rechnung erstellt"
       }
     },
     "upsert": {
@@ -423,7 +426,7 @@
       },
       "form": {
         "quote": {
-          "label": "Von Zitat",
+          "label": "Von Angebot",
           "placeholder": "Wählen Sie ein Angebot",
           "errors": {
             "required": "Bitte wählen Sie ein Angebot"
@@ -499,7 +502,7 @@
       }
     },
     "view": {
-      "title": "Rechnung {{Rechnungsnummer}}",
+      "title": "Rechnung {{number}}",
       "description": "Alle Details zu dieser Rechnung anzeigen.",
       "status": {
         "sent": "Gesendet",
@@ -532,7 +535,7 @@
       }
     },
     "pdf": {
-      "title": "Rechnung {{Nummer}} - PDF"
+      "title": "Rechnung {{number}} - PDF"
     }
   },
   "recurringInvoices": {
@@ -551,6 +554,21 @@
       "description": "Verwalten Sie Ihre wiederkehrenden Rechnungen und automatisieren Sie die Rechnungsstellung.",
       "actions": {
         "addNew": "Neue wiederkehrende Rechnung hinzufügen"
+      },
+      "item": {
+        "client": "Kunde",
+        "payment": "Zahlungsmethode",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalTTC": "Gesamt (inkl. MwSt.)"
+      },
+      "tooltips": {
+        "view": "Details anzeigen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "messages": {
+        "manual_process_success": "Manueller Prozess erfolgreich gestartet",
+        "manual_process_error": "Fehler beim Starten eines manuellen Prozesses"
       }
     },
     "emptyState": {
@@ -603,8 +621,8 @@
           }
         },
         "count": {
-          "label": "Vorkommnisse",
-          "placeholder": "Anzahl der Vorkommnisse eingeben",
+          "label": "Wiederholungen",
+          "placeholder": "Anzahl der Wiederholungen eingeben",
           "description": "Gesamtzahl der Wiederholungen der Rechnung (leer für unendliche Wiederholungen)"
         },
         "until": {
@@ -660,7 +678,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcomeMessage": "Willkommen zurück, {{Vorname}}!",
+    "welcomeMessage": "Willkommen zurück, {{firstname}}!",
     "revenue": {
       "title": "Überblick über die Einnahmen",
       "description": "Verfolgen Sie Ihre finanzielle Leistung im Laufe der Zeit",
@@ -751,13 +769,13 @@
           }
         },
         "legalId": {
-          "label": "Rechtlicher Ausweis",
-          "placeholder": "Juristische Kennung eingeben",
-          "description": "Die gesetzliche Registrierungsnummer Ihres Unternehmens",
+          "label": "Handelsregister Nr.",
+          "placeholder": "Handelsregister Nr.",
+          "description": "Die gesetzliche Handelsregister Nr. Ihres Unternehmens",
           "errors": {
-            "required": "Ein gültiger Ausweis ist erforderlich",
-            "empty": "Legal ID kann nicht leer sein",
-            "maxLength": "Legal ID muss weniger als 50 Zeichen umfassen"
+            "required": "Eine gültige Handelsregister Nr. ist erforderlich",
+            "empty": "Handelsregister Nr. kann nicht leer sein",
+            "maxLength": "Handelsregister Nr. muss weniger als 50 Zeichen umfassen"
           }
         },
         "vat": {
@@ -868,6 +886,24 @@
             "required": "Das Format der Rechnungsnummer ist erforderlich",
             "maxLength": "Das Format der Rechnungsnummer muss weniger als 100 Zeichen umfassen.",
             "format": "Das Format der Rechnungsnummer ist ungültig. Verwenden Sie {Jahr}, {Monat}, {Tag}, {Zahl} mit optionaler Auffüllung (z. B. {Zahl:4})"
+          }
+        },
+        "receiptStartingNumber": {
+          "label": "Beleg Startnummer",
+          "placeholder": "Startnummer für Beleg eingeben",
+          "description": "Initiale Nummer für die Belegnummerierung",
+          "errors": {
+            "min": "Die Ausgangsnummer des Belegs muss mindestens 1 sein."
+          }
+        },
+        "receiptNumberFormat": {
+          "label": "Format der Belegnummer",
+          "placeholder": "Geben Sie das Format der Belegnummer ein (z. B. BEL-{year}-{number})",
+          "description": "Format für Belegnummern",
+          "errors": {
+            "required": "Format der Belegnummer ist erforderlich",
+            "maxLength": "Das Format der Belegnummer muss weniger als 100 Zeichen umfassen.",
+            "format": "Das Format der Belegnummer ist ungültig. Verwenden Sie {year}, {month}, {day}, {number} mit optionaler Zeichenanzahl (z. B., {number:4})"
           }
         },
         "invoicePDFFormat": {
@@ -1144,7 +1180,7 @@
       },
       "saveButton": "Vorlage speichern",
       "messages": {
-        "saveSuccess": "Vorlage {{Name}} erfolgreich gespeichert",
+        "saveSuccess": "Vorlage {{name}} erfolgreich gespeichert",
         "saveError": "Vorlage konnte nicht gespeichert werden"
       }
     }
@@ -1154,6 +1190,7 @@
       "dashboard": "Dashboard",
       "quotes": "Angebote",
       "invoices": "Rechnungen",
+      "receipts": "Belege",
       "clients": "Kunden",
       "settings": "Einstellungen"
     },
@@ -1163,8 +1200,8 @@
     "menu": "Menü",
     "theme": {
       "toggleTheme": "Thema umschalten",
-      "light": "Licht",
-      "dark": "Dunkelheit",
+      "light": "Hell",
+      "dark": "Dunkel",
       "system": "System"
     },
     "userMenu": {
@@ -1228,7 +1265,7 @@
         "creatingAccount": "Konto erstellen...",
         "createButton": "Konto erstellen"
       },
-      "hasAccount": "Sie haben bereits ein Konto?",
+      "hasAccount": "Haben Sie bereits ein Konto?",
       "signInLink": "Anmelden",
       "errors": {
         "firstnameMinLength": "Der Vorname muss aus mindestens 2 Zeichen bestehen",
@@ -1263,7 +1300,145 @@
       "week": "Woche",
       "month": "Monat",
       "year": "Jahr"
-    }
+    },
+    "valueWithCurrency": "{{amount}}{{currency}}"
   },
-  "noOptions": "Keine Optionen vorhanden. Erstellen Sie einen neuen Kunden."
+  "noOptions": "Keine Optionen vorhanden. Erstellen Sie einen neuen Kunden.",
+  "receipts": {
+    "header": {
+      "subtitle": "Verwalten Sie Ihre Belege",
+      "count": "{{count}} Belege {{found}}",
+      "found": "gefunden"
+    },
+    "search": {
+      "placeholder": "Belege suchen..."
+    },
+    "actions": {
+      "addNew": "Neuen Beleg hinzufügen"
+    },
+    "stats": {
+      "total": "Anzahl Belege",
+      "draft": "Entwurf",
+      "sent": "Gesendet",
+      "signed": "Unterzeichnet"
+    },
+    "emptyState": {
+      "noReceipts": "Noch keine Belege",
+      "noResults": "Keine Belege gefunden",
+      "startAdding": "Beginnen Sie mit der Erstellung Ihres ersten Belegs.",
+      "tryDifferentSearch": "Versuchen Sie, Ihre Suchbegriffe anzupassen."
+    },
+    "list": {
+      "title": "Alle Belege",
+      "description": "Verwalten und betrachten Sie alle Ihre Belege an einem Ort.",
+      "status": {
+        "draft": "Entwurf",
+        "sent": "Gesendet",
+        "signed": "Unterzeichnet"
+      },
+      "item": {
+        "title": "Beleg {{number}}",
+        "client": "Kunde",
+        "issued": "Ausgestellt",
+        "validUntil": "Gültig Bis",
+        "totalHT": "Gesamt (ohne MwSt.)",
+        "totalTTC": "Gesamt (inkl. MwSt.)",
+        "invoice": "Rechnung",
+        "totalItemCount": "Gesamtzahl der Artikel",
+        "totalPaid": "Bezahlte Summe"
+      },
+      "tooltips": {
+        "view": "Beleg ansehen",
+        "viewPdf": "PDF anzeigen",
+        "downloadPdf": "PDF herunterladen",
+        "edit": "Beleg bearbeiten",
+        "sendToClient": "An den Kunden senden",
+        "delete": "Beleg löschen"
+      },
+      "messages": {
+        "emailSent": "Beleg erfolgreich an den Kunden gesendet.",
+        "emailError": "Der Beleg konnte nicht an den Kunden gesendet werden."
+      },
+      "actions": {
+        "addNew": "Neuen Beleg hinzufügen"
+      }
+    },
+    "upsert": {
+      "title": {
+        "edit": "Beleg bearbeiten",
+        "create": "Beleg erstellen"
+      },
+      "form": {
+        "client": {
+          "label": "Kunde",
+          "errors": {
+            "required": "Kunde ist erforderlich."
+          }
+        },
+        "items": {
+          "label": "Artikel",
+          "placeholder": "Posten zum Beleg hinzufügen",
+          "noResults": "Keine Artikel gefunden",
+          "addButton": "Artikel hinzufügen",
+          "description": {
+            "errors": {
+              "required": "Eine Beschreibung ist erforderlich."
+            }
+          },
+          "quantity": {
+            "errors": {
+              "required": "Menge ist erforderlich.",
+              "min": "Die Menge muss mindestens 1 betragen..",
+              "invalid": "Ungültige Menge."
+            }
+          },
+          "unitPrice": {
+            "errors": {
+              "required": "Stückpreis ist erforderlich.",
+              "min": "Stückpreis muss mindestens 0 betragen.",
+              "invalid": "Ungültiger Stückpreis."
+            }
+          },
+          "vatRate": {
+            "errors": {
+              "required": "Der Mehrwertsteuersatz ist erforderlich.",
+              "min": "Der Mehrwertsteuersatz muss mindestens 0 betragen."
+            }
+          }
+        },
+        "invoice": {
+          "label": "Rechnung",
+          "placeholder": "Wählen Sie eine Rechnung",
+          "noResults": "Keine Rechnungen gefunden"
+        },
+        "paymentMethod": {
+          "label": "Zahlungsmethode",
+          "placeholder": "Geben Sie die Zahlungsmethode ein",
+          "description": "Die für die Zahlung verwendete Methode"
+        },
+        "paymentDetails": {
+          "label": "Details zur Bezahlung",
+          "placeholder": "Zahlungsdaten eingeben",
+          "description": "Zusätzliche Informationen über die Zahlung"
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "save": "Änderungen speichern",
+        "create": "Beleg erstellen",
+        "edit": "Beleg bearbeiten"
+      }
+    },
+    "delete": {
+      "title": "Beleg löschen",
+      "description": "Sind Sie sicher, dass Sie diesen Beleg löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "actions": {
+        "cancel": "Abbrechen",
+        "delete": "Löschen"
+      }
+    },
+    "pdf": {
+      "title": "Beleg {{number}} - PDF"
+    }
+  }
 }
