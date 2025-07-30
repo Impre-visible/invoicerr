@@ -7,7 +7,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:5173', process.env.APP_URL || 'http://localhost:5173'],
+    origin: (_origin, callback) => {
+      callback(null, true);
+    }
   });
   app.use(cookieParser());
   app.setGlobalPrefix('api');
