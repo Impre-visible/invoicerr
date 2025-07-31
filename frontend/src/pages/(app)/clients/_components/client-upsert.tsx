@@ -131,7 +131,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-auto">
                     <DialogHeader>
-                        <DialogTitle>{`clients.upsert.title.${isEditing ? "edit" : "create"}`}</DialogTitle>
+                        <DialogTitle>{t(`clients.upsert.title.${isEditing ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">

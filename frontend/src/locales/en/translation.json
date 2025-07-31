@@ -250,7 +250,8 @@
                     "placeholder": "Select a client",
                     "errors": {
                         "required": "Please select a client"
-                    }
+                    },
+                    "noOptions": "No clients available. Please create a client first."
                 },
                 "currency": {
                     "label": "Currency"
@@ -437,7 +438,8 @@
                     "placeholder": "Select a client",
                     "errors": {
                         "required": "Please select a client"
-                    }
+                    },
+                    "noOptions": "No clients available. Please create a client first."
                 },
                 "dueDate": {
                     "label": "Due Date",
@@ -593,7 +595,8 @@
                     "placeholder": "Select a client",
                     "errors": {
                         "required": "Please select a client"
-                    }
+                    },
+                    "noOptions": "No clients available. Please create a client first."
                 },
                 "currency": {
                     "label": "Currency"
