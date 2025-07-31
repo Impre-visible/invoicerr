@@ -7,6 +7,7 @@ services:
       - DATABASE_URL=postgresql://invoicerr:invoicerr@invoicerr_db:5432/invoicerr_db
 
       - APP_URL=https://invoicerr.example.com # Required for email templates, as it redirects to the app
+      - CORS_ORIGINS=http://localhost:5173,https://invoicerr.example.com # Comma-separated list of allowed origins for CORS
 
       # Required for email features
       - SMTP_HOST=smtp-relay.example.com
