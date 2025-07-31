@@ -9,6 +9,9 @@ services:
       - APP_URL=https://invoicerr.example.com # Required for email templates, as it redirects to the app
       - CORS_ORIGINS=http://localhost:5173,https://invoicerr.example.com # Comma-separated list of allowed origins for CORS
 
+      # Set path to internal Chromium browser for PDF generation
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
       # Required for email features
       - SMTP_HOST=smtp-relay.example.com
       - SMTP_USER="username@example.com"
