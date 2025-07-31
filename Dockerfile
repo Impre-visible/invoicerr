@@ -26,6 +26,7 @@ RUN npm run build
 FROM ghcr.io/impre-visible/invoicerr-server-image:latest
 
 ENV PLUGIN_DIR=/usr/share/nginx/plugins
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
