@@ -387,7 +387,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                         <BetterInput
                                                                             {...field}
                                                                             defaultValue={field.value || ""}
-                                                                            postAdornment="$"
+                                                                            postAdornment={form.getValues("currency") || clients?.find(c => c.id === form.getValues("clientId"))?.currency || null}
                                                                             type="number"
                                                                             placeholder={t(
                                                                                 `quotes.upsert.form.items.unitPrice.placeholder`,
