@@ -37,7 +37,7 @@ export default function CreditNotes() {
     const [searchTerm, setSearchTerm] = useState("")
 
     const filteredCreditNotes =
-        creditNotes?.creditNotes.filter(
+        (creditNotes?.creditNotes || []).filter(
             (receipt) =>
                 receipt.invoice?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 receipt.invoice?.client?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,7 +110,7 @@ export default function CreditNotes() {
                                 <FileX className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-2xl font-semibold text-foreground">{creditNotes?.creditNotes.length || 0}</p>
+                                <p className="text-2xl font-semibold text-foreground">{(creditNotes?.creditNotes || []).length || 0}</p>
                                 <p className="text-sm text-primary">{t("credit-notes.stats.total")}</p>
                             </div>
                         </div>
