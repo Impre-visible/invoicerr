@@ -1193,6 +1193,7 @@
             "quotes": "Devis",
             "invoices": "Factures",
             "receipts": "Reçus",
+            "creditNotes": "Avoirs",
             "clients": "Clients",
             "settings": "Paramètres"
         },
@@ -1508,16 +1509,6 @@
                     "amountPaid": {
                         "placeholder": "Montant remboursé"
                     }
-                },
-                "paymentMethod": {
-                    "label": "Méthode de paiement",
-                    "placeholder": "Ex: Virement bancaire, Carte de crédit",
-                    "description": "La méthode utilisée pour effectuer le remboursement"
-                },
-                "paymentDetails": {
-                    "label": "Détails du paiement",
-                    "placeholder": "Ex: Numéro de transaction, Informations de compte",
-                    "description": "Détails supplémentaires sur le remboursement"
                 }
             },
             "actions": {

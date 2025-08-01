@@ -1194,6 +1194,7 @@
             "quotes": "Quotes",
             "invoices": "Invoices",
             "receipts": "Receipts",
+            "creditNotes": "Credit Notes",
             "clients": "Clients",
             "settings": "Settings"
         },
@@ -1510,16 +1511,6 @@
                     "amountPaid": {
                         "placeholder": "Amount refunded"
                     }
-                },
-                "paymentMethod": {
-                    "label": "Payment Method",
-                    "placeholder": "E.g., Bank Transfer, Credit Card",
-                    "description": "The method used to issue the refund"
-                },
-                "paymentDetails": {
-                    "label": "Payment Details",
-                    "placeholder": "E.g., Transaction number, Account information",
-                    "description": "Additional details about the refund"
                 }
             },
             "actions": {
