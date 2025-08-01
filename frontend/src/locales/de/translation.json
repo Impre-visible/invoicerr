@@ -208,7 +208,7 @@
         "signed": "Unterzeichnet"
       },
       "item": {
-        "title": "Zitat {{number}} {{title}}",
+        "title": "Angebot {{number}} {{title}}",
         "client": "Kunde",
         "issued": "Ausgestellt",
         "validUntil": "Gültig bis",
@@ -219,11 +219,11 @@
         "view": "Details zum Angebot anzeigen",
         "viewPdf": "PDF anzeigen",
         "downloadPdf": "PDF herunterladen",
-        "edit": "Zitat bearbeiten",
+        "edit": "Angebot bearbeiten",
         "sendSignature": "Zur Unterschrift senden",
         "resendSignature": "Erneut zur Unterschrift senden",
         "createInvoice": "Rechnung aus Angebot erstellen",
-        "delete": "Zitat löschen"
+        "delete": "Angebot löschen"
       },
       "actions": {
         "addNew": "Neues Angebot hinzufügen"
@@ -238,7 +238,7 @@
     "upsert": {
       "title": {
         "create": "Neues Angebot erstellen",
-        "edit": "Zitat bearbeiten"
+        "edit": "Angebot bearbeiten"
       },
       "form": {
         "title": {
@@ -316,7 +316,7 @@
       }
     },
     "view": {
-      "title": "Zitat {{number}}",
+      "title": "Angebot {{number}}",
       "description": "Alle Details zu diesem Angebot anzeigen.",
       "status": {
         "draft": "Entwurf",
@@ -339,15 +339,15 @@
       }
     },
     "delete": {
-      "title": "Zitat löschen",
-      "description": "Sind Sie sicher, dass Sie dieses Zitat löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "title": "Angebot löschen",
+      "description": "Sind Sie sicher, dass Sie dieses Angebot löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
       "actions": {
         "cancel": "Abbrechen",
-        "delete": "Zitat löschen"
+        "delete": "Angebot löschen"
       }
     },
     "pdf": {
-      "title": "Zitat {{number}} - PDF"
+      "title": "Angebot {{number}} - PDF"
     }
   },
   "invoices": {
@@ -417,7 +417,8 @@
       "messages": {
         "markAsPaidSuccess": "Rechnung als erfolgreich bezahlt markiert",
         "markAsPaidError": "Rechnung konnte nicht als bezahlt markiert werden",
-        "createReceiptSuccess": "Beleg erfolgreich aus Rechnung erstellt"
+        "createReceiptSuccess": "Beleg erfolgreich aus Rechnung erstellt",
+        "sendByEmailSuccess": "Rechnung wurde versandt"
       }
     },
     "upsert": {
@@ -587,7 +588,7 @@
       },
       "form": {
         "quote": {
-          "label": "Von Zitat",
+          "label": "Von Angebot",
           "placeholder": "Wählen Sie ein Angebot"
         },
         "client": {
