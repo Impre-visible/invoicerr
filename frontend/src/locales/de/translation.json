@@ -1444,5 +1444,105 @@
     "pdf": {
       "title": "Beleg {{number}} - PDF"
     }
+  },
+  "credit-notes": {
+    "header": {
+      "subtitle": "Verwalten Sie Ihre Gutschriften",
+      "count": "{{count}} Gutschriften {{found}}",
+      "found": "gefunden"
+    },
+    "search": {
+      "placeholder": "Gutschriften suchen..."
+    },
+    "actions": {
+      "addNew": "Neue Gutschrift hinzufügen"
+    },
+    "stats": {
+      "total": "Gesamtgutschriften"
+    },
+    "emptyState": {
+      "noCreditNotes": "Noch keine Gutschriften",
+      "noResults": "Keine Gutschriften gefunden",
+      "startAdding": "Erstellen Sie Ihre erste Gutschrift.",
+      "tryDifferentSearch": "Versuchen Sie, Ihre Suchbegriffe anzupassen."
+    },
+    "list": {
+      "title": "Alle Gutschriften",
+      "description": "Verwalten und sehen Sie alle Ihre Gutschriften an einem Ort.",
+      "item": {
+        "invoice": "Rechnung",
+        "noInvoice": "Keine Rechnung",
+        "totalItemCount": "Artikelanzahl",
+        "totalPaid": "Gesamterstattung"
+      },
+      "tooltips": {
+        "delete": "Gutschrift löschen",
+        "downloadPdf": "PDF herunterladen",
+        "edit": "Gutschrift bearbeiten",
+        "sendToClient": "An Kunden senden"
+      },
+      "actions": {
+        "addNew": "Neue Gutschrift hinzufügen"
+      },
+      "messages": {
+        "emailError": "E-Mail konnte nicht gesendet werden",
+        "emailSent": "E-Mail erfolgreich gesendet"
+      }
+    },
+    "upsert": {
+      "title": {
+        "edit": "Gutschrift bearbeiten",
+        "create": "Gutschrift erstellen"
+      },
+      "form": {
+        "invoice": {
+          "label": "Rechnung",
+          "placeholder": "Rechnung auswählen",
+          "noResults": "Keine Rechnungen gefunden"
+        },
+        "items": {
+          "label": "Artikel",
+          "placeholder": "Artikel auswählen",
+          "noResults": "Keine Artikel gefunden",
+          "addButton": "Hinzufügen",
+          "description": {
+            "placeholder": "Artikelbeschreibung"
+          },
+          "amountPaid": {
+            "placeholder": "Erstattungsbetrag"
+          },
+          "originalItem": "Original Artikel",
+          "creditNoteItem": "Gutschrift Artikel",
+          "quantity": {
+            "unit": "Stk",
+            "single": "Einheit",
+            "multiple": "Einheiten"
+          },
+          "modification": {
+            "label": "Änderung",
+            "totalDiscount": "Gesamtrabatt von {{total}} auf diesen Artikel",
+            "quantityDiscounted": {
+              "single": "1 Einheit storniert",
+              "multiple": "{{count}} Einheiten storniert"
+            },
+            "priceDiscount": "Rabatt von {{price}} pro {{quantityText}} ({{quantity}})",
+            "combined": "{{quantityDiff}} {{quantityText}} storniert und Rabatt von {{price}} pro Einheit"
+          }
+        }
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "create": "Erstellen"
+      }
+    },
+    "delete": {
+      "title": "Gutschrift löschen",
+      "description": "Sind Sie sicher, dass Sie diese Gutschrift löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "actions": {
+        "cancel": "Abbrechen",
+        "delete": "Löschen"
+      }
+    }
   }
 }
