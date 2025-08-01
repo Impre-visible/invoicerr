@@ -23,9 +23,12 @@ interface CreditNoteUpsertDialogProps {
 }
 
 interface Item {
-    creditNoteId: string
+    invoiceItemId: string
     description: string
-    amountPaid: number
+    quantity: number
+    unitPrice: number
+    vatRate: number
+    amountPaid?: number
 }
 
 export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteUpsertDialogProps) {
@@ -37,9 +40,12 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
     const [selectedItem, setSelectedItem] = useState<InvoiceItem | null>(null)
     const [items, setItems] = useState<Item[]>(creditNote?.items.map(item => ({
-        creditNoteId: item.creditNoteId,
-        description: creditNote.invoice?.items.find(invItem => invItem.id === item.creditNoteId)?.description || "",
-        amountPaid: item.unitPrice * item.quantity * (1 + item.vatRate / 100)
+        invoiceItemId: item.invoiceItemId,
+        description: creditNote.invoice?.items.find(invItem => invItem.id === item.invoiceItemId)?.description || "",
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        vatRate: item.vatRate || 0,
+        amountPaid: item.unitPrice * item.quantity * (1 + (item.vatRate / 100))
     })) || [])
 
     const creditNoteSchema = z.object({
@@ -57,15 +63,19 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
         },
     })
 
+
     useEffect(() => {
         if (isEdit && creditNote) {
             form.reset({
                 invoiceId: creditNote.invoiceId || "",
             })
             setItems(creditNote.items.map(item => ({
-                creditNoteId: item.creditNoteId,
-                description: creditNote.invoice?.items.find(invItem => invItem.id === item.creditNoteId)?.description || "",
-                amountPaid: item.unitPrice * item.quantity * (1 + item.vatRate / 100)
+                invoiceItemId: item.invoiceItemId,
+                description: creditNote.invoice?.items.find(invItem => invItem.id === item.invoiceItemId)?.description || "",
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                vatRate: item.vatRate || 0,
+                amountPaid: item.unitPrice * item.quantity * (1 + (item.vatRate / 100))
             })))
             setSelectedInvoice(creditNote.invoice || null)
             setSelectedItem(null)
@@ -92,7 +102,7 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
         trigger({
             ...data,
             items: items.map(item => ({
-                creditNoteId: item.creditNoteId,
+                invoiceItemId: item.invoiceItemId,
                 invoiceId: selectedInvoice?.id || "",
                 amountPaid: item.amountPaid,
             }))
@@ -107,19 +117,31 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
     const onAddItem = () => {
         if (selectedItem) {
             setItems([...items, {
-                creditNoteId: selectedItem.id,
+                invoiceItemId: selectedItem.id,
                 description: selectedItem.description,
-                amountPaid: selectedItem.unitPrice * selectedItem.quantity
+                quantity: 1,
+                unitPrice: selectedItem.unitPrice || 0,
+                vatRate: selectedItem.vatRate || 0,
+                amountPaid: (selectedItem.unitPrice || 0) * 1 * (1 + (selectedItem.vatRate || 0) / 100)
             }])
         }
     }
 
     const onRemoveItem = (index: number) => {
-        setItems(items.filter((_, i) => i !== index))
+        setItems((items || []).filter((_, i) => i !== index))
     }
 
-    const onEditItem = (index: number, field: keyof Item) => (value: string | number) => {
-        setItems(items.map((item, i) => i === index ? { ...item, [field]: value } : item))
+    const onEditItem = (index: number, field: keyof Item, value: any) => {
+        setItems(items.map((item, i) => {
+            if (i === index) {
+                return {
+                    ...item,
+                    [field]: value,
+                    amountPaid: (item.unitPrice || 0) * (item.quantity || 1) * (1 + (item.vatRate || 0) / 100)
+                }
+            }
+            return item
+        }))
     }
 
     return (
@@ -160,7 +182,7 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                         <FormControl>
                                             <SearchSelect
                                                 options={(selectedInvoice?.items || [])
-                                                    .filter(item => !items.some(i => i.creditNoteId === item.id))
+                                                    .filter(item => !items.some(i => i.invoiceItemId === item.id))
                                                     .map(item => ({ label: item.description, value: item.id }))}
                                                 value={selectedItem?.id || undefined}
                                                 onValueChange={(val) => {
@@ -185,28 +207,66 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                 <div className="flex flex-col gap-2">
                                     {items.map((item, index) => (
                                         <div className="flex gap-2 items-center">
-                                            <FormItem className="flex-1">
+                                            <FormItem>
                                                 <FormControl>
                                                     <BetterInput
-                                                        defaultValue={item.description || ""}
-                                                        placeholder={t("credit-notes.upsert.form.items.description.placeholder")}
-                                                        onChange={(e) => onEditItem(index, "description")(e.target.value)}
+                                                        defaultValue={item.description}
+                                                        placeholder={t(
+                                                            `invoices.upsert.form.items.description.placeholder`,
+                                                        )}
                                                         disabled
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
+
                                             <FormItem>
                                                 <FormControl>
                                                     <BetterInput
-                                                        defaultValue={item.amountPaid || ""}
-                                                        placeholder={t("credit-notes.upsert.form.items.amountPaid.placeholder")}
-                                                        onChange={(e) => onEditItem(index, "amountPaid")(parseFloat(e.target.value))}
+                                                        defaultValue={item.quantity || ""}
+                                                        postAdornment={t(`invoices.upsert.form.items.quantity.unit`)}
                                                         type="number"
-                                                        min={0}
+                                                        placeholder={t(
+                                                            `invoices.upsert.form.items.quantity.placeholder`,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            onEditItem(index, "quantity", e.target.value === "" ? undefined : Number(e.target.value))
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+
+                                            <FormItem>
+                                                <FormControl>
+                                                    <BetterInput
+                                                        defaultValue={item.unitPrice || ""}
+                                                        postAdornment={selectedInvoice?.currency || "€"}
+                                                        type="number"
+                                                        placeholder={t(
+                                                            `invoices.upsert.form.items.unitPrice.placeholder`,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            onEditItem(index, "unitPrice", e.target.value === "" ? undefined : Number(e.target.value.replace(",", ".")))
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+
+                                            <FormItem>
+                                                <FormControl>
+                                                    <BetterInput
+                                                        defaultValue={item.vatRate || ""}
+                                                        postAdornment="%"
+                                                        type="number"
                                                         step="0.01"
-                                                        postAdornment={selectedInvoice?.currency || ""}
-                                                        disabled={!selectedInvoice}
+                                                        placeholder={t(
+                                                            `invoices.upsert.form.items.vatRate.placeholder`,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            onEditItem(index, "vatRate", e.target.value === "" ? undefined : Number(e.target.value.replace(",", ".")))
+                                                        }
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
