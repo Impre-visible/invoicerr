@@ -508,7 +508,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                                                         <BetterInput
                                                                             {...field}
                                                                             defaultValue={field.value || ""}
-                                                                            postAdornment="$"
+                                                                            postAdornment={form.getValues("currency") || clients?.find(c => c.id === form.getValues("clientId"))?.currency || null}
                                                                             type="number"
                                                                             placeholder={t(
                                                                                 "recurringInvoices.upsert.form.items.unitPrice.placeholder",

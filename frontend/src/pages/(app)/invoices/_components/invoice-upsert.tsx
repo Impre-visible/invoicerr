@@ -417,7 +417,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                         <BetterInput
                                                                             {...field}
                                                                             defaultValue={field.value || ""}
-                                                                            postAdornment="$"
+                                                                            postAdornment={form.getValues("currency") || clients?.find(c => c.id === form.getValues("clientId"))?.currency || null}
                                                                             type="number"
                                                                             placeholder={t(
                                                                                 `invoices.upsert.form.items.unitPrice.placeholder`,
