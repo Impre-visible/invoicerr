@@ -10,10 +10,11 @@ export const baseTemplate = `
         .company-info h1 { margin: 0; color: {{primaryColor}}; }
         .receipt-info { text-align: right; }
         .client-info { margin-bottom: 30px; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-    th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }        
-    .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }        
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        .logo { max-height: 80px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
