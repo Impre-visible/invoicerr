@@ -57,6 +57,10 @@ jobs:
       - name: Lowercase repo name
         run: echo "REPO_NAME_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Check Docker cache
+        run: |
+          docker buildx du
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -65,5 +69,5 @@ jobs:
           tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=repository,mode=max
+          cache-to: type=gha,mode=max,scope=repository
