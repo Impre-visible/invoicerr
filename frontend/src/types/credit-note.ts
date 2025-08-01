@@ -1,4 +1,4 @@
-import type { Invoice } from "./invoice";
+import type { Invoice, InvoiceItem } from "./invoice";
 
 export interface CreditNote {
     id: string;
@@ -19,7 +19,10 @@ export interface CreditNote {
 
 export interface CreditNoteItem {
     id: string;
+    invoiceItemId: string;
     creditNoteId: string;
+    invoiceItem?: InvoiceItem; // Reference to the original invoice item
+
     description: string;
     quantity: number;
     unitPrice: number; // Unit price before tax
