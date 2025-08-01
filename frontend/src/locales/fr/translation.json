@@ -1441,5 +1441,98 @@
         "pdf": {
             "title": "Reçu {{number}} - PDF"
         }
+    },
+    "credit-notes": {
+        "header": {
+            "subtitle": "Gérez vos avoirs",
+            "count": "{{count}} avoirs {{found}}",
+            "found": "trouvés"
+        },
+        "search": {
+            "placeholder": "Rechercher des avoirs..."
+        },
+        "actions": {
+            "addNew": "Ajouter un nouvel avoir"
+        },
+        "stats": {
+            "total": "Total des avoirs"
+        },
+        "emptyState": {
+            "noCreditNotes": "Aucun avoir pour le moment",
+            "noResults": "Aucun avoir trouvé",
+            "startAdding": "Commencez par créer votre premier avoir.",
+            "tryDifferentSearch": "Essayez d'ajuster vos termes de recherche."
+        },
+        "list": {
+            "title": "Tous les avoirs",
+            "description": "Gérez et consultez tous vos avoirs en un seul endroit.",
+            "item": {
+                "invoice": "Facture",
+                "noInvoice": "Aucune facture",
+                "totalItemCount": "Nombre d'articles",
+                "totalPaid": "Total remboursé"
+            },
+            "tooltips": {
+                "delete": "Supprimer l'avoir",
+                "downloadPdf": "Télécharger le PDF",
+                "edit": "Modifier l'avoir",
+                "sendToClient": "Envoyer au client"
+            },
+            "actions": {
+                "addNew": "Ajouter un nouvel avoir"
+            },
+            "messages": {
+                "emailError": "Erreur lors de l'envoi de l'email",
+                "emailSent": "Email envoyé avec succès"
+            }
+        },
+        "upsert": {
+            "title": {
+                "edit": "Modifier l'avoir",
+                "create": "Créer un avoir"
+            },
+            "form": {
+                "invoice": {
+                    "label": "Facture",
+                    "placeholder": "Sélectionner une facture",
+                    "noResults": "Aucune facture trouvée"
+                },
+                "items": {
+                    "label": "Articles",
+                    "placeholder": "Sélectionner un article",
+                    "noResults": "Aucun article trouvé",
+                    "addButton": "Ajouter",
+                    "description": {
+                        "placeholder": "Description de l'article"
+                    },
+                    "amountPaid": {
+                        "placeholder": "Montant remboursé"
+                    }
+                },
+                "paymentMethod": {
+                    "label": "Méthode de paiement",
+                    "placeholder": "Ex: Virement bancaire, Carte de crédit",
+                    "description": "La méthode utilisée pour effectuer le remboursement"
+                },
+                "paymentDetails": {
+                    "label": "Détails du paiement",
+                    "placeholder": "Ex: Numéro de transaction, Informations de compte",
+                    "description": "Détails supplémentaires sur le remboursement"
+                }
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "save": "Enregistrer",
+                "create": "Créer"
+            }
+        },
+        "delete": {
+            "title": "Supprimer l'avoir",
+            "description": "Êtes-vous sûr de vouloir supprimer cet avoir ? Cette action ne peut pas être annulée.",
+            "actions": {
+                "cancel": "Annuler",
+                "delete": "Supprimer"
+            }
+        }
     }
 }

@@ -1443,5 +1443,98 @@
         "pdf": {
             "title": "Receipt {{number}} - PDF"
         }
+    },
+    "credit-notes": {
+        "header": {
+            "subtitle": "Manage your credit notes",
+            "count": "{{count}} credit notes {{found}}",
+            "found": "found"
+        },
+        "search": {
+            "placeholder": "Search credit notes..."
+        },
+        "actions": {
+            "addNew": "Add New Credit Note"
+        },
+        "stats": {
+            "total": "Total Credit Notes"
+        },
+        "emptyState": {
+            "noCreditNotes": "No credit notes yet",
+            "noResults": "No credit notes found",
+            "startAdding": "Get started by creating your first credit note.",
+            "tryDifferentSearch": "Try adjusting your search terms."
+        },
+        "list": {
+            "title": "All Credit Notes",
+            "description": "Manage and view all your credit notes in one place.",
+            "item": {
+                "invoice": "Invoice",
+                "noInvoice": "No invoice",
+                "totalItemCount": "Item count",
+                "totalPaid": "Total refunded"
+            },
+            "tooltips": {
+                "delete": "Delete credit note",
+                "downloadPdf": "Download PDF",
+                "edit": "Edit credit note",
+                "sendToClient": "Send to client"
+            },
+            "actions": {
+                "addNew": "Add New Credit Note"
+            },
+            "messages": {
+                "emailError": "Failed to send email",
+                "emailSent": "Email sent successfully"
+            }
+        },
+        "upsert": {
+            "title": {
+                "edit": "Edit Credit Note",
+                "create": "Create Credit Note"
+            },
+            "form": {
+                "invoice": {
+                    "label": "Invoice",
+                    "placeholder": "Select an invoice",
+                    "noResults": "No invoices found"
+                },
+                "items": {
+                    "label": "Items",
+                    "placeholder": "Select an item",
+                    "noResults": "No items found",
+                    "addButton": "Add",
+                    "description": {
+                        "placeholder": "Item description"
+                    },
+                    "amountPaid": {
+                        "placeholder": "Amount refunded"
+                    }
+                },
+                "paymentMethod": {
+                    "label": "Payment Method",
+                    "placeholder": "E.g., Bank Transfer, Credit Card",
+                    "description": "The method used to issue the refund"
+                },
+                "paymentDetails": {
+                    "label": "Payment Details",
+                    "placeholder": "E.g., Transaction number, Account information",
+                    "description": "Additional details about the refund"
+                }
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "save": "Save",
+                "create": "Create"
+            }
+        },
+        "delete": {
+            "title": "Delete Credit Note",
+            "description": "Are you sure you want to delete this credit note? This action cannot be undone.",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete"
+            }
+        }
     }
 }
