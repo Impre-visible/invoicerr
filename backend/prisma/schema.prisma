@@ -269,6 +269,7 @@ enum MailTemplateType {
   VERIFICATION_CODE
   INVOICE
   RECEIPT
+  CREDIT_NOTE
 }
 
 model MailTemplate {
@@ -437,15 +438,16 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id           String        @id @default(uuid())
-  invoice      Invoice       @relation(fields: [invoiceId], references: [id])
-  invoiceId    String
-  description  String
-  quantity     Int
-  unitPrice    Float
-  vatRate      Float // 20 for 20%
-  order        Int
-  receiptItems ReceiptItem[]
+  id             String           @id @default(uuid())
+  invoice        Invoice          @relation(fields: [invoiceId], references: [id])
+  invoiceId      String
+  description    String
+  quantity       Int
+  unitPrice      Float
+  vatRate        Float // 20 for 20%
+  order          Int
+  receiptItems   ReceiptItem[]
+  CreditNoteItem CreditNoteItem[]
 }
 
 model ReceiptItem {
@@ -472,13 +474,15 @@ model Receipt {
 }
 
 model CreditNoteItem {
-  id           String     @id @default(uuid())
-  creditNote   CreditNote @relation(fields: [creditNoteId], references: [id])
-  creditNoteId String
-  description  String
-  quantity     Int
-  unitPrice    Float
-  vatRate      Float // 20 for 20%
+  id            String      @id @default(uuid())
+  invoiceItem   InvoiceItem @relation(fields: [invoiceItemId], references: [id])
+  invoiceItemId String
+  creditNote    CreditNote  @relation(fields: [creditNoteId], references: [id])
+  creditNoteId  String
+  description   String
+  quantity      Int
+  unitPrice     Float
+  vatRate       Float // 20 for 20%
 }
 
 model CreditNote {
