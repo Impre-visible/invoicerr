@@ -433,6 +433,7 @@ model Invoice {
   currency           Currency
   isActive           Boolean           @default(true)
   receipts           Receipt[]
+  CreditNote         CreditNote[]
 }
 
 model InvoiceItem {
@@ -468,6 +469,33 @@ model Receipt {
   paymentDetails String        @default("") // Details for the payment method (e.g., bank account number)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+}
+
+model CreditNoteItem {
+  id           String     @id @default(uuid())
+  creditNote   CreditNote @relation(fields: [creditNoteId], references: [id])
+  creditNoteId String
+  description  String
+  quantity     Int
+  unitPrice    Float
+  vatRate      Float // 20 for 20%
+}
+
+model CreditNote {
+  id                    String           @id @default(uuid())
+  number                Int              @default(autoincrement())
+  rawNumber             String? // Raw number for custom formats (CN-XXXX)
+  reason                String // Reason for the credit note (e.g., "Refund", "Correction", "")
+  invoice               Invoice          @relation(fields: [invoiceId], references: [id])
+  invoiceId             String
+  items                 CreditNoteItem[]
+  taxCredit             Float // Total tax credit amount (calculates as sum of (quantity * unitPrice * vatRate / 100) for all items)
+  totalCredit           Float // Total credit amount (including tax) (calculates as sum of (quantity * unitPrice * (1 + vatRate / 100)) for all items)
+  invoiceAmount         Float // Original invoice amount (calculates as sum of (quantity * unitPrice * (1 + vatRate / 100)) for all invoice items)
+  adjustedInvoiceAmount Float // Adjusted invoice amount after credit note (calculates as invoiceAmount - totalCredit)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  isActive              Boolean          @default(true)
 }
 
 model Signature {
