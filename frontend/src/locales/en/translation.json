@@ -417,7 +417,8 @@
             "messages": {
                 "markAsPaidSuccess": "Invoice marked as paid successfully",
                 "markAsPaidError": "Failed to mark invoice as paid",
-                "createReceiptSuccess": "Receipt created successfully from invoice"
+                "createReceiptSuccess": "Receipt created successfully from invoice",
+                "sendByEmailSuccess": "Invoice has been sent to customer"
             }
         },
         "upsert": {

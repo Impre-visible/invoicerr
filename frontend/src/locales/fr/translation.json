@@ -417,7 +417,8 @@
             "messages": {
                 "markAsPaidSuccess": "Facture marquée comme payée avec succès",
                 "markAsPaidError": "Échec du marquage de la facture comme payée",
-                "createReceiptSuccess": "Reçu créé avec succès à partir de la facture"
+                "createReceiptSuccess": "Reçu créé avec succès à partir de la facture",
+                "sendByEmailSuccess": "La facture a été envoyée au client"
             }
         },
         "upsert": {
