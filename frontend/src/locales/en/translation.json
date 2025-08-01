@@ -1510,6 +1510,23 @@
                     },
                     "amountPaid": {
                         "placeholder": "Amount refunded"
+                    },
+                    "originalItem": "Original Item",
+                    "creditNoteItem": "Credit Note Item",
+                    "quantity": {
+                        "unit": "pcs",
+                        "single": "unit",
+                        "multiple": "units"
+                    },
+                    "modification": {
+                        "label": "Modification",
+                        "totalDiscount": "Total discount of {{total}} on this item",
+                        "quantityDiscounted": {
+                            "single": "1 unit cancelled",
+                            "multiple": "{{count}} units cancelled"
+                        },
+                        "priceDiscount": "Discount of {{price}} per {{quantityText}} ({{quantity}})",
+                        "combined": "{{quantityDiff}} {{quantityText}} cancelled and discount of {{price}} per unit"
                     }
                 }
             },

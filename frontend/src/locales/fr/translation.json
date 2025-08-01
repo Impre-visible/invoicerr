@@ -1508,6 +1508,23 @@
                     },
                     "amountPaid": {
                         "placeholder": "Montant remboursé"
+                    },
+                    "originalItem": "Article original",
+                    "creditNoteItem": "Article d'avoir",
+                    "quantity": {
+                        "unit": "pcs",
+                        "single": "unité",
+                        "multiple": "unités"
+                    },
+                    "modification": {
+                        "label": "Modification",
+                        "totalDiscount": "Remise totale de {{total}} sur cet article",
+                        "quantityDiscounted": {
+                            "single": "1 unité annulée",
+                            "multiple": "{{count}} unités annulées"
+                        },
+                        "priceDiscount": "Remise de {{price}} par {{quantityText}} ({{quantity}})",
+                        "combined": "{{quantityDiff}} {{quantityText}} annulées et remise de {{price}} par unité"
                     }
                 }
             },
