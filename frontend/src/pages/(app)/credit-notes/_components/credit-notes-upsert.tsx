@@ -297,7 +297,6 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                 <div className="flex flex-col gap-4">
                                     {items.map((item, index) => (
                                         <div key={index} className="border rounded-lg p-4">
-                                            {/* Item original */}
                                             <div className="mb-2">
                                                 <h4 className="text-sm font-medium mb-2">{t("credit-notes.upsert.form.items.originalItem")}</h4>
                                                 <div className="grid grid-cols-5 gap-2 items-center">
@@ -349,12 +348,10 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                                 </div>
                                             </div>
 
-                                            {/* Flèche vers le bas */}
                                             <div className="flex justify-center my-2">
                                                 <ArrowDown className="h-4 w-4" />
                                             </div>
 
-                                            {/* Item modifié */}
                                             <div className="mb-2">
                                                 <h4 className="text-sm font-medium mb-2">
                                                     {t("credit-notes.upsert.form.items.creditNoteItem")}
@@ -430,7 +427,6 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                                 </div>
                                             </div>
 
-                                            {/* Texte de modification */}
                                             <div className="mt-3 p-2 rounded text-sm">
                                                 <strong>{t("credit-notes.upsert.form.items.modification.label")}:</strong>{" "}
                                                 {getModificationText(item)}
