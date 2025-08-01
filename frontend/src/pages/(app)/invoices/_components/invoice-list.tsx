@@ -1,4 +1,4 @@
-import { Banknote, Code, Download, Edit, Eye, FileText, Mail, Plus, ReceiptText, Trash2 } from "lucide-react"
+import { Banknote, Code, Download, Edit, Eye, FileText, FileX, Mail, Plus, Receipt, ReceiptText, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
@@ -387,7 +387,17 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                     onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
                                                     className="text-gray-600 hover:text-green-600"
                                                 >
-                                                    <Plus className="h-4 w-4" />
+                                                    <Receipt className="h-4 w-4" />
+                                                </Button>
+
+                                                <Button
+                                                    tooltip={t("invoices.list.tooltips.createCreditNote")}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleCreateReceiptFromInvoice(invoice.id)}
+                                                    className="text-gray-600 hover:text-green-600"
+                                                >
+                                                    <FileX className="h-4 w-4" />
                                                 </Button>
                                             </div>
                                         </div>
