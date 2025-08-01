@@ -2,14 +2,13 @@
 
 import type { CreditNote, Invoice, InvoiceItem } from "@/types"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useEffect, useState } from "react"
 import { useGet, usePatch, usePost } from "@/lib/utils"
 
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
 import { ClientUpsert } from "../../clients/_components/client-upsert"
-import { Input } from "@/components/ui/input"
 import SearchSelect from "@/components/search-input"
 import { Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -44,9 +43,7 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
     })) || [])
 
     const creditNoteSchema = z.object({
-        invoiceId: z.string().optional(),
-        paymentMethod: z.string().optional(),
-        paymentDetails: z.string().optional()
+        invoiceId: z.string().optional()
     })
 
     const { data: invoices } = useGet<Invoice[]>(`/api/invoices/search?query=${searchTerm}`)
@@ -74,9 +71,7 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
             setSelectedItem(null)
         } else {
             form.reset({
-                invoiceId: "",
-                paymentMethod: "",
-                paymentDetails: ""
+                invoiceId: ""
             })
             setItems([])
         }
@@ -156,51 +151,6 @@ export function CreditNoteUpsert({ creditNote, open, onOpenChange }: CreditNoteU
                                     </FormItem>
                                 )}
                             />
-
-                            <section className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="paymentMethod"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("credit-notes.upsert.form.paymentMethod.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("credit-notes.upsert.form.paymentMethod.placeholder")}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("credit-notes.upsert.form.paymentMethod.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="paymentDetails"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("credit-notes.upsert.form.paymentDetails.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("credit-notes.upsert.form.paymentDetails.placeholder")}
-                                                    className="max-h-40"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("credit-notes.upsert.form.paymentDetails.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </section>
-
-
 
                             <FormItem className="flex flex-col gap-2 mt-2">
                                 <FormLabel className="mb-0">{t("credit-notes.upsert.form.items.label")}</FormLabel>
