@@ -1,4 +1,5 @@
 import * as cookieParser from 'cookie-parser';
+import * as bodyParser from 'body-parser';
 
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
@@ -11,10 +12,11 @@ async function bootstrap() {
   });
   app.use(cookieParser());
   app.setGlobalPrefix('api');
+  app.use(bodyParser.json({ limit: '1mb' }));
   app.use((_req, res, next) => {
     res.header('Access-Control-Expose-Headers', 'WWW-Authenticate');
     next();
-  })
+  });
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

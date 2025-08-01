@@ -250,7 +250,8 @@
           "placeholder": "Wählen Sie einen Kunden",
           "errors": {
             "required": "Bitte wählen Sie einen Kunden"
-          }
+          },
+          "noOptions": "Keine Kunden verfügbar. Bitte erstellen Sie zuerst einen Kunden."
         },
         "currency": {
           "label": "Währung"
@@ -260,7 +261,7 @@
           "placeholder": "Verfallsdatum auswählen"
         },
         "items": {
-          "label": "Artikel zitieren",
+          "label": "Artikel hinzufügen",
           "addItem": "Artikel hinzufügen",
           "description": {
             "placeholder": "Beschreibung des Artikels",
@@ -437,7 +438,8 @@
           "placeholder": "Wählen Sie einen Kunden",
           "errors": {
             "required": "Bitte wählen Sie einen Kunden"
-          }
+          },
+          "noOptions": "Keine Kunden verfügbar. Bitte erstellen Sie zuerst einen Kunden."
         },
         "dueDate": {
           "label": "Fälligkeitsdatum",
@@ -593,7 +595,8 @@
           "placeholder": "Wählen Sie einen Kunden",
           "errors": {
             "required": "Bitte wählen Sie einen Kunden"
-          }
+          },
+          "noOptions": "Keine Kunden verfügbar. Bitte erstellen Sie zuerst einen Kunden."
         },
         "currency": {
           "label": "Währung"
