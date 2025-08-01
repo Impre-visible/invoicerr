@@ -2,6 +2,7 @@ import {
     Building2,
     ChevronsUpDown,
     FileText,
+    FileX,
     LayoutDashboard,
     LogOut,
     Moon,
@@ -70,6 +71,11 @@ export function Sidebar() {
             title: t("sidebar.navigation.receipts"),
             icon: <Receipt className="w-4 h-4" />,
             url: "/receipts",
+        },
+        {
+            title: t("sidebar.navigation.creditNotes"),
+            icon: <FileX className="w-4 h-4" />,
+            url: "/credit-notes",
         },
         {
             title: t("sidebar.navigation.clients"),
