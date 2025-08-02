@@ -40,10 +40,13 @@ jobs:
             echo "IMAGE_TAGS=ghcr.io/${REPO_NAME_LOWER}:latest" >> $GITHUB_ENV
           fi
 
-      - name: Change Github Ref if in a tag
+      - name: Set CACHE_REF based on Git ref
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "GITHUB_REF='release'" >> $GITHUB_ENV
+            echo "CACHE_REF=release" >> $GITHUB_ENV
+          else
+            # Extrait le nom de la branche
+            echo "CACHE_REF=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
           fi
 
       - name: Extract metadata
@@ -77,5 +80,5 @@ jobs:
           tags: ${{ env.IMAGE_TAGS }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha,scope=repository,mode=max
-          cache-to: type=gha,mode=max,scope=repository
+          cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
