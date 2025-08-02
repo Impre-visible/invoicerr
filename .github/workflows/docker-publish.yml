@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
