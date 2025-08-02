@@ -24,16 +24,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set image tag
+      - name: Set image tags
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "IMAGE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+            TAG=${GITHUB_REF#refs/tags/}
+            echo "IMAGE_TAGS=ghcr.io/${{ github.repository }}:${TAG},ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
           elif [[ "${GITHUB_REF}" == refs/heads/* ]]; then
             BRANCH_NAME=${GITHUB_REF#refs/heads/}
             SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
-            echo "IMAGE_TAG=${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
+            echo "IMAGE_TAGS=ghcr.io/${{ github.repository }}:${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
           else
-            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+            echo "IMAGE_TAGS=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
           fi
 
       - name: Extract metadata
@@ -66,7 +67,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.IMAGE_TAGS }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha,scope=repository,mode=max
