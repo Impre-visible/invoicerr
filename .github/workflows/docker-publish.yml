@@ -40,6 +40,12 @@ jobs:
             echo "IMAGE_TAGS=ghcr.io/${REPO_NAME_LOWER}:latest" >> $GITHUB_ENV
           fi
 
+      - name: Change Github Ref if in a tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "GITHUB_REF='release'" >> $GITHUB_ENV
+          fi
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
