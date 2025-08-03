@@ -45,9 +45,7 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "CACHE_REF=release" >> $GITHUB_ENV
           else
-            BRANCH_NAME=${GITHUB_REF#refs/heads/}
-            SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
-            echo "CACHE_REF=${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
+            echo "CACHE_REF=test_cache" >> $GITHUB_ENV
           fi
 
       - name: Extract metadata
