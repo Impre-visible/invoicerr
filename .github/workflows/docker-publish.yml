@@ -92,8 +92,12 @@ jobs:
           tags: ${{ env.IMAGE_TAGS }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
+          cache-from: |
+            type=gha,scope=${{ env.CACHE_REF }}
+            type=registry,ref=ghcr.io/${{ env.REPO_NAME_LOWER }}:cache-${{ env.CACHE_REF }}
+          cache-to: |
+            type=gha,mode=max,scope=${{ env.CACHE_REF }}
+            type=registry,ref=ghcr.io/${{ env.REPO_NAME_LOWER }}:cache-${{ env.CACHE_REF }},mode=max
 
       - name: Display build summary
         run: |
