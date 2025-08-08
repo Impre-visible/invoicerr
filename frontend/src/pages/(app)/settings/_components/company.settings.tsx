@@ -21,7 +21,7 @@ export default function CompanySettings() {
     const { t } = useTranslation()
     const navigate = useNavigate()
 
-    const ALLOWED_DATE_FORMATS = ['dd/LL/yyyy', 'LL/dd/yyyy', 'yyyy/LL/dd', 'dd.LL.yyyy', 'dd-LL-yyyy', 'yyyy-LL-dd', 'EEEE, dd MMM yyyy'];
+    const ALLOWED_DATE_FORMATS = ['dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'dd-MM-yyyy', 'yyyy-MM-dd', 'EEEE, dd MMM yyyy'];
 
     const validateNumberFormat = (pattern: string): boolean => {
         const patternRegex = /\{(\w+)(?::(\d+))?\}/g
