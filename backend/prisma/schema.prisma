@@ -214,7 +214,7 @@ model Company {
 
   invoicePDFFormat String @default("facturx") // Ex: 'pdf' | 'facturx' | 'zugferd' | 'xrechnung' | 'ubl' | 'cii'
 
-  dateFormat String @default("dd/LL/yyyy") // Date format for quotes and invoices
+  dateFormat String @default("dd/MM/yyyy") // Date format for quotes and invoices
 
   pDFConfigId      String             @unique
   pdfConfig        PDFConfig          @relation(fields: [pDFConfigId], references: [id])
