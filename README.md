@@ -1,10 +1,15 @@
 # Invoicerr
 
-[![wakatime](https://wakatime.com/badge/user/4cf4132a-4ced-411d-b714-67bdbdc84527/project/2f27011d-6794-4fbe-97c9-9fdef2550fc7.svg?style=flat)](https://wakatime.com/badge/user/4cf4132a-4ced-411d-b714-67bdbdc84527/project/2f27011d-6794-4fbe-97c9-9fdef2550fc7)
 
 Invoicerr is a simple, open-source invoicing application designed to help freelancers manage their quotes and invoices efficiently. It provides a clean interface for creating, sending, and tracking quotes and invoices — so you get paid faster, with less hassle.
 
 ![Dashboard Page](https://github.com/user-attachments/assets/18e8af88-cf02-4e35-975a-d57f58d062c6)
+
+<section>
+<img src="https://wakatime.com/badge/user/4cf4132a-4ced-411d-b714-67bdbdc84527/project/2f27011d-6794-4fbe-97c9-9fdef2550fc7.svg?style=flat">
+<img src="https://m3-markdown-badges.vercel.app/stars/12/1/Impre-visible/invoicerr">
+<img src="https://m3-markdown-badges.vercel.app/issues/12/1/Impre-visible/invoicerr">
+</section>
 
 ## ✨ Features
 
@@ -162,3 +167,21 @@ Make sure port 80 is available on your host machine, or change the mapping.
 ![Settings Page](https://github.com/user-attachments/assets/b8913f41-109a-4e31-a1b8-3c46a1039414)
 
 </details>
+
+## 🧰 Technologies
+
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/React/react1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/NestJS/nestjs1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/TypeScript/typescript1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Prisma/prisma1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/SQLite/sqlite1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/PostgreSQL/postgresql1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/TailwindCSS/tailwindcss1.svg"/>
+- <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Docker/docker1.svg"/>
+
+## ⚖️ License
+
+This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0).
+See the [LICENSE](./LICENSE) file for more details.
+
+<img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv31.svg" />
