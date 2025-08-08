@@ -1,5 +1,7 @@
 # Invoicerr
 
+[![wakatime](https://wakatime.com/badge/user/4cf4132a-4ced-411d-b714-67bdbdc84527/project/2f27011d-6794-4fbe-97c9-9fdef2550fc7.svg?style=flat)](https://wakatime.com/badge/user/4cf4132a-4ced-411d-b714-67bdbdc84527/project/2f27011d-6794-4fbe-97c9-9fdef2550fc7)
+
 Invoicerr is a simple, open-source invoicing application designed to help freelancers manage their quotes and invoices efficiently. It provides a clean interface for creating, sending, and tracking quotes and invoices — so you get paid faster, with less hassle.
 
 ![Dashboard Page](https://github.com/user-attachments/assets/18e8af88-cf02-4e35-975a-d57f58d062c6)
@@ -12,14 +14,15 @@ Invoicerr is a simple, open-source invoicing application designed to help freela
 - Track status of quotes and invoices (signed, paid, unread, etc.)  
 - Built-in quote signing system with secure tokens  
 - Generate and send quote/invoice emails directly from the app
-- Generate clean PDF documents (quotes and invoices)  
+- Generate clean PDF documents (quotes, invoices, receipts, and more)  
 - Custom brand identity: logo, company name, VAT, and more  
-- Authentication via JWT (stored in local storage)  
+- Authentication via JWT or OIDC (stored in cookies)
 - International-friendly: Default English UI, customizable currencies  
 - SQLite database for quick local setup  
 - Docker & docker-compose ready for self-hosting  
 - Built with modern stack: React, NestJS, Prisma, SQLite/PostgreSQL  
-- REST API backend, ready for future integrations
+- REST API backend, ready for future integrations (mobile & desktop apps)
+- Plugin system for community-made features
 
 ---
 
