@@ -1,14 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { Cron } from '@nestjs/schedule';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { InvoicesService } from '../invoices/invoices.service';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RecurringInvoicesCronService {
     private readonly logger = new Logger(RecurringInvoicesCronService.name);
 
     constructor(
-        private readonly prisma: PrismaService,
         private readonly invoicesService: InvoicesService,
     ) { }
 
@@ -24,9 +24,9 @@ export class RecurringInvoicesCronService {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Normaliser à minuit
 
-            this.logger.log('Recurring invoices fetched from database:', await this.prisma.recurringInvoice.findMany());
+            this.logger.log('Recurring invoices fetched from database:', await prisma.recurringInvoice.findMany());
 
-            const recurringInvoices = await this.prisma.recurringInvoice.findMany({
+            const recurringInvoices = await prisma.recurringInvoice.findMany({
                 where: {
                     nextInvoiceDate: {
                         lte: today,
@@ -48,7 +48,7 @@ export class RecurringInvoicesCronService {
             for (const recurringInvoice of recurringInvoices) {
                 try {
                     if (recurringInvoice.count) {
-                        const generatedCount = await this.prisma.invoice.count({
+                        const generatedCount = await prisma.invoice.count({
                             where: {
                                 recurringInvoiceId: recurringInvoice.id,
                             },
@@ -89,7 +89,7 @@ export class RecurringInvoicesCronService {
                         recurringInvoice.frequency
                     );
 
-                    await this.prisma.recurringInvoice.update({
+                    await prisma.recurringInvoice.update({
                         where: { id: recurringInvoice.id },
                         data: {
                             nextInvoiceDate,

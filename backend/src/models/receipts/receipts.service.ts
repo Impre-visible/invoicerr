@@ -5,26 +5,26 @@ import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
 import { getInvertColor, getPDF } from 'src/utils/pdf';
 
 import { MailService } from 'src/mail/mail.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { formatDate } from 'src/utils/date';
+import prisma from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ReceiptsService {
-    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) { }
+    constructor(private readonly mailService: MailService) { }
 
     async getReceipts(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
         const pageSize = 10;
         const skip = (pageNumber - 1) * pageSize;
-        const company = await this.prisma.company.findFirst();
+        const company = await prisma.company.findFirst();
 
         if (!company) {
             throw new BadRequestException('No company found. Please create a company first.');
         }
 
-        const receipts = await this.prisma.receipt.findMany({
+        const receipts = await prisma.receipt.findMany({
             skip,
             take: pageSize,
             orderBy: {
@@ -42,14 +42,14 @@ export class ReceiptsService {
             },
         });
 
-        const totalReceipts = await this.prisma.receipt.count();
+        const totalReceipts = await prisma.receipt.count();
 
         return { pageCount: Math.ceil(totalReceipts / pageSize), receipts };
     }
 
     async searchReceipts(query: string) {
         if (!query) {
-            return this.prisma.receipt.findMany({
+            return prisma.receipt.findMany({
                 take: 10,
                 orderBy: {
                     number: 'asc',
@@ -66,7 +66,7 @@ export class ReceiptsService {
             });
         }
 
-        return this.prisma.receipt.findMany({
+        return prisma.receipt.findMany({
             where: {
                 OR: [
                     { invoice: { quote: { title: { contains: query } } } },
@@ -90,7 +90,7 @@ export class ReceiptsService {
     }
 
     private async checkInvoiceAfterReceipt(invoiceId: string) {
-        const invoice = await this.prisma.invoice.findUnique({
+        const invoice = await prisma.invoice.findUnique({
             where: { id: invoiceId }
         });
 
@@ -99,19 +99,19 @@ export class ReceiptsService {
         }
 
         if (invoice.status === 'UNPAID') {
-            const receipts = await this.prisma.receipt.findMany({
+            const receipts = await prisma.receipt.findMany({
                 where: { invoiceId },
                 select: { totalPaid: true },
             });
 
             const totalPaid = receipts.reduce((sum, receipt) => sum + receipt.totalPaid, 0);
             if (totalPaid >= invoice.totalTTC) {
-                await this.prisma.invoice.update({
+                await prisma.invoice.update({
                     where: { id: invoiceId },
                     data: { status: 'PAID' },
                 });
             } else {
-                await this.prisma.invoice.update({
+                await prisma.invoice.update({
                     where: { id: invoiceId },
                     data: { status: 'UNPAID' },
                 });
@@ -120,7 +120,7 @@ export class ReceiptsService {
     }
 
     async createReceipt(body: CreateReceiptDto) {
-        const invoice = await this.prisma.invoice.findUnique({
+        const invoice = await prisma.invoice.findUnique({
             where: { id: body.invoiceId },
             include: {
                 company: true,
@@ -133,7 +133,7 @@ export class ReceiptsService {
             throw new BadRequestException('Invoice not found');
         }
 
-        const receipt = await this.prisma.receipt.create({
+        const receipt = await prisma.receipt.create({
             data: {
                 invoiceId: body.invoiceId,
                 items: {
@@ -155,7 +155,7 @@ export class ReceiptsService {
     }
 
     async createReceiptFromInvoice(invoiceId: string) {
-        const invoice = await this.prisma.invoice.findUnique({
+        const invoice = await prisma.invoice.findUnique({
             where: { id: invoiceId },
             include: {
                 items: true
@@ -177,7 +177,7 @@ export class ReceiptsService {
     }
 
     async editReceipt(body: EditReceiptDto) {
-        const existingReceipt = await this.prisma.receipt.findUnique({
+        const existingReceipt = await prisma.receipt.findUnique({
             where: { id: body.id },
             include: {
                 items: true,
@@ -190,7 +190,7 @@ export class ReceiptsService {
 
         console.log('Editing receipt:', body)
 
-        const updatedReceipt = await this.prisma.receipt.update({
+        const updatedReceipt = await prisma.receipt.update({
             where: { id: existingReceipt.id },
             data: {
                 items: {
@@ -218,17 +218,17 @@ export class ReceiptsService {
     }
 
     async deleteReceipt(id: string) {
-        const existingReceipt = await this.prisma.receipt.findUnique({ where: { id } });
+        const existingReceipt = await prisma.receipt.findUnique({ where: { id } });
 
         if (!existingReceipt) {
             throw new BadRequestException('Receipt not found');
         }
 
-        await this.prisma.receiptItem.deleteMany({
+        await prisma.receiptItem.deleteMany({
             where: { receiptId: id },
         });
 
-        await this.prisma.receipt.delete({
+        await prisma.receipt.delete({
             where: { id },
         });
 
@@ -238,7 +238,7 @@ export class ReceiptsService {
     }
 
     async getReceiptPdf(receiptId: string): Promise<Uint8Array> {
-        const receipt = await this.prisma.receipt.findUnique({
+        const receipt = await prisma.receipt.findUnique({
             where: { id: receiptId },
             include: {
                 items: true,
@@ -303,7 +303,7 @@ export class ReceiptsService {
 
 
     async sendReceiptByEmail(id: string) {
-        const receipt = await this.prisma.receipt.findUnique({
+        const receipt = await prisma.receipt.findUnique({
             where: { id },
             include: {
                 invoice: {
@@ -321,7 +321,7 @@ export class ReceiptsService {
 
         const pdfBuffer = await this.getReceiptPdf(id);
 
-        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+        const mailTemplate = await prisma.mailTemplate.findFirst({
             where: { type: 'RECEIPT' },
             select: { subject: true, body: true }
         });

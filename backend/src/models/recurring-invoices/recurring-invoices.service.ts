@@ -1,19 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { Currency } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { UpsertInvoicesDto } from './dto/invoices.dto';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RecurringInvoicesService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor() { }
 
     async getRecurringInvoices(page: string = "1") {
         const pageNumber = parseInt(page, 10) || 1;
         const pageSize = 10;
         const skip = (pageNumber - 1) * pageSize;
 
-        const recurringInvoices = await this.prisma.recurringInvoice.findMany({
+        const recurringInvoices = await prisma.recurringInvoice.findMany({
             skip,
             take: pageSize,
             include: {
@@ -23,7 +23,7 @@ export class RecurringInvoicesService {
             },
         });
 
-        const totalCount = await this.prisma.recurringInvoice.count();
+        const totalCount = await prisma.recurringInvoice.count();
 
         return {
             data: recurringInvoices,
@@ -55,10 +55,10 @@ export class RecurringInvoicesService {
 
         const nextInvoiceDate = this.calculateNextInvoiceDate(nextMonday, data.frequency);
 
-        const recurringInvoice = await this.prisma.recurringInvoice.create({
+        const recurringInvoice = await prisma.recurringInvoice.create({
             data: {
                 clientId: data.clientId,
-                companyId: (await this.prisma.company.findFirst())?.id || "1",
+                companyId: (await prisma.company.findFirst())?.id || "1",
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
                 paymentDetails: data.paymentDetails,
@@ -106,7 +106,7 @@ export class RecurringInvoicesService {
         totalTTC = totalHT + totalVAT;
 
         // Update recurring invoice
-        const recurringInvoice = await this.prisma.recurringInvoice.update({
+        const recurringInvoice = await prisma.recurringInvoice.update({
             where: { id },
             data: {
                 notes: data.notes,
@@ -143,7 +143,7 @@ export class RecurringInvoicesService {
     }
 
     async getRecurringInvoice(id: string) {
-        const recurringInvoice = await this.prisma.recurringInvoice.findUnique({
+        const recurringInvoice = await prisma.recurringInvoice.findUnique({
             where: { id },
             include: {
                 client: true,
@@ -160,7 +160,7 @@ export class RecurringInvoicesService {
     }
 
     async deleteRecurringInvoice(id: string) {
-        const existingRecurringInvoice = await this.prisma.recurringInvoice.findUnique({
+        const existingRecurringInvoice = await prisma.recurringInvoice.findUnique({
             where: { id }
         });
 
@@ -169,11 +169,11 @@ export class RecurringInvoicesService {
         }
 
         // Supprimer en cascade les items puis la facture récurrente
-        await this.prisma.recurringInvoiceItem.deleteMany({
+        await prisma.recurringInvoiceItem.deleteMany({
             where: { recurringInvoiceId: id }
         });
 
-        return this.prisma.recurringInvoice.delete({
+        return prisma.recurringInvoice.delete({
             where: { id }
         });
     }

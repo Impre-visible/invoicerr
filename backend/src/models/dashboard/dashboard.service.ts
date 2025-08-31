@@ -1,7 +1,7 @@
 import { $Enums, Company, Invoice, Quote } from '@prisma/client';
 
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import prisma from 'src/prisma/prisma.service';
 
 interface DashboardData {
     company: Company | null,
@@ -40,33 +40,32 @@ interface DashboardData {
 
 @Injectable()
 export class DashboardService {
-    constructor(private readonly prisma: PrismaService) { }
 
     async getDashboardData(): Promise<DashboardData> {
-        const quotes = await this.prisma.quote.groupBy({
+        const quotes = await prisma.quote.groupBy({
             where: { isActive: true },
             by: ['status'],
             _count: true,
         });
 
-        const invoices = await this.prisma.invoice.groupBy({
+        const invoices = await prisma.invoice.groupBy({
             where: { isActive: true },
             by: ['status'],
             _count: true,
         });
-        const clientsCount = await this.prisma.client.count({
+        const clientsCount = await prisma.client.count({
             where: { isActive: true },
         });
-        const company = await this.prisma.company.findFirst();
+        const company = await prisma.company.findFirst();
 
-        const latestQuotes = await this.prisma.quote.findMany({
+        const latestQuotes = await prisma.quote.findMany({
             where: { isActive: true },
             orderBy: { updatedAt: 'desc' },
             include: { company: true, client: true },
             take: 5,
         });
 
-        const latestInvoices = await this.prisma.invoice.findMany({
+        const latestInvoices = await prisma.invoice.findMany({
             where: { isActive: true },
             orderBy: { updatedAt: 'desc' },
             include: { company: true, client: true },
@@ -153,7 +152,7 @@ export class DashboardService {
             return amount;
         }
 
-        const currencyRate = await this.prisma.currencyConversion.findFirst({
+        const currencyRate = await prisma.currencyConversion.findFirst({
             where: {
                 fromCurrency,
                 toCurrency,
@@ -172,7 +171,7 @@ export class DashboardService {
         }
         const rate = data.data.mid;
 
-        await this.prisma.currencyConversion.upsert({
+        await prisma.currencyConversion.upsert({
             where: {
                 fromCurrency_toCurrency: {
                     fromCurrency,
@@ -198,7 +197,7 @@ export class DashboardService {
         const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
         const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-        const invoices = await this.prisma.invoice.findMany({
+        const invoices = await prisma.invoice.findMany({
             where: {
                 createdAt: {
                     gte: startOfMonth,
@@ -221,7 +220,7 @@ export class DashboardService {
         const startOfYear = new Date(date.getFullYear(), 0, 1);
         const endOfYear = new Date(date.getFullYear() + 1, 0, 0);
 
-        const invoices = await this.prisma.invoice.findMany({
+        const invoices = await prisma.invoice.findMany({
             where: {
                 createdAt: {
                     gte: startOfYear,

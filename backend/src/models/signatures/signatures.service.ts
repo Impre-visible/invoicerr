@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { MailService } from 'src/mail/mail.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SignaturesService {
-    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) { }
+    constructor(private readonly mailService: MailService) { }
 
     async getSignature(signatureId: string) {
-        const signature = await this.prisma.signature.findUnique({
+        const signature = await prisma.signature.findUnique({
             where: { id: signatureId },
             select: {
                 id: true,
@@ -28,7 +28,7 @@ export class SignaturesService {
     }
 
     async createSignature(quoteId: string) {
-        const quote = await this.prisma.quote.findUnique({
+        const quote = await prisma.quote.findUnique({
             where: { id: quoteId },
             select: {
                 client: {
@@ -43,7 +43,7 @@ export class SignaturesService {
             throw new BadRequestException('Quote not found or client information is missing.');
         }
 
-        const signature = await this.prisma.signature.create({
+        const signature = await prisma.signature.create({
             data: {
                 quoteId,
                 expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
@@ -52,7 +52,7 @@ export class SignaturesService {
 
         await this.sendSignatureEmail(signature.id);
 
-        await this.prisma.quote.update({
+        await prisma.quote.update({
             where: { id: quoteId },
             data: {
                 status: 'SENT',
@@ -63,7 +63,7 @@ export class SignaturesService {
     }
 
     async generateOTPCode(signatureId: string) {
-        const signature = await this.prisma.signature.findFirst({
+        const signature = await prisma.signature.findFirst({
             where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
@@ -85,7 +85,7 @@ export class SignaturesService {
 
         const otpCode = Math.floor(10000000 + Math.random() * 90000000).toString();
 
-        await this.prisma.signature.update({
+        await prisma.signature.update({
             where: { id: signatureId },
             data: {
                 otpCode,
@@ -100,7 +100,7 @@ export class SignaturesService {
     }
 
     async sendSignatureEmail(signatureId: string) {
-        const signature = await this.prisma.signature.findFirst({
+        const signature = await prisma.signature.findFirst({
             where: { id: signatureId, isActive: true },
             select: {
                 quoteId: true,
@@ -122,12 +122,12 @@ export class SignaturesService {
             throw new BadRequestException('Quote not found or client information is missing.');
         }
 
-        await this.prisma.signature.updateMany({
+        await prisma.signature.updateMany({
             where: { quoteId: signature.quoteId, isActive: true, id: { not: signatureId } },
             data: { isActive: false },
         });
 
-        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+        const mailTemplate = await prisma.mailTemplate.findFirst({
             where: { type: 'SIGNATURE_REQUEST', companyId: signature.quote.company.id },
             select: { subject: true, body: true }
         });
@@ -160,7 +160,7 @@ export class SignaturesService {
     }
 
     async sendOtpToUser(email: string, otpCode: string) {
-        const signature = await this.prisma.signature.findFirst({
+        const signature = await prisma.signature.findFirst({
             where: { otpCode, otpUsed: false, isActive: true },
             select: { id: true, quote: { select: { company: true } } }
         });
@@ -169,7 +169,7 @@ export class SignaturesService {
             throw new BadRequestException('Signature not found or OTP code is invalid.');
         }
 
-        const mailTemplate = await this.prisma.mailTemplate.findFirst({
+        const mailTemplate = await prisma.mailTemplate.findFirst({
             where: { type: 'VERIFICATION_CODE', companyId: signature.quote.company.id },
             select: { subject: true, body: true }
         });
@@ -198,7 +198,7 @@ export class SignaturesService {
     }
 
     async signQuote(signatureId: string, otpCode: string) {
-        const signature = await this.prisma.signature.findFirst({
+        const signature = await prisma.signature.findFirst({
             where: {
                 id: signatureId,
                 otpCode,
@@ -214,7 +214,7 @@ export class SignaturesService {
             throw new BadRequestException('Invalid or expired OTP code.');
         }
 
-        await this.prisma.signature.update({
+        await prisma.signature.update({
             where: { id: signature.id },
             data: {
                 otpUsed: true,
@@ -222,7 +222,7 @@ export class SignaturesService {
             },
         });
 
-        await this.prisma.quote.update({
+        await prisma.quote.update({
             where: { id: signature.quoteId },
             data: {
                 status: 'SIGNED',
