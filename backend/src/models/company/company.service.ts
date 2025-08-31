@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { EditCompanyDto, PDFConfig } from './dto/company.dto';
 import { MailTemplate, MailTemplateType } from '@prisma/client';
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import prisma from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
 export interface EmailTemplate {
@@ -17,17 +17,16 @@ export interface EmailTemplate {
 
 @Injectable()
 export class CompanyService {
-    constructor(private readonly prisma: PrismaService) { }
 
     async getCompanyInfo() {
-        const company = await this.prisma.company.findFirst({ include: { emailTemplates: true } });
+        const company = await prisma.company.findFirst({ include: { emailTemplates: true } });
 
         if (!company) {
             return null
         }
 
-        await this.prisma.$transaction([
-            this.prisma.mailTemplate.upsert({
+        await prisma.$transaction([
+            prisma.mailTemplate.upsert({
                 where: {
                     companyId_type: { companyId: company.id, type: MailTemplateType.SIGNATURE_REQUEST }
                 },
@@ -40,7 +39,7 @@ export class CompanyService {
                 update: {}
             }),
 
-            this.prisma.mailTemplate.upsert({
+            prisma.mailTemplate.upsert({
                 where: {
                     companyId_type: { companyId: company.id, type: MailTemplateType.VERIFICATION_CODE }
                 },
@@ -53,7 +52,7 @@ export class CompanyService {
                 update: {}
             }),
 
-            this.prisma.mailTemplate.upsert({
+            prisma.mailTemplate.upsert({
                 where: {
                     companyId_type: { companyId: company.id, type: MailTemplateType.INVOICE }
                 },
@@ -66,7 +65,7 @@ export class CompanyService {
                 update: {}
             }),
 
-            this.prisma.mailTemplate.upsert({
+            prisma.mailTemplate.upsert({
                 where: {
                     companyId_type: { companyId: company.id, type: MailTemplateType.RECEIPT }
                 },
@@ -80,11 +79,11 @@ export class CompanyService {
             })
         ]);
 
-        return await this.prisma.company.findFirst();
+        return await prisma.company.findFirst();
     }
 
     async getPDFTemplateConfig(): Promise<PDFConfig> {
-        const existingCompany = await this.prisma.company.findFirst({
+        const existingCompany = await prisma.company.findFirst({
             include: { pdfConfig: true }
         });
 
@@ -127,7 +126,7 @@ export class CompanyService {
     }
 
     async editPDFTemplateConfig(pdfConfig: PDFConfig) {
-        const existingCompany = await this.prisma.company.findFirst({
+        const existingCompany = await prisma.company.findFirst({
             include: { pdfConfig: true }
         });
 
@@ -135,7 +134,7 @@ export class CompanyService {
             throw new BadRequestException('No PDF configuration found for the company');
         }
 
-        return this.prisma.pDFConfig.update({
+        return prisma.pDFConfig.update({
             where: { id: existingCompany.pdfConfig.id }, // ✅ ici on utilise un identifiant unique
             data: {
                 fontFamily: pdfConfig.fontFamily,
@@ -174,19 +173,19 @@ export class CompanyService {
 
     async editCompanyInfo(editCompanyDto: EditCompanyDto) {
         const data = { ...editCompanyDto };
-        const existingCompany = await this.prisma.company.findFirst();
+        const existingCompany = await prisma.company.findFirst();
 
         if (existingCompany) {
             const { pdfConfig, ...rest } = data;
 
-            return this.prisma.company.update({
+            return prisma.company.update({
                 where: { id: existingCompany.id },
                 data: {
                     ...rest
                 }
             });
         } else {
-            return this.prisma.company.create({
+            return prisma.company.create({
                 data: {
                     ...data,
                     pdfConfig: {
@@ -219,7 +218,7 @@ export class CompanyService {
     }
 
     async getEmailTemplates(): Promise<EmailTemplate[]> {
-        const existingCompany = await this.prisma.company.findFirst({
+        const existingCompany = await prisma.company.findFirst({
             include: { emailTemplates: true }
         });
 
@@ -264,14 +263,14 @@ export class CompanyService {
     }
 
     async updateEmailTemplate(id: MailTemplate['id'], subject: string, body: string) {
-        let existingTemplate = await this.prisma.mailTemplate.findUnique({
+        let existingTemplate = await prisma.mailTemplate.findUnique({
             where: { id },
         });
         if (!existingTemplate) {
             throw new BadRequestException(`Email template with id ${id} not found`);
         }
 
-        existingTemplate = await this.prisma.mailTemplate.update({
+        existingTemplate = await prisma.mailTemplate.update({
             where: { id },
             data: {
                 subject,

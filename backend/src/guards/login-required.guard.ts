@@ -10,16 +10,15 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { AuthService } from 'src/models/auth/auth.service';
 import { CurrentUser } from 'src/types/user';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { RequestWithUser } from 'src/types/request';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class LoginRequiredGuard implements CanActivate {
   private jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
   constructor(
-    private readonly jwt: JwtService,
-    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService
   ) {
     if (process.env.OIDC_JWKS_URI) {
       try {
@@ -85,7 +84,7 @@ export class LoginRequiredGuard implements CanActivate {
       }
     }
 
-    const user = await this.prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: { email: payload.email },
       select: {
         id: true,

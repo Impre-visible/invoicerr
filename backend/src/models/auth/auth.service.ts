@@ -5,14 +5,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import prisma from 'src/prisma/prisma.service';
 
 const ACCESS_DURATION = '15m';
 const REFRESH_DURATION = '7d';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService) { }
+    constructor(private readonly jwt: JwtService) { }
 
 
     static getJWTSecret() {
@@ -26,7 +26,7 @@ export class AuthService {
     }
 
     async getMe(userId: string) {
-        const user = await this.prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: { id: userId },
             select: {
                 id: true,
@@ -45,7 +45,7 @@ export class AuthService {
     }
 
     async updateMe(userId: string, firstname: string, lastname: string, email: string) {
-        const user = await this.prisma.user.update({
+        const user = await prisma.user.update({
             where: { id: userId },
             data: {
                 firstname,
@@ -64,7 +64,7 @@ export class AuthService {
     }
 
     async updatePassword(userId: string, currentPassword: string, newPassword: string) {
-        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({ where: { id: userId } });
 
         if (!user || !bcrypt.compareSync(currentPassword, user.password || '')) {
             throw new BadRequestException('Invalid current password');
@@ -75,7 +75,7 @@ export class AuthService {
         }
 
         const hashedPassword = bcrypt.hashSync(newPassword, 10);
-        await this.prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: { password: hashedPassword },
         });
@@ -84,11 +84,11 @@ export class AuthService {
     }
 
     async signUp(firstname: string, lastname: string, email: string, password?: string) {
-        if (await this.prisma.user.count() > 0) {
+        if (await prisma.user.count() > 0) {
             throw new BadRequestException('User already exists');
         }
 
-        if (await this.prisma.user.findUnique({ where: { email } })) {
+        if (await prisma.user.findUnique({ where: { email } })) {
             throw new BadRequestException('Email already used');
         }
 
@@ -96,7 +96,7 @@ export class AuthService {
             throw new BadRequestException('Password is required');
         }
 
-        const user = await this.prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 firstname,
                 lastname,
@@ -117,7 +117,7 @@ export class AuthService {
     }
 
     async signIn(email: string, password: string) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user || !bcrypt.compareSync(password, user.password || '')) {
             throw new BadRequestException('Invalid email or password');
@@ -153,7 +153,7 @@ export class AuthService {
                 throw new BadRequestException('Invalid refresh token payload');
             }
 
-            const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+            const user = await prisma.user.findUnique({ where: { id: payload.sub } });
 
             if (!user) {
                 throw new BadRequestException('User not found');
@@ -218,10 +218,10 @@ export class AuthService {
     }
 
     async loginOrCreateUserFromOidc(userInfo: any) {
-        let user = await this.prisma.user.findUnique({ where: { email: userInfo.email } });
+        let user = await prisma.user.findUnique({ where: { email: userInfo.email } });
 
         if (!user) {
-            user = await this.prisma.user.create({
+            user = await prisma.user.create({
                 data: {
                     email: userInfo.email,
                     firstname: userInfo.given_name || '',

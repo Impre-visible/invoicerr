@@ -4,20 +4,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
 import { getInvertColor, getPDF } from 'src/utils/pdf';
 
-import { PrismaService } from 'src/prisma/prisma.service';
 import { baseTemplate } from './templates/base.template';
 import { formatDate } from 'src/utils/date';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class QuotesService {
-    constructor(private readonly prisma: PrismaService) { }
 
     async getQuotes(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
         const pageSize = 10;
         const skip = (pageNumber - 1) * pageSize;
 
-        const quotes = await this.prisma.quote.findMany({
+        const quotes = await prisma.quote.findMany({
             skip,
             take: pageSize,
             where: {
@@ -33,14 +32,14 @@ export class QuotesService {
             },
         });
 
-        const totalQuotes = await this.prisma.quote.count();
+        const totalQuotes = await prisma.quote.count();
 
         return { pageCount: Math.ceil(totalQuotes / pageSize), quotes };
     }
 
     async searchQuotes(query: string) {
         if (!query) {
-            return this.prisma.quote.findMany({
+            return prisma.quote.findMany({
                 take: 10,
                 orderBy: {
                     number: 'asc',
@@ -53,7 +52,7 @@ export class QuotesService {
             });
         }
 
-        return this.prisma.quote.findMany({
+        return prisma.quote.findMany({
             where: {
                 isActive: true,
                 OR: [
@@ -76,13 +75,13 @@ export class QuotesService {
     async createQuote(body: CreateQuoteDto) {
         const { items, ...data } = body;
 
-        const company = await this.prisma.company.findFirst();
+        const company = await prisma.company.findFirst();
 
         if (!company) {
             throw new BadRequestException('No company found. Please create a company first.');
         }
 
-        const client = await this.prisma.client.findUnique({
+        const client = await prisma.client.findUnique({
             where: { id: body.clientId },
         });
 
@@ -90,7 +89,7 @@ export class QuotesService {
             throw new BadRequestException('Client not found');
         }
 
-        return this.prisma.quote.create({
+        return prisma.quote.create({
             data: {
                 ...data,
                 notes: body.notes,
@@ -120,7 +119,7 @@ export class QuotesService {
             throw new BadRequestException('Quote ID is required for editing');
         }
 
-        const existingQuote = await this.prisma.quote.findUnique({
+        const existingQuote = await prisma.quote.findUnique({
             where: { id },
             include: { items: true }
         });
@@ -138,7 +137,7 @@ export class QuotesService {
         const totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         const totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
 
-        const updateQuote = await this.prisma.quote.update({
+        const updateQuote = await prisma.quote.update({
             where: { id },
             data: {
                 ...data,
@@ -175,7 +174,7 @@ export class QuotesService {
             },
         });
 
-        await this.prisma.signature.updateMany({
+        await prisma.signature.updateMany({
             where: { quoteId: id },
             data: { isActive: false },
         });
@@ -184,20 +183,20 @@ export class QuotesService {
     }
 
     async deleteQuote(id: string) {
-        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+        const existingQuote = await prisma.quote.findUnique({ where: { id } });
 
         if (!existingQuote) {
             throw new BadRequestException('Quote not found');
         }
 
-        return this.prisma.quote.update({
+        return prisma.quote.update({
             where: { id },
             data: { isActive: false },
         });
     }
 
     async getQuotePdf(id: string): Promise<Uint8Array> {
-        const quote = await this.prisma.quote.findUnique({
+        const quote = await prisma.quote.findUnique({
             where: { id },
             include: {
                 items: true,
@@ -278,13 +277,13 @@ export class QuotesService {
             throw new BadRequestException('Quote ID is required');
         }
 
-        const existingQuote = await this.prisma.quote.findUnique({ where: { id } });
+        const existingQuote = await prisma.quote.findUnique({ where: { id } });
 
         if (!existingQuote) {
             throw new BadRequestException('Quote not found');
         }
 
-        return this.prisma.quote.update({
+        return prisma.quote.update({
             where: { id },
             data: { signedAt: new Date(), status: "SIGNED" },
         });

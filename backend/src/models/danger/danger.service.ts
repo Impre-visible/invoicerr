@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CurrentUser } from 'src/types/user';
 import { MailService } from 'src/mail/mail.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DangerService {
@@ -12,7 +12,7 @@ export class DangerService {
     private OTP: string | null = null; // Store the OTP in memory for the session, as it is not persisted in the database
     private otpExpirationTime: Date | null = null; // Store the expiration time of the OTP
 
-    constructor(private readonly prisma: PrismaService, private readonly mailService: MailService) {
+    constructor(private readonly mailService: MailService) {
     }
 
     async requestOtp(user: CurrentUser) {
@@ -50,15 +50,15 @@ export class DangerService {
         }
 
         // Reset everything but the user data
-        await this.prisma.company.deleteMany();
-        await this.prisma.pDFConfig.deleteMany();
-        await this.prisma.mailTemplate.deleteMany();
-        await this.prisma.client.deleteMany();
-        await this.prisma.quoteItem.deleteMany();
-        await this.prisma.quote.deleteMany();
-        await this.prisma.invoiceItem.deleteMany();
-        await this.prisma.invoice.deleteMany();
-        await this.prisma.signature.deleteMany();
+        await prisma.company.deleteMany();
+        await prisma.pDFConfig.deleteMany();
+        await prisma.mailTemplate.deleteMany();
+        await prisma.client.deleteMany();
+        await prisma.quoteItem.deleteMany();
+        await prisma.quote.deleteMany();
+        await prisma.invoiceItem.deleteMany();
+        await prisma.invoice.deleteMany();
+        await prisma.signature.deleteMany();
 
 
         return { message: 'Application reset successfully' };
