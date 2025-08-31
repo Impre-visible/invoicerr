@@ -21,10 +21,12 @@ export class LoginRequiredGuard implements CanActivate {
     private readonly jwt: JwtService,
     private readonly prisma: PrismaService,
   ) {
-    try {
-      this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
-    } catch (error) {
-      Logger.error('Failed to create JWKS set:', error);
+    if (process.env.OIDC_JWKS_URI) {
+      try {
+        this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+      } catch (error) {
+        Logger.error('Failed to create JWKS set:', error);
+      }
     }
   }
 
