@@ -1,0 +1,21 @@
+model Client {
+  id               String             @id @default(cuid())
+  name             String
+  description      String?
+  legalId          String? // Legal identification number (SIRET, EIN, etc.)
+  VAT              String? // VAT number
+  foundedAt        DateTime? // Date when the client company was founded
+  contactFirstname String
+  contactLastname  String
+  contactEmail     String             @unique
+  contactPhone     String?
+  address          String
+  postalCode       String
+  city             String
+  country          String
+  currency         Currency?
+  isActive         Boolean            @default(true)
+  Quote            Quote[]
+  Invoice          Invoice[]
+  RecurringInvoice RecurringInvoice[]
+}

@@ -1,5 +1,5 @@
 import { formatPattern } from '@/utils/pdf';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@invoicerr/prisma/client'
 
 
 const prisma = new PrismaClient().$extends({

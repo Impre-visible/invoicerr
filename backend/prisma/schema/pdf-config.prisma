@@ -1,0 +1,39 @@
+model PDFConfig {
+  id      String   @id @default(cuid())
+  Company Company? // 👈 Relation inverse, sans arguments
+
+  fontFamily     String @default("Arial")
+  padding        Int    @default(40)
+  primaryColor   String @default("#2563eb")
+  secondaryColor String @default("#64748b")
+
+  includeLogo Boolean @default(false)
+  logoB64     String?
+
+  invoice        String @default("Invoice")
+  quote          String @default("Quote")
+  receipt        String @default("Receipt")
+  description    String @default("Description:")
+  date           String @default("Date:")
+  dueDate        String @default("Due date:")
+  validUntil     String @default("Valid until:")
+  paymentDate    String @default("Payment date:")
+  billTo         String @default("Bill to:")
+  quoteFor       String @default("Quote for:")
+  receivedFrom   String @default("Received from:")
+  invoiceRefer   String @default("Invoice reference:")
+  quantity       String @default("Qty")
+  vatRate        String @default("VAT (%)")
+  unitPrice      String @default("Unit price")
+  subtotal       String @default("Subtotal:")
+  total          String @default("Total:")
+  vat            String @default("VAT:")
+  grandTotal     String @default("Grand total:")
+  totalReceived  String @default("Total received:")
+  notes          String @default("Notes:")
+  paymentMethod  String @default("Payment Method:")
+  paymentDetails String @default("Payment Details:")
+
+  VATId   String @default("VAT")
+  legalId String @default("Legal ID")
+}

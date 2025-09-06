@@ -18,7 +18,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@invoicerr/prisma/*": ["prisma/generated/prisma/*"]
     }
   }
 }

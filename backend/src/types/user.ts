@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@invoicerr/prisma/client";
 
 export interface CurrentUser extends Omit<User, 'password'> {
     id: string;

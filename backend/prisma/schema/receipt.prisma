@@ -1,0 +1,22 @@
+model ReceiptItem {
+  id            String      @id @default(uuid())
+  invoiceItem   InvoiceItem @relation(fields: [invoiceItemId], references: [id])
+  invoiceItemId String
+  amountPaid    Float // Amount paid for this item
+  Receipt       Receipt     @relation(fields: [receiptId], references: [id])
+  receiptId     String
+}
+
+model Receipt {
+  id             String        @id @default(cuid())
+  number         Int           @default(autoincrement())
+  rawNumber      String? // Raw number for custom formats
+  invoiceId      String
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id])
+  items          ReceiptItem[]
+  totalPaid      Float
+  paymentMethod  String        @default("") // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails String        @default("") // Details for the payment method (e.g., bank account number)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}

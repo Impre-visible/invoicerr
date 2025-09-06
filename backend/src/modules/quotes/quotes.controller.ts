@@ -1,3 +1,4 @@
+import { CreateQuoteDto, EditQuotesDto } from '@/modules/quotes/dto/quotes.dto';
 import { QuotesService } from '@/modules/quotes/quotes.service';
 import {
   Body,
