@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
-import { QuotesController } from './quotes.controller';
-import { QuotesService } from './quotes.service';
+import { QuotesController } from '@/models/quotes/quotes.controller';
+import { QuotesService } from '@/models/quotes/quotes.service';
 
 @Module({
   controllers: [QuotesController],

@@ -10,11 +10,11 @@ import {
   Res,
 } from '@nestjs/common';
 
-import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
-import { InvoicesService } from './invoices.service';
 import { Response } from 'express';
 import { ExportFormat } from '@fin.cx/einvoice';
-import { PluginsService } from '../plugins/plugins.service';
+import { CreateInvoiceDto, EditInvoicesDto } from '@/models/invoices/dto/invoices.dto';
+import { InvoicesService } from '@/models/invoices/invoices.service';
+import { PluginsService } from '@/models/plugins/plugins.service';
 
 @Controller('invoices')
 export class InvoicesController {

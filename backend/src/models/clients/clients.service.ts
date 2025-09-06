@@ -1,7 +1,6 @@
+import { EditClientsDto } from '@/models/clients/dto/clients.dto';
+import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-
-import { EditClientsDto } from './dto/clients.dto';
-import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ClientsService {

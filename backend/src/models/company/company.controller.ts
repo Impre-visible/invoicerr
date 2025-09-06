@@ -1,7 +1,7 @@
+import { CompanyService } from '@/models/company/company.service';
+import { EditCompanyDto, PDFConfigDto } from '@/models/company/dto/company.dto';
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 
-import { CompanyService } from './company.service';
-import { EditCompanyDto, PDFConfig } from './dto/company.dto';
 
 @Controller('company')
 export class CompanyController {
@@ -26,7 +26,7 @@ export class CompanyController {
   }
 
   @Post('pdf-template')
-  async postPDFTemplateConfig(@Body() body: PDFConfig) {
+  async postPDFTemplateConfig(@Body() body: PDFConfigDto) {
     const data = await this.companyService.editPDFTemplateConfig(body);
     return data || {};
   }

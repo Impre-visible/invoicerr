@@ -1,7 +1,7 @@
-import { CompanyController } from './company.controller';
-import { CompanyService } from './company.service';
 import { JwtService } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
+import { CompanyController } from '@/models/company/company.controller';
+import { CompanyService } from '@/models/company/company.service';
 
 @Module({
   controllers: [CompanyController],

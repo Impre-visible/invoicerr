@@ -1,3 +1,8 @@
+import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
+import { User } from '@/decorators/user.decorator';
+import { AuthService } from '@/models/auth/auth.service';
+import { SignupDto } from '@/models/auth/dto/signup.dto';
+import { CurrentUser } from '@/types/user';
 import {
   BadRequestException,
   Body,
@@ -12,12 +17,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-import { LoginRequired } from 'src/decorators/login-required.decorator';
-import { User } from 'src/decorators/user.decorator';
-import { CurrentUser } from 'src/types/user';
-import { SignupDto } from './dto/signup.dto';
-import { AuthService } from './auth.service';
-import { AllowAnonymous } from 'src/decorators/allow-anonymous.decorator';
 
 @Controller('auth')
 export class AuthController {

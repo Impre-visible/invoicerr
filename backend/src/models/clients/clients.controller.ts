@@ -1,3 +1,5 @@
+import { ClientsService } from '@/models/clients/clients.service';
+import { EditClientsDto } from '@/models/clients/dto/clients.dto';
 import {
   Body,
   Controller,
@@ -8,9 +10,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-
-import { ClientsService } from './clients.service';
-import { EditClientsDto } from './dto/clients.dto';
 
 @Controller('clients')
 export class ClientsController {

@@ -1,8 +1,8 @@
+import { InvoicesService } from '@/models/invoices/invoices.service';
+import prisma from '@/prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Cron } from '@nestjs/schedule';
-import { InvoicesService } from '../invoices/invoices.service';
-import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RecurringInvoicesCronService {

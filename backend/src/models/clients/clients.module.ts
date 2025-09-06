@@ -1,7 +1,7 @@
-import { ClientsController } from './clients.controller';
-import { ClientsService } from './clients.service';
 import { JwtService } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
+import { ClientsController } from '@/models/clients/clients.controller';
+import { ClientsService } from '@/models/clients/clients.service';
 
 @Module({
   controllers: [ClientsController],

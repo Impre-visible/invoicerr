@@ -1,16 +1,14 @@
 import * as Handlebars from 'handlebars';
-
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateInvoiceDto, EditInvoicesDto } from './dto/invoices.dto';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
-import { getInvertColor, getPDF } from 'src/utils/pdf';
-
-import { MailService } from 'src/mail/mail.service';
-import { baseTemplate } from './templates/base.template';
+import { MailService } from '@/mail/mail.service';
+import { CreateInvoiceDto, EditInvoicesDto } from '@/models/invoices/dto/invoices.dto';
+import { baseTemplate } from '@/models/quotes/templates/base.template';
+import prisma from '@/prisma/prisma.service';
+import { parseAddress } from '@/utils/adress';
+import { getInvertColor, getPDF } from '@/utils/pdf';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
-import { formatDate } from 'src/utils/date';
-import { parseAddress } from 'src/utils/adress';
-import prisma from 'src/prisma/prisma.service';
+import { formatDate } from '@/utils/date';
 
 @Injectable()
 export class InvoicesService {

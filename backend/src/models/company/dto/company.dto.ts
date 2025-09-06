@@ -1,6 +1,6 @@
 import { finance } from "@fin.cx/einvoice/dist_ts/plugins"
 
-export interface PDFConfig {
+export interface PDFConfigDto {
     fontFamily: string
     includeLogo: boolean
     logoB64: string | null
@@ -45,7 +45,7 @@ export class EditCompanyDto {
     country: string
     phone: string
     email: string
-    pdfConfig: PDFConfig
+    pdfConfig: PDFConfigDto
     quoteStartingNumber: number
     quoteNumberFormat: string
     invoiceStartingNumber: number

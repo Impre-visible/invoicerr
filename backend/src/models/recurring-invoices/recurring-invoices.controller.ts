@@ -1,3 +1,5 @@
+import { UpsertInvoicesDto } from '@/models/recurring-invoices/dto/invoices.dto';
+import { RecurringInvoicesService } from '@/models/recurring-invoices/recurring-invoices.service';
 import {
   Body,
   Controller,
@@ -9,15 +11,10 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { RecurringInvoicesService } from './recurring-invoices.service';
-import { RecurringInvoicesCronService } from './cron.service';
-import { UpsertInvoicesDto } from './dto/invoices.dto';
-
 @Controller('recurring-invoices')
 export class RecurringInvoicesController {
   constructor(
     private readonly recurringInvoicesService: RecurringInvoicesService,
-    private readonly cronService: RecurringInvoicesCronService,
   ) {}
 
   @Get()
