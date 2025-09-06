@@ -22,6 +22,7 @@
   "dependencies": {
     "@fin.cx/einvoice": "^5.0.3",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
@@ -30,6 +31,7 @@
     "@prisma/client": "^6.10.1",
     "@types/pdfkit": "^0.14.0",
     "@types/stream-buffers": "^3.0.7",
+    "add": "^2.0.6",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
