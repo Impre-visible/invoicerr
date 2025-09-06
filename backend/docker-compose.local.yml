@@ -1,4 +1,4 @@
-  name: invoiceerr-backend
+  name: invoiceerr-backend-dev
 
   services:
     database-postgresql:
