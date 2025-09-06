@@ -17,6 +17,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SignaturesModule } from './models/signatures/signatures.module';
 import { LoginRequiredGuard } from 'src/guards/login-required.guard';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthService } from 'src/models/auth/auth.service';
 
 @Module({
   imports: [
@@ -24,6 +26,11 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
+    JwtModule.register({
+      global: true,
+      secret: AuthService.getJWTSecret(),
+      signOptions: { expiresIn: '1h' },
+    }),
     AuthModule,
     CompanyModule,
     ClientsModule,

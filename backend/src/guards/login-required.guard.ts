@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { Reflector } from '@nestjs/core';
 
 import { AuthService } from 'src/models/auth/auth.service';
 import { CurrentUser } from 'src/types/user';
