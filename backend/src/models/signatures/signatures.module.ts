@@ -1,8 +1,8 @@
 import { JwtService } from '@nestjs/jwt';
-import { MailService } from 'src/mail/mail.service';
 import { Module } from '@nestjs/common';
-import { SignaturesController } from './signatures.controller';
-import { SignaturesService } from './signatures.service';
+import { MailService } from '@/mail/mail.service';
+import { SignaturesController } from '@/models/signatures/signatures.controller';
+import { SignaturesService } from '@/models/signatures/signatures.service';
 
 @Module({
   controllers: [SignaturesController],

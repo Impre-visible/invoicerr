@@ -1,14 +1,12 @@
 import * as Handlebars from 'handlebars';
-
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
-import { getInvertColor, getPDF } from 'src/utils/pdf';
-
-import { MailService } from 'src/mail/mail.service';
-import { baseTemplate } from './templates/base.template';
-import { formatDate } from 'src/utils/date';
-import prisma from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
+import { MailService } from '@/mail/mail.service';
+import { baseTemplate } from '@/models/quotes/templates/base.template';
+import { CreateReceiptDto, EditReceiptDto } from '@/models/receipts/dto/receipts.dto';
+import prisma from '@/prisma/prisma.service';
+import { getInvertColor, getPDF } from '@/utils/pdf';
+import { formatDate } from '@/utils/date';
 
 @Injectable()
 export class ReceiptsService {

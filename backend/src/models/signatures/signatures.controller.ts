@@ -1,7 +1,6 @@
+import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
+import { SignaturesService } from '@/models/signatures/signatures.service';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-
-import { SignaturesService } from './signatures.service';
-import { AllowAnonymous } from 'src/decorators/allow-anonymous.decorator';
 
 @Controller('signatures')
 export class SignaturesController {

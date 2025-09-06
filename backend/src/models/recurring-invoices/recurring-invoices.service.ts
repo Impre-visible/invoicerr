@@ -1,8 +1,7 @@
+import { UpsertInvoicesDto } from '@/models/recurring-invoices/dto/invoices.dto';
+import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-
 import { Currency } from '@prisma/client';
-import { UpsertInvoicesDto } from './dto/invoices.dto';
-import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RecurringInvoicesService {

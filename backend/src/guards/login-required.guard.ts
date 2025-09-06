@@ -7,12 +7,11 @@ import {
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { Reflector } from '@nestjs/core';
-
-import { AuthService } from 'src/models/auth/auth.service';
-import { CurrentUser } from 'src/types/user';
 import { JwtService } from '@nestjs/jwt';
-import { RequestWithUser } from 'src/types/request';
-import prisma from 'src/prisma/prisma.service';
+import { AuthService } from '@/models/auth/auth.service';
+import prisma from '@/prisma/prisma.service';
+import { RequestWithUser } from '@/types/request';
+import { CurrentUser } from '@/types/user';
 
 @Injectable()
 export class LoginRequiredGuard implements CanActivate {

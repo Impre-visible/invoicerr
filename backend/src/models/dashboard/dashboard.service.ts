@@ -1,7 +1,6 @@
 import { $Enums, Company, Invoice, Quote } from '@prisma/client';
-
 import { Injectable } from '@nestjs/common';
-import prisma from 'src/prisma/prisma.service';
+import prisma from '@/prisma/prisma.service';
 
 interface DashboardData {
     company: Company | null,

@@ -1,6 +1,6 @@
+import { PluginsService } from '@/models/plugins/plugins.service';
 import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 
-import { PluginsService } from '../plugins/plugins.service';
 
 @Controller('plugins')
 export class PluginsController {

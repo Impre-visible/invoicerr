@@ -1,8 +1,7 @@
+import { EditCompanyDto, PDFConfigDto } from '@/models/company/dto/company.dto';
+import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { EditCompanyDto, PDFConfig } from './dto/company.dto';
 import { MailTemplate, MailTemplateType } from '@prisma/client';
-
-import prisma from 'src/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
 export interface EmailTemplate {
@@ -82,7 +81,7 @@ export class CompanyService {
         return await prisma.company.findFirst();
     }
 
-    async getPDFTemplateConfig(): Promise<PDFConfig> {
+    async getPDFTemplateConfig(): Promise<PDFConfigDto> {
         const existingCompany = await prisma.company.findFirst({
             include: { pdfConfig: true }
         });
@@ -125,7 +124,7 @@ export class CompanyService {
         }
     }
 
-    async editPDFTemplateConfig(pdfConfig: PDFConfig) {
+    async editPDFTemplateConfig(pdfConfig: PDFConfigDto) {
         const existingCompany = await prisma.company.findFirst({
             include: { pdfConfig: true }
         });

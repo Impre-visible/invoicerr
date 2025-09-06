@@ -1,8 +1,8 @@
+import { MailService } from '@/mail/mail.service';
+import prisma from '@/prisma/prisma.service';
+import { CurrentUser } from '@/types/user';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { CurrentUser } from 'src/types/user';
-import { MailService } from 'src/mail/mail.service';
-import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DangerService {

@@ -1,12 +1,12 @@
 import * as Handlebars from 'handlebars';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
-import { getInvertColor, getPDF } from 'src/utils/pdf';
+import { CreateQuoteDto, EditQuotesDto } from '@/models/quotes/dto/quotes.dto';
+import { baseTemplate } from '@/models/quotes/templates/base.template';
+import prisma from '@/prisma/prisma.service';
+import { getInvertColor, getPDF } from '@/utils/pdf';
+import { formatDate } from '@/utils/date';
 
-import { baseTemplate } from './templates/base.template';
-import { formatDate } from 'src/utils/date';
-import prisma from 'src/prisma/prisma.service';
 
 @Injectable()
 export class QuotesService {

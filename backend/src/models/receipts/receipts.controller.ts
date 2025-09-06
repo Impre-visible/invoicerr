@@ -1,3 +1,5 @@
+import { CreateReceiptDto, EditReceiptDto } from '@/models/receipts/dto/receipts.dto';
+import { ReceiptsService } from '@/models/receipts/receipts.service';
 import {
   Body,
   Controller,
@@ -10,9 +12,6 @@ import {
   Res,
 } from '@nestjs/common';
 
-import { CreateReceiptDto, EditReceiptDto } from './dto/receipts.dto';
-import { LoginRequired } from 'src/decorators/login-required.decorator';
-import { ReceiptsService } from './receipts.service';
 import { Response } from 'express';
 
 @Controller('receipts')

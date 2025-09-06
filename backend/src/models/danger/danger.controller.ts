@@ -1,3 +1,6 @@
+import { User } from '@/decorators/user.decorator';
+import { DangerService } from '@/models/danger/danger.service';
+import { CurrentUser } from '@/types/user';
 import {
   BadRequestException,
   Body,
@@ -7,11 +10,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-
-import { CurrentUser } from 'src/types/user';
-import { DangerService } from './danger.service';
-import { LoginRequired } from 'src/decorators/login-required.decorator';
-import { User } from 'src/decorators/user.decorator';
 
 @Controller('danger')
 export class DangerController {

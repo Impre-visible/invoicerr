@@ -1,3 +1,5 @@
+import { CreateQuoteDto, EditQuotesDto } from '@/models/quotes/dto/quotes.dto';
+import { QuotesService } from '@/models/quotes/quotes.service';
 import {
   Body,
   Controller,
@@ -10,8 +12,6 @@ import {
   Res,
 } from '@nestjs/common';
 
-import { CreateQuoteDto, EditQuotesDto } from './dto/quotes.dto';
-import { QuotesService } from './quotes.service';
 import { Response } from 'express';
 
 @Controller('quotes')
