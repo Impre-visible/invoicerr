@@ -8,7 +8,7 @@ import {
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from '@/models/auth/auth.service';
+import { AuthService } from '@/modules/auth/auth.service';
 import prisma from '@/prisma/prisma.service';
 import { RequestWithUser } from '@/types/request';
 import { CurrentUser } from '@/types/user';
