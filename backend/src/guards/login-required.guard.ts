@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { Reflector } from '@nestjs/core';
 
 import { AuthService } from 'src/models/auth/auth.service';
 import { CurrentUser } from 'src/types/user';
@@ -18,11 +19,14 @@ export class LoginRequiredGuard implements CanActivate {
   private jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
   constructor(
-    private readonly jwt: JwtService
+    private readonly reflector: Reflector,
+    private readonly jwt: JwtService,
   ) {
     if (process.env.OIDC_JWKS_URI) {
       try {
-        this.jwks = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+        this.jwks = createRemoteJWKSet(
+          new URL(process.env.OIDC_JWKS_URI || ''),
+        );
       } catch (error) {
         Logger.error('Failed to create JWKS set:', error);
       }
@@ -30,6 +34,10 @@ export class LoginRequiredGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (LoginRequiredGuard.isAllowedAnonymous(this.reflector, context)) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const response = context.switchToHttp().getResponse();
     let authHeader = request.headers['authorization'];
@@ -38,12 +46,15 @@ export class LoginRequiredGuard implements CanActivate {
       authHeader = request.cookies['access_token'];
     }
 
-
     if (!authHeader || typeof authHeader !== 'string') {
-      throw new UnauthorizedException('Missing or invalid authorization header');
+      throw new UnauthorizedException(
+        'Missing or invalid authorization header',
+      );
     }
 
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader;
 
     let payload: { sub: string; email: string; name?: string };
 
@@ -59,7 +70,9 @@ export class LoginRequiredGuard implements CanActivate {
     } catch (err) {
       if (!this.jwks) {
         response.setHeader('WWW-Authenticate', 'expired_token');
-        throw new UnauthorizedException('No JWT and the OIDC_JWKS_URI is not set');
+        throw new UnauthorizedException(
+          'No JWT and the OIDC_JWKS_URI is not set',
+        );
       }
       try {
         const result = await jwtVerify(token, this.jwks, {
@@ -74,7 +87,7 @@ export class LoginRequiredGuard implements CanActivate {
         }
 
         payload = {
-          sub: claims.sub as string,
+          sub: claims.sub,
           email: claims.email as string,
           name: claims.name as string,
         };
@@ -104,5 +117,15 @@ export class LoginRequiredGuard implements CanActivate {
     } as CurrentUser;
 
     return true;
+  }
+
+  public static isAllowedAnonymous(
+    reflector: Reflector,
+    context: ExecutionContext,
+  ): boolean {
+    return !!reflector.getAllAndOverride<boolean>('allowAnonymous', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
   }
 }

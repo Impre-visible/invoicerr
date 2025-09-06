@@ -12,226 +12,250 @@ const REFRESH_DURATION = '7d';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwt: JwtService) { }
+  constructor(private readonly jwt: JwtService) {}
 
+  static getJWTSecret() {
+    if (process.env.JWT_SECRET) {
+      return process.env.JWT_SECRET;
+    }
+    const platform = os.platform();
+    const arch = os.arch();
+    const ram = os.totalmem();
+    return Buffer.from(`${platform}-${arch}-${ram}`).toString('base64');
+  }
 
-    static getJWTSecret() {
-        if (process.env.JWT_SECRET) {
-            return process.env.JWT_SECRET;
-        }
-        const platform = os.platform();
-        const arch = os.arch();
-        const ram = os.totalmem();
-        return Buffer.from(`${platform}-${arch}-${ram}`).toString('base64');
+  async getMe(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+      },
+    });
+
+    if (!user) {
+      console.error('User not found for ID:', userId);
+      throw new BadRequestException('User not found');
     }
 
-    async getMe(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                firstname: true,
-                lastname: true,
-                email: true,
-            },
-        });
+    return user;
+  }
 
-        if (!user) {
-            console.error('User not found for ID:', userId);
-            throw new BadRequestException('User not found');
-        }
+  async updateMe(
+    userId: string,
+    firstname: string,
+    lastname: string,
+    email: string,
+  ) {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstname,
+        lastname,
+        email,
+      },
+      select: {
+        id: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+      },
+    });
 
-        return user;
+    return user;
+  }
+
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user || !bcrypt.compareSync(currentPassword, user.password || '')) {
+      throw new BadRequestException('Invalid current password');
     }
 
-    async updateMe(userId: string, firstname: string, lastname: string, email: string) {
-        const user = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                firstname,
-                lastname,
-                email,
-            },
-            select: {
-                id: true,
-                firstname: true,
-                lastname: true,
-                email: true,
-            },
-        });
-
-        return user;
+    if (!newPassword) {
+      throw new BadRequestException('New password is required');
     }
 
-    async updatePassword(userId: string, currentPassword: string, newPassword: string) {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
 
-        if (!user || !bcrypt.compareSync(currentPassword, user.password || '')) {
-            throw new BadRequestException('Invalid current password');
-        }
+    return { message: 'Password updated successfully' };
+  }
 
-        if (!newPassword) {
-            throw new BadRequestException('New password is required');
-        }
-
-        const hashedPassword = bcrypt.hashSync(newPassword, 10);
-        await prisma.user.update({
-            where: { id: userId },
-            data: { password: hashedPassword },
-        });
-
-        return { message: 'Password updated successfully' };
+  async signUp(
+    firstname: string,
+    lastname: string,
+    email: string,
+    password?: string,
+  ) {
+    if ((await prisma.user.count()) > 0) {
+      throw new BadRequestException('User already exists');
     }
 
-    async signUp(firstname: string, lastname: string, email: string, password?: string) {
-        if (await prisma.user.count() > 0) {
-            throw new BadRequestException('User already exists');
-        }
-
-        if (await prisma.user.findUnique({ where: { email } })) {
-            throw new BadRequestException('Email already used');
-        }
-
-        if (!password) {
-            throw new BadRequestException('Password is required');
-        }
-
-        const user = await prisma.user.create({
-            data: {
-                firstname,
-                lastname,
-                email,
-                password: bcrypt.hashSync(password, 10),
-            },
-        });
-
-        return {
-            user: {
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                email: user.email,
-            },
-            message: 'User created successfully',
-        };
+    if (await prisma.user.findUnique({ where: { email } })) {
+      throw new BadRequestException('Email already used');
     }
 
-    async signIn(email: string, password: string) {
-        const user = await prisma.user.findUnique({ where: { email } });
-
-        if (!user || !bcrypt.compareSync(password, user.password || '')) {
-            throw new BadRequestException('Invalid email or password');
-        }
-
-        const payload = { sub: user.id, email: user.email };
-        const accessToken = this.jwt.sign(payload, {
-            secret: AuthService.getJWTSecret(),
-            expiresIn: ACCESS_DURATION,
-        });
-        const refreshToken = this.jwt.sign(payload, {
-            secret: AuthService.getJWTSecret(),
-            expiresIn: REFRESH_DURATION,
-        });
-
-        return {
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            user: {
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                email: user.email,
-            },
-        };
+    if (!password) {
+      throw new BadRequestException('Password is required');
     }
 
-    async refreshToken(token: string) {
-        try {
-            const payload = this.jwt.verify<{ sub: string, email: string, iat: number, exp: number }>(token, { secret: AuthService.getJWTSecret() });
+    const user = await prisma.user.create({
+      data: {
+        firstname,
+        lastname,
+        email,
+        password: bcrypt.hashSync(password, 10),
+      },
+    });
 
-            if (!payload || !payload.sub || !payload.email) {
-                throw new BadRequestException('Invalid refresh token payload');
-            }
+    return {
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+      },
+      message: 'User created successfully',
+    };
+  }
 
-            const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+  async signIn(email: string, password: string) {
+    const user = await prisma.user.findUnique({ where: { email } });
 
-            if (!user) {
-                throw new BadRequestException('User not found');
-            }
-
-            const newAccessToken = this.jwt.sign({ sub: user.id, email: user.email }, {
-                secret: AuthService.getJWTSecret(),
-                expiresIn: ACCESS_DURATION,
-            });
-
-            return { access_token: newAccessToken };
-        } catch (error) {
-            throw new BadRequestException('Invalid refresh token');
-        }
+    if (!user || !bcrypt.compareSync(password, user.password || '')) {
+      throw new BadRequestException('Invalid email or password');
     }
 
+    const payload = { sub: user.id, email: user.email };
+    const accessToken = this.jwt.sign(payload, {
+      secret: AuthService.getJWTSecret(),
+      expiresIn: ACCESS_DURATION,
+    });
+    const refreshToken = this.jwt.sign(payload, {
+      secret: AuthService.getJWTSecret(),
+      expiresIn: REFRESH_DURATION,
+    });
 
-    async exchangeCodeForTokens(code: string): Promise<{ id_token: string; access_token: string }> {
-        const params = new URLSearchParams({
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: process.env.OIDC_CALLBACK_URL || '',
-            client_id: process.env.OIDC_CLIENT_ID || '',
-            client_secret: process.env.OIDC_CLIENT_SECRET || '',
-        });
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+      },
+    };
+  }
 
-        const response = await fetch(process.env.OIDC_TOKEN_ENDPOINT || '', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json',
-            },
-            body: params.toString(),
-        });
+  async refreshToken(token: string) {
+    try {
+      const payload = this.jwt.verify<{
+        sub: string;
+        email: string;
+        iat: number;
+        exp: number;
+      }>(token, { secret: AuthService.getJWTSecret() });
 
-        if (!response.ok) {
-            console.error('Failed to exchange code for tokens:', response.statusText);
-            throw new Error('Failed to exchange code for tokens');
-        }
+      if (!payload || !payload.sub || !payload.email) {
+        throw new BadRequestException('Invalid refresh token payload');
+      }
 
-        const responseData = await response.json();
+      const user = await prisma.user.findUnique({ where: { id: payload.sub } });
 
-        if (!responseData.id_token) {
-            throw new Error('No id_token returned');
-        }
-        if (!responseData.access_token) {
-            throw new Error('No access_token returned');
-        }
-        return {
-            id_token: responseData.id_token,
-            access_token: responseData.access_token,
-        };
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      const newAccessToken = this.jwt.sign(
+        { sub: user.id, email: user.email },
+        {
+          secret: AuthService.getJWTSecret(),
+          expiresIn: ACCESS_DURATION,
+        },
+      );
+
+      return { access_token: newAccessToken };
+    } catch (error) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+  }
+
+  async exchangeCodeForTokens(
+    code: string,
+  ): Promise<{ id_token: string; access_token: string }> {
+    const params = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: process.env.OIDC_CALLBACK_URL || '',
+      client_id: process.env.OIDC_CLIENT_ID || '',
+      client_secret: process.env.OIDC_CLIENT_SECRET || '',
+    });
+
+    const response = await fetch(process.env.OIDC_TOKEN_ENDPOINT || '', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+      },
+      body: params.toString(),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to exchange code for tokens:', response.statusText);
+      throw new Error('Failed to exchange code for tokens');
     }
 
-    async processIdToken(idToken: string) {
-        const JWKS = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
-        const { payload } = await jwtVerify(idToken, JWKS, {
-            issuer: process.env.OIDC_ISSUER,
-            audience: process.env.OIDC_CLIENT_ID,
-        });
-        return payload;
+    const responseData = await response.json();
+
+    if (!responseData.id_token) {
+      throw new Error('No id_token returned');
+    }
+    if (!responseData.access_token) {
+      throw new Error('No access_token returned');
+    }
+    return {
+      id_token: responseData.id_token,
+      access_token: responseData.access_token,
+    };
+  }
+
+  async processIdToken(idToken: string) {
+    const JWKS = createRemoteJWKSet(new URL(process.env.OIDC_JWKS_URI || ''));
+    const { payload } = await jwtVerify(idToken, JWKS, {
+      issuer: process.env.OIDC_ISSUER,
+      audience: process.env.OIDC_CLIENT_ID,
+    });
+    return payload;
+  }
+
+  async loginOrCreateUserFromOidc(userInfo: any) {
+    let user = await prisma.user.findUnique({
+      where: { email: userInfo.email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: userInfo.email,
+          firstname: userInfo.given_name || '',
+          lastname: userInfo.family_name || '',
+        },
+      });
     }
 
-    async loginOrCreateUserFromOidc(userInfo: any) {
-        let user = await prisma.user.findUnique({ where: { email: userInfo.email } });
+    const accessToken = this.jwt.sign({ sub: user.id, email: user.email });
 
-        if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    email: userInfo.email,
-                    firstname: userInfo.given_name || '',
-                    lastname: userInfo.family_name || '',
-                },
-            });
-        }
-
-        const accessToken = this.jwt.sign({ sub: user.id, email: user.email });
-
-        return { accessToken, user };
-    }
+    return { accessToken, user };
+  }
 }
