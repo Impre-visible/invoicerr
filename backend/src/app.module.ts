@@ -1,24 +1,24 @@
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
-import { AuthModule } from './models/auth/auth.module';
-import { ClientsModule } from './models/clients/clients.module';
-import { CompanyModule } from './models/company/company.module';
-import { DangerModule } from './models/danger/danger.module';
-import { DashboardModule } from './models/dashboard/dashboard.module';
-import { InvoicesModule } from './models/invoices/invoices.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { ClientsModule } from './modules/clients/clients.module';
+import { CompanyModule } from './modules/company/company.module';
+import { DangerModule } from './modules/danger/danger.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { InvoicesModule } from './modules/invoices/invoices.module';
 import { MailService } from './mail/mail.service';
 import { APP_GUARD } from '@nestjs/core';
-import { PluginsModule } from './models/plugins/plugins.module';
-import { QuotesModule } from './models/quotes/quotes.module';
-import { ReceiptsModule } from './models/receipts/receipts.module';
-import { RecurringInvoicesModule } from './models/recurring-invoices/recurring-invoices.module';
+import { PluginsModule } from './modules/plugins/plugins.module';
+import { QuotesModule } from './modules/quotes/quotes.module';
+import { ReceiptsModule } from './modules/receipts/receipts.module';
+import { RecurringInvoicesModule } from './modules/recurring-invoices/recurring-invoices.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { SignaturesModule } from './models/signatures/signatures.module';
+import { SignaturesModule } from './modules/signatures/signatures.module';
 import { LoginRequiredGuard } from 'src/guards/login-required.guard';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from 'src/models/auth/auth.service';
+import { AuthService } from '@/modules/auth/auth.service';
 
 @Module({
   imports: [
