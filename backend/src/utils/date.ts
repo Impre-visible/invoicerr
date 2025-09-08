@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { Company } from "@invoicerr/prisma/client";
 import { format } from "date-fns";
 
 export const formatDate = (company: Company, date?: Date | null,) => {

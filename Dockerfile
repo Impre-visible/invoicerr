@@ -8,6 +8,7 @@ RUN npm install
 
 COPY backend/. .
 
+RUN npx prisma migrate deploy 
 RUN npx prisma generate
 RUN npm run build
 

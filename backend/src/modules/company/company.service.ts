@@ -1,7 +1,7 @@
 import { EditCompanyDto, PDFConfigDto } from '@/modules/company/dto/company.dto';
 import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { MailTemplate, MailTemplateType } from '@prisma/client';
+import { MailTemplate, MailTemplateType } from '@invoicerr/prisma/client'
 import { randomUUID } from 'crypto';
 
 export interface EmailTemplate {
