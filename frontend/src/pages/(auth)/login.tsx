@@ -1,5 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from "react"
+import {
+    EyeClosedIcon, EyeIcon
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,7 +29,7 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<Record<string, string[]>>({})
     const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
     const [hasToasted, setHasToasted] = useState(false)
-
+    const [showPassword, setShowPassword] = useState(false);
 
     // Move schema inside component to access t function
     const loginSchema = z.object({
@@ -90,7 +93,25 @@ export default function LoginPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="password">{t("auth.login.form.password.label")}</Label>
-                            <Input id="password" name="password" type="password" disabled={loading} />
+                            <div className="flex items-center justify-between gap-2">
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    disabled={loading}
+                                />
+                                    <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                >
+                                    {showPassword ? (
+                                    <EyeClosedIcon className="h-4 w-4" />
+                                    ) : (
+                                    <EyeIcon className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            </div>
                             {errors.password && <p className="text-sm text-red-600">{errors.password[0]}</p>}
                         </div>
                         <Button type="submit" className="w-full" disabled={loading}>
