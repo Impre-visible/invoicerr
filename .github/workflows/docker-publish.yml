@@ -8,18 +8,19 @@ on:
       - test/workflow
 
 jobs:
-  setup-env:
+  build-multiarch:
     runs-on: ubuntu-latest
-    outputs:
-      repo-name-lower: ${{ steps.set-vars.outputs.repo-name-lower }}
-      image-tag: ${{ steps.set-vars.outputs.image-tag }}
-      cache-ref: ${{ steps.set-vars.outputs.cache-ref }}
+    permissions:
+      contents: read
+      packages: write
+
     steps:
+      - uses: actions/checkout@v4
+
       - name: Set repo name, image tag and cache ref
         id: set-vars
         run: |
           REPO_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
-
           GIT_REF="${GITHUB_REF:-${{ github.ref }}}"
 
           if [[ "$GIT_REF" == refs/tags/* ]]; then
@@ -28,36 +29,16 @@ jobs:
           elif [[ "$GIT_REF" == refs/heads/test/workflow ]]; then
             IMAGE_TAG=test-workflow
             CACHE_REF=test-workflow
-          elif [[ -n "$GIT_REF" ]]; then
+          else
             BRANCH_NAME=${GIT_REF#refs/heads/}
             SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
             IMAGE_TAG=${SAFE_BRANCH_NAME}
             CACHE_REF=branch-${SAFE_BRANCH_NAME}
-          else
-            IMAGE_TAG=latest
-            CACHE_REF=latest
           fi
 
           echo "repo-name-lower=$REPO_NAME_LOWER" >> $GITHUB_OUTPUT
           echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
           echo "cache-ref=$CACHE_REF" >> $GITHUB_OUTPUT
-
-      - name: Display cache configuration
-        run: |
-          echo "🚀 Cache configuration:"
-          echo "  Repo: ${{ steps.set-vars.outputs.repo-name-lower }}"
-          echo "  Image tag: ${{ steps.set-vars.outputs.image-tag }}"
-          echo "  Cache ref: ${{ steps.set-vars.outputs.cache-ref }}"
-          echo "  Git ref: $GITHUB_REF"
-
-  build-amd64:
-    needs: setup-env
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -73,67 +54,19 @@ jobs:
             [worker.oci]
               max-parallelism = 8
 
-      - name: Build and push AMD64 image
+      - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
-          platforms: linux/amd64
-          cache-from: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
-          cache-to: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
-
-  build-arm64:
-    needs: setup-env
-    runs-on: ubuntu-22.04-arm
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-flags: --oci-worker-no-process-sandbox=false
-          driver-opts: image=moby/buildkit:latest
-
-      - name: Build and push ARM64 image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
-          platforms: linux/arm64
-          cache-from: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
-          cache-to: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
-
-  create-manifest:
-    needs: [build-amd64, build-arm64, setup-env]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create multi-arch manifest
-        run: |
-          docker manifest create ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }} \
-            ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
-          docker manifest push ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
+          tags: ghcr.io/${{ steps.set-vars.outputs.repo-name-lower }}:${{ steps.set-vars.outputs.image-tag }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,mode=max,scope=${{ steps.set-vars.outputs.cache-ref }}
+          cache-to: type=gha,mode=max,scope=${{ steps.set-vars.outputs.cache-ref }}
 
       - name: Display build summary
         run: |
           echo "✅ Build completed successfully!"
-          echo "  Image pushed: ${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}"
-          echo "  Cache scope used: ${{ needs.setup-env.outputs.cache-ref }}"
+          echo "  Image pushed: ${{ steps.set-vars.outputs.repo-name-lower }}:${{ steps.set-vars.outputs.image-tag }}"
+          echo "  Cache scope used: ${{ steps.set-vars.outputs.cache-ref }}"
+          echo "  Platforms built: linux/amd64, linux/arm64"
