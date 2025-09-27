@@ -20,17 +20,22 @@ jobs:
         run: |
           REPO_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
 
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            IMAGE_TAG=${GITHUB_REF#refs/tags/}
+          GIT_REF="${GITHUB_REF:-${{ github.ref }}}"
+
+          if [[ "$GIT_REF" == refs/tags/* ]]; then
+            IMAGE_TAG=${GIT_REF#refs/tags/}
             CACHE_REF=release
-          elif [[ "${GITHUB_REF}" == refs/heads/test/workflow ]]; then
+          elif [[ "$GIT_REF" == refs/heads/test/workflow ]]; then
             IMAGE_TAG=test-workflow
             CACHE_REF=test-workflow
-          else
-            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          elif [[ -n "$GIT_REF" ]]; then
+            BRANCH_NAME=${GIT_REF#refs/heads/}
             SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
             IMAGE_TAG=${SAFE_BRANCH_NAME}
             CACHE_REF=branch-${SAFE_BRANCH_NAME}
+          else
+            IMAGE_TAG=latest
+            CACHE_REF=latest
           fi
 
           echo "repo-name-lower=$REPO_NAME_LOWER" >> $GITHUB_OUTPUT
