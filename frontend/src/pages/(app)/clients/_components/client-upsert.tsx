@@ -41,8 +41,8 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
             .optional(),
         currency: z.string().nullable().optional(),
         foundedAt: z.date().optional().refine((date) => !date || date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
-        contactFirstname: z.string().min(1, t("clients.upsert.validation.contactFirstname.required")),
-        contactLastname: z.string().min(1, t("clients.upsert.validation.contactLastname.required")),
+        contactFirstname: z.string().optional(),
+        contactLastname: z.string().optional(),
         contactPhone: z
             .string()
             .min(8, t("clients.upsert.validation.contactPhone.minLength"))
@@ -141,7 +141,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     name="contactFirstname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.upsert.fields.contactFirstname.placeholder")} />
                                             </FormControl>
@@ -154,7 +154,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     name="contactLastname"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.upsert.fields.contactLastname.placeholder")} />
                                             </FormControl>

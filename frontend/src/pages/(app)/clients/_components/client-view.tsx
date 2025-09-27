@@ -33,12 +33,14 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                             <p className="text-sm text-muted-foreground">{t("clients.view.fields.companyName")}</p>
                             <p className="font-medium">{client?.name || "—"}</p>
                         </div>
+                        {(!!client?.contactFirstname || !!client?.contactLastname) && (
                         <div className="w-fit">
                             <p className="text-sm text-muted-foreground">{t("clients.view.fields.contactPerson")}</p>
                             <p className="font-medium">
-                                {client?.contactFirstname} {client?.contactLastname}
+                                    {client?.contactFirstname || ''} {client?.contactLastname || ''}
                             </p>
                         </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
