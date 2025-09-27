@@ -72,7 +72,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+          tags: ghcr.io/${{ github.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
           cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
@@ -98,7 +98,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+          tags: ghcr.io/${{ github.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
           platforms: linux/arm64
           cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
           cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
@@ -116,12 +116,12 @@ jobs:
 
       - name: Create multi-arch manifest
         run: |
-          docker manifest create ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }} \
-            ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
-          docker manifest push ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+          docker manifest create ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }} \
+            ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
+          docker manifest push ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
 
       - name: Display build summary
         run: |
           echo "✅ Build completed successfully!"
-          echo "  Image pushed: ${{ github.repository }}:${{ env.IMAGE_TAG }}"
+          echo "  Image pushed: ${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}"
           echo "  Cache scope used: ${{ env.CACHE_REF }}"
