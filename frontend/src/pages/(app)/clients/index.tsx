@@ -32,8 +32,8 @@ export default function Clients() {
         clients?.clients.filter(
             (client) =>
                 client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                client.contactFirstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                client.contactLastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.contactFirstname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.contactLastname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 client.contactEmail.toLowerCase().includes(searchTerm.toLowerCase()),
         ) || []
 
