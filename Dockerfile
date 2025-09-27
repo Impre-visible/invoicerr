@@ -1,10 +1,5 @@
 FROM node:22-bullseye AS backend-builder
 
-RUN apt-get update && \
-    apt-get install -y build-essential python3 curl git pkg-config libssl-dev && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
-    export PATH=$HOME/.cargo/bin:$PATH
-
 WORKDIR /app
 
 COPY backend/package.json ./package.json
