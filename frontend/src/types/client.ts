@@ -5,8 +5,8 @@ export interface Client {
     legalId?: string;
     VAT?: string;
     foundedAt?: Date;
-    contactFirstname: string;
-    contactLastname: string;
+    contactFirstname?: string;
+    contactLastname?: string;
     contactEmail: string;
     contactPhone?: string;
     address?: string;
