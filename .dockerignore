@@ -1,7 +1,7 @@
 backend/.env
 backend/.env.example
 backend/node_modules
-
+backend/prisma/generated
 
 frontend/.env
 frontend/.env.example

@@ -1,4 +1,4 @@
-import { Currency } from "@invoicerr/prisma/enums";
+import { Currency } from "@invoicerr/prisma";
 
 export class CreateInvoiceDto {
     clientId: string;

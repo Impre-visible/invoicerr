@@ -22,4 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 backend/prisma/db.sqlite
+backend/prisma/generated

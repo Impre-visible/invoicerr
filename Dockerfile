@@ -3,20 +3,21 @@ FROM node:22-bullseye AS backend-builder
 WORKDIR /app
 
 COPY backend/package.json ./package.json
+COPY backend/prisma ./prisma
 
 RUN npm install
 
 COPY backend/. .
 
-RUN npx prisma generate
+RUN npx prisma generate --schema=prisma/schema.prisma
 RUN npm run build
+RUN chmod -R 755 /app/prisma/generated
 
 FROM node:22-bullseye AS frontend-builder
 
 WORKDIR /app
 
 COPY frontend/package.json ./package.json
-
 RUN npm install
 
 COPY frontend/. .
@@ -30,12 +31,11 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
-COPY --from=backend-builder /app/dist /usr/share/nginx/backend
+COPY --from=backend-builder /app/dist /usr/share/nginx/backend/src
 COPY --from=backend-builder /app/node_modules /usr/share/nginx/backend/node_modules
 COPY --from=backend-builder /app/package*.json /usr/share/nginx/backend/
-
-COPY --from=backend-builder /app/node_modules/.prisma /usr/share/nginx/.prisma
-COPY --from=backend-builder /app/prisma /usr/share/nginx/prisma
+COPY --from=backend-builder /app/prisma /usr/share/nginx/backend/prisma
+COPY --from=backend-builder /app/prisma/generated /usr/share/nginx/backend/prisma/generated
 COPY --from=backend-builder /app/package.json /usr/share/nginx/
 
 COPY entrypoint.sh /usr/share/nginx/entrypoint.sh
