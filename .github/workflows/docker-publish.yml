@@ -8,7 +8,45 @@ on:
       - test/workflow
 
 jobs:
+  setup-env:
+    runs-on: ubuntu-latest
+    outputs:
+      repo-name-lower: ${{ steps.set-vars.outputs.repo-name-lower }}
+      image-tag: ${{ steps.set-vars.outputs.image-tag }}
+      cache-ref: ${{ steps.set-vars.outputs.cache-ref }}
+    steps:
+      - name: Set repo name, image tag and cache ref
+        id: set-vars
+        run: |
+          REPO_NAME_LOWER=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            IMAGE_TAG=${GITHUB_REF#refs/tags/}
+            CACHE_REF=release
+          elif [[ "${GITHUB_REF}" == refs/heads/test/workflow ]]; then
+            IMAGE_TAG=test-workflow
+            CACHE_REF=test-workflow
+          else
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+            SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
+            IMAGE_TAG=${SAFE_BRANCH_NAME}
+            CACHE_REF=branch-${SAFE_BRANCH_NAME}
+          fi
+
+          echo "repo-name-lower=$REPO_NAME_LOWER" >> $GITHUB_OUTPUT
+          echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "cache-ref=$CACHE_REF" >> $GITHUB_OUTPUT
+
+      - name: Display cache configuration
+        run: |
+          echo "🚀 Cache configuration:"
+          echo "  Repo: ${{ steps.set-vars.outputs.repo-name-lower }}"
+          echo "  Image tag: ${{ steps.set-vars.outputs.image-tag }}"
+          echo "  Cache ref: ${{ steps.set-vars.outputs.cache-ref }}"
+          echo "  Git ref: $GITHUB_REF"
+
   build-amd64:
+    needs: setup-env
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,38 +61,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Lowercase repo name
-        run: echo "REPO_NAME_LOWER=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Set image tags and cache reference
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG=${GITHUB_REF#refs/tags/}
-            echo "IMAGE_TAG=${TAG}" >> $GITHUB_ENV
-            echo "CACHE_REF=release" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF}" == refs/heads/test/workflow ]]; then
-            echo "IMAGE_TAG=test-workflow" >> $GITHUB_ENV
-            echo "CACHE_REF=test-workflow" >> $GITHUB_ENV
-          else
-            BRANCH_NAME=${GITHUB_REF#refs/heads/}
-            SAFE_BRANCH_NAME=${BRANCH_NAME//\//-}
-            echo "IMAGE_TAG=${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
-            echo "CACHE_REF=branch-${SAFE_BRANCH_NAME}" >> $GITHUB_ENV
-          fi
-
-      - name: Display cache configuration
-        run: |
-          echo "🚀 Cache configuration:"
-          echo "  Cache reference: ${{ env.CACHE_REF }}"
-          echo "  Image tag: ${{ env.IMAGE_TAG }}"
-          echo "  Git ref: ${GITHUB_REF}"
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -62,23 +68,18 @@ jobs:
             [worker.oci]
               max-parallelism = 8
 
-      - name: Check existing Docker cache
-        run: |
-          echo "🔍 Checking existing cache for scope: ${{ env.CACHE_REF }}"
-          docker buildx du || true
-
       - name: Build and push AMD64 image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
           platforms: linux/amd64
-          cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
+          cache-from: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
+          cache-to: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
 
   build-arm64:
+    needs: setup-env
     runs-on: ubuntu-22.04-arm
     permissions:
       contents: read
@@ -104,10 +105,10 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
+          tags: ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
           platforms: linux/arm64
-          cache-from: type=gha,mode=max,scope=${{ env.CACHE_REF }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
+          cache-from: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
+          cache-to: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
 
   create-manifest:
     needs: [build-amd64, build-arm64]
@@ -122,12 +123,12 @@ jobs:
 
       - name: Create multi-arch manifest
         run: |
-          docker manifest create ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }} \
-            ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
-          docker manifest push ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
+          docker manifest create ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }} \
+            ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
+          docker manifest push ghcr.io/${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}
 
       - name: Display build summary
         run: |
           echo "✅ Build completed successfully!"
-          echo "  Image pushed: ${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}"
-          echo "  Cache scope used: ${{ env.CACHE_REF }}"
+          echo "  Image pushed: ${{ needs.setup-env.outputs.repo-name-lower }}:${{ needs.setup-env.outputs.image-tag }}"
+          echo "  Cache scope used: ${{ needs.setup-env.outputs.cache-ref }}"
