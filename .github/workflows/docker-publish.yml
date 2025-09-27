@@ -116,7 +116,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ needs.setup-env.outputs.cache-ref }}
 
   create-manifest:
-    needs: [build-amd64, build-arm64]
+    needs: [build-amd64, build-arm64, setup-env]
     runs-on: ubuntu-latest
     steps:
       - name: Log in to the Container registry
