@@ -53,7 +53,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ env.REPO_NAME_LOWER }}:${{ env.IMAGE_TAG }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -79,7 +79,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ env.CACHE_REF }}
 
   build-arm64:
-    runs-on: ubuntu-22.04-arm64
+    runs-on: ubuntu-22.04-arm
     permissions:
       contents: read
       packages: write
