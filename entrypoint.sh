@@ -3,6 +3,18 @@
 # Navigate to the backend directory where the compiled code and config are
 cd /usr/share/nginx/backend/src
 
+echo "[DEBUG] - Listing files in /usr/share/nginx/backend"
+ls -la /usr/share/nginx/backend
+
+echo "[DEBUG] - Listing files in /usr/share/nginx/backend/src"
+ls -la /usr/share/nginx/backend/src
+
+echo "[DEBUG] - Listing files in /"
+ls -la /
+
+echo "[DEBUG] - Architecture info"
+uname -a
+
 # Push database schema using the standard Prisma command
 echo "Pushing database schema..."
 npx prisma db push --skip-generate --accept-data-loss --schema=./prisma/schema.prisma
