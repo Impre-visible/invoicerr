@@ -9,6 +9,12 @@ ls -la /usr/share/nginx/backend
 echo "[DEBUG] - Listing files in /usr/share/nginx/backend/src"
 ls -la /usr/share/nginx/backend/src
 
+echo "[DEBUG] - Listing files in /usr/share/nginx/backend/prisma"
+ls -la /usr/share/nginx/backend/prisma
+
+echo "[DEBUG] - Listing files in /usr/share/nginx/backend/src/prisma"
+ls -la /usr/share/nginx/backend/src/prisma
+
 echo "[DEBUG] - Listing files in /"
 ls -la /
 
