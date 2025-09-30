@@ -23,7 +23,7 @@ uname -a
 
 # Push database schema using the standard Prisma command
 echo "Pushing database schema..."
-npx prisma db push --skip-generate --accept-data-loss --schema=./prisma/schema.prisma
+npx prisma db push --skip-generate --accept-data-loss --schema=/usr/share/nginx/backend/prisma/schema.prisma
 
 # Start the backend service
 echo "Starting backend service..."
