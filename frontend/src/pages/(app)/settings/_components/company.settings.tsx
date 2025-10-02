@@ -9,6 +9,7 @@ import type { Company } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
@@ -136,6 +137,7 @@ export default function CompanySettings() {
             .refine((val) => {
                 return ALLOWED_DATE_FORMATS.includes(val)
             }, t("settings.company.form.dateFormat.errors.format")),
+        exemptVat: z.boolean().optional(),
     })
 
     const { data } = useGet<Company>("/api/company/info")
@@ -149,6 +151,7 @@ export default function CompanySettings() {
             description: "",
             legalId: "",
             VAT: "",
+            exemptVat: false,
             foundedAt: new Date(),
             currency: "",
             address: "",
@@ -172,6 +175,7 @@ export default function CompanySettings() {
             form.reset({
                 ...data,
                 foundedAt: new Date(data.foundedAt),
+                exemptVat: !!data.exemptVat,
             })
         }
     }, [data, form])
@@ -596,6 +600,21 @@ export default function CompanySettings() {
                                             </Select>
                                         </FormControl>
                                         <FormDescription>{t("settings.company.form.dateFormat.description")}</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="exemptVat"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("settings.company.form.exemptVat.label")}</FormLabel>
+                                        <FormControl>
+                                            <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
+                                        </FormControl>
+                                        <FormDescription>{t("settings.company.form.exemptVat.description")}</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
