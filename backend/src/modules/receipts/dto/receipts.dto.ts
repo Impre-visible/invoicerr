@@ -4,8 +4,9 @@ export class CreateReceiptDto {
         invoiceItemId: string;
         amountPaid: number | string;
     }[];
-    paymentMethod: string;
-    paymentDetails: string;
+    paymentMethodId?: string;
+    paymentMethod?: string;
+    paymentDetails?: string;
 }
 
 export class EditReceiptDto extends CreateReceiptDto {
