@@ -5,6 +5,7 @@ export interface Company {
     name: string
     currency: string
     VAT: string
+    exemptVat?: boolean
     address: string
     postalCode: string
     city: string
