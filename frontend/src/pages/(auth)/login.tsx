@@ -125,10 +125,13 @@ export default function LoginPage() {
                                 {t("auth.login.signUpLink")}
                             </a>
                         </div>
-                        {import.meta.env.VITE_OIDC_ENDPOINT && (
+                        {((window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT) && (
                             <div className="text-center text-sm">
                                 {t("auth.login.oidc")}{" "}
-                                <a href={import.meta.env.VITE_OIDC_ENDPOINT} className="underline hover:text-primary">
+                                <a
+                                    href={(window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT}
+                                    className="underline hover:text-primary"
+                                >
                                     {t("auth.login.oidcLink")}
                                 </a>
                             </div>
