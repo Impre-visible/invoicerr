@@ -215,7 +215,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.client")}:</span>{" "}
-                                                                {invoice.client.name}
+                                                                {invoice.client.name||invoice.client.contactFirstname+" "+invoice.client.contactLastname}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.issued")}:</span>{" "}
@@ -230,7 +230,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                                     <span className="font-medium text-foreground">
                                                                         {t("invoices.list.item.payment")}:
                                                                     </span>{" "}
-                                                                    {invoice.paymentMethod}
+                                                                    {((invoice.paymentMethod as any)?.name ?? (invoice.paymentMethod as any)?.type) ?? "-"}
                                                                 </span>
                                                             )}
                                                             <span>
