@@ -31,12 +31,12 @@ export function RecurringInvoiceViewDialog({ recurringInvoice, onOpenChange }: R
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-4 rounded-lg">
                         <div>
                             <p className="text-sm text-muted-foreground">{t("recurringInvoices.view.fields.client")}</p>
-                            <p className="font-medium">{recurringInvoice.client?.name || recurringInvoice.clientId}</p>
+                            <p className="font-medium">{recurringInvoice.client?.name || recurringInvoice.client?.contactFirstname+ " " + recurringInvoice.client?.contactLastname || recurringInvoice.clientId}</p>
                         </div>
 
                         <div>
                             <p className="text-sm text-muted-foreground">{t("recurringInvoices.view.fields.paymentMethod")}</p>
-                            <p className="font-medium">{recurringInvoice.paymentMethod || "—"}</p>
+                            <p className="font-medium">{recurringInvoice.paymentMethod?.name || recurringInvoice.paymentMethod?.type || "—"}</p>
                         </div>
                     </div>
 
