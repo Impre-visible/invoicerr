@@ -1,4 +1,5 @@
 import type { Invoice } from "./invoice";
+import type { PaymentMethod } from "./payment-method";
 
 interface ReceiptItem {
     id: string;
@@ -20,6 +21,6 @@ export interface Receipt {
     totalPaid: number;
     createdAt: string; // ISO date string
     updatedAt: string; // ISO date string
-    paymentMethod: string;
-    paymentDetails: string;
+    paymentMethodId?: string;
+    paymentMethod?: PaymentMethod;
 }
