@@ -58,6 +58,28 @@ export class ClientsService {
 
     async createClient(editClientsDto: EditClientsDto) {
         const { id, ...data } = editClientsDto;
+
+        // Server-side validation to mirror frontend rules:
+        // - INDIVIDUAL: contactFirstname & contactLastname are required
+        // - COMPANY: name & legalId (SIRET/SIREN) are required
+        const type = (data as any).type || 'COMPANY';
+
+        if (type === 'INDIVIDUAL') {
+            if (!data.contactFirstname || (data.contactFirstname as string).trim() === '') {
+                throw new BadRequestException('First name is required for individual clients');
+            }
+            if (!data.contactLastname || (data.contactLastname as string).trim() === '') {
+                throw new BadRequestException('Last name is required for individual clients');
+            }
+        } else {
+            if (!data.name || (data.name as string).trim() === '') {
+                throw new BadRequestException('Company name is required for company clients');
+            }
+            if (!data.legalId || (data.legalId as string).trim() === '') {
+                throw new BadRequestException('SIRET/SIREN (legalId) is required for company clients');
+            }
+        }
+
         return prisma.client.create({ data });
     }
 
@@ -65,8 +87,30 @@ export class ClientsService {
         if (!editClientsDto.id) {
             throw new BadRequestException('Client ID is required for editing');
         }
-        if (! await prisma.client.findUnique({ where: { id: editClientsDto.id } })) {
+
+        const existingClient = await prisma.client.findUnique({ where: { id: editClientsDto.id } });
+        if (!existingClient) {
             throw new BadRequestException('Client not found');
+        }
+
+        const data = { ...editClientsDto } as any;
+        // Prefer explicit type in payload, otherwise fall back to existing client's type
+        const type = data.type || existingClient.type || 'COMPANY';
+
+        if (type === 'INDIVIDUAL') {
+            if (!data.contactFirstname || (data.contactFirstname as string).trim() === '') {
+                throw new BadRequestException('First name is required for individual clients');
+            }
+            if (!data.contactLastname || (data.contactLastname as string).trim() === '') {
+                throw new BadRequestException('Last name is required for individual clients');
+            }
+        } else {
+            if (!data.name || (data.name as string).trim() === '') {
+                throw new BadRequestException('Company name is required for company clients');
+            }
+            if (!data.legalId || (data.legalId as string).trim() === '') {
+                throw new BadRequestException('SIRET/SIREN (legalId) is required for company clients');
+            }
         }
 
         return await prisma.client.update({
