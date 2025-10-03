@@ -187,23 +187,29 @@ export default function Clients() {
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <h3 className="font-medium text-foreground break-words">{client.name}</h3>
+                                                    <h3 className="font-medium text-foreground break-words">{client.name || client.contactFirstname + " " + client.contactLastname}</h3>
                                                     <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                                                             } w-fit`}
                                                     >
                                                         {client.isActive ? t("clients.list.status.active") : t("clients.list.status.inactive")}
                                                     </span>
+                                                    <span
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.type === 'INDIVIDUAL' ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"
+                                                            } w-fit ml-2`}
+                                                    >
+                                                        {client.type === 'INDIVIDUAL' ? t("clients.upsert.fields.type.individual") : t("clients.upsert.fields.type.company")}
+                                                    </span>
                                                 </div>
                                                 <div className="mt-2 flex flex-col lg:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
-                                                        <span>{client.contactEmail}</span>
+                                                        <span>{client.contactEmail||"-"}</span>
                                                     </div>
                                                     {client.contactPhone && (
                                                         <div className="flex items-center space-x-1">
                                                             <Phone className="h-4 w-4" />
-                                                            <span>{client.contactPhone}</span>
+                                                            <span>{client.contactPhone||"-"}</span>
                                                         </div>
                                                     )}
                                                     {client.city && (
