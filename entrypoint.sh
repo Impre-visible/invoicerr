@@ -21,6 +21,15 @@ ls -la /
 echo "[DEBUG] - Architecture info"
 uname -a
 
+# Create runtime config for frontend (populated from environment variables)
+echo "[DEBUG] - Writing frontend runtime config to /usr/share/nginx/html/config.json"
+mkdir -p /usr/share/nginx/html
+cat > /usr/share/nginx/html/config.json <<EOF
+{
+  "VITE_OIDC_ENDPOINT": "${VITE_OIDC_ENDPOINT:-}"
+}
+EOF
+
 # Push database schema using the standard Prisma command
 echo "Pushing database schema..."
 npx prisma db push --skip-generate --accept-data-loss --schema=/usr/share/nginx/backend/prisma/schema.prisma
