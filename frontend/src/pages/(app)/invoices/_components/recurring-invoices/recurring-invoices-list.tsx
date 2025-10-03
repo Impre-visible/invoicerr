@@ -100,14 +100,14 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("recurringInvoices.list.item.client")}:</span>{" "}
-                                                                {recurringInvoice.client.name}
+                                                                {recurringInvoice.client.name || recurringInvoice.client.contactFirstname+ " " +recurringInvoice.client.contactLastname}
                                                             </span>
                                                             {recurringInvoice.paymentMethod && (
                                                                 <span>
                                                                     <span className="font-medium text-foreground">
                                                                         {t("recurringInvoices.list.item.payment")}:
                                                                     </span>{" "}
-                                                                    {recurringInvoice.paymentMethod}
+                                                                    {((recurringInvoice.paymentMethod as any)?.name ?? (recurringInvoice.paymentMethod as any)?.type) ?? "-"}
                                                                 </span>
                                                             )}
                                                             <span>
