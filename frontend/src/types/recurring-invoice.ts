@@ -1,5 +1,6 @@
 import type { Client } from "./client";
 import type { Company } from "./company";
+import type { PaymentMethod } from "./payment-method";
 
 export enum RecurrenceFrequency {
     WEEKLY = 'WEEKLY',
@@ -29,7 +30,8 @@ export interface RecurringInvoice {
     client: Client;
     company: Company;
     items: RecurringInvoiceItem[];
-    paymentMethod?: string;
+    paymentMethodId?: string;
+    paymentMethod?: PaymentMethod;
     paymentDetails?: string;
     notes?: string;
     totalHT: number;
@@ -50,7 +52,7 @@ export interface CreateRecurringInvoiceDto {
     clientId: string;
     currency?: string;
     notes?: string;
-    paymentMethod?: string;
+    paymentMethodId?: string;
     paymentDetails?: string;
     frequency: RecurrenceFrequency;
     count?: number;
