@@ -7,6 +7,7 @@ import type { Client } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -28,32 +29,34 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
     const { trigger: updateClient } = usePatch(`/api/clients/${client?.id}`)
 
     const clientSchema = z.object({
-        name: z.string().min(1, t("clients.upsert.validation.name.required")),
+        type: z.enum(['INDIVIDUAL', 'COMPANY']),
+        name: z.string().optional(),
         description: z.string().max(500, t("clients.upsert.validation.description.maxLength")).optional(),
         legalId: z.string().max(50, t("clients.upsert.validation.legalId.maxLength")).optional(),
         VAT: z
             .string()
             .max(15, t("clients.upsert.validation.vat.maxLength"))
+            .optional()
             .refine((val) => {
                 if (!val) return true // Skip validation if VAT is not provided
                 return /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(val)
-            }, t("clients.upsert.validation.vat.format"))
-            .optional(),
+            }, t("clients.upsert.validation.vat.format")),
         currency: z.string().nullable().optional(),
         foundedAt: z.date().optional().refine((date) => !date || date <= new Date(), t("clients.upsert.validation.foundedAt.future")),
         contactFirstname: z.string().optional(),
         contactLastname: z.string().optional(),
         contactPhone: z
             .string()
-            .min(8, t("clients.upsert.validation.contactPhone.minLength"))
+            .optional()
             .refine((val) => {
+                if (!val) return true;
                 return /^[+]?[0-9\s\-()]{8,20}$/.test(val)
             }, t("clients.upsert.validation.contactPhone.format")),
         contactEmail: z
             .string()
-            .email()
-            .min(1, t("clients.upsert.validation.contactEmail.required"))
+            .optional()
             .refine((val) => {
+                if (!val) return true;
                 return z.string().email().safeParse(val).success
             }, t("clients.upsert.validation.contactEmail.format")),
         address: z.string().min(1, t("clients.upsert.validation.address.required")),
@@ -62,11 +65,28 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
         }, t("clients.upsert.validation.postalCode.format")),
         city: z.string().min(1, t("clients.upsert.validation.city.required")),
         country: z.string().min(1, t("clients.upsert.validation.country.required")),
+    }).superRefine((val, ctx) => {
+        if (val.type === 'INDIVIDUAL') {
+            if (!val.contactFirstname || val.contactFirstname.trim() === '') {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['contactFirstname'], message: t("clients.upsert.validation.contactFirstname.required") || "First name is required for individuals" })
+            }
+            if (!val.contactLastname || val.contactLastname.trim() === '') {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['contactLastname'], message: t("clients.upsert.validation.contactLastname.required") || "Last name is required for individuals" })
+            }
+        } else {
+            if (!val.name || val.name.trim() === '') {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['name'], message: t("clients.upsert.validation.name.required") })
+            }
+            if (!val.legalId || val.legalId.trim() === '') {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['legalId'], message: t("clients.upsert.validation.legalId.required") || "SIRET is required for companies" })
+            }
+        }
     })
 
     const form = useForm<z.infer<typeof clientSchema>>({
         resolver: zodResolver(clientSchema),
         defaultValues: {
+            type: 'COMPANY',
             name: "",
             description: "",
             legalId: "",
@@ -84,14 +104,32 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
         },
     })
 
+    // watch the selected client type to conditionally render company-specific fields
+    const clientType = form.watch("type")
+
     useEffect(() => {
         if (isEditing && client) {
+            const c: any = client as any;
             form.reset({
-                ...client,
-                foundedAt: client.foundedAt ? new Date(client.foundedAt) : undefined,
+                type: c.type || 'COMPANY',
+                name: c.name || "",
+                description: c.description || "",
+                legalId: c.legalId || "",
+                VAT: c.VAT || "",
+                currency: c.currency || null,
+                foundedAt: c.foundedAt ? new Date(c.foundedAt) : undefined,
+                contactFirstname: c.contactFirstname || "",
+                contactLastname: c.contactLastname || "",
+                contactPhone: c.contactPhone || "",
+                contactEmail: c.contactEmail || "",
+                address: c.address || "",
+                postalCode: c.postalCode || "",
+                city: c.city || "",
+                country: c.country || "",
             })
         } else if (!isEditing) {
             form.reset({
+                type: 'COMPANY',
                 name: "",
                 description: "",
                 legalId: "",
@@ -163,20 +201,48 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     )}
                                 />
                             </div>
-
+    
                             <FormField
                                 control={form.control}
-                                name="name"
+                                name="type"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel required>{t("clients.upsert.fields.name.label")}</FormLabel>
+                                        <FormLabel>{t("clients.upsert.fields.type.label") || "Client type"}</FormLabel>
                                         <FormControl>
-                                            <Input {...field} placeholder={t("clients.upsert.fields.name.placeholder")} />
+                                            <Select value={field.value || "COMPANY"} onValueChange={(value) => field.onChange(value)}>
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="COMPANY">
+                                                        {t("clients.upsert.fields.type.company") || "Company"}
+                                                    </SelectItem>
+                                                    <SelectItem value="INDIVIDUAL">
+                                                        {t("clients.upsert.fields.type.individual") || "Individual"}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+    
+                            {clientType === 'COMPANY' && (
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t("clients.upsert.fields.name.label")}</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder={t("clients.upsert.fields.name.placeholder")} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
 
                             <FormField
                                 control={form.control}
@@ -192,34 +258,36 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                 )}
                             />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="legalId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("clients.upsert.fields.legalId.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder={t("clients.upsert.fields.legalId.placeholder")} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="VAT"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("clients.upsert.fields.vat.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder={t("clients.upsert.fields.vat.placeholder")} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                            {clientType === 'COMPANY' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="legalId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("clients.upsert.fields.legalId.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} placeholder={t("clients.upsert.fields.legalId.placeholder")} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="VAT"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("clients.upsert.fields.vat.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} placeholder={t("clients.upsert.fields.vat.placeholder")} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
@@ -261,7 +329,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     name="contactEmail"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.upsert.fields.contactEmail.placeholder")} />
                                             </FormControl>
@@ -274,7 +342,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     name="contactPhone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel required>{t("clients.upsert.fields.contactPhone.label")}</FormLabel>
+                                            <FormLabel>{t("clients.upsert.fields.contactPhone.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.upsert.fields.contactPhone.placeholder")} />
                                             </FormControl>
