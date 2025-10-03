@@ -24,8 +24,17 @@ export class RecurringInvoicesService {
 
         const totalCount = await prisma.recurringInvoice.count();
 
+        // Attach payment method object if available so frontend can consume recurringInvoice.paymentMethod as an object
+        const recurringInvoicesWithPM = await Promise.all(recurringInvoices.map(async (ri: any) => {
+            if (ri.paymentMethodId) {
+                const pm = await prisma.paymentMethod.findUnique({ where: { id: ri.paymentMethodId } });
+                return { ...ri, paymentMethod: pm ?? ri.paymentMethod };
+            }
+            return ri;
+        }));
+
         return {
-            data: recurringInvoices,
+            data: recurringInvoicesWithPM,
             totalCount,
             currentPage: page,
             totalPages: Math.ceil(totalCount / pageSize),
@@ -33,6 +42,9 @@ export class RecurringInvoicesService {
     }
 
     async createRecurringInvoice(data: UpsertInvoicesDto) {
+        const company = await prisma.company.findFirst();
+        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FR');
+
         // Calculate totals
         let totalHT = 0;
         let totalVAT = 0;
@@ -40,11 +52,12 @@ export class RecurringInvoicesService {
 
         for (const item of data.items) {
             const itemHT = item.quantity * item.unitPrice;
-            const itemVAT = itemHT * (item.vatRate / 100);
+            const vatRate = isVatExemptFrance ? 0 : (item.vatRate || 0);
+            const itemVAT = itemHT * (vatRate / 100);
             totalHT += itemHT;
             totalVAT += itemVAT;
         }
-        totalTTC = totalHT + totalVAT;
+        totalTTC = isVatExemptFrance ? totalHT : (totalHT + totalVAT);
 
         const today = new Date();
         const nextMonday = new Date(today);
@@ -57,9 +70,10 @@ export class RecurringInvoicesService {
         const recurringInvoice = await prisma.recurringInvoice.create({
             data: {
                 clientId: data.clientId,
-                companyId: (await prisma.company.findFirst())?.id || "1",
+                companyId: company?.id || "1",
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
+                paymentMethodId: data.paymentMethodId,
                 paymentDetails: data.paymentDetails,
                 frequency: data.frequency,
                 count: data.count,
@@ -75,7 +89,8 @@ export class RecurringInvoicesService {
                         description: item.description,
                         quantity: item.quantity,
                         unitPrice: item.unitPrice,
-                        vatRate: item.vatRate,
+                        vatRate: isVatExemptFrance ? 0 : item.vatRate,
+                        type: item.type,
                         order: item.order || index,
                     })),
                 },
@@ -91,6 +106,9 @@ export class RecurringInvoicesService {
     }
 
     async updateRecurringInvoice(id: string, data: UpsertInvoicesDto) {
+        const company = await prisma.company.findFirst();
+        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FR');
+
         // Calculate totals
         let totalHT = 0;
         let totalVAT = 0;
@@ -98,11 +116,12 @@ export class RecurringInvoicesService {
 
         for (const item of data.items) {
             const itemHT = item.quantity * item.unitPrice;
-            const itemVAT = itemHT * (item.vatRate / 100);
+            const vatRate = isVatExemptFrance ? 0 : (item.vatRate || 0);
+            const itemVAT = itemHT * (vatRate / 100);
             totalHT += itemHT;
             totalVAT += itemVAT;
         }
-        totalTTC = totalHT + totalVAT;
+        totalTTC = isVatExemptFrance ? totalHT : (totalHT + totalVAT);
 
         // Update recurring invoice
         const recurringInvoice = await prisma.recurringInvoice.update({
@@ -110,6 +129,7 @@ export class RecurringInvoicesService {
             data: {
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
+                paymentMethodId: data.paymentMethodId,
                 paymentDetails: data.paymentDetails,
                 nextInvoiceDate: this.calculateNextInvoiceDate(new Date(), data.frequency),
                 frequency: data.frequency,
@@ -126,7 +146,8 @@ export class RecurringInvoicesService {
                         description: item.description,
                         quantity: item.quantity,
                         unitPrice: item.unitPrice,
-                        vatRate: item.vatRate,
+                        vatRate: isVatExemptFrance ? 0 : item.vatRate,
+                        type: item.type,
                         order: item.order || index,
                     })),
                 },
@@ -153,6 +174,13 @@ export class RecurringInvoicesService {
 
         if (!recurringInvoice) {
             throw new BadRequestException('Recurring invoice not found');
+        }
+
+        if (recurringInvoice.paymentMethodId) {
+            const pm = await prisma.paymentMethod.findUnique({ where: { id: recurringInvoice.paymentMethodId } });
+            if (pm) {
+                (recurringInvoice as any).paymentMethod = pm;
+            }
         }
 
         return recurringInvoice;
