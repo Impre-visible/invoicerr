@@ -204,19 +204,17 @@ export default function SignupPage() {
                 {t("auth.signup.signInLink")}
               </a>
             </div>
-            <div className="text-center text-sm">
-              {import.meta.env.VITE_OIDC_ENDPOINT && (
-                <div className="text-center text-sm">
-                  {t("auth.signup.oidc")}{" "}
-                  <a
-                    href={import.meta.env.VITE_OIDC_ENDPOINT}
-                    className="underline hover:text-primary"
-                  >
-                    {t("auth.signup.oidcLink")}
-                  </a>
-                </div>
-              )}
-            </div>
+            {((window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT) && (
+              <div className="text-center text-sm">
+                {t("auth.signup.oidc")}{" "}
+                <a
+                  href={(window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT}
+                  className="underline hover:text-primary"
+                >
+                  {t("auth.signup.oidcLink")}
+                </a>
+              </div>
+            )}
           </section>
         </CardContent>
       </Card>
