@@ -1,5 +1,5 @@
-import { Currency } from "@invoicerr/prisma";
-
+import { Currency, ClientType } from "@invoicerr/prisma";
+ 
 export class EditClientsDto {
     description?: string
     legalId?: string
@@ -7,14 +7,15 @@ export class EditClientsDto {
     foundedAt?: Date;
     id: string;
     name: string;
-    contactFirstname: string;
-    contactLastname: string;
-    contactEmail: string;
-    contactPhone: string;
+    contactFirstname?: string;
+    contactLastname?: string;
+    contactEmail?: string;
+    contactPhone?: string;
     address: string;
     postalCode: string;
     city: string;
     country: string;
     currency: Currency;
+    type?: ClientType;
     isActive: boolean;
 }
