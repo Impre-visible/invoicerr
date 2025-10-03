@@ -1,4 +1,5 @@
-import type { Client, Invoice, Quote } from "@/types"
+import type { Client, Invoice, Quote, PaymentMethod } from "@/types"
+import { PaymentMethodType } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -15,6 +16,7 @@ import { ClientUpsert } from "../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
@@ -44,12 +46,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             }),
         dueDate: z.date().optional(),
         notes: z.string().optional(),
-        paymentMethod: z
-            .string()
-            .optional(),
-        paymentDetails: z
-            .string()
-            .optional(),
+        paymentMethodId: z.string().optional(),
         currency: z.string().optional(),
         items: z.array(
             z.object({
@@ -81,16 +78,18 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                         invalid_type_error: t("invoices.upsert.form.items.vatRate.errors.required"),
                     })
                     .min(0, t("invoices.upsert.form.items.vatRate.errors.min")),
+                type: z.enum(['HOUR','DAY','DEPOSIT','SERVICE','PRODUCT']).optional(),
                 order: z.number(),
             }),
         ),
     })
-
+    
     const [clientSearchTerm, setClientsSearchTerm] = useState("")
     const [quoteSearchTerm, setQuoteSearchTerm] = useState("")
     const [clientDialogOpen, setClientDialogOpen] = useState(false)
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${clientSearchTerm}`)
     const { data: quotes } = useGet<Quote[]>(`/api/quotes/search?query=${quoteSearchTerm}`)
+    const { data: paymentMethods } = useGet<PaymentMethod[]>(`/api/payment-methods`)
 
     const { trigger: createTrigger } = usePost("/api/invoices")
     const { trigger: updateTrigger } = usePatch(`/api/invoices/${invoice?.id}`)
@@ -101,6 +100,8 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
             quoteId: undefined,
             clientId: "",
             dueDate: undefined,
+            paymentMethodId: "",
+            currency: undefined,
             items: [],
             notes: "",
         },
@@ -108,21 +109,23 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
 
     useEffect(() => {
         if (isEdit && invoice) {
+            const inv: any = invoice as any;
             form.reset({
-                quoteId: invoice.quoteId || "",
-                clientId: invoice.clientId || "",
-                dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-                notes: invoice.notes || "",
-                paymentMethod: invoice.paymentMethod || "",
-                paymentDetails: invoice.paymentDetails || "",
-                items: invoice.items
-                    .sort((a, b) => a.order - b.order)
-                    .map((item) => ({
+                quoteId: inv.quoteId || "",
+                clientId: inv.clientId || "",
+                dueDate: inv.dueDate ? new Date(inv.dueDate) : undefined,
+                notes: inv.notes || "",
+                paymentMethodId: inv.paymentMethodId || "",
+                currency: inv.currency || "",
+                items: (inv.items || [])
+                    .sort((a: any, b: any) => a.order - b.order)
+                    .map((item: any) => ({
                         id: item.id,
                         description: item.description || "",
                         quantity: item.quantity || 1,
                         unitPrice: item.unitPrice || 0,
                         vatRate: item.vatRate || 0,
+                        type: item.type || 'SERVICE',
                         order: item.order || 0,
                     })),
             })
@@ -131,6 +134,9 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                 quoteId: undefined,
                 clientId: "",
                 dueDate: undefined,
+                notes: "",
+                paymentMethodId: "",
+                currency: undefined,
                 items: [],
             })
         }
@@ -212,19 +218,20 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                 onValueChange={(val) => {
                                                     field.onChange(val || null)
                                                     if (val) {
-                                                        form.setValue("clientId", quotes?.find((q) => q.id === val)?.clientId || "")
-                                                        form.setValue("notes", quotes?.find((q) => q.id === val)?.notes || "")
-                                                        form.setValue("paymentMethod", quotes?.find((q) => q.id === val)?.paymentMethod || "")
-                                                        form.setValue("paymentDetails", quotes?.find((q) => q.id === val)?.paymentDetails || "")
-                                                        form.setValue("currency", quotes?.find((q) => q.id === val)?.currency || "")
-                                                        form.setValue('items', quotes?.find((q) => q.id === val)?.items.map((item, index) => ({
+                                                        const selectedQuote = quotes?.find((q) => q.id === val)
+                                                        form.setValue("clientId", selectedQuote?.clientId || "")
+                                                        form.setValue("notes", selectedQuote?.notes || "")
+                                                        form.setValue("paymentMethodId", (selectedQuote as any)?.paymentMethodId || "")
+                                                        form.setValue("currency", selectedQuote?.currency || "")
+                                                        form.setValue('items', (selectedQuote?.items || []).map((item: any, index) => ({
                                                             id: item.id,
                                                             description: item.description || "",
                                                             quantity: item.quantity || 1,
                                                             unitPrice: item.unitPrice || 0,
                                                             vatRate: item.vatRate || 0,
+                                                            type: item.type || 'SERVICE',
                                                             order: index,
-                                                        })) || [])
+                                                        })))
                                                     }
                                                 }}
                                                 onSearchChange={setQuoteSearchTerm}
@@ -244,7 +251,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                         <FormLabel required>{t("invoices.upsert.form.client.label")}</FormLabel>
                                         <FormControl>
                                             <SearchSelect
-                                                options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
+                                                options={(clients || []).map((c) => ({ label: c.name||c.contactFirstname+" "+c.contactLastname, value: c.id }))}
                                                 value={field.value ?? ""}
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setClientsSearchTerm}
@@ -314,15 +321,26 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                             <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={control}
-                                    name="paymentMethod"
+                                    name="paymentMethodId"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("invoices.upsert.form.paymentMethod.label")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("invoices.upsert.form.paymentMethod.placeholder")}
-                                                />
+                                                <Select value={field.value ?? ""} onValueChange={(val) => {
+                                                        const v = val || "";
+                                                        field.onChange(v);
+                                                    }}>
+                                                        <SelectTrigger className="w-full" aria-label={t("invoices.upsert.form.paymentMethod.label") as string}>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {(paymentMethods || []).map((pm: PaymentMethod) => (
+                                                                <SelectItem key={pm.id} value={pm.id}>
+                                                                    {pm.name} - {pm.type==PaymentMethodType.BANK_TRANSFER?t("paymentMethods.fields.type.bank_transfer"):pm.type==PaymentMethodType.PAYPAL?t("paymentMethods.fields.type.paypal"):pm.type==PaymentMethodType.CHECK?t("paymentMethods.fields.type.check"):pm.type==PaymentMethodType.CASH?t("paymentMethods.fields.type.cash"):pm.type==PaymentMethodType.OTHER?t("paymentMethods.fields.type.other"):pm.type}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                             </FormControl>
                                             <FormDescription>
                                                 {t("invoices.upsert.form.paymentMethod.description")}
@@ -332,26 +350,6 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                     )}
                                 />
 
-                                <FormField
-                                    control={control}
-                                    name="paymentDetails"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("invoices.upsert.form.paymentDetails.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("invoices.upsert.form.paymentDetails.placeholder")}
-                                                    className="max-h-40"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("invoices.upsert.form.paymentDetails.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </section>
 
                             <FormItem>
@@ -383,7 +381,31 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                 </FormItem>
                                                             )}
                                                         />
-
+    
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.type`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                            <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
+                                                                                <SelectTrigger className="w-32" size="sm" aria-label={t("invoices.upsert.form.items.type.label") as string}>
+                                                                                    <SelectValue />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    <SelectItem value="HOUR">{t("invoices.upsert.form.items.type.hour")}</SelectItem>
+                                                                                    <SelectItem value="DAY">{t("invoices.upsert.form.items.type.day")}</SelectItem>
+                                                                                    <SelectItem value="DEPOSIT">{t("invoices.upsert.form.items.type.deposit")}</SelectItem>
+                                                                                    <SelectItem value="SERVICE">{t("invoices.upsert.form.items.type.service")}</SelectItem>
+                                                                                    <SelectItem value="PRODUCT">{t("invoices.upsert.form.items.type.product")}</SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+    
                                                         <FormField
                                                             control={control}
                                                             name={`items.${index}.quantity`}
@@ -460,7 +482,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                                 </FormItem>
                                                             )}
                                                         />
-
+    
                                                         <Button variant={"outline"} onClick={() => onRemove(index)}>
                                                             <Trash2 className="h-4 w-4 text-red-700" />
                                                         </Button>
@@ -480,6 +502,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                             quantity: Number.NaN,
                                             unitPrice: Number.NaN,
                                             vatRate: Number.NaN,
+                                            type: 'SERVICE',
                                             order: fields.length,
                                         })
                                     }
