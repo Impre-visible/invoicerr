@@ -195,7 +195,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.client")}:</span>{" "}
-                                                                {quote.client.name}
+                                                                {quote.client.name||quote.client.contactFirstname+" "+quote.client.contactLastname}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.issued")}:</span>{" "}
