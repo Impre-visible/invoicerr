@@ -1,11 +1,20 @@
 import type { Client } from "./client";
 import type { Company } from "./company";
+import type { PaymentMethod } from "./payment-method";
 
 export enum InvoiceStatus {
     PAID = 'PAID',
     UNPAID = 'UNPAID',
     OVERDUE = 'OVERDUE',
     SENT = 'SENT'
+}
+
+export enum InvoiceItemType {
+    HOUR = "HOUR",
+    DAY = "DAY",
+    DEPOSIT = "DEPOSIT",
+    SERVICE = "SERVICE",
+    PRODUCT = "PRODUCT"
 }
 
 export interface InvoiceItem {
@@ -15,6 +24,7 @@ export interface InvoiceItem {
     quantity: number;
     unitPrice: number;
     vatRate: number; // 20 for 20%
+    type: InvoiceItemType;
     order: number;
 }
 
@@ -34,8 +44,8 @@ export interface Invoice {
     updatedAt: string; // ISO date string
     dueDate: string; // ISO date string
     paidAt?: string; // ISO date string
-    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
-    paymentDetails?: string; // Additional details for the payment method
+    paymentMethodId?: string; // Reference to saved payment method
+    paymentMethod?: PaymentMethod; // Linked PaymentMethod object
     notes?: string;
     totalHT: number;
     totalVAT: number;
@@ -62,6 +72,7 @@ export interface RecurringInvoiceItem {
     quantity: number;
     unitPrice: number;
     vatRate: number; // 20 for 20%
+    type: InvoiceItemType;
     order: number;
 }
 
@@ -72,8 +83,8 @@ export interface RecurringInvoice {
     companyId: string;
     company: Company;
     items: RecurringInvoiceItem[];
-    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal", "Cash"
-    paymentDetails?: string; // Details for the payment method (e.g., bank account number)
+    paymentMethodId?: string;
+    paymentMethod?: PaymentMethod; // Linked PaymentMethod object
     notes?: string;
     totalHT: number;
     totalVAT: number;
