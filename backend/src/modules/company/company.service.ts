@@ -99,6 +99,14 @@ export class CompanyService {
             secondaryColor: existingCompany.pdfConfig.secondaryColor,
 
             labels: {
+                // Receipt-specific labels
+                receipt: existingCompany.pdfConfig.receipt,
+                receivedFrom: existingCompany.pdfConfig.receivedFrom,
+                invoiceRefer: existingCompany.pdfConfig.invoiceRefer,
+                paymentDate: existingCompany.pdfConfig.paymentDate,
+                totalReceived: existingCompany.pdfConfig.totalReceived,
+    
+                // Generic / shared labels
                 billTo: existingCompany.pdfConfig.billTo,
                 description: existingCompany.pdfConfig.description,
                 date: existingCompany.pdfConfig.date,
@@ -117,6 +125,20 @@ export class CompanyService {
                 notes: existingCompany.pdfConfig.notes,
                 paymentMethod: existingCompany.pdfConfig.paymentMethod,
                 paymentDetails: existingCompany.pdfConfig.paymentDetails,
+    
+                // Payment method display labels
+                paymentMethodBankTransfer: existingCompany.pdfConfig.paymentMethodBankTransfer,
+                paymentMethodPayPal: existingCompany.pdfConfig.paymentMethodPayPal,
+                paymentMethodCash: existingCompany.pdfConfig.paymentMethodCash,
+                paymentMethodCheck: existingCompany.pdfConfig.paymentMethodCheck,
+                paymentMethodOther: existingCompany.pdfConfig.paymentMethodOther,
+    
+                type: existingCompany.pdfConfig.type,
+                hour: existingCompany.pdfConfig.hour,
+                day: existingCompany.pdfConfig.day,
+                deposit: existingCompany.pdfConfig.deposit,
+                service: existingCompany.pdfConfig.service,
+                product: existingCompany.pdfConfig.product,
 
                 legalId: existingCompany.pdfConfig.legalId,
                 VATId: existingCompany.pdfConfig.VATId,
@@ -143,6 +165,14 @@ export class CompanyService {
                 primaryColor: pdfConfig.primaryColor,
                 secondaryColor: pdfConfig.secondaryColor,
 
+                // Receipt-specific labels
+                receipt: pdfConfig.labels.receipt,
+                receivedFrom: pdfConfig.labels.receivedFrom,
+                invoiceRefer: pdfConfig.labels.invoiceRefer,
+                paymentDate: pdfConfig.labels.paymentDate,
+                totalReceived: pdfConfig.labels.totalReceived,
+    
+                // Generic / shared labels
                 billTo: pdfConfig.labels.billTo,
                 description: pdfConfig.labels.description,
                 dueDate: pdfConfig.labels.dueDate,
@@ -162,6 +192,20 @@ export class CompanyService {
                 notes: pdfConfig.labels.notes,
                 paymentMethod: pdfConfig.labels.paymentMethod,
                 paymentDetails: pdfConfig.labels.paymentDetails,
+    
+                // Payment method display labels
+                paymentMethodBankTransfer: pdfConfig.labels.paymentMethodBankTransfer,
+                paymentMethodPayPal: pdfConfig.labels.paymentMethodPayPal,
+                paymentMethodCash: pdfConfig.labels.paymentMethodCash,
+                paymentMethodCheck: pdfConfig.labels.paymentMethodCheck,
+                paymentMethodOther: pdfConfig.labels.paymentMethodOther,
+
+                type: pdfConfig.labels.type,
+                hour: pdfConfig.labels.hour,
+                day: pdfConfig.labels.day,
+                deposit: pdfConfig.labels.deposit,
+                service: pdfConfig.labels.service,
+                product: pdfConfig.labels.product,
 
                 legalId: pdfConfig.labels.legalId,
                 VATId: pdfConfig.labels.VATId,
