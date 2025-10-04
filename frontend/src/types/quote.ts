@@ -1,5 +1,6 @@
 import type { Client } from "./client";
 import type { Company } from "./company";
+import type { PaymentMethod } from "./payment-method";
 
 export enum QuoteStatus {
     DRAFT = "DRAFT",
@@ -30,14 +31,23 @@ export interface Quote {
     totalVAT: number;
     totalTTC: number;
     currency: string; // Currency code, e.g., "EUR", "USD"
-    paymentMethod?: string; // Ex: "Bank Transfer", "PayPal"
-    paymentDetails?: string; // Additional details for the payment method
+    paymentMethodId?: string;
+    paymentMethod?: PaymentMethod;
     isActive: boolean;
+}
+
+export enum QuoteItemType {
+    HOUR = "HOUR",
+    DAY = "DAY",
+    DEPOSIT = "DEPOSIT",
+    SERVICE = "SERVICE",
+    PRODUCT = "PRODUCT"
 }
 
 export interface QuoteItem {
     id: string;
     quoteId: string;
+    type: QuoteItemType;
     description: string;
     quantity: number;
     unitPrice: number;
