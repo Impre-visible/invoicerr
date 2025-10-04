@@ -3,6 +3,7 @@ import {
     ChevronsUpDown,
     FileText,
     LayoutDashboard,
+    TrendingUp,
     LogOut,
     Moon,
     Receipt,
@@ -11,6 +12,7 @@ import {
     Sun,
     User,
     Users,
+    CreditCard,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -75,6 +77,16 @@ export function Sidebar() {
             title: t("sidebar.navigation.clients"),
             icon: <Users className="w-4 h-4" />,
             url: "/clients",
+        },
+        {
+            title: t("sidebar.navigation.paymentMethods"),
+            icon: <CreditCard className="w-4 h-4" />,
+            url: "/payment-methods",
+        },
+        {
+            title: t("sidebar.navigation.stats"),
+            icon: <TrendingUp className="w-4 h-4" />,
+            url: "/stats",
         },
         {
             title: t("sidebar.navigation.settings"),
