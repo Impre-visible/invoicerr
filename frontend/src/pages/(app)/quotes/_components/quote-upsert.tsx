@@ -1,6 +1,7 @@
 "use client"
 
-import type { Client, Quote } from "@/types"
+import type { Client, Quote, PaymentMethod } from "@/types"
+import { PaymentMethodType } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -17,6 +18,7 @@ import { ClientUpsert } from "../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
@@ -48,12 +50,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
         currency: z.string().optional(),
         validUntil: z.date().optional(),
         notes: z.string().optional(),
-        paymentMethod: z
-            .string()
-            .optional(),
-        paymentDetails: z
-            .string()
-            .optional(),
+        paymentMethodId: z.string().optional(),
         items: z.array(
             z.object({
                 id: z.string().optional(),
@@ -63,6 +60,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                     .refine((val) => val !== "", {
                         message: t("quotes.upsert.form.items.description.errors.required"),
                     }),
+                type: z.string(),
                 quantity: z
                     .number({ invalid_type_error: t("quotes.upsert.form.items.quantity.errors.required") })
                     .min(1, t("quotes.upsert.form.items.quantity.errors.min"))
@@ -87,6 +85,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
 
     const [searchTerm, setSearchTerm] = useState("")
     const { data: clients } = useGet<Client[]>(`/api/clients/search?query=${searchTerm}`)
+    const { data: paymentMethods } = useGet<PaymentMethod[]>(`/api/payment-methods`)
 
     const { trigger: createTrigger } = usePost("/api/quotes")
     const { trigger: updateTrigger } = usePatch(`/api/quotes/${quote?.id}`)
@@ -110,6 +109,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                 validUntil: quote.validUntil ? new Date(quote.validUntil) : undefined,
                 currency: quote.currency,
                 notes: quote.notes || "",
+                paymentMethodId: (quote as any).paymentMethodId || "",
                 items: quote.items
                     .sort((a, b) => a.order - b.order)
                     .map((item) => ({
@@ -214,7 +214,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                         <FormLabel required>{t("quotes.upsert.form.client.label")}</FormLabel>
                                         <FormControl>
                                             <SearchSelect
-                                                options={(clients || []).map((c) => ({ label: c.name, value: c.id }))}
+                                                options={(clients || []).map((c) => ({ label: c.name||c.contactFirstname+" "+c.contactLastname, value: c.id }))}
                                                 value={field.value ?? ""}
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setSearchTerm}
@@ -284,39 +284,26 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                             <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={control}
-                                    name="paymentMethod"
+                                    name="paymentMethodId"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("quotes.upsert.form.paymentMethod.placeholder")}
-                                                />
+                                                <Select value={field.value ?? ""} onValueChange={(val) => field.onChange(val || "")}>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t("quotes.upsert.form.paymentMethod.placeholder")} />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {paymentMethods?.map((pm: PaymentMethod) => (
+                                                            <SelectItem key={pm.id} value={pm.id}>
+                                                                {pm.name} - {pm.type==PaymentMethodType.BANK_TRANSFER?t("paymentMethods.fields.type.bank_transfer"):pm.type==PaymentMethodType.PAYPAL?t("paymentMethods.fields.type.paypal"):pm.type==PaymentMethodType.CHECK?t("paymentMethods.fields.type.check"):pm.type==PaymentMethodType.CASH?t("paymentMethods.fields.type.cash"):pm.type==PaymentMethodType.OTHER?t("paymentMethods.fields.type.other"):pm.type}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </FormControl>
                                             <FormDescription>
                                                 {t("quotes.upsert.form.paymentMethod.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={control}
-                                    name="paymentDetails"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("quotes.upsert.form.paymentDetails.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    placeholder={t("quotes.upsert.form.paymentDetails.placeholder")}
-                                                    className="max-h-40"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("quotes.upsert.form.paymentDetails.description")}
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -348,6 +335,30 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                                 `quotes.upsert.form.items.description.placeholder`,
                                                                             )}
                                                                         />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={control}
+                                                            name={`items.${index}.type`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                            <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
+                                                                                <SelectTrigger className="w-32" size="sm" aria-label={t("invoices.upsert.form.items.type.label") as string}>
+                                                                                    <SelectValue />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    <SelectItem value="HOUR">{t("invoices.upsert.form.items.type.hour")}</SelectItem>
+                                                                                    <SelectItem value="DAY">{t("invoices.upsert.form.items.type.day")}</SelectItem>
+                                                                                    <SelectItem value="DEPOSIT">{t("invoices.upsert.form.items.type.deposit")}</SelectItem>
+                                                                                    <SelectItem value="SERVICE">{t("invoices.upsert.form.items.type.service")}</SelectItem>
+                                                                                    <SelectItem value="PRODUCT">{t("invoices.upsert.form.items.type.product")}</SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -447,6 +458,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                     onClick={() =>
                                         append({
                                             description: "",
+                                            type: "HOUR",
                                             quantity: Number.NaN,
                                             unitPrice: Number.NaN,
                                             vatRate: Number.NaN,
