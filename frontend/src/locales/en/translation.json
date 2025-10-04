@@ -92,6 +92,12 @@
                     "label": "City",
                     "placeholder": "Enter city"
                 },
+                "type": {
+                    "label": "Client Type",
+                    "company": "Company",
+                    "individual": "Individual",
+                    "description": "Select whether the client is an individual or a company"
+                },
                 "country": {
                     "label": "Country",
                     "placeholder": "Enter country"
@@ -478,6 +484,14 @@
                             "required": "VAT rate is required",
                             "min": "VAT rate must be positive"
                         }
+                    },
+                    "type": {
+                        "label": "Type",
+                        "hour": "Hour",
+                        "day": "Day",
+                        "deposit": "Deposit/Down payment",
+                        "service": "Service",
+                        "product": "Product"
                     }
                 },
                 "notes": {
@@ -670,6 +684,14 @@
                             "required": "VAT rate is required",
                             "min": "VAT rate must be positive"
                         }
+                    },
+                    "type": {
+                        "label": "Type",
+                        "hour": "Hour",
+                        "day": "Day",
+                        "deposit": "Deposit/Down payment",
+                        "service": "Service",
+                        "product": "Product"
                     }
                 }
             },
@@ -723,6 +745,93 @@
             }
         }
     },
+    "paymentMethods": {
+        "title": "Payment Methods",
+        "description": "Manage reusable payment methods.",
+        "empty": "No payment methods yet.",
+        "search": {
+          "placeholder": "Search payment methods..."
+        },
+        "list": {
+          "add": "Add payment method",
+          "empty": "No payment methods found"
+        },
+        "stats": {
+          "total": "Total Payment Methods",
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "fields": {
+          "name": {
+            "label": "Name",
+            "placeholder": "e.g. Bank transfer (business)"
+          },
+          "details": {
+            "label": "Details",
+            "placeholder": "IBAN / details"
+          },
+          "type": {
+            "label": "Type",
+            "bank_transfer": "Bank transfer",
+            "paypal": "PayPal",
+            "check": "Check",
+            "cash": "Cash",
+            "other": "Other"
+          },
+          "status": {
+            "label": "Status"
+          }
+        },
+        "upsert": {
+          "title": {
+            "create": "Add payment method",
+            "edit": "Edit payment method"
+          },
+          "form": {
+            "name": {
+              "label": "Name",
+              "placeholder": "e.g. Bank transfer (business)"
+            },
+            "details": {
+              "label": "Details",
+              "placeholder": "IBAN / details"
+            },
+            "type": {
+              "label": "Type",
+              "bank_transfer": "Bank transfer",
+              "paypal": "PayPal",
+              "check": "Check",
+              "cash": "Cash",
+              "other": "Other"
+            }
+          },
+          "messages": {
+            "nameRequired": "Name is required",
+            "addSuccess": "Payment method added",
+            "addError": "Failed to add payment method",
+            "updateSuccess": "Payment method updated",
+            "updateError": "Failed to update payment method",
+            "deleteSuccess": "Payment method deleted",
+            "deleteError": "Failed to delete payment method"
+          },
+          "actions": {
+            "cancel": "Cancel",
+            "add": "Add",
+            "save": "Save",
+            "edit": "Edit",
+            "delete": "Delete",
+            "deleting": "Deleting..."
+          }
+        },
+        "tooltips": {
+          "view": "View",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "delete": {
+          "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+        }
+      },
     "settings": {
         "tabs": {
             "company": "Company",
@@ -1084,7 +1193,8 @@
                 "label": "Template Type",
                 "options": {
                     "invoice": "Invoice Template",
-                    "quote": "Quote Template"
+                    "quote": "Quote Template",
+                    "receipt": "Receipt Template"
                 }
             },
             "typography": {
@@ -1114,12 +1224,16 @@
                 "title": "Labels & Text",
                 "invoice": "Invoice",
                 "quote": "Quote",
+                "receipt": "Receipt",
                 "billTo": "Bill To",
                 "quoteFor": "Quote For",
                 "validUntil": "Valid Until",
                 "dueDate": "Due Date",
+                "paymentDate": "Payment Date",
                 "date": "Date",
                 "description": "Description",
+                "receivedFrom": "Received from",
+                "invoiceRefer": "Invoice reference",
                 "quantity": "Quantity",
                 "unitPrice": "Unit Price",
                 "total": "Total",
@@ -1129,17 +1243,34 @@
                 "vatRate": "VAT Rate",
                 "paymentMethod": "Payment Method",
                 "paymentDetails": "Payment Details",
-                "notes": "Notes"
+                "paymentMethodVariants": "Payment method display names",
+                "paymentMethodBankTransfer": "Bank transfer",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Cash",
+                "paymentMethodCheck": "Check",
+                "paymentMethodOther": "Other",
+                "notes": "Notes",
+                "totalReceived": "Total received",
+                "hour": "Hour",
+                "day": "Day",
+                "deposit": "Deposit",
+                "service": "Service",
+                "product": "Product",
+                "type": "Type"
             },
             "defaultLabels": {
                 "invoice": "Invoice",
                 "quote": "Quote",
+                "receipt": "Receipt",
                 "billTo": "Bill To",
                 "quoteFor": "Quote For",
                 "validUntil": "Valid Until",
                 "date": "Date",
                 "dueDate": "Due Date",
+                "paymentDate": "Payment Date",
                 "description": "Description",
+                "receivedFrom": "Received from",
+                "invoiceRefer": "Invoice reference",
                 "quantity": "Quantity",
                 "unitPrice": "Unit Price",
                 "total": "Total",
@@ -1149,7 +1280,19 @@
                 "vatRate": "VAT Rate",
                 "paymentMethod": "Payment Method",
                 "paymentDetails": "Payment Details",
-                "notes": "Notes"
+                "paymentMethodBankTransfer": "Bank transfer",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Cash",
+                "paymentMethodCheck": "Check",
+                "paymentMethodOther": "Other",
+                "notes": "Notes",
+                "totalReceived": "Total received",
+                "hour": "Hour",
+                "day": "Day",
+                "deposit": "Deposit",
+                "service": "Service",
+                "product": "Product",
+                "type": "Type"
             },
             "preview": {
                 "title": "Preview",
@@ -1196,6 +1339,8 @@
             "invoices": "Invoices",
             "receipts": "Receipts",
             "clients": "Clients",
+            "paymentMethods": "Payment Methods",
+            "stats": "Statistics",
             "settings": "Settings"
         },
         "company": {
@@ -1444,5 +1589,25 @@
         "pdf": {
             "title": "Receipt {{number}} - PDF"
         }
+    },
+    "stats": {
+        "title": "Statistics",
+        "description": "View invoiced amounts, revenue and deposits by month and year.",
+        "noData": "No data available for the selected period.",
+        "controls": {
+            "year": "Year",
+            "range": "Year range"
+        },
+        "monthly": {
+            "title": "Monthly statistics"
+        },
+        "yearly": {
+            "title": "Yearly statistics"
+        },
+        "month": "Month",
+        "year": "Year",
+        "invoiced": "Invoiced (incl. VAT)",
+        "revenue": "Revenue (excl. VAT)",
+        "deposits": "Deposits (invoice paid)"
     }
 }
