@@ -147,6 +147,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @AllowAnonymous()
   async logout(@Res() res: Response) {
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
