@@ -19,7 +19,8 @@ import { LoginRequiredGuard } from 'src/guards/login-required.guard';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from '@/modules/auth/auth.service';
-
+import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
+import { StatsModule } from './modules/stats/stats.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,6 +43,8 @@ import { AuthService } from '@/modules/auth/auth.service';
     DangerModule,
     PluginsModule,
     RecurringInvoicesModule,
+    PaymentMethodsModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [
