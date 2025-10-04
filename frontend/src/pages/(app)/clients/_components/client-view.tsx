@@ -30,8 +30,12 @@ export function ClientViewDialog({ client, onOpenChange }: ClientViewDialogProps
                 <div className="flex flex-col gap-4 w-full">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 bg-muted/50 p-4 rounded-lg w-full">
                         <div className="w-fit">
-                            <p className="text-sm text-muted-foreground">{t("clients.view.fields.companyName")}</p>
-                            <p className="font-medium">{client?.name || "—"}</p>
+                            {client?.type === 'COMPANY' &&(<p className="text-sm text-muted-foreground">{t("clients.view.fields.companyName")}</p>)}
+                            {client?.type === 'COMPANY' &&(<p className="font-medium">{client?.name || "—"}</p>)}
+                            <p className="text-sm text-muted-foreground mt-2">{t("clients.upsert.fields.type.label")}</p>
+                            <p className="font-medium">
+                                {client?.type === 'INDIVIDUAL' ? t("clients.upsert.fields.type.individual") : t("clients.upsert.fields.type.company")}
+                            </p>
                         </div>
                         {(!!client?.contactFirstname || !!client?.contactLastname) && (
                         <div className="w-fit">
