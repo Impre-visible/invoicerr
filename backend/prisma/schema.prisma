@@ -221,6 +221,30 @@ enum RecurrenceFrequency {
   ANNUALLY // Every year
 }
 
+// Client type
+enum ClientType {
+  INDIVIDUAL
+  COMPANY
+}
+
+// Item type (used for quote/invoice/recurring items)
+enum ItemType {
+  HOUR
+  DAY
+  DEPOSIT
+  SERVICE
+  PRODUCT
+}
+
+// Payment method types
+enum PaymentMethodType {
+  BANK_TRANSFER
+  PAYPAL
+  CASH
+  CHECK
+  OTHER
+}
+
 // User model
 model User {
   id        String  @id @default(cuid())
@@ -266,6 +290,18 @@ model PDFConfig {
   notes          String @default("Notes:")
   paymentMethod  String @default("Payment Method:")
   paymentDetails String @default("Payment Details:")
+  type           String @default("Type")
+  hour           String @default("Hour")
+  day            String @default("Day")
+  deposit        String @default("Deposit")
+  service        String @default("Service")
+  product        String @default("Product")
+
+  paymentMethodBankTransfer String @default("Bank transfer")
+  paymentMethodPayPal       String @default("PayPal")
+  paymentMethodCash         String @default("Cash")
+  paymentMethodCheck        String @default("Check")
+  paymentMethodOther        String @default("Other")
 
   VATId   String @default("VAT")
   legalId String @default("Legal ID")
@@ -280,6 +316,7 @@ model Company {
   legalId     String?
   foundedAt   DateTime
   VAT         String?
+  exemptVat   Boolean  @default(false)
   address     String
   postalCode  String
   city        String
@@ -302,6 +339,7 @@ model Company {
   pdfConfig        PDFConfig          @relation(fields: [pDFConfigId], references: [id])
   Quote            Quote[]
   Invoice          Invoice[]
+  PaymentMethod    PaymentMethod[]
   emailTemplates   MailTemplate[]
   RecurringInvoice RecurringInvoice[]
 }
@@ -316,13 +354,14 @@ model Client {
   foundedAt        DateTime? // Date when the client company was founded
   contactFirstname String?
   contactLastname  String?
-  contactEmail     String             @unique
+  contactEmail     String?             @unique
   contactPhone     String?
   address          String
   postalCode       String
   city             String
   country          String
   currency         Currency?
+  type             ClientType         @default(COMPANY)
   isActive         Boolean            @default(true)
   Quote            Quote[]
   Invoice          Invoice[]
@@ -365,6 +404,7 @@ model Quote {
   currency       Currency
   paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
   paymentDetails String? // Details for the payment method (e.g., bank account number)
+  paymentMethodId String?
   notes          String?     @default("")
   isActive       Boolean     @default(true)
   Invoice        Invoice[]
@@ -379,6 +419,7 @@ model QuoteItem {
   quantity    Int
   unitPrice   Float
   vatRate     Float // 20 for 20%
+  type        ItemType @default(SERVICE)
   order       Int // For sorting items in the quote pdf
 }
 
@@ -403,6 +444,7 @@ model Invoice {
   paidAt             DateTime?
   paymentMethod      String? // Ex: "Bank Transfer", "PayPal", "Cash"
   paymentDetails     String? // Details for the payment method (e.g., bank account number)
+  paymentMethodId    String?
   notes              String?           @default("")
   totalHT            Float
   totalVAT           Float
@@ -420,6 +462,7 @@ model InvoiceItem {
   quantity     Int
   unitPrice    Float
   vatRate      Float // 20 for 20%
+  type         ItemType @default(SERVICE)
   order        Int
   receiptItems ReceiptItem[]
 }
@@ -435,6 +478,7 @@ model RecurringInvoice {
   generatedInvoices Invoice[] // Relation inverse pour les factures générées
   paymentMethod     String? // Ex: "Bank Transfer", "PayPal", "Cash"
   paymentDetails    String? // Details for the payment method (e.g., bank account number)
+  paymentMethodId   String?
   notes             String?                @default("")
   totalHT           Float
   totalVAT          Float
@@ -458,6 +502,7 @@ model RecurringInvoiceItem {
   quantity           Int
   unitPrice          Float
   vatRate            Float // 20 for 20%
+  type               ItemType @default(SERVICE)
   order              Int
 }
 
@@ -481,8 +526,21 @@ model Receipt {
   totalPaid      Float
   paymentMethod  String        @default("") // Ex: "Bank Transfer", "PayPal", "Cash"
   paymentDetails String        @default("") // Details for the payment method (e.g., bank account number)
+  paymentMethodId String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+}
+
+model PaymentMethod {
+  id        String   @id @default(cuid())
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  name      String
+  details   String?                        // Use this to store IBAN or other textual details
+  type      PaymentMethodType @default(BANK_TRANSFER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Signature model
