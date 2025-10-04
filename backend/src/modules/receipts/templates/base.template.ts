@@ -40,7 +40,7 @@ export const baseTemplate = `
         </div>
     </div>
     <div class="client-info">
-        <h3>{{labels.billTo}}</h3>
+        <h3>{{labels.receivedFrom}}</h3>
         <p>{{client.name}}<br>
         {{#if client.description}}<strong>{{labels.description}}</strong> {{client.description}}<br>{{/if}}
         {{client.address}}<br>
@@ -54,16 +54,18 @@ export const baseTemplate = `
 
 
   <table>
-    <thead><tr><th>{{labels.description}}</th><th>{{labels.totalReceived}}</th></tr></thead>
+    <thead><tr><th>{{labels.description}}</th><th>{{labels.type}}</th><th>{{labels.totalReceived}}</th></tr></thead>
     <tbody>
     {{#each items}}
       <tr>
         <td>{{description}}</td>
+        <td>{{type}}</td>
         <td>{{currency}} {{amount}}</td>
       </tr>
     {{/each}}
     <tr class="total-row">
       <td><strong>{{labels.totalReceived}}</strong></td>
+      <td></td>
       <td><strong>{{currency}} {{totalAmount}}</strong></td>
     </tr>
     </tbody>
