@@ -1,5 +1,5 @@
-import { Currency } from "@invoicerr/prisma";
-
+import { Currency, ItemType } from "@invoicerr/prisma";
+ 
 export class CreateInvoiceDto {
     clientId: string;
     quoteId?: string;
@@ -9,15 +9,17 @@ export class CreateInvoiceDto {
     notes: string;
     paymentMethod?: string;
     paymentDetails?: string;
+    paymentMethodId?: string;
     items: {
         description: string;
         quantity: number;
         unitPrice: number;
         vatRate: number;
+        type: ItemType;
         order: number;
     }[];
 }
-
+ 
 export class EditInvoicesDto {
     id: string;
     quoteId?: string;
@@ -28,12 +30,14 @@ export class EditInvoicesDto {
     notes: string;
     paymentMethod?: string;
     paymentDetails?: string;
+    paymentMethodId?: string;
     items: {
         id?: string; // Optional for new items
         description: string;
         quantity: number;
         unitPrice: number;
         vatRate: number;
+        type: ItemType;
         order: number;
     }[];
 }
