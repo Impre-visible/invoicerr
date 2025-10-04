@@ -3,7 +3,7 @@ export const baseTemplate = `
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice {{number}}</title>
+    <title>{{labels.invoice}} {{number}}</title>
     <style>
         body { font-family: {{fontFamily}}, sans-serif; margin: {{padding}}px; color: #333; }
         .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
@@ -56,6 +56,7 @@ export const baseTemplate = `
         <thead>
             <tr>
                 <th>{{labels.description}}</th>
+                <th>{{labels.type}}</th>
                 <th>{{labels.quantity}}</th>
                 <th>{{labels.unitPrice}}</th>
                 <th>{{labels.vatRate}}</th>
@@ -66,6 +67,7 @@ export const baseTemplate = `
             {{#each items}}
             <tr>
                 <td>{{description}}</td>
+                <td>{{type}}</td>
                 <td>{{quantity}}</td>
                 <td>{{../currency}} {{unitPrice}}</td>
                 <td>{{vatRate}}%</td>
@@ -75,15 +77,21 @@ export const baseTemplate = `
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4"><strong>{{labels.subtotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.subtotal}}</strong></td>
                 <td><strong>{{currency}} {{totalHT}}</strong></td>
             </tr>
             <tr>
-                <td colspan="4"><strong>{{labels.vat}}</strong></td>
+                <td colspan="5"><strong>{{labels.vat}}</strong></td>
                 <td><strong>{{currency}} {{totalVAT}}</strong></td>
             </tr>
+            {{#if vatExemptText}}
+            <tr>
+                <td></td>
+                <td colspan="5" style="font-size:12px; color:#666; text-align:right;"><em>{{vatExemptText}}</em></td>
+            </tr>
+            {{/if}}
             <tr class="total-row">
-                <td colspan="4"><strong>{{labels.grandTotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.grandTotal}}</strong></td>
                 <td><strong>{{currency}} {{totalTTC}}</strong></td>
             </tr>
         </tfoot>
