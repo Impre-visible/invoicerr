@@ -92,6 +92,12 @@
                     "label": "Ville",
                     "placeholder": "Saisir la ville"
                 },
+                "type": {
+                    "label": "Type de client",
+                    "company": "Entreprise",
+                    "individual": "Particulier",
+                    "description": "Sélectionnez si le client est une personne physique (particulier) ou une entreprise"
+                },
                 "country": {
                     "label": "Pays",
                     "placeholder": "Saisir le pays"
@@ -477,6 +483,14 @@
                             "required": "Le taux de TVA est requis",
                             "min": "Le taux de TVA doit être positif"
                         }
+                    },
+                    "type": {
+                        "label": "Type",
+                        "hour": "Heure",
+                        "day": "Jour",
+                        "deposit": "Acompte / Arrhes",
+                        "service": "Service",
+                        "product": "Produit"
                     }
                 },
                 "notes": {
@@ -669,6 +683,14 @@
                             "required": "Le taux de TVA est requis",
                             "min": "Le taux de TVA doit être positif"
                         }
+                    },
+                    "type": {
+                        "label": "Type",
+                        "hour": "Heure",
+                        "day": "Jour",
+                        "deposit": "Acompte / Arrhes",
+                        "service": "Service",
+                        "product": "Produit"
                     }
                 }
             },
@@ -722,6 +744,102 @@
             }
         }
     },
+    "paymentMethods": {
+        "title": "Méthodes de paiement",
+        "description": "Gérez des méthodes de paiement réutilisables (IBAN, PayPal, Espèces...)",
+        "search": {
+          "placeholder": "Rechercher des méthodes de paiement..."
+        },
+        "list": {
+          "add": "Ajouter une méthode de paiement",
+          "empty": "Aucune méthode de paiement pour le moment"
+        },
+        "stats": {
+          "total": "Total des méthodes de paiement",
+          "active": "Actives",
+          "inactive": "Inactives"
+        },
+        "fields": {
+          "name": {
+            "label": "Nom",
+            "placeholder": "ex: Virement bancaire (pro)"
+          },
+          "details": {
+            "label": "Détails",
+            "placeholder": "IBAN, email PayPal, ..."
+          },
+          "type": {
+            "label": "Type",
+            "bank_transfer": "Virement bancaire",
+            "paypal": "PayPal",
+            "check": "Chèque",
+            "cash": "Espèces",
+            "other": "Autre"
+          },
+          "status": {
+            "label": "Statut"
+          }
+        },
+        "upsert": {
+          "title": {
+            "create": "Ajouter une méthode de paiement",
+            "edit": "Modifier la méthode de paiement"
+          },
+          "form": {
+            "name": {
+              "label": "Nom",
+              "placeholder": "ex: Virement bancaire (pro)"
+            },
+            "details": {
+              "label": "Détails",
+              "placeholder": "IBAN, email PayPal, ..."
+            },
+            "type": {
+              "label": "Type",
+              "options": {
+                "bank_transfer": "Virement bancaire",
+                "paypal": "PayPal",
+                "check": "Chèque",
+                "cash": "Espèces",
+                "other": "Autre"
+              }
+            }
+          },
+          "messages": {
+            "addSuccess": "Méthode de paiement ajoutée",
+            "addError": "Échec de l'ajout de la méthode de paiement",
+            "updateSuccess": "Méthode de paiement mise à jour",
+            "updateError": "Échec de la mise à jour de la méthode de paiement",
+            "deleteSuccess": "Méthode de paiement supprimée",
+            "deleteError": "Échec de la suppression de la méthode de paiement"
+          }
+        },
+        "messages": {
+          "nameRequired": "Le nom est requis",
+          "addSuccess": "Méthode de paiement ajoutée",
+          "addError": "Échec de l'ajout de la méthode de paiement",
+          "updateSuccess": "Méthode de paiement mise à jour",
+          "updateError": "Échec de la mise à jour de la méthode de paiement",
+          "deleteSuccess": "Méthode de paiement supprimée",
+          "deleteError": "Échec de la suppression de la méthode de paiement"
+        },
+        "actions": {
+          "cancel": "Annuler",
+          "add": "Ajouter",
+          "save": "Enregistrer",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression..."
+        },
+        "tooltips": {
+          "view": "Voir",
+          "edit": "Modifier",
+          "delete": "Supprimer"
+        },
+        "delete": {
+          "description": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action ne peut pas être annulée."
+        }
+      },
     "settings": {
         "tabs": {
             "company": "Entreprise",
@@ -933,6 +1051,10 @@
                         "required": "Le format de date est requis"
                     }
                 },
+                "exemptVat": {
+                    "label": "TVA non applicable (art. 293 B du CGI)",
+                    "description": "Afficher la mention légale 'TVA non applicable, art. 293 B du CGI' sur les prochains documents lorsque activé et si le pays de l'entreprise est la France."
+                },
                 "saving": "Enregistrement...",
                 "saveSettings": "Enregistrer les paramètres"
             },
@@ -1083,7 +1205,8 @@
                 "label": "Type de modèle",
                 "options": {
                     "invoice": "Modèle de facture",
-                    "quote": "Modèle de devis"
+                    "quote": "Modèle de devis",
+                    "receipt": "Modèle de reçu"
                 }
             },
             "typography": {
@@ -1113,12 +1236,16 @@
                 "title": "Libellés et texte",
                 "invoice": "Facture",
                 "quote": "Devis",
+                "receipt": "Reçu",
                 "billTo": "Facturer à",
                 "quoteFor": "Devis pour",
                 "validUntil": "Valide jusqu'au",
                 "dueDate": "Date d'échéance",
+                "paymentDate": "Date de paiement",
                 "date": "Date",
                 "description": "Description",
+                "receivedFrom": "Reçu de",
+                "invoiceRefer": "Référence de la facture",
                 "quantity": "Quantité",
                 "unitPrice": "Prix unitaire",
                 "total": "Total",
@@ -1128,19 +1255,41 @@
                 "vatRate": "Taux de TVA",
                 "paymentMethod": "Méthode de paiement",
                 "paymentDetails": "Détails de paiement",
-                "notes": "Notes"
+                "paymentMethodVariants": "Noms affichés des méthodes de paiement",
+                "paymentMethodBankTransfer": "Virement bancaire",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Espèces",
+                "paymentMethodCheck": "Chèque",
+                "paymentMethodOther": "Autre",
+                "notes": "Notes",
+                "totalReceived": "Total reçu",
+                "hour": "Heure",
+                "day": "Jour",
+                "deposit": "Acompte / Arrhes",
+                "service": "Service",
+                "product": "Produit",
+                "type": "Type"
             },
             "defaultLabels": {
                 "invoice": "Facture",
                 "quote": "Devis",
+                "receipt": "Reçu",
                 "billTo": "Facturer à",
                 "quoteFor": "Devis pour",
                 "validUntil": "Valide jusqu'au",
                 "dueDate": "Date d'échéance",
+                "paymentDate": "Date de paiement",
                 "date": "Date",
                 "description": "Description",
+                "receivedFrom": "Reçu de",
+                "invoiceRefer": "Référence de la facture",
                 "quantity": "Quantité",
                 "unitPrice": "Prix unitaire",
+                "paymentMethodBankTransfer": "Virement bancaire",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Espèces",
+                "paymentMethodCheck": "Chèque",
+                "paymentMethodOther": "Autre",
                 "total": "Total",
                 "subtotal": "Sous-total",
                 "vat": "TVA",
@@ -1148,7 +1297,14 @@
                 "vatRate": "Taux de TVA",
                 "paymentMethod": "Méthode de paiement",
                 "paymentDetails": "Détails de paiement",
-                "notes": "Notes"
+                "notes": "Notes",
+                "totalReceived": "Total reçu",
+                "hour": "Heure",
+                "day": "Jour",
+                "deposit": "Acompte / Arrhes",
+                "service": "Service",
+                "product": "Produit",
+                "type": "Type"
             },
             "preview": {
                 "title": "Aperçu",
@@ -1195,6 +1351,8 @@
             "invoices": "Factures",
             "receipts": "Reçus",
             "clients": "Clients",
+            "paymentMethods": "Méthodes de paiement",
+            "stats": "Statistiques",
             "settings": "Paramètres"
         },
         "company": {
@@ -1442,5 +1600,25 @@
         "pdf": {
             "title": "Reçu {{number}} - PDF"
         }
+    },
+    "stats": {
+        "title": "Statistiques",
+        "description": "Afficher les montants facturés, les revenus et les acomptes par mois et par année.",
+        "noData": "Aucune donnée disponible pour la période sélectionnée.",
+        "controls": {
+            "year": "Année",
+            "range": "Plage d'années"
+        },
+        "monthly": {
+            "title": "Statistiques mensuelles"
+        },
+        "yearly": {
+            "title": "Statistiques annuelles"
+        },
+        "month": "Mois",
+        "year": "Année",
+        "invoiced": "Facturé (TTC)",
+        "revenue": "Chiffre d'affaire (HT)",
+        "deposits": "Encaissements (facture payée)"
     }
 }
