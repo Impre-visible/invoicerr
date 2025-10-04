@@ -89,12 +89,18 @@
           "placeholder": "Geben Sie die Postleitzahl ein"
         },
         "city": {
-          "label": "Stadt",
-          "placeholder": "Geben Sie der Stadt ein"
+            "label": "Stadt",
+            "placeholder": "Geben Sie der Stadt ein"
+        },
+        "type": {
+            "label": "Kundentyp",
+            "company": "Unternehmen",
+            "individual": "Privatperson",
+            "description": "Wählen Sie, ob der Kunde eine Privatperson oder ein Unternehmen ist"
         },
         "country": {
-          "label": "Land",
-          "placeholder": "Geben Sie dem Land ein"
+            "label": "Land",
+            "placeholder": "Geben Sie dem Land ein"
         }
       },
       "validation": {
@@ -473,13 +479,21 @@
             }
           },
           "vatRate": {
-            "placeholder": "MEHRWERTSTEUER %",
-            "errors": {
-              "required": "Mehrwertsteuersatz ist erforderlich",
-              "min": "Der Mehrwertsteuersatz muss positiv sein"
-            }
+              "placeholder": "MEHRWERTSTEUER %",
+              "errors": {
+                  "required": "Mehrwertsteuersatz ist erforderlich",
+                  "min": "Der Mehrwertsteuersatz muss positiv sein"
+              }
+          },
+          "type": {
+              "label": "Typ",
+              "hour": "Stunde",
+              "day": "Tag",
+              "deposit": "Anzahlung",
+              "service": "Service",
+              "product": "Produkt"
           }
-        },
+      },
         "notes": {
           "label": "Anmerkungen",
           "placeholder": "Zusätzliche Hinweise oder Begriffe"
@@ -670,6 +684,14 @@
               "required": "Mehrwertsteuersatz ist erforderlich",
               "min": "Der Mehrwertsteuersatz muss positiv sein"
             }
+          },
+          "type": {
+              "label": "Typ",
+              "hour": "Stunde",
+              "day": "Tag",
+              "deposit": "Anzahlung",
+              "service": "Service",
+              "product": "Produkt"
           }
         }
       },
@@ -721,6 +743,93 @@
       "stats": {
         "total": "Kunden insgesamt"
       }
+    }
+  },
+  "paymentMethods": {
+    "title": "Zahlungsmethoden",
+    "description": "Verwalten Sie wiederverwendbare Zahlungsmethoden (IBAN, PayPal, Bargeld...)",
+    "empty": "Noch keine Zahlungsmethoden",
+    "search": {
+      "placeholder": "Zahlungsmethoden suchen..."
+    },
+    "list": {
+      "add": "Zahlungsmethode hinzufügen",
+      "empty": "Noch keine Zahlungsmethoden"
+    },
+    "stats": {
+      "total": "Gesamt Zahlungsmethoden",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "z. B. Banküberweisung (geschäftlich)"
+      },
+      "details": {
+        "label": "Details",
+        "placeholder": "IBAN / Details"
+      },
+      "type": {
+        "label": "Typ",
+        "bank_transfer": "Banküberweisung",
+        "paypal": "PayPal",
+        "check": "Scheck",
+        "cash": "Bargeld",
+        "other": "Andere"
+      },
+      "status": {
+        "label": "Status"
+      }
+    },
+    "upsert": {
+      "title": {
+        "create": "Zahlungsmethode hinzufügen",
+        "edit": "Zahlungsmethode bearbeiten"
+      },
+      "form": {
+        "name": {
+          "label": "Name",
+          "placeholder": "z. B. Banküberweisung (geschäftlich)"
+        },
+        "details": {
+          "label": "Details",
+          "placeholder": "IBAN / Details"
+        },
+        "type": {
+          "label": "Typ",
+          "bank_transfer": "Banküberweisung",
+          "paypal": "PayPal",
+          "check": "Scheck",
+          "cash": "Bargeld",
+          "other": "Andere"
+        }
+      },
+      "messages": {
+        "nameRequired": "Name ist erforderlich",
+        "addSuccess": "Zahlungsmethode hinzugefügt",
+        "addError": "Fehler beim Hinzufügen der Zahlungsmethode",
+        "updateSuccess": "Zahlungsmethode aktualisiert",
+        "updateError": "Fehler beim Aktualisieren der Zahlungsmethode",
+        "deleteSuccess": "Zahlungsmethode gelöscht",
+        "deleteError": "Fehler beim Löschen der Zahlungsmethode"
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "add": "Hinzufügen",
+        "save": "Speichern",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "deleting": "Lösche..."
+      }
+    },
+    "tooltips": {
+      "view": "Ansehen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "delete": {
+      "description": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
     }
   },
   "settings": {
@@ -934,6 +1043,10 @@
             "required": "Datumsformat ist erforderlich"
           }
         },
+        "exemptVat": {
+          "label": "TVA non applicable (art. 293 B du CGI)",
+          "description": "Die gesetzliche Angabe 'TVA non applicable, art. 293 B du CGI' auf zukünftigen Dokumenten anzeigen, wenn aktiviert und das Land Ihres Unternehmens Frankreich ist."
+        },
         "saving": "Speichern...",
         "saveSettings": "Einstellungen speichern"
       },
@@ -1084,7 +1197,8 @@
         "label": "Vorlagen Typ",
         "options": {
           "invoice": "Rechnungsvorlage",
-          "quote": "Angebotsvorlage"
+          "quote": "Angebotsvorlage",
+          "receipt": "Belegvorlage"
         }
       },
       "typography": {
@@ -1114,12 +1228,16 @@
         "title": "Etiketten & Text",
         "invoice": "Rechnung",
         "quote": "Angebot",
+        "receipt": "Beleg",
         "billTo": "Rechnung an",
         "quoteFor": "Angebot für",
         "validUntil": "Gültig bis",
         "dueDate": "Fälligkeitsdatum",
+        "paymentDate": "Zahlungsdatum",
         "date": "Datum",
         "description": "Beschreibung",
+        "receivedFrom": "Erhalten von",
+        "invoiceRefer": "Rechnungsreferenz",
         "quantity": "Menge",
         "unitPrice": "Preis pro Einheit",
         "total": "Insgesamt",
@@ -1129,19 +1247,41 @@
         "vatRate": "MwSt.-Satz",
         "paymentMethod": "Zahlungsmethode",
         "paymentDetails": "Details zur Bezahlung",
-        "notes": "Anmerkungen"
+        "paymentMethodVariants": "Angezeigte Namen der Zahlungsmethoden",
+        "paymentMethodBankTransfer": "Banküberweisung",
+        "paymentMethodPayPal": "PayPal",
+        "paymentMethodCash": "Bargeld",
+        "paymentMethodCheck": "Scheck",
+        "paymentMethodOther": "Andere",
+        "notes": "Anmerkungen",
+        "totalReceived": "Gesamt erhalten",
+        "hour": "Stunde",
+        "day": "Tag",
+        "deposit": "Anzahlung",
+        "service": "Service",
+        "product": "Produkt",
+        "type": "Typ"
       },
       "defaultLabels": {
         "invoice": "Rechnung",
         "quote": "Angebot",
+        "receipt": "Beleg",
         "billTo": "Rechnung an",
         "quoteFor": "Angebot für",
         "validUntil": "Gültig bis",
         "date": "Datum",
         "dueDate": "Fälligkeitsdatum",
+        "paymentDate": "Zahlungsdatum",
         "description": "Beschreibung",
+        "receivedFrom": "Erhalten von",
+        "invoiceRefer": "Rechnungsreferenz",
         "quantity": "Menge",
         "unitPrice": "Preis pro Einheit",
+        "paymentMethodBankTransfer": "Banküberweisung",
+        "paymentMethodPayPal": "PayPal",
+        "paymentMethodCash": "Bargeld",
+        "paymentMethodCheck": "Scheck",
+        "paymentMethodOther": "Andere",
         "total": "Insgesamt",
         "subtotal": "Zwischensumme",
         "vat": "MwSt.",
@@ -1149,7 +1289,14 @@
         "vatRate": "MwSt.-Satz",
         "paymentMethod": "Zahlungsmethode",
         "paymentDetails": "Details zur Bezahlung",
-        "notes": "Anmerkungen"
+        "notes": "Anmerkungen",
+        "totalReceived": "Gesamt erhalten",
+        "hour": "Stunde",
+        "day": "Tag",
+        "deposit": "Anzahlung",
+        "service": "Service",
+        "product": "Produkt",
+        "type": "Typ"
       },
       "preview": {
         "title": "Vorschau",
@@ -1196,6 +1343,8 @@
       "invoices": "Rechnungen",
       "receipts": "Belege",
       "clients": "Kunden",
+      "paymentMethods": "Zahlungsmethoden",
+      "stats": "Statistiken",
       "settings": "Einstellungen"
     },
     "company": {
@@ -1444,5 +1593,25 @@
     "pdf": {
       "title": "Beleg {{number}} - PDF"
     }
+  },
+  "stats": {
+    "title": "Statistiken",
+    "description": "Angezeigte Beträge für fakturierte Summen, Umsatz und Einzahlungen nach Monat und Jahr.",
+    "noData": "Für den ausgewählten Zeitraum sind keine Daten verfügbar.",
+    "controls": {
+      "year": "Jahr",
+      "range": "Zeitraum"
+    },
+    "monthly": {
+      "title": "Monatliche Statistiken"
+    },
+    "yearly": {
+      "title": "Jährliche Statistiken"
+    },
+    "month": "Monat",
+    "year": "Jahr",
+    "invoiced": "Fakturiert (inkl. MwSt.)",
+    "revenue": "Umsatz (ohne MwSt.)",
+    "deposits": "Einzahlungen (Rechnung bezahlt)"
   }
 }
