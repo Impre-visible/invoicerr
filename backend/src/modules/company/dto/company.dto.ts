@@ -8,7 +8,15 @@ export interface PDFConfigDto {
     primaryColor: string
     secondaryColor: string
     labels: {
+        // Generic labels
+        receipt: string
         billTo: string
+        receivedFrom: string
+        invoiceRefer: string
+        paymentDate: string
+        totalReceived: string
+        
+        // Common fields
         description: string
         dueDate: string
         date: string
@@ -27,6 +35,21 @@ export interface PDFConfigDto {
         paymentMethod: string
         paymentDetails: string
 
+        type: string
+        hour: string
+        day: string
+        deposit: string
+        service: string
+        product: string
+
+        // Payment method labels (for mapping enum types to display text)
+        paymentMethodBankTransfer: string
+        paymentMethodPayPal: string
+        paymentMethodCash: string
+        paymentMethodCheck: string
+        paymentMethodOther: string
+
+        // Legal fields
         legalId: string
         VATId: string
     }
@@ -39,6 +62,7 @@ export class EditCompanyDto {
     name: string
     currency: finance.TCurrency
     VAT?: string
+    exemptVat?: boolean
     address: string
     postalCode: string
     city: string
