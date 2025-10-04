@@ -23,7 +23,7 @@ const defaultInvoiceTemplate = `
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice {{number}}</title>
+    <title>{{labels.invoice}} {{number}}</title>
     <style>
         body { font-family: {{fontFamily}}, sans-serif; margin: {{padding}}px; color: #333; }
         .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
@@ -74,6 +74,7 @@ const defaultInvoiceTemplate = `
         <thead>
             <tr>
                 <th>{{labels.description}}</th>
+                <th>{{labels.type}}</th>
                 <th>{{labels.quantity}}</th>
                 <th>{{labels.unitPrice}}</th>
                 <th>{{labels.vatRate}}</th>
@@ -84,6 +85,7 @@ const defaultInvoiceTemplate = `
             {{#each items}}
             <tr>
                 <td>{{description}}</td>
+                <td>{{type}}</td>
                 <td>{{quantity}}</td>
                 <td>{{../currency}} {{unitPrice}}</td>
                 <td>{{vatRate}}%</td>
@@ -93,15 +95,15 @@ const defaultInvoiceTemplate = `
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4"><strong>{{labels.subtotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.subtotal}}</strong></td>
                 <td><strong>{{currency}} {{totalHT}}</strong></td>
             </tr>
             <tr>
-                <td colspan="4"><strong>{{labels.vat}}</strong></td>
+                <td colspan="5"><strong>{{labels.vat}}</strong></td>
                 <td><strong>{{currency}} {{totalVAT}}</strong></td>
             </tr>
             <tr class="total-row">
-                <td colspan="4"><strong>{{labels.grandTotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.grandTotal}}</strong></td>
                 <td><strong>{{currency}} {{totalTTC}}</strong></td>
             </tr>
         </tfoot>
@@ -183,6 +185,7 @@ const defaultQuoteTemplate = `
         <thead>
             <tr>
                 <th>{{labels.description}}</th>
+                <th>{{labels.type}}</th>
                 <th>{{labels.quantity}}</th>
                 <th>{{labels.unitPrice}}</th>
                 <th>{{labels.vatRate}}</th>
@@ -193,6 +196,7 @@ const defaultQuoteTemplate = `
             {{#each items}}
             <tr>
                 <td>{{description}}</td>
+                <td>{{type}}</td>
                 <td>{{quantity}}</td>
                 <td>{{../currency}} {{unitPrice}}</td>
                 <td>{{vatRate}}%</td>
@@ -202,15 +206,15 @@ const defaultQuoteTemplate = `
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4"><strong>{{labels.subtotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.subtotal}}</strong></td>
                 <td><strong>{{currency}} {{totalHT}}</strong></td>
             </tr>
             <tr>
-                <td colspan="4"><strong>{{labels.vat}}</strong></td>
+                <td colspan="5"><strong>{{labels.vat}}</strong></td>
                 <td><strong>{{currency}} {{totalVAT}}</strong></td>
             </tr>
             <tr class="total-row">
-                <td colspan="4"><strong>{{labels.grandTotal}}</strong></td>
+                <td colspan="5"><strong>{{labels.grandTotal}}</strong></td>
                 <td><strong>{{currency}} {{totalTTC}}</strong></td>
             </tr>
         </tfoot>
@@ -235,8 +239,102 @@ const defaultQuoteTemplate = `
 </html>
 `
 
+const defaultReceiptTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{labels.receipt}} {{number}}</title>
+    <style>
+        body { font-family: {{fontFamily}}, sans-serif; margin: {{padding}}px; color: #333; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .company-info h1 { margin: 0; color: {{primaryColor}}; }
+        .receipt-info { text-align: right; }
+        .client-info { margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: {{secondaryColor}}; font-weight: bold; color: {{tableTextColor}}; }
+        .total-row { font-weight: bold; background-color: {{secondaryColor}}; color: {{tableTextColor}}; }
+        .notes { margin-top: 20px; padding: 20px; background-color: {{secondaryColor}}; border-radius: 4px; color: {{tableTextColor}}; }
+        .payment-info { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid {{primaryColor}}; color: #333; }
+        .logo { max-height: 80px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-info">
+            {{#if includeLogo}}
+            <img src="{{logoB64}}" alt="Logo" class="logo">
+            {{/if}}
+            <h1>{{company.name}}</h1>
+            <p>{{company.address}}<br>
+            {{company.city}}, {{company.postalCode}}<br>
+            {{company.country}}<br>
+            {{company.email}} | {{company.phone}}<br>
+            {{#if company.legalId}}<strong>{{labels.legalId}}:</strong> {{company.legalId}}<br>{{/if}}
+            {{#if company.VAT}}<strong>{{labels.VATId}}:</strong> {{company.VAT}}{{/if}}</p>
+        </div>
+        <div class="receipt-info">
+            <h2>{{labels.receipt}}</h2>
+            <p><strong>{{labels.receipt}}:</strong> #{{number}}<br>
+            <strong>{{labels.paymentDate}}</strong> {{paymentDate}}<br>
+            <strong>{{labels.invoiceRefer}}</strong> {{invoiceNumber}}</p>
+        </div>
+    </div>
+    <div class="client-info">
+        <h3>{{labels.receivedFrom}}</h3>
+        <p>{{client.name}}<br>
+        {{#if client.description}}<strong>{{labels.description}}</strong> {{client.description}}<br>{{/if}}
+        {{client.address}}<br>
+        {{client.city}}, {{client.postalCode}}<br>
+        {{client.country}}<br>
+        {{client.email}}</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>{{labels.description}}</th>
+                <th>{{labels.type}}</th>
+                <th>{{labels.totalReceived}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+            <tr>
+                <td>{{description}}</td>
+                <td>{{type}}</td>
+                <td>{{../currency}} {{amount}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="2"><strong>{{labels.totalReceived}}</strong></td>
+                <td><strong>{{currency}} {{totalAmount}}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    {{#if paymentMethod}}
+    <div class="payment-info">
+        <strong>{{labels.paymentMethod}}</strong> {{paymentMethod}}<br>
+        {{#if paymentDetails}}
+        <strong>{{labels.paymentDetails}}</strong> {{{paymentDetails}}}
+        {{/if}}
+    </div>
+    {{/if}}
+    
+    {{#if noteExists}}
+    <div class="notes">
+        <h4>{{labels.notes}}</h4>
+        <p>{{{notes}}}</p>
+    </div>
+    {{/if}}
+</body>
+</html>
+`
 interface TemplateSettings {
-    templateType: "invoice" | "quote"
+    templateType: "invoice" | "quote" | "receipt"
     fontFamily: string
     primaryColor: string
     secondaryColor: string
@@ -263,6 +361,26 @@ interface TemplateSettings {
         paymentDetails: string
         legalId: string
         VATId: string
+        hour: string
+        day: string
+        deposit: string
+        service: string
+        product: string
+        type: string
+
+        // Receipt-specific labels
+        receipt: string
+        receivedFrom: string
+        invoiceRefer: string
+        paymentDate: string
+        totalReceived: string
+
+        // Payment method labels (configurable in settings)
+        paymentMethodBankTransfer: string
+        paymentMethodPayPal: string
+        paymentMethodCash: string
+        paymentMethodCheck: string
+        paymentMethodOther: string
     }
     padding: number
 }
@@ -314,8 +432,28 @@ export default function PDFTemplatesSettings() {
             notes: t("settings.pdfTemplates.defaultLabels.notes"),
             paymentMethod: t("settings.pdfTemplates.defaultLabels.paymentMethod"),
             paymentDetails: t("settings.pdfTemplates.defaultLabels.paymentDetails"),
+            // new payment method labels
+            paymentMethodBankTransfer: t("settings.pdfTemplates.defaultLabels.paymentMethodBankTransfer"),
+            paymentMethodPayPal: t("settings.pdfTemplates.defaultLabels.paymentMethodPayPal"),
+            paymentMethodCash: t("settings.pdfTemplates.defaultLabels.paymentMethodCash"),
+            paymentMethodCheck: t("settings.pdfTemplates.defaultLabels.paymentMethodCheck"),
+            paymentMethodOther: t("settings.pdfTemplates.defaultLabels.paymentMethodOther"),
+
             legalId: t("settings.pdfTemplates.defaultLabels.legalId"),
             VATId: t("settings.pdfTemplates.defaultLabels.VATId"),
+            hour: t("settings.pdfTemplates.defaultLabels.hour"),
+            day: t("settings.pdfTemplates.defaultLabels.day"),
+            deposit: t("settings.pdfTemplates.defaultLabels.deposit"),
+            service: t("settings.pdfTemplates.defaultLabels.service"),
+            product: t("settings.pdfTemplates.defaultLabels.product"),
+            type: t("settings.pdfTemplates.defaultLabels.type"),
+
+            // Receipt defaults
+            receipt: t("settings.pdfTemplates.defaultLabels.receipt"),
+            receivedFrom: t("settings.pdfTemplates.defaultLabels.receivedFrom"),
+            invoiceRefer: t("settings.pdfTemplates.defaultLabels.invoiceRefer"),
+            paymentDate: t("settings.pdfTemplates.defaultLabels.paymentDate"),
+            totalReceived: t("settings.pdfTemplates.defaultLabels.totalReceived"),
         },
         padding: 40,
     })
@@ -390,10 +528,12 @@ export default function PDFTemplatesSettings() {
                 legalId: "987654321",
                 VAT: "US987654321",
             },
-            number: settings.templateType === "invoice" ? "INV-2024-001" : "QUO-2024-001",
+            number: settings.templateType === "invoice" ? "INV-2024-001" : settings.templateType === "quote" ? "QUO-2024-001" : "REC-2024-001",
             date: new Date().toLocaleDateString("en-US"),
             dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
             validUntil: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US"),
+            paymentDate: new Date().toLocaleDateString("en-US"),
+            invoiceNumber: "0001",
             paymentMethod: "Bank Transfer",
             paymentDetails: "Bank: Acme Bank, Account: 123456789, SWIFT: ACMEUS33",
             noteExists: true,
@@ -401,6 +541,7 @@ export default function PDFTemplatesSettings() {
             items: [
                 {
                     description: "Web Development",
+                    type: "Hour",
                     quantity: "40",
                     unitPrice: "75.00",
                     vatRate: "20",
@@ -408,6 +549,7 @@ export default function PDFTemplatesSettings() {
                 },
                 {
                     description: "Consulting Services",
+                    type: "Service",
                     quantity: "10",
                     unitPrice: "100.00",
                     vatRate: "20",
@@ -431,7 +573,12 @@ export default function PDFTemplatesSettings() {
     )
 
     const generatePreviewHTML = useMemo(() => {
-        const template = settings.templateType === "invoice" ? defaultInvoiceTemplate : defaultQuoteTemplate
+        const template =
+            settings.templateType === "invoice"
+                ? defaultInvoiceTemplate
+                : settings.templateType === "quote"
+                ? defaultQuoteTemplate
+                : defaultReceiptTemplate
         const compiledTemplate = Handlebars.compile(template)
         return compiledTemplate(sampleData)
     }, [settings, sampleData])
@@ -474,7 +621,7 @@ export default function PDFTemplatesSettings() {
                                                 <Label htmlFor="template-type">{t("settings.pdfTemplates.templateType.label")}</Label>
                                                 <Select
                                                     value={settings.templateType}
-                                                    onValueChange={(value: "invoice" | "quote") =>
+                                                    onValueChange={(value: "invoice" | "quote" | "receipt") =>
                                                         setSettings((prev) => ({ ...prev, templateType: value }))
                                                     }
                                                 >
@@ -487,6 +634,9 @@ export default function PDFTemplatesSettings() {
                                                         </SelectItem>
                                                         <SelectItem value="quote">
                                                             {t("settings.pdfTemplates.templateType.options.quote")}
+                                                        </SelectItem>
+                                                        <SelectItem value="receipt">
+                                                            {t("settings.pdfTemplates.templateType.options.receipt")}
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -808,6 +958,141 @@ export default function PDFTemplatesSettings() {
                                                         value={settings.labels.notes}
                                                         onChange={(e) => updateLabel("notes", e.target.value)}
                                                     />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-type">{t("settings.pdfTemplates.labels.type")}</Label>
+                                                    <Input
+                                                        id="label-type"
+                                                        value={settings.labels.type}
+                                                        onChange={(e) => updateLabel("type", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-hour">{t("settings.pdfTemplates.labels.hour")}</Label>
+                                                    <Input
+                                                        id="label-hour"
+                                                        value={settings.labels.hour}
+                                                        onChange={(e) => updateLabel("hour", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-day">{t("settings.pdfTemplates.labels.day")}</Label>
+                                                    <Input
+                                                        id="label-day"
+                                                        value={settings.labels.day}
+                                                        onChange={(e) => updateLabel("day", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-deposit">{t("settings.pdfTemplates.labels.deposit")}</Label>
+                                                    <Input
+                                                        id="label-deposit"
+                                                        value={settings.labels.deposit}
+                                                        onChange={(e) => updateLabel("deposit", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-service">{t("settings.pdfTemplates.labels.service")}</Label>
+                                                    <Input
+                                                        id="label-service"
+                                                        value={settings.labels.service}
+                                                        onChange={(e) => updateLabel("service", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-product">{t("settings.pdfTemplates.labels.product")}</Label>
+                                                    <Input
+                                                        id="label-product"
+                                                        value={settings.labels.product}
+                                                        onChange={(e) => updateLabel("product", e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-receipt">{t("settings.pdfTemplates.labels.receipt")}</Label>
+                                                    <Input
+                                                        id="label-receipt"
+                                                        value={settings.labels.receipt}
+                                                        onChange={(e) => updateLabel("receipt", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-received-from">{t("settings.pdfTemplates.labels.receivedFrom")}</Label>
+                                                    <Input
+                                                        id="label-received-from"
+                                                        value={settings.labels.receivedFrom}
+                                                        onChange={(e) => updateLabel("receivedFrom", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-invoice-refer">{t("settings.pdfTemplates.labels.invoiceRefer")}</Label>
+                                                    <Input
+                                                        id="label-invoice-refer"
+                                                        value={settings.labels.invoiceRefer}
+                                                        onChange={(e) => updateLabel("invoiceRefer", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-payment-date">{t("settings.pdfTemplates.labels.paymentDate")}</Label>
+                                                    <Input
+                                                        id="label-payment-date"
+                                                        value={settings.labels.paymentDate}
+                                                        onChange={(e) => updateLabel("paymentDate", e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="label-total-received">{t("settings.pdfTemplates.labels.totalReceived")}</Label>
+                                                    <Input
+                                                        id="label-total-received"
+                                                        value={settings.labels.totalReceived}
+                                                        onChange={(e) => updateLabel("totalReceived", e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2 pt-4 border-t">
+                                                    <h4 className="text-sm font-medium">{t("settings.pdfTemplates.labels.paymentMethodVariants")}</h4>
+                                                    <div className="grid grid-cols-1 gap-2 mt-2">
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="label-payment-bank-transfer">{t("settings.pdfTemplates.labels.paymentMethodBankTransfer")}</Label>
+                                                            <Input
+                                                                id="label-payment-bank-transfer"
+                                                                value={settings.labels.paymentMethodBankTransfer}
+                                                                onChange={(e) => updateLabel("paymentMethodBankTransfer", e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="label-payment-paypal">{t("settings.pdfTemplates.labels.paymentMethodPayPal")}</Label>
+                                                            <Input
+                                                                id="label-payment-paypal"
+                                                                value={settings.labels.paymentMethodPayPal}
+                                                                onChange={(e) => updateLabel("paymentMethodPayPal", e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="label-payment-cash">{t("settings.pdfTemplates.labels.paymentMethodCash")}</Label>
+                                                            <Input
+                                                                id="label-payment-cash"
+                                                                value={settings.labels.paymentMethodCash}
+                                                                onChange={(e) => updateLabel("paymentMethodCash", e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="label-payment-check">{t("settings.pdfTemplates.labels.paymentMethodCheck")}</Label>
+                                                            <Input
+                                                                id="label-payment-check"
+                                                                value={settings.labels.paymentMethodCheck}
+                                                                onChange={(e) => updateLabel("paymentMethodCheck", e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor="label-payment-other">{t("settings.pdfTemplates.labels.paymentMethodOther")}</Label>
+                                                            <Input
+                                                                id="label-payment-other"
+                                                                value={settings.labels.paymentMethodOther}
+                                                                onChange={(e) => updateLabel("paymentMethodOther", e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </CardContent>
