@@ -2,7 +2,7 @@ import * as Handlebars from 'handlebars';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { MailService } from '@/mail/mail.service';
-import { baseTemplate } from '@/modules/quotes/templates/base.template';
+import { baseTemplate } from '@/modules/receipts/templates/base.template';
 import { CreateReceiptDto, EditReceiptDto } from '@/modules/receipts/dto/receipts.dto';
 import prisma from '@/prisma/prisma.service';
 import { getInvertColor, getPDF } from '@/utils/pdf';
@@ -42,12 +42,21 @@ export class ReceiptsService {
 
         const totalReceipts = await prisma.receipt.count();
 
-        return { pageCount: Math.ceil(totalReceipts / pageSize), receipts };
+        // Attach payment method object when available so frontend can consume receipt.paymentMethod as an object
+        const receiptsWithPM = await Promise.all(receipts.map(async (r: any) => {
+            if (r.paymentMethodId) {
+                const pm = await prisma.paymentMethod.findUnique({ where: { id: r.paymentMethodId } });
+                return { ...r, paymentMethod: pm ?? r.paymentMethod };
+            }
+            return r;
+        }));
+
+        return { pageCount: Math.ceil(totalReceipts / pageSize), receipts: receiptsWithPM };
     }
 
     async searchReceipts(query: string) {
         if (!query) {
-            return prisma.receipt.findMany({
+            const results = await prisma.receipt.findMany({
                 take: 10,
                 orderBy: {
                     number: 'asc',
@@ -62,9 +71,19 @@ export class ReceiptsService {
                     }
                 },
             });
+
+            const resultsWithPM = await Promise.all(results.map(async (r: any) => {
+                if (r.paymentMethodId) {
+                    const pm = await prisma.paymentMethod.findUnique({ where: { id: r.paymentMethodId } });
+                    return { ...r, paymentMethod: pm ?? r.paymentMethod };
+                }
+                return r;
+            }));
+
+            return resultsWithPM;
         }
 
-        return prisma.receipt.findMany({
+        const results = await prisma.receipt.findMany({
             where: {
                 OR: [
                     { invoice: { quote: { title: { contains: query } } } },
@@ -85,6 +104,16 @@ export class ReceiptsService {
                 }
             },
         });
+
+        const resultsWithPM = await Promise.all(results.map(async (r: any) => {
+            if (r.paymentMethodId) {
+                const pm = await prisma.paymentMethod.findUnique({ where: { id: r.paymentMethodId } });
+                return { ...r, paymentMethod: pm ?? r.paymentMethod };
+            }
+            return r;
+        }));
+
+        return resultsWithPM;
     }
 
     private async checkInvoiceAfterReceipt(invoiceId: string) {
@@ -141,6 +170,9 @@ export class ReceiptsService {
                     })),
                 },
                 totalPaid: body.items.reduce((sum, item) => sum + +item.amountPaid, 0),
+                paymentMethodId: body.paymentMethodId,
+                paymentMethod: body.paymentMethod,
+                paymentDetails: body.paymentDetails,
             },
             include: {
                 items: true,
@@ -169,6 +201,7 @@ export class ReceiptsService {
                 invoiceItemId: item.id,
                 amountPaid: (item.quantity * item.unitPrice * (1 + item.vatRate / 100)).toFixed(2),
             })),
+            paymentMethodId: invoice.paymentMethodId || undefined,
             paymentMethod: invoice.paymentMethod || '',
             paymentDetails: invoice.paymentDetails || '',
         });
@@ -202,6 +235,7 @@ export class ReceiptsService {
                     },
                 },
                 totalPaid: body.items.reduce((sum, item) => sum + +item.amountPaid, 0),
+                paymentMethodId: body.paymentMethodId,
                 paymentMethod: body.paymentMethod,
                 paymentDetails: body.paymentDetails,
             },
@@ -258,7 +292,48 @@ export class ReceiptsService {
 
         const { pdfConfig } = receipt.invoice.company;
         const template = Handlebars.compile(baseTemplate); // ton template reçu ici
-
+ 
+        if(receipt.invoice.client.name.length==0){
+            receipt.invoice.client.name = receipt.invoice.client.contactFirstname + " " + receipt.invoice.client.contactLastname
+        }
+ 
+        // Map payment method enum -> PDFConfig label
+        const paymentMethodLabels: Record<string, string> = {
+            BANK_TRANSFER: pdfConfig.paymentMethodBankTransfer,
+            PAYPAL: pdfConfig.paymentMethodPayPal,
+            CASH: pdfConfig.paymentMethodCash,
+            CHECK: pdfConfig.paymentMethodCheck,
+            OTHER: pdfConfig.paymentMethodOther,
+        };
+ 
+        // Default payment display values
+        let paymentMethodName = receipt.paymentMethod;
+        let paymentDetails = receipt.paymentDetails;
+ 
+        // Prefer the saved payment method record if referenced
+        if (receipt.paymentMethodId) {
+            const pm = await prisma.paymentMethod.findUnique({ where: { id: receipt.paymentMethodId } });
+            if (pm) {
+                // Use configured label for the payment method type when available
+                paymentMethodName = paymentMethodLabels[pm.type as string] || pm.type;
+                paymentDetails = pm.details || paymentDetails;
+            }
+        } else {
+            // If stored paymentMethod matches an enum, map it to configured label
+            if (paymentMethodName && paymentMethodLabels[paymentMethodName.toUpperCase()]) {
+                paymentMethodName = paymentMethodLabels[paymentMethodName.toUpperCase()];
+            }
+        }
+ 
+        // Map item type enums to PDF label text (from pdfConfig)
+        const itemTypeLabels: Record<string, string> = {
+            HOUR: pdfConfig.hour,
+            DAY: pdfConfig.day,
+            DEPOSIT: pdfConfig.deposit,
+            SERVICE: pdfConfig.service,
+            PRODUCT: pdfConfig.product,
+        };
+ 
         const html = template({
             number: receipt.rawNumber || receipt.number.toString(),
             paymentDate: formatDate(receipt.invoice.company, new Date()), // TODO: Add a payment date
@@ -266,13 +341,17 @@ export class ReceiptsService {
             client: receipt.invoice.client,
             company: receipt.invoice.company,
             currency: receipt.invoice.currency,
-            paymentMethod: receipt.paymentMethod,
+            paymentMethod: paymentMethodName,
             totalAmount: receipt.totalPaid.toFixed(2),
-
-            items: receipt.items.map(item => ({
-                description: receipt.invoice.items.find(i => i.id === item.invoiceItemId)?.description || 'N/A',
-                amount: item.amountPaid.toFixed(2),
-            })),
+ 
+            items: receipt.items.map(item => {
+                const invoiceItem = receipt.invoice.items.find(i => i.id === item.invoiceItemId);
+                return {
+                    description: invoiceItem?.description || 'N/A',
+                    type: itemTypeLabels[invoiceItem?.type as string] || invoiceItem?.type || '',
+                    amount: item.amountPaid.toFixed(2),
+                };
+            }),
 
             fontFamily: pdfConfig.fontFamily ?? 'Inter',
             primaryColor: pdfConfig.primaryColor ?? '#0ea5e9',
@@ -288,11 +367,20 @@ export class ReceiptsService {
                 receivedFrom: pdfConfig.receivedFrom,
                 invoiceRefer: pdfConfig.invoiceRefer,
                 description: pdfConfig.description,
+                type: pdfConfig.type,
                 totalReceived: pdfConfig.totalReceived,
                 paymentMethod: pdfConfig.paymentMethod,
+                paymentDetails: pdfConfig.paymentDetails,
                 legalId: pdfConfig.legalId,
                 VATId: pdfConfig.VATId,
+                hour: pdfConfig.hour,
+                day: pdfConfig.day,
+                deposit: pdfConfig.deposit,
+                service: pdfConfig.service,
+                product: pdfConfig.product
             },
+
+            vatExemptText: receipt.invoice.company.exemptVat && (receipt.invoice.company.country || '').toUpperCase() === 'FRANCE' ? 'TVA non applicable, art. 293 B du CGI' : null,
         });
 
         const pdfBuffer = await getPDF(html);
@@ -334,6 +422,10 @@ export class ReceiptsService {
             COMPANY_NAME: receipt.invoice.company.name,
             CLIENT_NAME: receipt.invoice.client.name,
         };
+
+        if (!receipt.invoice.client.contactEmail) {
+            throw new BadRequestException('Client has no email configured; receipt not sent');
+        }
 
         const mailOptions = {
             to: receipt.invoice.client.contactEmail,
