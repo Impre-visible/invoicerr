@@ -115,19 +115,41 @@ Make sure port 80 is available on your host machine, or change the mapping.
    cd backend
    npm install
    npx prisma generate
-   npm run dev
+   npm run start
    ```
 
 3. Frontend setup (in a new terminal):  
    ```bash
    cd frontend
    npm install
-   npm run dev
+   npm run start
    ```
 
 4. Open in your browser:  
    - Frontend: `http://localhost:5173`  
    - API: `http://localhost:3000`
+
+---
+
+## 🧪 Lancer les tests end-to-end (Cypress)
+
+Pour lancer les tests e2e localement ou en CI :
+
+1. Démarrer le backend et le frontend avec les variables de test :
+   ```bash
+   cd backend && npm run start:test &
+   cd frontend && npm run start:test &
+   ```
+   (Assurez-vous d'avoir un .env.test dans chaque dossier)
+
+2. Dans un autre terminal, lancer Cypress :
+   ```bash
+   cd e2e
+   npm install
+   npm run e2e:open # ou npm run e2e:run
+   ```
+
+En CI, le workflow GitHub Actions fait ces étapes automatiquement.
 
 ---
 

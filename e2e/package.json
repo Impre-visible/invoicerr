@@ -5,7 +5,8 @@
     "cypress": "^15.3.0"
   },
   "scripts": {
-    "cypress:open": "ts-node start-local.ts"
+    "e2e:open": "cypress open",
+    "e2e:run": "cypress run"
   },
   "dependencies": {
     "child_process": "^1.0.2",
