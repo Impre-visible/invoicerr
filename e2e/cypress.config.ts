@@ -5,8 +5,8 @@ import { exec } from "child_process";
 export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      on('task', {
-        resetDatabase() {
+      on('before:run', (details) => {
+        console.log('Override before:run');
           return new Promise((resolve, reject) => {
             exec('node ../backend/prisma/reset-db.test.ts', (err: any, stdout: any, stderr: any) => {
               if (err) {
@@ -14,10 +14,9 @@ export default defineConfig({
                 return reject(err);
               }
               console.log(stdout);
-              resolve(null);
+              resolve();
             });
           });
-        }
       });
     },
     baseUrl: process.env.FRONTEND_URL || "http://localhost:6284",
