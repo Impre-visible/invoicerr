@@ -67,9 +67,7 @@ export default function LoginPage() {
         if (data && !error && !hasToasted) {
             setHasToasted(true)
             setTimeout(() => {
-                console.log("Login successful, redirecting to home")
                 window.location.href = "/"
-                console.log("Data received:", data)
             }, 1000)
             toast.success(t("auth.login.messages.loginSuccess"))
         } else if (error) {
