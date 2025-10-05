@@ -5,6 +5,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useTranslation } from "react-i18next";
 import { useGet } from "@/lib/utils";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import YearPicker from "@/components/year-picker";
 
 type MonthStat = { month: number; invoiced: number; revenue: number; deposits: number };
 type YearStat = { year: number; invoiced: number; revenue: number; deposits: number };
@@ -92,13 +93,11 @@ export default function StatsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <label className="text-sm text-muted-foreground">{t("stats.controls.year")}</label>
-            <input
-              type="number"
+            <YearPicker
+              startYear={2000}
+              endYear={2100}
               value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="border rounded px-2 py-1 w-24"
-              min={2000}
-              max={2100}
+              onChange={setYear}
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -183,10 +182,20 @@ export default function StatsPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-muted-foreground">{t("stats.controls.range")}</label>
-            <input type="number" value={startYear} onChange={(e) => setStartYear(Number(e.target.value))} className="border rounded px-2 py-1 w-24" />
+            <label className="text-sm text-muted-foreground text-nowrap">{t("stats.controls.range")}</label>
+            <YearPicker
+              startYear={2000}
+              endYear={2100}
+              value={startYear}
+              onChange={setStartYear}
+            />
             <span>-</span>
-            <input type="number" value={endYear} onChange={(e) => setEndYear(Number(e.target.value))} className="border rounded px-2 py-1 w-24" />
+            <YearPicker
+              startYear={2000}
+              endYear={2100}
+              value={endYear}
+              onChange={setEndYear}
+            />
           </div>
           <div className="flex items-center space-x-2">
             {yearlyCurrencies.length ? (
