@@ -34,11 +34,11 @@ export function PaymentMethodDeleteDialog({
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Delete failed");
-      toast.success(t("paymentMethods.messages.deleteSuccess") || "Payment method deleted");
+      toast.success(t("paymentMethods.upsert.messages.deleteSuccess") || "Payment method deleted");
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error(t("paymentMethods.messages.deleteError") || "Failed to delete payment method");
+      toast.error(t("paymentMethods.upsert.messages.deleteError") || "Failed to delete payment method");
     } finally {
       setLoading(false);
     }
@@ -55,7 +55,7 @@ export function PaymentMethodDeleteDialog({
 
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            {t("paymentMethods.delete.description") || `Are you sure you want to delete "${paymentMethod?.name}"? This action cannot be undone.`}
+            {t("paymentMethods.delete.description", { name: paymentMethod?.name }) || `Are you sure you want to delete "${paymentMethod?.name}"? This action cannot be undone.`}
           </p>
 
           <div className="flex justify-end gap-2">
