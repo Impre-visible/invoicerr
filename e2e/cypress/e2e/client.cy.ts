@@ -44,7 +44,7 @@ describe('Client E2E', () => {
         cy.get('#radix-«r7» .text-primary-foreground').click();
 
         cy.contains('ACME')
-        cy.contains('Active')
+        cy.contains('+1 23 456 789')
     })
 
     it('allows to create a new client (Individual)', () => {
@@ -72,7 +72,7 @@ describe('Client E2E', () => {
         cy.get('[name="contactEmail"]').type('jane.doe@acme.org');
 
         cy.get('[name="contactPhone"]').clear();
-        cy.get('[name="contactPhone"]').type('+1 23 456 789');
+        cy.get('[name="contactPhone"]').type('+1 34 567 890');
 
         cy.get('[name="address"]').clear();
         cy.get('[name="address"]').type('123 Street Name');
@@ -88,6 +88,6 @@ describe('Client E2E', () => {
         cy.get('#radix-«r7» .text-primary-foreground').click();
 
         cy.contains('Jane Doe')
-        cy.contains('Active')
+        cy.contains('+1 34 567 890')
     })
 });
