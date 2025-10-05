@@ -186,7 +186,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit">
+                <DialogContent className="max-w-sm lg:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>{t(`quotes.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
@@ -281,35 +281,33 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 )}
                             />
 
-                            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={control}
-                                    name="paymentMethodId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
-                                            <FormControl>
-                                                <Select value={field.value ?? ""} onValueChange={(val) => field.onChange(val || "")}>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder={t("quotes.upsert.form.paymentMethod.placeholder")} />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {paymentMethods?.map((pm: PaymentMethod) => (
-                                                            <SelectItem key={pm.id} value={pm.id}>
-                                                                {pm.name} - {pm.type==PaymentMethodType.BANK_TRANSFER?t("paymentMethods.fields.type.bank_transfer"):pm.type==PaymentMethodType.PAYPAL?t("paymentMethods.fields.type.paypal"):pm.type==PaymentMethodType.CHECK?t("paymentMethods.fields.type.check"):pm.type==PaymentMethodType.CASH?t("paymentMethods.fields.type.cash"):pm.type==PaymentMethodType.OTHER?t("paymentMethods.fields.type.other"):pm.type}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("quotes.upsert.form.paymentMethod.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </section>
+                            <FormField
+                                control={control}
+                                name="paymentMethodId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("quotes.upsert.form.paymentMethod.label")}</FormLabel>
+                                        <FormControl>
+                                            <Select value={field.value ?? ""} onValueChange={(val) => field.onChange(val || "")}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder={t("quotes.upsert.form.paymentMethod.placeholder")} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {paymentMethods?.map((pm: PaymentMethod) => (
+                                                        <SelectItem key={pm.id} value={pm.id}>
+                                                            {pm.name} - {pm.type == PaymentMethodType.BANK_TRANSFER ? t("paymentMethods.fields.type.bank_transfer") : pm.type == PaymentMethodType.PAYPAL ? t("paymentMethods.fields.type.paypal") : pm.type == PaymentMethodType.CHECK ? t("paymentMethods.fields.type.check") : pm.type == PaymentMethodType.CASH ? t("paymentMethods.fields.type.cash") : pm.type == PaymentMethodType.OTHER ? t("paymentMethods.fields.type.other") : pm.type}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t("quotes.upsert.form.paymentMethod.description")}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormItem>
                                 <FormLabel>{t("quotes.upsert.form.items.label")}</FormLabel>
@@ -348,7 +346,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                                 <FormItem>
                                                                     <FormControl>
                                                                             <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
-                                                                                <SelectTrigger className="w-32" size="sm" aria-label={t("invoices.upsert.form.items.type.label") as string}>
+                                                                            <SelectTrigger className="w-32 mb-0" aria-label={t("invoices.upsert.form.items.type.label") as string}>
                                                                                     <SelectValue />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
