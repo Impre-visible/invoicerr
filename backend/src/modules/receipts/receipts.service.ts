@@ -219,8 +219,6 @@ export class ReceiptsService {
             throw new BadRequestException('Receipt not found');
         }
 
-        console.log('Editing receipt:', body)
-
         const updatedReceipt = await prisma.receipt.update({
             where: { id: existingReceipt.id },
             data: {
