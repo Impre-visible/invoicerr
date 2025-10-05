@@ -10,11 +10,13 @@ export type Path =
   | `/invoices`
   | `/login`
   | `/logout`
+  | `/payment-methods`
   | `/quotes`
   | `/receipts`
   | `/settings/:tab?`
   | `/signature/:id`
   | `/signup`
+  | `/stats`
 
 export type Params = {
   '/settings/:tab?': { tab?: string }
