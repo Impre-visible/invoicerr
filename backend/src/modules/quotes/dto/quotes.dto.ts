@@ -1,4 +1,4 @@
-import { Currency, ItemType } from "@invoicerr/prisma";
+import { Currency, ItemType } from "@prisma/client";
  
 export class CreateQuoteDto {
     // number is auto generated

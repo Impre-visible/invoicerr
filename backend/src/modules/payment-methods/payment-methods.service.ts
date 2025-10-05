@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import prisma from '@/prisma/prisma.service';
-import { PaymentMethod, PaymentMethodType } from '@invoicerr/prisma';
+import { PaymentMethod, PaymentMethodType } from '@prisma/client';
 
 export interface CreatePaymentMethodDto {
   name: string;

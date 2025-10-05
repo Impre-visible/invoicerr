@@ -1,7 +1,7 @@
 import * as puppeteer from 'puppeteer';
 
 import { BadRequestException } from '@nestjs/common';
-import { PrismaClient } from '@invoicerr/prisma';
+import { PrismaClient } from '@prisma/client';
 
 type PatternType = "receipt" | "invoice" | "quote";
 
