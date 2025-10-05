@@ -749,6 +749,14 @@
     "title": "Zahlungsmethoden",
     "description": "Verwalten Sie wiederverwendbare Zahlungsmethoden (IBAN, PayPal, Bargeld...)",
     "empty": "Noch keine Zahlungsmethoden",
+    "actions": {
+      "cancel": "Abbrechen",
+      "add": "Hinzufügen",
+      "save": "Speichern",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleting": "Lösche..."
+    },
     "search": {
       "placeholder": "Zahlungsmethoden suchen..."
     },

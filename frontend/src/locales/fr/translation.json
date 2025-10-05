@@ -747,6 +747,14 @@
     "paymentMethods": {
         "title": "Méthodes de paiement",
         "description": "Gérez des méthodes de paiement réutilisables (IBAN, PayPal, Espèces...)",
+        "actions": {
+          "cancel": "Annuler",
+          "add": "Ajouter",
+          "save": "Enregistrer",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression..."
+        },
         "search": {
           "placeholder": "Rechercher des méthodes de paiement..."
         },
@@ -822,14 +830,6 @@
           "updateError": "Échec de la mise à jour de la méthode de paiement",
           "deleteSuccess": "Méthode de paiement supprimée",
           "deleteError": "Échec de la suppression de la méthode de paiement"
-        },
-        "actions": {
-          "cancel": "Annuler",
-          "add": "Ajouter",
-          "save": "Enregistrer",
-          "edit": "Modifier",
-          "delete": "Supprimer",
-          "deleting": "Suppression..."
         },
         "tooltips": {
           "view": "Voir",
