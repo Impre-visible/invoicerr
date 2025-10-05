@@ -112,6 +112,12 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
             .catch((err) => console.error(err))
     }
 
+    useEffect(() => {
+        if (selectedInvoice) {
+            form.setValue("paymentMethodId", selectedInvoice.paymentMethodId || "")
+        }
+    }, [form, selectedInvoice])
+
     const onAddItem = () => {
         if (selectedItem) {
             setItems([...items, {
@@ -149,7 +155,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                                             <SearchSelect
                                                 options={(invoices || []).map((invoice) => ({ label: invoice.rawNumber || invoice.number.toString(), value: invoice.id }))}
                                                 value={field.value ?? ""}
-                                                onValueChange={(val) => { field.onChange(val || null); setSelectedInvoice(invoices?.find(inv => inv.id === val) || null); setSelectedItem(null) }}
+                                                onValueChange={(val) => { field.onChange(val || null); setSelectedInvoice(invoices?.find(inv => inv.id === val) || null); setSelectedItem(null); }}
                                                 onSearchChange={setSearchTerm}
                                                 placeholder={t("receipts.upsert.form.invoice.placeholder")}
                                                 noResultsText={t("receipts.upsert.form.invoice.noResults")}
@@ -160,37 +166,33 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                                 )}
                             />
 
-                            <section className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="paymentMethodId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("receipts.upsert.form.paymentMethod.label")}</FormLabel>
-                                            <FormControl>
-                                                <Select value={field.value ?? ""} onValueChange={(val) => field.onChange(val || "")}>
-                                                    <SelectTrigger className="w-full" aria-label={t("receipts.upsert.form.paymentMethod.label") as string}>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {(paymentMethods || []).map((pm: PaymentMethod) => (
-                                                            <SelectItem key={pm.id} value={pm.id}>
-                                                                {pm.name} - {pm.type==PaymentMethodType.BANK_TRANSFER?t("paymentMethods.fields.type.bank_transfer"):pm.type==PaymentMethodType.PAYPAL?t("paymentMethods.fields.type.paypal"):pm.type==PaymentMethodType.CHECK?t("paymentMethods.fields.type.check"):pm.type==PaymentMethodType.CASH?t("paymentMethods.fields.type.cash"):pm.type==PaymentMethodType.OTHER?t("paymentMethods.fields.type.other"):pm.type}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormDescription>
-                                                {t("receipts.upsert.form.paymentMethod.description")}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </section>
-
-
+                            <FormField
+                                control={form.control}
+                                name="paymentMethodId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("receipts.upsert.form.paymentMethod.label")}</FormLabel>
+                                        <FormControl>
+                                            <Select value={field.value ?? ""} onValueChange={(val) => field.onChange(val || "")}>
+                                                <SelectTrigger className="w-full" aria-label={t("receipts.upsert.form.paymentMethod.label") as string}>
+                                                    <SelectValue placeholder={t("receipts.upsert.form.paymentMethod.placeholder")} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {(paymentMethods || []).map((pm: PaymentMethod) => (
+                                                        <SelectItem key={pm.id} value={pm.id}>
+                                                            {pm.name} - {pm.type == PaymentMethodType.BANK_TRANSFER ? t("paymentMethods.fields.type.bank_transfer") : pm.type == PaymentMethodType.PAYPAL ? t("paymentMethods.fields.type.paypal") : pm.type == PaymentMethodType.CHECK ? t("paymentMethods.fields.type.check") : pm.type == PaymentMethodType.CASH ? t("paymentMethods.fields.type.cash") : pm.type == PaymentMethodType.OTHER ? t("paymentMethods.fields.type.other") : pm.type}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormDescription>
+                                            {t("receipts.upsert.form.paymentMethod.description")}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormItem className="flex flex-col gap-2 mt-2">
                                 <FormLabel className="mb-0">{t("receipts.upsert.form.items.label")}</FormLabel>
