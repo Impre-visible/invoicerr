@@ -1,5 +1,5 @@
-import { Currency, ClientType } from "@invoicerr/prisma";
- 
+import { ClientType, Currency } from "@prisma/client";
+
 export class EditClientsDto {
     description?: string
     legalId?: string

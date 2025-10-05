@@ -1,6 +1,5 @@
 import { formatPattern } from '@/utils/pdf';
-import { Prisma, PrismaClient } from '../../prisma/generated/prisma/client';
-
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient().$extends({
     query: {
