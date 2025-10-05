@@ -25,10 +25,6 @@ export default function Invoices() {
     const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
 
     useEffect(() => {
-        console.log(recurringInvoices)
-    }, [recurringInvoices])
-
-    useEffect(() => {
         if (downloadInvoicePdf && pdf) {
             pdf.arrayBuffer().then((buffer) => {
                 const blob = new Blob([buffer], { type: "application/pdf" })
