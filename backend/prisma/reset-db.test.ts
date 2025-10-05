@@ -9,5 +9,4 @@ import { execSync } from "child_process";
 
 const schemaPath = path.resolve(__dirname, "./schema.prisma");
 
-execSync("docker-compose -f ../docker-compose.test.yml up -d", { stdio: "inherit" });
 execSync(`npx prisma migrate reset --force --skip-seed --schema=${schemaPath}`, { stdio: "inherit" });
