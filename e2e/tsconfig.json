@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "types": ["cypress", "node"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "e2e/**/*.ts"],
-    "exclude": ["node_modules"]
+  "include": ["**/*.ts", "**/*.tsx", "e2e/**/*.ts", "cypress"],
+  "exclude": ["node_modules"]
 }

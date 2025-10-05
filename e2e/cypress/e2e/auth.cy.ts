@@ -10,10 +10,7 @@ describe('Authentication E2E', () => {
     });
 
     it('allows a user to login', () => {
-        cy.visit('/login');
-        cy.get('input[name=email]').type('john.doe@acme.org');
-        cy.get('input[name=password]').type('Super_Secret_Password123!');
-        cy.get('button[type=submit]').click();
+        cy.login();
         cy.contains('Successfully signed in');
         cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
     });
