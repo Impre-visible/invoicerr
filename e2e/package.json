@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "@types/wait-on": "^5.3.4",
+    "cypress": "^15.3.0"
+  },
+  "scripts": {
+    "cypress:open": "ts-node start-local.ts"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.1"
+  }
+}
