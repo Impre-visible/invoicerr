@@ -25,3 +25,4 @@ dist-ssr
 
 backend/prisma/db.sqlite
 backend/prisma/generated
+e2e/cypress/fixtures/session.json

@@ -43,4 +43,12 @@ Cypress.Commands.add('login', () => {
     cy.get('input[name=email]').type('john.doe@acme.org');
     cy.get('input[name=password]').type('Super_Secret_Password123!');
     cy.get('button[type=submit]').click();
+    cy.getCookie('access_token').then(access => {
+        cy.getCookie('refresh_token').then(refresh => {
+            cy.writeFile('cypress/fixtures/session.json', {
+                access_token: access?.value,
+                refresh_token: refresh?.value,
+            });
+        });
+    });
 });
