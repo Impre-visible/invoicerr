@@ -122,7 +122,7 @@ export class QuotesService {
         let totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
  
-        const isVatExemptFrance = !!(company.exemptVat && (company.country || '').toUpperCase() === 'FR');
+        const isVatExemptFrance = !!(company.exemptVat && (company.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
             totalVAT = 0;
             totalTTC = totalHT;
@@ -181,7 +181,7 @@ export class QuotesService {
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
  
         const company = await prisma.company.findFirst();
-        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FR');
+        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
             totalVAT = 0;
             totalTTC = totalHT;
