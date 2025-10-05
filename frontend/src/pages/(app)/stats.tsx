@@ -95,7 +95,7 @@ export default function StatsPage() {
             <label className="text-sm text-muted-foreground">{t("stats.controls.year")}</label>
             <YearPicker
               startYear={2000}
-              endYear={2100}
+              endYear={new Date().getFullYear()}
               value={year}
               onChange={setYear}
             />
@@ -185,14 +185,14 @@ export default function StatsPage() {
             <label className="text-sm text-muted-foreground text-nowrap">{t("stats.controls.range")}</label>
             <YearPicker
               startYear={2000}
-              endYear={2100}
+              endYear={new Date().getFullYear()}
               value={startYear}
               onChange={setStartYear}
             />
             <span>-</span>
             <YearPicker
               startYear={2000}
-              endYear={2100}
+              endYear={new Date().getFullYear()}
               value={endYear}
               onChange={setEndYear}
             />
