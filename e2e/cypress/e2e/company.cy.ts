@@ -1,5 +1,4 @@
 describe('Company E2E', () => {
-
   it('allows to fill in company settings', () => {
     cy.login();
     cy.visit('/settings/company');
