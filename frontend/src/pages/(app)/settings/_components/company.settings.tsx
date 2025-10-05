@@ -609,7 +609,7 @@ export default function CompanySettings() {
                                 control={form.control}
                                 name="exemptVat"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col space-y-3">
                                         <FormLabel>{t("settings.company.form.exemptVat.label")}</FormLabel>
                                         <FormControl>
                                             <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
