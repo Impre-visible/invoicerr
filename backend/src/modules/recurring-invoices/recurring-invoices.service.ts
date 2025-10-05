@@ -43,7 +43,7 @@ export class RecurringInvoicesService {
 
     async createRecurringInvoice(data: UpsertInvoicesDto) {
         const company = await prisma.company.findFirst();
-        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FR');
+        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FRANCE');
 
         // Calculate totals
         let totalHT = 0;
@@ -107,7 +107,7 @@ export class RecurringInvoicesService {
 
     async updateRecurringInvoice(id: string, data: UpsertInvoicesDto) {
         const company = await prisma.company.findFirst();
-        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FR');
+        const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FRANCE');
 
         // Calculate totals
         let totalHT = 0;
