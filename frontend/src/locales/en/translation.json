@@ -749,6 +749,14 @@
         "title": "Payment Methods",
         "description": "Manage reusable payment methods.",
         "empty": "No payment methods yet.",
+        "actions": {
+          "cancel": "Cancel",
+          "add": "Add",
+          "save": "Save",
+          "edit": "Edit",
+          "delete": "Delete",
+          "deleting": "Deleting..."
+        },
         "search": {
           "placeholder": "Search payment methods..."
         },
