@@ -1260,7 +1260,9 @@
         "deposit": "Anzahlung",
         "service": "Service",
         "product": "Produkt",
-        "type": "Typ"
+        "type": "Typ",
+        "legalId": "Ausweis",
+        "vatId": "Umsatzsteuer-Identifikationsnummer"
       },
       "defaultLabels": {
         "invoice": "Rechnung",
@@ -1296,7 +1298,9 @@
         "deposit": "Anzahlung",
         "service": "Service",
         "product": "Produkt",
-        "type": "Typ"
+        "type": "Typ",
+        "legalId": "Ausweis",
+        "vatId": "Umsatzsteuer-Identifikationsnummer"
       },
       "preview": {
         "title": "Vorschau",

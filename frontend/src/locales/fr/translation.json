@@ -1268,7 +1268,9 @@
                 "deposit": "Acompte / Arrhes",
                 "service": "Service",
                 "product": "Produit",
-                "type": "Type"
+                "type": "Type",
+                "legalId": "SIRET/SIREN",
+                "vatId": "Numéro de TVA"
             },
             "defaultLabels": {
                 "invoice": "Facture",
@@ -1304,7 +1306,9 @@
                 "deposit": "Acompte / Arrhes",
                 "service": "Service",
                 "product": "Produit",
-                "type": "Type"
+                "type": "Type",
+                "legalId": "SIRET/SIREN",
+                "vatId": "Numéro de TVA"
             },
             "preview": {
                 "title": "Aperçu",
