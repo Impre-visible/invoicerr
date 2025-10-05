@@ -4,6 +4,7 @@ import { exec } from "child_process";
 
 export default defineConfig({
   e2e: {
+    experimentalStudio: true,
     setupNodeEvents(on, config) {
       on('before:run', (details) => {
         console.log('Override before:run');
