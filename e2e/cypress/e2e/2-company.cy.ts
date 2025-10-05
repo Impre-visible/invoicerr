@@ -1,6 +1,16 @@
+beforeEach(() => {
+  cy.readFile('cypress/fixtures/session.json').then((tokens) => {
+    if (tokens.access_token) {
+      cy.setCookie('access_token', tokens.access_token);
+    }
+    if (tokens.refresh_token) {
+      cy.setCookie('refresh_token', tokens.refresh_token);
+    }
+  });
+});
+
 describe('Company E2E', () => {
   it('allows to fill in company settings', () => {
-    cy.login();
     cy.visit('/settings/company');
 
     cy.get('input[name=name]').clear().type('Acme Corp');

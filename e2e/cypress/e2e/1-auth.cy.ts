@@ -7,6 +7,7 @@ describe('Authentication E2E', () => {
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
         cy.contains('Account created successfully');
+
     });
 
     it('allows a user to login', () => {

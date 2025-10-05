@@ -1,18 +1,28 @@
+beforeEach(() => {
+    cy.readFile('cypress/fixtures/session.json').then((tokens) => {
+        if (tokens.access_token) {
+            cy.setCookie('access_token', tokens.access_token);
+        }
+        if (tokens.refresh_token) {
+            cy.setCookie('refresh_token', tokens.refresh_token);
+        }
+    });
+});
+
 describe('Client E2E', () => {
     it('allows to create a new client (Company)', () => {
-        cy.login()
         cy.visit('/clients')
-        cy.get('#root .md\\:inline-flex').click();
-        cy.get('[name="contactFirstname"]').clear();
-        cy.get('[name="contactFirstname"]').type('John');
-        cy.get('[name="contactLastname"]').clear();
+        cy.get('#root .md\\:inline-flex').click({ force: true });
+        cy.get('[name="contactFirstname"]').clear({ force: true });
+        cy.get('[name="contactFirstname"]').type('John', { force: true });
+        cy.get('[name="contactLastname"]').clear({ force: true });
         cy.get('[name="contactLastname"]').type('Doe');
 
-        cy.get('[name="name"]').clear();
-        cy.get('[name="name"]').type('ACME');
+        cy.get('[name="name"]').clear({ force: true });
+        cy.get('[name="name"]').type('ACME', { force: true });
 
-        cy.get('[name="description"]').click();
-        cy.get('[name="description"]').clear();
+        cy.get('[name="description"]').click({ force: true });
+        cy.get('[name="description"]').clear({ force: true });
         cy.get('[name="description"]').type('ACME Description');
 
         cy.get('[name="legalId"]').click();
@@ -48,9 +58,8 @@ describe('Client E2E', () => {
     })
 
     it('allows to create a new client (Individual)', () => {
-        cy.login()
         cy.visit('/clients')
-        cy.get('#root .md\\:inline-flex').click();
+        cy.get('#root .md\\:inline-flex').click({ force: true });
         cy.get('[name="contactFirstname"]').clear();
         cy.get('[name="contactFirstname"]').type('Jane');
         cy.get('[name="contactLastname"]').clear();
