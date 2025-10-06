@@ -1,7 +1,7 @@
 {
     "clients": {
         "header": {
-            "subtitle": "Gestiona tus clientes",
+            "subtitle": "Administra tus clientes",
             "count": "{{count}} clientes {{found}}",
             "found": "encontrados"
         },
@@ -20,7 +20,7 @@
             "noClients": "Aún no hay clientes",
             "noResults": "No se encontraron clientes",
             "startAdding": "Comienza creando tu primer cliente.",
-            "tryDifferentSearch": "Intenta ajustar tus términos de búsqueda."
+            "tryDifferentSearch": "Prueba ajustando tus términos de búsqueda."
         },
         "list": {
             "title": "Todos los clientes",
@@ -43,27 +43,27 @@
             "fields": {
                 "contactFirstname": {
                     "label": "Nombre",
-                    "placeholder": "Ingrese el nombre"
+                    "placeholder": "Ingrese nombre"
                 },
                 "contactLastname": {
                     "label": "Apellido",
-                    "placeholder": "Ingrese el apellido"
+                    "placeholder": "Ingrese apellido"
                 },
                 "name": {
-                    "label": "Razón social",
-                    "placeholder": "Ingrese la razón social"
+                    "label": "Nombre de la empresa",
+                    "placeholder": "Ingrese el nombre de la empresa"
                 },
                 "description": {
                     "label": "Descripción",
                     "placeholder": "Ingrese la descripción de la empresa"
                 },
                 "legalId": {
-                    "label": "ID Legal",
-                    "placeholder": "Ingrese el identificador legal"
+                    "label": "Identificación legal",
+                    "placeholder": "Ingrese identificador legal"
                 },
                 "vat": {
                     "label": "Número de IVA",
-                    "placeholder": "Ingrese el número de IVA (ej: FR12345678901)"
+                    "placeholder": "Ingrese número de IVA (ej.: FR12345678901)"
                 },
                 "currency": {
                     "label": "Moneda"
@@ -78,23 +78,29 @@
                 },
                 "contactPhone": {
                     "label": "Teléfono",
-                    "placeholder": "Ingrese el número telefónico"
+                    "placeholder": "Ingrese número de teléfono"
                 },
                 "address": {
                     "label": "Dirección",
-                    "placeholder": "Ingrese la dirección"
+                    "placeholder": "Ingrese dirección"
                 },
                 "postalCode": {
                     "label": "Código postal",
-                    "placeholder": "Ingrese el código postal"
+                    "placeholder": "Ingrese código postal"
                 },
                 "city": {
                     "label": "Ciudad",
-                    "placeholder": "Ingrese la ciudad"
+                    "placeholder": "Ingrese ciudad"
+                },
+                "type": {
+                    "label": "Tipo de cliente",
+                    "company": "Empresa",
+                    "individual": "Persona física",
+                    "description": "Selecciona si el cliente es una persona física o empresa"
                 },
                 "country": {
                     "label": "País",
-                    "placeholder": "Ingrese el país"
+                    "placeholder": "Ingrese país"
                 }
             },
             "validation": {
@@ -106,15 +112,15 @@
                     "maxLength": "La descripción debe tener menos de 500 caracteres"
                 },
                 "legalId": {
-                    "required": "El ID legal es obligatorio",
-                    "empty": "El ID legal no puede estar vacío",
-                    "maxLength": "El ID legal debe tener menos de 50 caracteres"
+                    "required": "La identificación legal es obligatoria",
+                    "empty": "La identificación legal no puede estar vacía",
+                    "maxLength": "La identificación legal debe tener menos de 50 caracteres"
                 },
                 "vat": {
                     "required": "El número de IVA es obligatorio",
                     "empty": "El número de IVA no puede estar vacío",
                     "maxLength": "El número de IVA debe tener menos de 15 caracteres",
-                    "format": "El formato del número de IVA no es válido (ej: FR12345678901)"
+                    "format": "El formato del número de IVA es inválido (ej.: FR12345678901)"
                 },
                 "foundedAt": {
                     "future": "La fecha de fundación no puede ser en el futuro"
@@ -127,17 +133,17 @@
                 },
                 "contactPhone": {
                     "minLength": "El número de teléfono debe tener al menos 8 caracteres",
-                    "format": "El formato del número de teléfono no es válido"
+                    "format": "El formato del número de teléfono es inválido"
                 },
                 "contactEmail": {
                     "required": "El correo electrónico es obligatorio",
-                    "format": "El formato del correo electrónico no es válido"
+                    "format": "El formato de correo electrónico es inválido"
                 },
                 "address": {
                     "required": "La dirección es obligatoria"
                 },
                 "postalCode": {
-                    "format": "El formato del código postal no es válido"
+                    "format": "El formato del código postal es inválido"
                 },
                 "city": {
                     "required": "La ciudad es obligatoria"
@@ -156,7 +162,7 @@
             "title": "Detalles del cliente",
             "description": "Ver toda la información relevante de este cliente.",
             "fields": {
-                "companyName": "Razón social",
+                "companyName": "Nombre de la empresa",
                 "contactPerson": "Persona de contacto",
                 "email": "Correo electrónico",
                 "phone": "Teléfono",
@@ -168,7 +174,7 @@
         },
         "delete": {
             "title": "Eliminar cliente",
-            "description": "¿Seguro que deseas eliminar este cliente? Esta acción no se puede deshacer.",
+            "description": "¿Seguro que desea eliminar este cliente? Esta acción no puede deshacerse.",
             "actions": {
                 "cancel": "Cancelar",
                 "delete": "Eliminar cliente"
@@ -177,91 +183,91 @@
     },
     "quotes": {
         "header": {
-            "subtitle": "Gestiona tus presupuestos",
-            "count": "{{count}} presupuestos {{found}}",
-            "found": "encontrados"
+            "subtitle": "Administra tus cotizaciones",
+            "count": "{{count}} cotizaciones {{found}}",
+            "found": "encontradas"
         },
         "search": {
-            "placeholder": "Buscar presupuestos..."
+            "placeholder": "Buscar cotizaciones..."
         },
         "actions": {
-            "addNew": "Agregar nuevo presupuesto"
+            "addNew": "Agregar nueva cotización"
         },
         "stats": {
-            "total": "Total de presupuestos",
+            "total": "Total de cotizaciones",
             "draft": "Borrador",
-            "signed": "Firmado"
+            "signed": "Firmada"
         },
         "emptyState": {
-            "noQuotes": "Aún no hay presupuestos",
-            "noResults": "No se encontraron presupuestos",
-            "startAdding": "Comienza creando tu primer presupuesto.",
-            "tryDifferentSearch": "Intenta ajustar tus términos de búsqueda."
+            "noQuotes": "Aún no hay cotizaciones",
+            "noResults": "No se encontraron cotizaciones",
+            "startAdding": "Comienza creando tu primera cotización.",
+            "tryDifferentSearch": "Prueba ajustando tus términos de búsqueda."
         },
         "list": {
-            "title": "Todos los presupuestos",
-            "description": "Administra y visualiza todos tus presupuestos en un solo lugar.",
+            "title": "Todas las cotizaciones",
+            "description": "Administra y visualiza todas tus cotizaciones en un solo lugar.",
             "status": {
                 "draft": "Borrador",
-                "sent": "Enviado",
-                "expired": "Vencido",
-                "signed": "Firmado"
+                "sent": "Enviada",
+                "expired": "Vencida",
+                "signed": "Firmada"
             },
             "item": {
-                "title": "Presupuesto {{number}} {{title}}",
+                "title": "Cotización {{number}} {{title}}",
                 "client": "Cliente",
-                "issued": "Emitido",
-                "validUntil": "Válido hasta",
+                "issued": "Emitida",
+                "validUntil": "Válida hasta",
                 "totalHT": "Total (sin IVA)",
                 "totalTTC": "Total (con IVA)"
             },
             "tooltips": {
-                "view": "Ver detalles del presupuesto",
+                "view": "Ver detalles de la cotización",
                 "viewPdf": "Ver PDF",
                 "downloadPdf": "Descargar PDF",
-                "edit": "Editar presupuesto",
+                "edit": "Editar cotización",
                 "sendSignature": "Enviar para firma",
                 "resendSignature": "Reenviar para firma",
-                "createInvoice": "Crear factura a partir de presupuesto",
-                "delete": "Eliminar presupuesto"
+                "createInvoice": "Crear factura desde la cotización",
+                "delete": "Eliminar cotización"
             },
             "actions": {
-                "addNew": "Agregar nuevo presupuesto"
+                "addNew": "Agregar nueva cotización"
             },
             "messages": {
-                "sendSignatureError": "No se pudo enviar el presupuesto para firma",
-                "sendSignatureSuccess": "Presupuesto enviado para firma exitosamente",
-                "invoiceCreated": "Factura creada exitosamente desde el presupuesto",
-                "invoiceCreateError": "No se pudo crear la factura desde el presupuesto"
+                "sendSignatureError": "Error al enviar la cotización para firma",
+                "sendSignatureSuccess": "Cotización enviada para firma con éxito",
+                "invoiceCreated": "Factura creada exitosamente desde la cotización",
+                "invoiceCreateError": "Error al crear la factura desde la cotización"
             }
         },
         "upsert": {
             "title": {
-                "create": "Crear nuevo presupuesto",
-                "edit": "Editar presupuesto"
+                "create": "Crear nueva cotización",
+                "edit": "Editar cotización"
             },
             "form": {
                 "title": {
                     "label": "Título",
-                    "placeholder": "Ingrese el título del presupuesto"
+                    "placeholder": "Ingrese el título de la cotización"
                 },
                 "client": {
                     "label": "Cliente",
-                    "placeholder": "Seleccione un cliente",
+                    "placeholder": "Seleccionar un cliente",
                     "errors": {
-                        "required": "Por favor, seleccione un cliente"
+                        "required": "Por favor seleccione un cliente"
                     },
-                    "noOptions": "No hay clientes disponibles. Debe crear uno primero."
+                    "noOptions": "No hay clientes disponibles. Por favor cree un cliente primero."
                 },
                 "currency": {
                     "label": "Moneda"
                 },
                 "validUntil": {
-                    "label": "Válido hasta",
-                    "placeholder": "Seleccione la fecha de vencimiento"
+                    "label": "Válida hasta",
+                    "placeholder": "Seleccionar fecha de vencimiento"
                 },
                 "items": {
-                    "label": "Ítems del presupuesto",
+                    "label": "Ítems de la cotización",
                     "addItem": "Agregar ítem",
                     "description": {
                         "placeholder": "Descripción del ítem",
@@ -271,7 +277,7 @@
                     },
                     "quantity": {
                         "placeholder": "Cantidad",
-                        "unit": "uds.",
+                        "unit": "uds",
                         "errors": {
                             "required": "La cantidad es obligatoria",
                             "min": "La cantidad debe ser al menos 1",
@@ -287,7 +293,7 @@
                         }
                     },
                     "vatRate": {
-                        "placeholder": "% IVA",
+                        "placeholder": "IVA %",
                         "errors": {
                             "required": "La tasa de IVA es obligatoria",
                             "min": "La tasa de IVA debe ser positiva"
@@ -296,40 +302,40 @@
                 },
                 "notes": {
                     "label": "Notas",
-                    "placeholder": "Notas adicionales o términos"
+                    "placeholder": "Notas o términos adicionales"
                 },
                 "paymentMethod": {
                     "label": "Método de pago",
-                    "placeholder": "Seleccione el método de pago",
-                    "description": "Método de pago preferido para este presupuesto (ej: Transferencia bancaria, Cheque, etc.)"
+                    "placeholder": "Seleccionar método de pago",
+                    "description": "Método de pago preferido para esta cotización (ej.: transferencia bancaria, cheque, etc.)"
                 },
                 "paymentDetails": {
                     "label": "Detalles de pago",
-                    "placeholder": "Ingrese los detalles de pago",
-                    "description": "Información adicional para el pago (ej: IBAN, instrucciones, etc.)"
+                    "placeholder": "Ingresar detalles de pago",
+                    "description": "Información adicional de pago (ej.: IBAN, instrucciones, etc.)"
                 }
             },
             "actions": {
                 "cancel": "Cancelar",
-                "create": "Crear presupuesto",
+                "create": "Crear cotización",
                 "save": "Guardar cambios"
             }
         },
         "view": {
-            "title": "Presupuesto {{number}}",
-            "description": "Ver todos los detalles de este presupuesto.",
+            "title": "Cotización {{number}}",
+            "description": "Ver todos los detalles de esta cotización.",
             "status": {
                 "draft": "Borrador",
-                "sent": "Enviado",
-                "expired": "Vencido",
-                "signed": "Firmado"
+                "sent": "Enviada",
+                "expired": "Vencida",
+                "signed": "Firmada"
             },
             "fields": {
                 "title": "Título",
                 "status": "Estado",
-                "createdAt": "Creado",
-                "validUntil": "Válido hasta",
-                "signedAt": "Firmado el",
+                "createdAt": "Creada",
+                "validUntil": "Válida hasta",
+                "signedAt": "Firmada el",
                 "client": "Cliente",
                 "signedBy": "Firmado por",
                 "totalHT": "Total (sin IVA)",
@@ -339,20 +345,20 @@
             }
         },
         "delete": {
-            "title": "Eliminar presupuesto",
-            "description": "¿Seguro que deseas eliminar este presupuesto? Esta acción no se puede deshacer.",
+            "title": "Eliminar cotización",
+            "description": "¿Seguro que desea eliminar esta cotización? Esta acción no puede deshacerse.",
             "actions": {
                 "cancel": "Cancelar",
-                "delete": "Eliminar presupuesto"
+                "delete": "Eliminar cotización"
             }
         },
         "pdf": {
-            "title": "Presupuesto {{number}} - PDF"
+            "title": "Cotización {{number}} - PDF"
         }
     },
     "invoices": {
         "header": {
-            "subtitle": "Gestiona tus facturas",
+            "subtitle": "Administra tus facturas",
             "count": "{{count}} facturas {{found}}",
             "found": "encontradas"
         },
@@ -371,7 +377,7 @@
             "noInvoices": "Aún no hay facturas",
             "noResults": "No se encontraron facturas",
             "startAdding": "Comienza creando tu primera factura.",
-            "tryDifferentSearch": "Intenta ajustar tus términos de búsqueda."
+            "tryDifferentSearch": "Prueba ajustando tus términos de búsqueda."
         },
         "list": {
             "title": "Todas las facturas",
@@ -386,7 +392,7 @@
                 "title": "Factura {{number}} {{title}}",
                 "client": "Cliente",
                 "issued": "Emitida",
-                "due": "Vencimiento",
+                "due": "Vence",
                 "payment": "Pago",
                 "totalHT": "Total (sin IVA)",
                 "totalTTC": "Total (con IVA)"
@@ -399,7 +405,7 @@
                 "markAsPaid": "Marcar como pagada",
                 "delete": "Eliminar factura",
                 "createReceipt": "Crear recibo desde esta factura",
-                "sendByEmail": "Enviar factura por email"
+                "sendByEmail": "Enviar factura por correo"
             },
             "actions": {
                 "addNew": "Agregar nueva factura",
@@ -415,10 +421,10 @@
                 "cii": "CII"
             },
             "messages": {
-                "markAsPaidSuccess": "Factura marcada como pagada exitosamente",
-                "markAsPaidError": "No se pudo marcar la factura como pagada",
-                "createReceiptSuccess": "Recibo creado exitosamente desde factura",
-                "sendByEmailSuccess": "La factura ha sido enviada al cliente"
+                "markAsPaidSuccess": "Factura marcada como pagada con éxito",
+                "markAsPaidError": "Error al marcar la factura como pagada",
+                "createReceiptSuccess": "Recibo creado correctamente desde la factura",
+                "sendByEmailSuccess": "La factura fue enviada al cliente"
             }
         },
         "upsert": {
@@ -428,19 +434,19 @@
             },
             "form": {
                 "quote": {
-                    "label": "Desde presupuesto",
-                    "placeholder": "Seleccionar presupuesto",
+                    "label": "Desde cotización",
+                    "placeholder": "Seleccionar una cotización",
                     "errors": {
-                        "required": "Por favor, seleccione un presupuesto"
+                        "required": "Por favor seleccione una cotización"
                     }
                 },
                 "client": {
                     "label": "Cliente",
-                    "placeholder": "Seleccionar cliente",
+                    "placeholder": "Seleccionar un cliente",
                     "errors": {
-                        "required": "Por favor, seleccione un cliente"
+                        "required": "Por favor seleccione un cliente"
                     },
-                    "noOptions": "No hay clientes disponibles. Debe crear uno primero."
+                    "noOptions": "No hay clientes disponibles. Por favor cree un cliente primero."
                 },
                 "dueDate": {
                     "label": "Fecha de vencimiento",
@@ -457,7 +463,7 @@
                     },
                     "quantity": {
                         "placeholder": "Cantidad",
-                        "unit": "uds.",
+                        "unit": "uds",
                         "errors": {
                             "required": "La cantidad es obligatoria",
                             "min": "La cantidad debe ser al menos 1",
@@ -473,26 +479,34 @@
                         }
                     },
                     "vatRate": {
-                        "placeholder": "% IVA",
+                        "placeholder": "IVA %",
                         "errors": {
                             "required": "La tasa de IVA es obligatoria",
                             "min": "La tasa de IVA debe ser positiva"
                         }
+                    },
+                    "type": {
+                        "label": "Tipo",
+                        "hour": "Hora",
+                        "day": "Día",
+                        "deposit": "Anticipo/Depósito",
+                        "service": "Servicio",
+                        "product": "Producto"
                     }
                 },
                 "notes": {
                     "label": "Notas",
-                    "placeholder": "Notas adicionales o términos"
+                    "placeholder": "Notas o términos adicionales"
                 },
                 "paymentMethod": {
                     "label": "Método de pago",
-                    "placeholder": "Seleccione el método de pago",
-                    "description": "Método de pago preferido para este presupuesto (ej: Transferencia bancaria, Cheque, etc.)"
+                    "placeholder": "Seleccionar método de pago",
+                    "description": "Método de pago preferido para esta cotización (ej.: transferencia bancaria, cheque, etc.)"
                 },
                 "paymentDetails": {
                     "label": "Detalles de pago",
-                    "placeholder": "Ingrese los detalles de pago",
-                    "description": "Información adicional para el pago (ej: IBAN, instrucciones, etc.)"
+                    "placeholder": "Ingresar detalles de pago",
+                    "description": "Información adicional de pago (ej.: IBAN, instrucciones, etc.)"
                 },
                 "currency": {
                     "label": "Moneda"
@@ -520,7 +534,7 @@
                 "createdAt": "Creada",
                 "dueDate": "Fecha de vencimiento",
                 "paidAt": "Pagada el",
-                "updatedAt": "Actualizada",
+                "updatedAt": "Actualizado",
                 "client": "Cliente",
                 "paymentMethod": "Método de pago",
                 "totalHT": "Total (sin IVA)",
@@ -531,7 +545,7 @@
         },
         "delete": {
             "title": "Eliminar factura",
-            "description": "¿Seguro que deseas eliminar esta factura? Esta acción no se puede deshacer.",
+            "description": "¿Seguro que desea eliminar esta factura? Esta acción no puede deshacerse.",
             "actions": {
                 "cancel": "Cancelar",
                 "delete": "Eliminar factura"
@@ -570,7 +584,7 @@
                 "delete": "Eliminar"
             },
             "messages": {
-                "manual_process_success": "Proceso manual ejecutado exitosamente",
+                "manual_process_success": "Proceso manual ejecutado con éxito",
                 "manual_process_error": "Error al ejecutar el proceso manual"
             }
         },
@@ -588,38 +602,38 @@
             },
             "form": {
                 "quote": {
-                    "label": "Desde presupuesto",
-                    "placeholder": "Seleccionar presupuesto"
+                    "label": "Desde cotización",
+                    "placeholder": "Seleccionar una cotización"
                 },
                 "client": {
                     "label": "Cliente",
-                    "placeholder": "Seleccionar cliente",
+                    "placeholder": "Seleccionar un cliente",
                     "errors": {
-                        "required": "Por favor, seleccione un cliente"
+                        "required": "Por favor seleccione un cliente"
                     },
-                    "noOptions": "No hay clientes disponibles. Debe crear uno primero."
+                    "noOptions": "No hay clientes disponibles. Por favor cree un cliente primero."
                 },
                 "currency": {
                     "label": "Moneda"
                 },
                 "notes": {
                     "label": "Notas",
-                    "placeholder": "Notas adicionales o términos"
+                    "placeholder": "Notas o términos adicionales"
                 },
                 "paymentMethod": {
                     "label": "Método de pago",
-                    "placeholder": "Seleccione método de pago",
-                    "description": "Método de pago preferido para esta factura recurrente (ej: Transferencia bancaria, Cheque, etc.)"
+                    "placeholder": "Seleccionar método de pago",
+                    "description": "Método de pago preferido para esta factura recurrente (ej.: transferencia bancaria, cheque, etc.)"
                 },
                 "paymentDetails": {
                     "label": "Detalles de pago",
-                    "placeholder": "Ingrese los detalles de pago",
-                    "description": "Información adicional para el pago (ej: IBAN, instrucciones, etc.)"
+                    "placeholder": "Ingresar detalles de pago",
+                    "description": "Información adicional de pago (ej.: IBAN, instrucciones, etc.)"
                 },
                 "frequency": {
                     "label": "Frecuencia",
-                    "placeholder": "Seleccione la frecuencia",
-                    "description": "Con qué frecuencia se generarán las facturas",
+                    "placeholder": "Seleccionar frecuencia",
+                    "description": "Cada cuánto se generarán las facturas",
                     "errors": {
                         "required": "La frecuencia es obligatoria"
                     }
@@ -627,19 +641,19 @@
                 "count": {
                     "label": "Ocurrencias",
                     "placeholder": "Ingrese el número de ocurrencias",
-                    "description": "Total de veces que se generará la factura (vacío para recurrencia infinita)"
+                    "description": "Número total de veces que se generará la factura (dejar vacío para recurrencia infinita)"
                 },
                 "until": {
                     "label": "Fecha de finalización",
-                    "placeholder": "Seleccionar fecha de finalización",
-                    "description": "Fecha en que dejará de generarse la factura recurrente (dejar vacío para recurrencia infinita)"
+                    "placeholder": "Seleccionar fecha final",
+                    "description": "Fecha cuando la factura recurrente dejará de generarse (dejar vacío para recurrencia infinita)"
                 },
                 "autoSend": {
                     "label": "Envío automático",
-                    "description": "Enviar automáticamente la factura recurrente al cliente cuando se genere"
+                    "description": "Enviar automáticamente la factura recurrente al cliente al generarse"
                 },
                 "items": {
-                    "label": "Ítems de la factura recurrente",
+                    "label": "Ítems de factura recurrente",
                     "addItem": "Agregar ítem",
                     "description": {
                         "placeholder": "Descripción del ítem",
@@ -649,7 +663,7 @@
                     },
                     "quantity": {
                         "placeholder": "Cantidad",
-                        "unit": "uds.",
+                        "unit": "uds",
                         "errors": {
                             "required": "La cantidad es obligatoria",
                             "min": "La cantidad debe ser al menos 1",
@@ -665,11 +679,19 @@
                         }
                     },
                     "vatRate": {
-                        "placeholder": "% IVA",
+                        "placeholder": "IVA %",
                         "errors": {
                             "required": "La tasa de IVA es obligatoria",
                             "min": "La tasa de IVA debe ser positiva"
                         }
+                    },
+                    "type": {
+                        "label": "Tipo",
+                        "hour": "Hora",
+                        "day": "Día",
+                        "deposit": "Anticipo/Depósito",
+                        "service": "Servicio",
+                        "product": "Producto"
                     }
                 }
             },
@@ -685,23 +707,23 @@
         "welcomeMessage": "¡Bienvenido de nuevo, {{firstname}}!",
         "revenue": {
             "title": "Resumen de ingresos",
-            "description": "Monitorea tu rendimiento financiero a lo largo del tiempo",
+            "description": "Sigue tu desempeño financiero a lo largo del tiempo",
             "thisMonth": "Este mes",
             "thisYear": "Este año",
             "chartLabel": "Ingresos"
         },
         "quotes": {
-            "title": "Resumen de presupuestos",
-            "description": "Controla tu flujo de presupuestos y tasas de conversión",
+            "title": "Resumen de cotizaciones",
+            "description": "Monitorea tu flujo y tasa de conversión de cotizaciones",
             "stats": {
-                "total": "Total de presupuestos",
+                "total": "Total de cotizaciones",
                 "draft": "Borrador",
-                "sent": "Enviados",
-                "signed": "Firmados",
-                "expired": "Vencidos"
+                "sent": "Enviadas",
+                "signed": "Firmadas",
+                "expired": "Vencidas"
             },
-            "latestTitle": "Presupuestos recientes",
-            "noRecent": "No hay presupuestos recientes"
+            "latestTitle": "Cotizaciones recientes",
+            "noRecent": "No hay cotizaciones recientes"
         },
         "invoices": {
             "title": "Resumen de facturas",
@@ -723,6 +745,101 @@
             }
         }
     },
+    "paymentMethods": {
+        "title": "Métodos de pago",
+        "description": "Gestiona métodos de pago reutilizables.",
+        "empty": "Aún no hay métodos de pago.",
+        "actions": {
+          "cancel": "Cancelar",
+          "add": "Agregar",
+          "save": "Guardar",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando..."
+        },
+        "search": {
+          "placeholder": "Buscar métodos de pago..."
+        },
+        "list": {
+          "add": "Agregar método de pago",
+          "empty": "No se encontraron métodos de pago"
+        },
+        "stats": {
+          "total": "Total de métodos de pago",
+          "active": "Activo",
+          "inactive": "Inactivo"
+        },
+        "fields": {
+          "name": {
+            "label": "Nombre",
+            "placeholder": "ej. Transferencia bancaria (empresarial)"
+          },
+          "details": {
+            "label": "Detalles",
+            "placeholder": "IBAN / detalles"
+          },
+          "type": {
+            "label": "Tipo",
+            "bank_transfer": "Transferencia bancaria",
+            "paypal": "PayPal",
+            "check": "Cheque",
+            "cash": "Efectivo",
+            "other": "Otro"
+          },
+          "status": {
+            "label": "Estado"
+          }
+        },
+        "upsert": {
+          "title": {
+            "create": "Agregar método de pago",
+            "edit": "Editar método de pago"
+          },
+          "form": {
+            "name": {
+              "label": "Nombre",
+              "placeholder": "ej. Transferencia bancaria (empresarial)"
+            },
+            "details": {
+              "label": "Detalles",
+              "placeholder": "IBAN / detalles"
+            },
+            "type": {
+              "label": "Tipo",
+              "bank_transfer": "Transferencia bancaria",
+              "paypal": "PayPal",
+              "check": "Cheque",
+              "cash": "Efectivo",
+              "other": "Otro"
+            }
+          },
+          "messages": {
+            "nameRequired": "El nombre es obligatorio",
+            "addSuccess": "Método de pago agregado",
+            "addError": "No se pudo agregar el método de pago",
+            "updateSuccess": "Método de pago actualizado",
+            "updateError": "No se pudo actualizar el método de pago",
+            "deleteSuccess": "Método de pago eliminado",
+            "deleteError": "No se pudo eliminar el método de pago"
+          },
+          "actions": {
+            "cancel": "Cancelar",
+            "add": "Agregar",
+            "save": "Guardar",
+            "edit": "Editar",
+            "delete": "Eliminar",
+            "deleting": "Eliminando..."
+          }
+        },
+        "tooltips": {
+          "view": "Ver",
+          "edit": "Editar",
+          "delete": "Eliminar"
+        },
+        "delete": {
+          "description": "¿Seguro que desea eliminar \"{{name}}\"? Esta acción no puede deshacerse."
+        }
+      },
     "settings": {
         "tabs": {
             "company": "Empresa",
@@ -736,28 +853,28 @@
             "title": "Configuración de la empresa",
             "description": "Administra la información y datos de tu empresa",
             "basicInfo": "Información básica",
-            "basicInfoDescription": "Datos esenciales de tu empresa",
+            "basicInfoDescription": "Detalles esenciales de tu empresa",
             "address": {
-                "title": "Dirección",
+                "title": "Información de dirección",
                 "description": "Ubicación física de tu empresa"
             },
             "contact": {
                 "title": "Información de contacto",
-                "description": "Cómo pueden contactarse los clientes"
+                "description": "Cómo los clientes pueden contactar a tu empresa"
             },
             "numberFormats": {
-                "title": "Formatos numéricos",
-                "description": "Personaliza los formatos de número para presupuestos y facturas"
+                "title": "Formatos de numeración",
+                "description": "Personaliza los formatos de numeración para cotizaciones y facturas"
             },
             "other": {
                 "title": "Otras configuraciones",
-                "description": "Ajustes adicionales para tu empresa"
+                "description": "Configuraciones adicionales de tu empresa"
             },
             "form": {
                 "company": {
-                    "label": "Razón social",
-                    "placeholder": "Ingrese la razón social",
-                    "description": "El nombre legal de tu empresa",
+                    "label": "Nombre de la empresa",
+                    "placeholder": "Ingrese el nombre de su empresa",
+                    "description": "Nombre legal de tu negocio",
                     "errors": {
                         "required": "El nombre de la empresa es obligatorio",
                         "empty": "El nombre de la empresa no puede estar vacío",
@@ -766,154 +883,154 @@
                 },
                 "description": {
                     "label": "Descripción",
-                    "placeholder": "Breve descripción de tu empresa",
-                    "description": "Corta descripción sobre las actividades de tu negocio",
+                    "placeholder": "Breve descripción de la empresa",
+                    "description": "Breve descripción de la actividad de tu negocio",
                     "errors": {
                         "maxLength": "La descripción debe tener menos de 500 caracteres"
                     }
                 },
                 "legalId": {
-                    "label": "ID Legal",
-                    "placeholder": "Ingrese el identificador legal",
-                    "description": "Número de registro legal de la empresa",
+                    "label": "Identificación legal",
+                    "placeholder": "Ingrese identificador legal",
+                    "description": "Número legal de registro de tu empresa",
                     "errors": {
-                        "required": "El ID legal es obligatorio",
-                        "empty": "El ID legal no puede estar vacío",
-                        "maxLength": "El ID legal debe tener menos de 50 caracteres"
+                        "required": "La identificación legal es obligatoria",
+                        "empty": "La identificación legal no puede estar vacía",
+                        "maxLength": "La identificación legal debe tener menos de 50 caracteres"
                     }
                 },
                 "vat": {
                     "label": "Número de IVA",
-                    "placeholder": "Ingrese el número de IVA (ej: FR12345678901)",
-                    "description": "Número de identificación fiscal de tu empresa",
+                    "placeholder": "Ingrese número de IVA (ej.: FR12345678901)",
+                    "description": "Número de identificación de IVA de tu empresa",
                     "errors": {
                         "required": "El número de IVA es obligatorio",
                         "empty": "El número de IVA no puede estar vacío",
                         "maxLength": "El número de IVA debe tener menos de 15 caracteres",
-                        "format": "El formato del número de IVA no es válido (ej: FR12345678901)"
+                        "format": "El formato del número de IVA es inválido (ej.: FR12345678901)"
                     }
                 },
                 "foundedAt": {
                     "label": "Fecha de fundación",
-                    "placeholder": "Selecciona la fecha de fundación",
-                    "description": "Fecha de creación de la empresa",
+                    "placeholder": "Seleccionar fecha de fundación",
+                    "description": "Fecha de creación de tu empresa",
                     "errors": {
                         "future": "La fecha de fundación no puede ser en el futuro"
                     }
                 },
                 "currency": {
                     "label": "Moneda",
-                    "description": "Moneda predeterminada para facturas y presupuestos",
+                    "description": "Moneda predeterminada para facturas y cotizaciones",
                     "errors": {
                         "required": "La moneda es obligatoria",
-                        "select": "Por favor selecciona una moneda"
+                        "select": "Por favor seleccione una moneda"
                     }
                 },
                 "address": {
                     "label": "Dirección",
-                    "placeholder": "Ingrese la dirección",
-                    "description": "Dirección de la empresa",
+                    "placeholder": "Ingrese dirección",
+                    "description": "Dirección física de tu empresa",
                     "errors": {
                         "empty": "La dirección es obligatoria"
                     }
                 },
                 "postalCode": {
                     "label": "Código postal",
-                    "placeholder": "Ingrese el código postal",
+                    "placeholder": "Ingrese código postal",
                     "errors": {
-                        "format": "El formato del código postal no es válido"
+                        "format": "El formato del código postal es inválido"
                     }
                 },
                 "city": {
                     "label": "Ciudad",
-                    "placeholder": "Ingrese la ciudad",
+                    "placeholder": "Ingrese ciudad",
                     "errors": {
                         "empty": "La ciudad es obligatoria"
                     }
                 },
                 "country": {
                     "label": "País",
-                    "placeholder": "Ingrese el país",
+                    "placeholder": "Ingrese país",
                     "errors": {
                         "empty": "El país es obligatorio"
                     }
                 },
                 "phone": {
                     "label": "Teléfono",
-                    "placeholder": "Ingrese el número de teléfono",
-                    "description": "Teléfono principal de la empresa",
+                    "placeholder": "Ingrese número de teléfono",
+                    "description": "Número de teléfono principal de la empresa",
                     "errors": {
                         "minLength": "El número de teléfono debe tener al menos 8 caracteres",
-                        "format": "El formato del número de teléfono no es válido"
+                        "format": "El formato del número de teléfono es inválido"
                     }
                 },
                 "email": {
                     "label": "Correo electrónico",
-                    "placeholder": "Ingrese el correo electrónico",
-                    "description": "Correo electrónico principal de la empresa",
+                    "placeholder": "Ingrese dirección de correo",
+                    "description": "Correo principal de la empresa",
                     "errors": {
                         "required": "El correo electrónico es obligatorio",
-                        "format": "El formato del correo electrónico no es válido"
+                        "format": "El formato de correo electrónico es inválido"
                     }
                 },
                 "quoteStartingNumber": {
-                    "label": "Número inicial de presupuesto",
-                    "placeholder": "Ingrese el número inicial para presupuestos",
-                    "description": "Número inicial para presupuestos",
+                    "label": "Número inicial de cotización",
+                    "placeholder": "Ingrese número inicial para cotizaciones",
+                    "description": "Número inicial para la numeración de cotizaciones",
                     "errors": {
-                        "min": "El número inicial del presupuesto debe ser al menos 1"
+                        "min": "El número inicial de cotización debe ser al menos 1"
                     }
                 },
                 "quoteNumberFormat": {
-                    "label": "Formato de número de presupuesto",
-                    "placeholder": "Ingrese el formato de número (ej: P-{year}-{number})",
-                    "description": "Formato de numeración de presupuesto",
+                    "label": "Formato de número de cotización",
+                    "placeholder": "Ingrese el formato de número de cotización (ej. C-{year}-{number})",
+                    "description": "Formato para los números de cotizaciones",
                     "errors": {
-                        "required": "El formato de número de presupuesto es obligatorio",
-                        "maxLength": "El formato debe tener menos de 100 caracteres",
-                        "format": "Formato inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej: {number:4})"
+                        "required": "El formato de número de cotización es obligatorio",
+                        "maxLength": "El formato de número de cotización debe ser menor a 100 caracteres",
+                        "format": "El formato de número de cotización es inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej. {number:4})"
                     }
                 },
                 "invoiceStartingNumber": {
                     "label": "Número inicial de factura",
-                    "placeholder": "Ingrese el número inicial para facturas",
-                    "description": "Número inicial para facturación",
+                    "placeholder": "Ingrese número inicial para facturas",
+                    "description": "Número inicial para la numeración de facturas",
                     "errors": {
-                        "min": "El número inicial de la factura debe ser al menos 1"
+                        "min": "El número inicial de factura debe ser al menos 1"
                     }
                 },
                 "invoiceNumberFormat": {
                     "label": "Formato de número de factura",
-                    "placeholder": "Ingrese el formato de número de factura (ej: F-{year}-{number})",
-                    "description": "Formato de número de factura",
+                    "placeholder": "Ingrese el formato de número de factura (ej. FAC-{year}-{number})",
+                    "description": "Formato para los números de facturas",
                     "errors": {
                         "required": "El formato de número de factura es obligatorio",
-                        "maxLength": "El formato debe tener menos de 100 caracteres",
-                        "format": "Formato inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej: {number:4})"
+                        "maxLength": "El formato de número de factura debe ser menor a 100 caracteres",
+                        "format": "El formato de número de factura es inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej. {number:4})"
                     }
                 },
                 "receiptStartingNumber": {
                     "label": "Número inicial de recibo",
-                    "placeholder": "Ingrese el número inicial para recibos",
-                    "description": "Número inicial de recibos",
+                    "placeholder": "Ingrese número inicial para recibos",
+                    "description": "Número inicial para la numeración de recibos",
                     "errors": {
                         "min": "El número inicial de recibo debe ser al menos 1"
                     }
                 },
                 "receiptNumberFormat": {
                     "label": "Formato de número de recibo",
-                    "placeholder": "Ingrese el formato de número de recibo (ej: R-{year}-{number})",
-                    "description": "Formato de número de recibo",
+                    "placeholder": "Ingrese el formato de número de recibo (ej. REC-{year}-{number})",
+                    "description": "Formato para los números de recibo",
                     "errors": {
                         "required": "El formato de número de recibo es obligatorio",
-                        "maxLength": "El formato debe tener menos de 100 caracteres",
-                        "format": "Formato inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej: {number:4})"
+                        "maxLength": "El formato de número de recibo debe ser menor a 100 caracteres",
+                        "format": "El formato de número de recibo es inválido. Use {year}, {month}, {day}, {number} con relleno opcional (ej. {number:4})"
                     }
                 },
                 "invoicePDFFormat": {
-                    "label": "Formato PDF de factura",
-                    "placeholder": "Seleccionar formato PDF",
-                    "description": "Elige el formato para los PDFs de facturas enviados a clientes",
+                    "label": "Formato de PDF de factura",
+                    "placeholder": "Seleccionar formato PDF de factura",
+                    "description": "Elija el formato de los PDFs de factura que se enviarán a los clientes",
                     "options": {
                         "pdf": "PDF estándar",
                         "facturx": "Factur-X",
@@ -923,35 +1040,39 @@
                         "cii": "CII"
                     },
                     "errors": {
-                        "required": "El formato PDF es obligatorio"
+                        "required": "El formato PDF de factura es obligatorio"
                     }
                 },
                 "dateFormat": {
                     "label": "Formato de fecha",
-                    "placeholder": "Selecciona un formato de fecha",
-                    "description": "Elige cómo se mostrarán las fechas en presupuestos y facturas",
+                    "placeholder": "Seleccionar formato de fecha",
+                    "description": "Elija cómo se mostrarán las fechas en cotizaciones y facturas.",
                     "errors": {
                         "required": "El formato de fecha es obligatorio"
                     }
+                },
+                "exemptVat": {
+                    "label": "TVA inaplicable",
+                    "description": "Mostrar el aviso legal 'IVA no aplicable, art. 293 B del CGI' en los próximos documentos cuando esté activado y si el país de la empresa es Francia."
                 },
                 "saving": "Guardando...",
                 "saveSettings": "Guardar configuración"
             },
             "messages": {
-                "updateSuccess": "Configuración de la empresa actualizada exitosamente",
-                "updateError": "No se pudo actualizar la configuración de la empresa"
+                "updateSuccess": "Los datos de la empresa fueron actualizados correctamente",
+                "updateError": "Error al actualizar los datos de la empresa"
             }
         },
         "account": {
-            "title": "Ajustes de la cuenta",
-            "description": "Administra tu información personal y seguridad",
+            "title": "Configuración de cuenta",
+            "description": "Administra la información y seguridad de tu cuenta personal",
             "profile": {
-                "title": "Información del perfil",
+                "title": "Información de perfil",
                 "description": "Actualiza tus datos personales"
             },
             "password": {
                 "title": "Contraseña y seguridad",
-                "description": "Cambia tu contraseña y las configuraciones de seguridad"
+                "description": "Cambiar contraseña y configuración de seguridad"
             },
             "form": {
                 "firstname": {
@@ -969,10 +1090,10 @@
                     }
                 },
                 "email": {
-                    "label": "Correo electrónico",
-                    "placeholder": "Ingrese su correo electrónico",
+                    "label": "Correo",
+                    "placeholder": "Ingrese su correo",
                     "errors": {
-                        "invalid": "El formato del correo es inválido"
+                        "invalid": "El formato de correo es inválido"
                     }
                 },
                 "currentPassword": {
@@ -987,9 +1108,9 @@
                     "placeholder": "Ingrese la nueva contraseña",
                     "errors": {
                         "minLength": "La contraseña debe tener al menos 8 caracteres",
-                        "letter": "La contraseña debe contener al menos una letra",
-                        "number": "La contraseña debe contener al menos un número",
-                        "special": "La contraseña debe contener al menos un caracter especial"
+                        "letter": "La contraseña debe tener al menos una letra",
+                        "number": "La contraseña debe tener al menos un número",
+                        "special": "La contraseña debe tener al menos un caracter especial"
                     }
                 },
                 "confirmPassword": {
@@ -1019,30 +1140,30 @@
             "description": "Acciones irreversibles y destructivas",
             "resetApp": {
                 "title": "Restablecer datos de la aplicación",
-                "description": "Eliminar todos los presupuestos, facturas y clientes pero mantener tu cuenta",
-                "button": "Restablecer datos de la aplicación"
+                "description": "Eliminar todas las cotizaciones, facturas y clientes, pero conservar su cuenta",
+                "button": "Restablecer datos de la app"
             },
             "resetDatabase": {
                 "title": "Restablecer todo",
-                "description": "Eliminar permanentemente tu cuenta y todos los datos asociados",
+                "description": "Eliminar permanentemente su cuenta y todos los datos asociados",
                 "button": "Restablecer base de datos"
             },
             "modal": {
                 "title": "Confirmar acción peligrosa",
-                "description": "Ingrese el código de verificación enviado a su correo para confirmar esta acción.",
+                "description": "Por favor, ingrese el código de verificación enviado a su correo para confirmar esta acción.",
                 "otpLabel": "Código de verificación",
                 "otpPlaceholder": "0000-0000",
-                "warningApp": "Esto restablecerá todos los datos de tu aplicación",
-                "warningAppDescription": "Todos los presupuestos, facturas y clientes serán eliminados permanentemente",
-                "warningDatabase": "Esto eliminará toda tu cuenta",
-                "warningDatabaseDescription": "Tu cuenta y todos los datos serán eliminados permanentemente",
+                "warningApp": "Esto restablecerá todos los datos de su aplicación",
+                "warningAppDescription": "Todas las cotizaciones, facturas y clientes serán eliminados permanentemente",
+                "warningDatabase": "Esto eliminará toda su cuenta",
+                "warningDatabaseDescription": "Su cuenta y todos los datos serán eliminados permanentemente",
                 "cancel": "Cancelar",
                 "confirm": "Confirmar acción"
             },
             "messages": {
-                "otpSentSuccess": "Código de verificación enviado a tu correo",
+                "otpSentSuccess": "Código de verificación enviado a su correo",
                 "otpSentError": "No se pudo enviar el código de verificación",
-                "actionSuccess": "Acción completada exitosamente",
+                "actionSuccess": "Acción completada con éxito",
                 "actionError": "No se pudo completar la acción",
                 "actionFailed": "Acción fallida",
                 "unexpectedError": "Ocurrió un error inesperado"
@@ -1050,13 +1171,13 @@
         },
         "plugins": {
             "title": "Plugins ({{count}})",
-            "description": "Instala y gestiona plugins para ampliar la funcionalidad de la aplicación",
+            "description": "Instale y administre plugins para ampliar la funcionalidad de la aplicación",
             "add": {
                 "title": "Agregar plugin",
                 "description": "Instalar un plugin desde un repositorio Git",
                 "gitUrl": {
                     "label": "URL del repositorio Git",
-                    "placeholder": "https://github.com/usuario/repositorio"
+                    "placeholder": "https://github.com/username/repo"
                 }
             },
             "actions": {
@@ -1066,25 +1187,26 @@
                 "deleting": "Eliminando..."
             },
             "emptyState": {
-                "noPlugins": "No hay plugins instalados. Agrega un plugin para ampliar la funcionalidad."
+                "noPlugins": "No hay plugins instalados. Agregue un plugin para ampliar la funcionalidad."
             },
             "messages": {
-                "addSuccess": "Plugin agregado exitosamente",
+                "addSuccess": "Plugin agregado correctamente",
                 "addError": "No se pudo agregar el plugin",
-                "deleteSuccess": "Plugin eliminado exitosamente",
+                "deleteSuccess": "Plugin eliminado correctamente",
                 "deleteError": "No se pudo eliminar el plugin"
             }
         },
         "pdfTemplates": {
             "title": "Plantillas PDF",
-            "description": "Personaliza la apariencia de tus facturas y presupuestos",
+            "description": "Personaliza la apariencia de tus facturas y cotizaciones",
             "templateType": {
                 "title": "Tipo de plantilla",
-                "description": "Elige la plantilla a personalizar",
+                "description": "Elije qué plantilla personalizar",
                 "label": "Tipo de plantilla",
                 "options": {
                     "invoice": "Plantilla de factura",
-                    "quote": "Plantilla de presupuesto"
+                    "quote": "Plantilla de cotización",
+                    "receipt": "Plantilla de recibo"
                 }
             },
             "typography": {
@@ -1094,85 +1216,122 @@
             },
             "colors": {
                 "title": "Colores",
-                "description": "Colores de la marca y temas",
-                "primaryColor": "Color principal",
+                "description": "Colores y tema de la marca",
+                "primaryColor": "Color primario",
                 "secondaryColor": "Color secundario"
             },
             "logo": {
                 "title": "Logo",
-                "description": "Ajustes de logo de la empresa",
+                "description": "Configuración del logotipo de la empresa",
                 "includeLogo": "Incluir logo",
                 "logoPreview": "Vista previa del logo",
                 "uploadText": "Haz clic para subir logo"
             },
             "spacing": {
-                "title": "Espaciado y diseño",
+                "title": "Espaciado y disposición",
                 "description": "Controla los espacios y márgenes",
-                "padding": "Espaciado/padding"
+                "padding": "Relleno"
             },
             "labels": {
                 "title": "Etiquetas y textos",
                 "invoice": "Factura",
-                "quote": "Presupuesto",
+                "quote": "Cotización",
+                "receipt": "Recibo",
                 "billTo": "Facturar a",
-                "quoteFor": "Presupuesto para",
-                "validUntil": "Válido hasta",
+                "quoteFor": "Cotización para",
+                "validUntil": "Válida hasta",
                 "dueDate": "Fecha de vencimiento",
+                "paymentDate": "Fecha de pago",
                 "date": "Fecha",
                 "description": "Descripción",
+                "receivedFrom": "Recibido de",
+                "invoiceRefer": "Referencia de factura",
                 "quantity": "Cantidad",
                 "unitPrice": "Precio unitario",
                 "total": "Total",
                 "subtotal": "Subtotal",
                 "vat": "IVA",
-                "grandTotal": "Total general",
-                "vatRate": "Tasa IVA",
+                "grandTotal": "Gran total",
+                "vatRate": "Tasa de IVA",
                 "paymentMethod": "Método de pago",
                 "paymentDetails": "Detalles de pago",
-                "notes": "Notas"
+                "paymentMethodVariants": "Nombres que se muestran para métodos de pago",
+                "paymentMethodBankTransfer": "Transferencia bancaria",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Efectivo",
+                "paymentMethodCheck": "Cheque",
+                "paymentMethodOther": "Otro",
+                "notes": "Notas",
+                "totalReceived": "Total recibido",
+                "hour": "Hora",
+                "day": "Día",
+                "deposit": "Depósito",
+                "service": "Servicio",
+                "product": "Producto",
+                "type": "Tipo",
+                "legalId": "ID legal",
+                "vatId": "ID IVA"
             },
             "defaultLabels": {
                 "invoice": "Factura",
-                "quote": "Presupuesto",
+                "quote": "Cotización",
+                "receipt": "Recibo",
                 "billTo": "Facturar a",
-                "quoteFor": "Presupuesto para",
-                "validUntil": "Válido hasta",
+                "quoteFor": "Cotización para",
+                "validUntil": "Válida hasta",
                 "date": "Fecha",
                 "dueDate": "Fecha de vencimiento",
+                "paymentDate": "Fecha de pago",
                 "description": "Descripción",
+                "receivedFrom": "Recibido de",
+                "invoiceRefer": "Referencia de factura",
                 "quantity": "Cantidad",
                 "unitPrice": "Precio unitario",
                 "total": "Total",
                 "subtotal": "Subtotal",
                 "vat": "IVA",
-                "grandTotal": "Total general",
-                "vatRate": "Tasa IVA",
+                "grandTotal": "Gran total",
+                "vatRate": "Tasa de IVA",
                 "paymentMethod": "Método de pago",
                 "paymentDetails": "Detalles de pago",
-                "notes": "Notas"
+                "paymentMethodBankTransfer": "Transferencia bancaria",
+                "paymentMethodPayPal": "PayPal",
+                "paymentMethodCash": "Efectivo",
+                "paymentMethodCheck": "Cheque",
+                "paymentMethodOther": "Otro",
+                "notes": "Notas",
+                "totalReceived": "Total recibido",
+                "hour": "Hora",
+                "day": "Día",
+                "deposit": "Depósito",
+                "service": "Servicio",
+                "product": "Producto",
+                "type": "Tipo",
+                "legalId": "ID legal",
+                "vatId": "ID IVA"
             },
             "preview": {
                 "title": "Vista previa",
-                "description": "Vista previa en tiempo real de tu plantilla {{templateType}}",
-                "iframeTitle": "Vista previa de la plantilla"
+                "description": "Vista previa en vivo de tu plantilla {{templateType}}",
+                "iframeTitle": "Vista previa de plantilla"
             },
             "saveButton": "Guardar configuración de plantilla",
             "messages": {
-                "updateSuccess": "Configuración de la plantilla guardada exitosamente",
-                "updateError": "No se pudo actualizar la configuración de la plantilla"
+                "updateSuccess": "Configuración de plantilla guardada correctamente",
+                "updateError": "No se pudo guardar la configuración de la plantilla"
             }
         },
         "emailTemplates": {
             "title": "Plantillas de correo",
-            "description": "Personaliza los correos para facturas y presupuestos",
+            "description": "Personaliza plantillas de correo para facturas y cotizaciones",
             "editor": {
                 "subject": "Asunto",
                 "subjectPlaceholder": "Ingrese el asunto del correo",
                 "body": "Cuerpo del correo",
-                "htmlPlaceholder": "Ingrese contenido en HTML...",
-                "htmlTip": "Puedes usar etiquetas HTML para dar formato",
+                "htmlPlaceholder": "Ingrese contenido HTML...",
+                "htmlTip": "Puedes usar etiquetas HTML para el formato",
                 "availableVariables": "Variables disponibles",
-                "variablesTip": "Utiliza estas variables en tu plantilla usando llaves dobles"
+                "variablesTip": "Utiliza estas variables en la plantilla envolviéndolas en doble llaves"
             },
             "preview": {
                 "from": "De",
@@ -1184,19 +1343,21 @@
             },
             "saveButton": "Guardar plantilla",
             "messages": {
-                "saveSuccess": "Plantilla {{name}} guardada exitosamente",
+                "saveSuccess": "Plantilla {{name}} guardada correctamente",
                 "saveError": "No se pudo guardar la plantilla"
             }
         }
     },
     "sidebar": {
         "navigation": {
-            "dashboard": "Panel",
-            "quotes": "Presupuestos",
+            "dashboard": "Panel de control",
+            "quotes": "Cotizaciones",
             "invoices": "Facturas",
             "receipts": "Recibos",
             "clients": "Clientes",
-            "settings": "Configuraciones"
+            "paymentMethods": "Métodos de pago",
+            "stats": "Estadísticas",
+            "settings": "Configuración"
         },
         "company": {
             "plan": "Empresa"
@@ -1213,18 +1374,18 @@
             "logout": "Cerrar sesión"
         },
         "companyDialog": {
-            "title": "Completa la configuración de empresa",
-            "description": "Completa tus datos de empresa para continuar usando la aplicación.",
-            "goButton": "Ir a configuración de empresa"
+            "title": "Completar configuración de empresa",
+            "description": "Completa la información de tu empresa para continuar usando la aplicación.",
+            "goButton": "Ir a configuración de la empresa"
         }
     },
     "auth": {
         "login": {
             "title": "Iniciar sesión",
-            "description": "Ingrese sus credenciales para acceder a su cuenta",
+            "description": "Ingrese sus datos para acceder a su cuenta",
             "form": {
                 "email": {
-                    "label": "Correo electrónico"
+                    "label": "Correo"
                 },
                 "password": {
                     "label": "Contraseña"
@@ -1232,22 +1393,22 @@
                 "loggingIn": "Iniciando sesión...",
                 "loginButton": "Iniciar sesión"
             },
-            "noAccount": "¿No tienes una cuenta?",
-            "signUpLink": "Regístrate",
+            "noAccount": "¿No tienes cuenta?",
+            "signUpLink": "Registrarse",
             "errors": {
-                "invalidEmail": "Por favor ingrese un correo electrónico válido",
+                "invalidEmail": "Por favor, ingrese una dirección de correo válida",
                 "passwordRequired": "La contraseña es obligatoria"
             },
             "messages": {
-                "loginSuccess": "Sesión iniciada con éxito",
+                "loginSuccess": "Sesión iniciada correctamente",
                 "loginError": "Credenciales inválidas"
             },
-            "oidc": "Iniciar sesión con OIDC.",
-            "oidcLink": "Inicio de sesión OIDC"
+            "oidc": "Inicie sesión con OIDC.",
+            "oidcLink": "Iniciar sesión con OIDC"
         },
         "signup": {
             "title": "Crear cuenta",
-            "description": "Cree una cuenta nueva para comenzar",
+            "description": "Crea una cuenta para empezar",
             "form": {
                 "firstname": {
                     "label": "Nombre",
@@ -1258,42 +1419,42 @@
                     "placeholder": "Ingrese su apellido"
                 },
                 "email": {
-                    "label": "Correo electrónico",
+                    "label": "Correo",
                     "placeholder": "Ingrese su correo"
                 },
                 "password": {
                     "label": "Contraseña",
-                    "placeholder": "Cree una contraseña",
-                    "requirements": "Requisitos de la contraseña:"
+                    "placeholder": "Crea una contraseña",
+                    "requirements": "Requisitos de contraseña:"
                 },
                 "creatingAccount": "Creando cuenta...",
                 "createButton": "Crear cuenta"
             },
-            "hasAccount": "¿Ya tienes una cuenta?",
-            "signInLink": "Inicia sesión",
+            "hasAccount": "¿Ya tienes cuenta?",
+            "signInLink": "Iniciar sesión",
             "errors": {
                 "firstnameMinLength": "El nombre debe tener al menos 2 caracteres",
                 "lastnameMinLength": "El apellido debe tener al menos 2 caracteres",
-                "invalidEmail": "Por favor ingrese un correo válido",
+                "invalidEmail": "Por favor, ingrese una dirección de correo válida",
                 "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
-                "passwordLetter": "La contraseña debe contener al menos una letra",
-                "passwordNumber": "La contraseña debe contener al menos un número",
-                "passwordSpecial": "La contraseña debe contener al menos un caracter especial"
+                "passwordLetter": "La contraseña debe tener al menos una letra",
+                "passwordNumber": "La contraseña debe tener al menos un número",
+                "passwordSpecial": "La contraseña debe tener al menos un caracter especial"
             },
             "messages": {
-                "accountCreated": "Cuenta creada exitosamente"
+                "accountCreated": "Cuenta creada correctamente"
             },
             "oidc": "Registrarse con OIDC.",
-            "oidcLink": "Registro OIDC"
+            "oidcLink": "Registrarse con OIDC"
         }
     },
     "unavailable": {
-        "title": "No disponible en móvil/tablet",
-        "description": "Esta funcionalidad solo está disponible en computadoras de escritorio."
+        "title": "No disponible en Móvil/Tablet",
+        "description": "Esta función solo está disponible en computadoras para mejor experiencia."
     },
     "component": {
         "currency-select": {
-            "placeholder": "Seleccione su moneda",
+            "placeholder": "Selecciona tu moneda",
             "searchPlaceholder": "Buscar monedas...",
             "noResults": "No se encontraron monedas"
         }
@@ -1307,10 +1468,10 @@
         },
         "valueWithCurrency": "{{amount}}{{currency}}"
     },
-    "noOptions": "No hay opciones disponibles. Crea un nuevo cliente.",
+    "noOptions": "No hay opciones disponibles. Cree un nuevo cliente.",
     "receipts": {
         "header": {
-            "subtitle": "Gestiona tus recibos",
+            "subtitle": "Administra tus recibos",
             "count": "{{count}} recibos {{found}}",
             "found": "encontrados"
         },
@@ -1323,22 +1484,22 @@
         "stats": {
             "total": "Total de recibos",
             "draft": "Borrador",
-            "sent": "Enviado",
-            "signed": "Firmado"
+            "sent": "Enviada",
+            "signed": "Firmada"
         },
         "emptyState": {
             "noReceipts": "Aún no hay recibos",
             "noResults": "No se encontraron recibos",
             "startAdding": "Comienza creando tu primer recibo.",
-            "tryDifferentSearch": "Intenta ajustar tus términos de búsqueda."
+            "tryDifferentSearch": "Prueba ajustando tus términos de búsqueda."
         },
         "list": {
             "title": "Todos los recibos",
             "description": "Administra y visualiza todos tus recibos en un solo lugar.",
             "status": {
                 "draft": "Borrador",
-                "sent": "Enviado",
-                "signed": "Firmado"
+                "sent": "Enviada",
+                "signed": "Firmada"
             },
             "item": {
                 "title": "Recibo {{number}}",
@@ -1360,7 +1521,7 @@
                 "delete": "Eliminar recibo"
             },
             "messages": {
-                "emailSent": "Recibo enviado al cliente exitosamente.",
+                "emailSent": "Recibo enviado al cliente correctamente.",
                 "emailError": "No se pudo enviar el recibo al cliente."
             },
             "actions": {
@@ -1381,7 +1542,7 @@
                 },
                 "items": {
                     "label": "Ítems",
-                    "placeholder": "Agrega ítems al recibo",
+                    "placeholder": "Agregue ítems al recibo",
                     "noResults": "No se encontraron ítems",
                     "addButton": "Agregar ítem",
                     "description": {
@@ -1412,17 +1573,17 @@
                 },
                 "invoice": {
                     "label": "Factura",
-                    "placeholder": "Seleccionar una factura",
+                    "placeholder": "Seleccionar factura",
                     "noResults": "No se encontraron facturas"
                 },
                 "paymentMethod": {
                     "label": "Método de pago",
                     "placeholder": "Ingrese el método de pago",
-                    "description": "Método de pago utilizado"
+                    "description": "Método usado para realizar el pago"
                 },
                 "paymentDetails": {
                     "label": "Detalles de pago",
-                    "placeholder": "Ingrese los detalles de pago",
+                    "placeholder": "Ingrese detalles del pago",
                     "description": "Información adicional sobre el pago"
                 }
             },
@@ -1435,7 +1596,7 @@
         },
         "delete": {
             "title": "Eliminar recibo",
-            "description": "¿Seguro que deseas eliminar este recibo? Esta acción no se puede deshacer.",
+            "description": "¿Seguro que desea eliminar este recibo? Esta acción no puede deshacerse.",
             "actions": {
                 "cancel": "Cancelar",
                 "delete": "Eliminar"
@@ -1444,5 +1605,25 @@
         "pdf": {
             "title": "Recibo {{number}} - PDF"
         }
+    },
+    "stats": {
+        "title": "Estadísticas",
+        "description": "Ver montos facturados, ingresos y anticipos por mes y año.",
+        "noData": "No hay datos disponibles para el periodo seleccionado.",
+        "controls": {
+            "year": "Año",
+            "range": "Rango de años"
+        },
+        "monthly": {
+            "title": "Estadísticas mensuales"
+        },
+        "yearly": {
+            "title": "Estadísticas anuales"
+        },
+        "month": "Mes",
+        "year": "Año",
+        "invoiced": "Facturado (con IVA)",
+        "revenue": "Ingresos (sin IVA)",
+        "deposits": "Anticipos (factura pagada)"
     }
 }
