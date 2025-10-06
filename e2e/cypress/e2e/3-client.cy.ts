@@ -1,12 +1,6 @@
 beforeEach(() => {
-  cy.readFile('cypress/fixtures/session.json').then((tokens) => {
-    if (tokens.access_token) {
-      cy.setCookie('access_token', tokens.access_token);
-    }
-    if (tokens.refresh_token) {
-      cy.setCookie('refresh_token', tokens.refresh_token);
-    }
-  });
+  cy.login();
+  cy.visit('/');
 });
 
 describe('Client E2E', () => {
