@@ -14,9 +14,9 @@ jobs:
       postgres-test:
         image: postgres:16
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: invoicerr_test
+          POSTGRES_USER: invoicerr
+          POSTGRES_PASSWORD: invoicerr
+          POSTGRES_DB: invoicerr_db
         ports:
           - "5433:5432"
         options: >-
