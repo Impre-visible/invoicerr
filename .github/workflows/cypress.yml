@@ -52,9 +52,26 @@ jobs:
 
       - name: Run backend, frontend & tests
         run: |
-          (cd $GITHUB_WORKSPACE/backend && npm run start:test > $GITHUB_WORKSPACE/logs/backend.log 2>&1 &)
-          (cd $GITHUB_WORKSPACE/frontend && npm run start:test > /dev/null 2>&1 &)
-          (cd $GITHUB_WORKSPACE/e2e && npm run e2e:run)
+          mkdir -p $GITHUB_WORKSPACE/logs
+          # Lancer le backend et rediriger les logs
+          cd $GITHUB_WORKSPACE/backend
+          npm run start:test > $GITHUB_WORKSPACE/logs/backend.log 2>&1 &
+          BACKEND_PID=$!
+
+          # Lancer le frontend
+          cd $GITHUB_WORKSPACE/frontend
+          npm run start:test > /dev/null 2>&1 &
+          FRONTEND_PID=$!
+
+          # Attendre que le backend soit prêt
+          npx wait-on http://localhost:3000
+
+          # Lancer les tests Cypress
+          cd $GITHUB_WORKSPACE/e2e
+          npm run e2e:run
+
+          # Stopper backend et frontend à la fin
+          kill $BACKEND_PID $FRONTEND_PID
 
       - name: Upload backend logs
         if: always()
