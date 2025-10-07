@@ -75,7 +75,7 @@ export class AuthController {
         httpOnly: true,
         secure: this.isHttps,
       });
-      res.redirect('/');
+      res.redirect(`${process.env.APP_URL || ''}/`);
     } catch (error) {
       console.error(error);
       throw new UnauthorizedException('OIDC authentication failed');
