@@ -19,7 +19,7 @@ import { Response } from 'express';
 
 
 @Controller('auth')
-export class AuthController { 
+export class AuthController {
 
   isHttps: boolean;
 
