@@ -55,3 +55,12 @@ jobs:
           (cd $GITHUB_WORKSPACE/backend && npm run start:test > /dev/null 2>&1 &)
           (cd $GITHUB_WORKSPACE/frontend && npm run start:test > /dev/null 2>&1 &)
           (cd $GITHUB_WORKSPACE/e2e && npm run e2e:run)
+
+      - name: Upload Cypress videos and screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos-screenshots
+          path: |
+            e2e/cypress/videos
+            e2e/cypress/screenshots
