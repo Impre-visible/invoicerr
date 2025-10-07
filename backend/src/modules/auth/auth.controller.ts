@@ -19,8 +19,17 @@ import { Response } from 'express';
 
 
 @Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+export class AuthController { 
+
+  isHttps: boolean;
+
+  constructor(private readonly authService: AuthService) {
+    if (process.env?.APP_URL !== undefined) {
+      this.isHttps = process.env.APP_URL.startsWith('https');
+    } else {
+      this.isHttps = true; // true by default for safety in production
+    }
+  }
 
   @Get('me')
   getMe(@User() user: CurrentUser) {
@@ -64,7 +73,7 @@ export class AuthController {
       const jwt = await this.authService.loginOrCreateUserFromOidc(userInfo);
       res.cookie('access_token', jwt.accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: this.isHttps,
       });
       res.redirect('/');
     } catch (error) {
@@ -114,11 +123,11 @@ export class AuthController {
       const tokens = await this.authService.signIn(email, password);
       res.cookie('access_token', tokens.access_token, {
         httpOnly: true,
-        secure: true,
+        secure: this.isHttps,
       });
       res.cookie('refresh_token', tokens.refresh_token, {
         httpOnly: true,
-        secure: true,
+        secure: this.isHttps,
       });
       res.send({ message: 'Connexion réussie' });
     } catch (error) {
@@ -138,7 +147,7 @@ export class AuthController {
       const tokens = await this.authService.refreshToken(refreshToken);
       res.cookie('access_token', tokens.access_token, {
         httpOnly: true,
-        secure: true,
+        secure: this.isHttps,
       });
       res.send({ message: 'Tokens rafraîchis avec succès' });
     } catch (error) {

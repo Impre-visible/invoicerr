@@ -62,5 +62,5 @@ jobs:
         with:
           name: cypress-videos-screenshots
           path: |
-            e2e/cypress/videos
-            e2e/cypress/screenshots
+            ${{ github.workspace }}/e2e/cypress/videos
+            ${{ github.workspace }}/e2e/cypress/screenshots
