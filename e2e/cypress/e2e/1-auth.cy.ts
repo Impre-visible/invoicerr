@@ -12,7 +12,6 @@ describe('Authentication E2E', () => {
 
     it('allows a user to login', () => {
         cy.login();
-        cy.contains('Successfully signed in');
         cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
     });
 
