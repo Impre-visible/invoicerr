@@ -14,9 +14,9 @@ jobs:
       postgres-test:
         image: postgres:16
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: invoicerr_test
+          POSTGRES_USER: invoicerr
+          POSTGRES_PASSWORD: invoicerr
+          POSTGRES_DB: invoicerr_db
         ports:
           - "5433:5432"
         options: >-
@@ -52,6 +52,23 @@ jobs:
 
       - name: Run backend, frontend & tests
         run: |
-          (cd $GITHUB_WORKSPACE/backend && npm run start:test > /dev/null 2>&1 &)
+          mkdir -p $GITHUB_WORKSPACE/logs
+          (cd $GITHUB_WORKSPACE/backend && npm run start:test > $GITHUB_WORKSPACE/logs/backend.log 2>&1 &)
           (cd $GITHUB_WORKSPACE/frontend && npm run start:test > /dev/null 2>&1 &)
           (cd $GITHUB_WORKSPACE/e2e && npm run e2e:run)
+
+      - name: Upload backend logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-logs
+          path: ${{ github.workspace }}/logs/backend.log
+
+      - name: Upload Cypress videos and screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-screenshots
+          path: |
+            ${{ github.workspace }}/e2e/cypress/videos
+            ${{ github.workspace }}/e2e/cypress/screenshots
