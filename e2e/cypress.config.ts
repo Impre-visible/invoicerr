@@ -7,7 +7,6 @@ export default defineConfig({
     experimentalStudio: true,
     setupNodeEvents(on, config) {
       on('before:run', (details) => {
-        console.log('Override before:run');
         return new Promise((resolve, reject) => {
           exec('node ../backend/prisma/reset-db.test.ts', (err: any, stdout: any, stderr: any) => {
             if (err) {
