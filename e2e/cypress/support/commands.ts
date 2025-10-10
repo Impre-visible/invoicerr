@@ -43,6 +43,9 @@ Cypress.Commands.add('login', () => {
     cy.get('input[name=email]').type('john.doe@acme.org');
     cy.get('input[name=password]').type('Super_Secret_Password123!');
     cy.get('button[type=submit]').click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
+
     cy.getCookie('access_token').then(access => {
         cy.getCookie('refresh_token').then(refresh => {
             cy.writeFile('cypress/fixtures/session.json', {
@@ -52,3 +55,8 @@ Cypress.Commands.add('login', () => {
         });
     });
 });
+
+Cypress.on('window:before:load', (window) => {
+    Object.defineProperty(window.navigator, 'language', { value: 'en-US' })
+    Object.defineProperty(window.navigator, 'languages', { value: ['en-US'] })
+})
