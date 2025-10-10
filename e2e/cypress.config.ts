@@ -4,6 +4,7 @@ import { exec } from "child_process";
 
 export default defineConfig({
   e2e: {
+    video: true,
     experimentalStudio: true,
     setupNodeEvents(on, config) {
       on('before:run', (details) => {
