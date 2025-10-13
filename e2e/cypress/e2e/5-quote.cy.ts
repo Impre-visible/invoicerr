@@ -121,4 +121,73 @@ describe('Quotes E2E', () => {
         const formatedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
         cy.contains(formatedDate);
     });
-})
+
+    it('should send a quote and get the signature link', () => {
+    // Envoi du devis
+    cy.get('#root > div > section > main > section > section > div > div > div > div > div:nth-child(1) > div > div > button:nth-child(5)').click();
+    cy.contains('Quote sent for signature successfully');
+    cy.contains('Sent');
+
+    // Vérifie l'envoi de l'email
+    cy.getLastEmail().then(email => {
+        cy.clearEmails();
+
+        cy.wrap(email).should('exist');
+        cy.wrap(email.From.Address).should('eq', 'test@local.dev');
+        cy.wrap(email.To[0].Address).should('eq', 'jane.doe@acme.org');
+        cy.wrap(email.Subject).should(subject => {
+        expect(subject.startsWith('Please sign document #')).to.be.true;
+        });
+
+        const html = email.HTML || '';
+        const linkMatch = html.match(/http:\/\/localhost:6284\/signature\/[0-9a-fA-F-]{36}/);
+        expect(linkMatch, 'le lien de signature doit exister').to.not.be.null;
+
+        const signatureLink = linkMatch[0];
+        cy.wrap(signatureLink).should('include', '/signature/');
+
+        cy.log(`Signature Link: ${signatureLink}`);
+
+        // On passe à la session de signature
+        cy.session('signature-session', () => {
+        cy.visit(signatureLink);
+
+        // Cliquer sur "Sign"
+        cy.get('#root > div > section > main > section > section > div > div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6 > div.space-y-6 > div:nth-child(1) > div.px-6.space-y-4 > button').click();
+
+        // Récupérer l'email de confirmation
+        cy.getLastEmail().then(confirmationEmail => {
+            cy.clearEmails();
+
+            cy.wrap(confirmationEmail).should('exist');
+            cy.wrap(confirmationEmail.From.Address).should('eq', 'test@local.dev');
+            cy.wrap(confirmationEmail.To[0].Address).should('eq', 'jane.doe@acme.org');
+
+            const confirmationHtml = confirmationEmail.HTML || '';
+            const secureCodeMatch = confirmationHtml.match(/\b\d{4}-\d{4}\b/);
+            expect(secureCodeMatch, 'le code de sécurité doit exister').to.not.be.null;
+
+            const secureCode = secureCodeMatch[0];
+            cy.wrap(secureCode).should('include', '-');
+
+            cy.log(`Secure Code: ${secureCode}`);
+
+            // Entrer le code
+            cy.get('#root > div > section > main > section > section > div > div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6 > div.space-y-6 > div:nth-child(1) > div:nth-child(2) > form > div.space-y-2 > section > div > div:nth-child(4) > input')
+            .type(secureCode.replace('-', ''), { force: true });
+
+            // Cliquer sur "Sign quote"
+            cy.get('#root > div > section > main > section > section > div > div > div > div:nth-child(1) > div:nth-child(2) > form > div > button')
+            .contains('Sign quote')
+            .click();
+
+            // Vérifier la date de signature
+            const date = new Date();
+            const formatedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
+            cy.contains(`This quote was signed on ${formatedDate}`);
+        });
+        });
+    });
+    });
+
+});
