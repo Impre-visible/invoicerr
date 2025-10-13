@@ -23,6 +23,11 @@ jobs:
           --health-cmd pg_isready
           --health-interval 2s
           --health-retries 10
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - "8025:8025"
+          - "1025:1025"
 
     steps:
       - uses: actions/checkout@v3
