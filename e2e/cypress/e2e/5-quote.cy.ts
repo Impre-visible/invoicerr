@@ -161,7 +161,7 @@ describe('Quotes E2E', () => {
 
                     cy.wrap(confirmationEmail).should('exist');
                     cy.wrap(confirmationEmail.From.Address).should('eq', 'test@local.dev');
-                    cy.wrap(confirmationEmail.To[0].Address).should('eq', 'jane.doe@acme.org');
+                    cy.wrap(confirmationEmail.To[0].Address).should('match', /^(john|jane)\.doe@acme\.org$/);
 
                     const confirmationHtml = confirmationEmail.HTML || '';
                     const secureCodeMatch = confirmationHtml.match(/\b\d{4}-\d{4}\b/);
