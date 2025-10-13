@@ -80,14 +80,17 @@ describe('Quotes E2E', () => {
         cy.get("span").contains("Euro (€)").click();
 
         // Select valid until date
-        cy.get('#«rp»-form-item').click();
+        const dateButton = cy.get('button').filter((index, el) => {
+            return Cypress.$(el).text().trim() === 'Select expiration date';
+        })
+        dateButton.click();
         cy.wait(50)
         cy.get('[aria-label="Go to the Next Month"]').click();
         cy.wait(50)
         cy.get('[aria-label="Go to the Next Month"]').click();
         cy.wait(50)
-        cy.get("#radix-«rq» > div > div > div > table > tbody > tr:nth-child(4) > td:nth-child(5) > button").click();
-        cy.get('#«rp»-form-item').click();
+        cy.get("* > table > tbody > tr:nth-child(4) > td:nth-child(5) > button").click();
+        dateButton.click();
 
         // Set "notes"
         cy.get('[name="notes"]').type('These are some other notes');
