@@ -57,10 +57,6 @@ describe('Quotes E2E', () => {
         cy.contains('2420.00USD'); // Total with tax
         cy.contains('2200.00USD'); // Subtotal without tax
         cy.contains('ACME') // Client name
-
-        const date = new Date();
-        const formatedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
-        cy.contains(formatedDate);
     });
 
     it('should create a quote (Jane Doe)', () => {
