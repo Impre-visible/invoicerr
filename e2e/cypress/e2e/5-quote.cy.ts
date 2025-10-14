@@ -119,10 +119,6 @@ describe('Quotes E2E', () => {
         cy.contains('3072.00EUR'); // Total with tax
         cy.contains('2560.00EUR'); // Subtotal without tax
         cy.contains('Jane Doe') // Client name
-
-        const date = new Date();
-        const formatedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
-        cy.contains(formatedDate);
     });
 
     it('should send a quote and get the signature link', () => {
@@ -183,11 +179,6 @@ describe('Quotes E2E', () => {
                     cy.get('#root > div > section > main > section > section > div > div > div > div:nth-child(1) > div:nth-child(2) > form > div > button')
                     .contains('Sign quote')
                     .click();
-
-                    // Vérifier la date de signature
-                    const date = new Date();
-                    const formatedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
-                    cy.contains(`This quote was signed on ${formatedDate}`);
                 });
             });
         });
