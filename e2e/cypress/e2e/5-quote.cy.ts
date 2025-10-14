@@ -123,6 +123,8 @@ describe('Quotes E2E', () => {
         cy.contains('Quote sent for signature successfully');
         cy.contains('Sent');
 
+        cy.wait(3000);
+
         // Vérifie l'envoi de l'email
         cy.getLastEmail().then(email => {
             cy.clearEmails();
@@ -149,6 +151,8 @@ describe('Quotes E2E', () => {
 
                 // Cliquer sur "Sign"
                 cy.get('#root > div > section > main > section > section > div > div.grid.grid-cols-1.lg\\:grid-cols-3.gap-6 > div.space-y-6 > div:nth-child(1) > div.px-6.space-y-4 > button').click();
+
+                cy.wait(3000);
 
                 // Récupérer l'email de confirmation
                 cy.getLastEmail().then(confirmationEmail => {
