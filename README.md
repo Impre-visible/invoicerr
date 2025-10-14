@@ -203,7 +203,8 @@ En CI, le workflow GitHub Actions fait ces étapes automatiquement.
 
 ## ⚖️ License
 
-This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0).
-See the [LICENSE](./LICENSE) file for more details.
+This project is dual-licensed:
+- Open Source: [AGPL-3.0](./LICENSE)
+- Commercial: [COMMERCIAL-LICENSE](./COMMERCIAL-LICENSE)
 
-<img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv31.svg" />
+Contact me for commercial use.
