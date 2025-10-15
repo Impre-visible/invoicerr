@@ -183,4 +183,14 @@ describe('Quotes E2E', () => {
             });
         });
     });
+
+    it('should mark the quote as signed', () => {
+        cy.get('#root > div > section > main > section > section > div > div > div > div > div:nth-child(1) > div > div > button:nth-child(4)').click();
+        cy.contains('Invoice created successfully from quote');
+        cy.visit('/invoices');
+        cy.get("#root > div > section > main > section > section > div > div:nth-child(4) > div > div > div")
+          .children()
+          .its('length')
+          .should('be.greaterThan', 0);
+    });
 });
