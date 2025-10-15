@@ -132,8 +132,8 @@ describe('Quotes E2E', () => {
             cy.wrap(email).should('exist');
             cy.wrap(email.From.Address).should('eq', 'test@local.dev');
             cy.wrap(email.To[0].Address).should('match', /^(john|jane)\.doe@acme\.org$/);
-            cy.wrap(email.Subject).should(subject => {
-                expect(subject.startsWith('Please sign document #')).to.be.true;
+            cy.wrap(email.Subject).should((subject) => {
+                expect((subject as unknown as string).startsWith('Please sign document #')).to.be.true;
             });
 
             const html = email.HTML || '';
