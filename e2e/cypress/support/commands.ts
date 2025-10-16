@@ -57,6 +57,23 @@ Cypress.Commands.add('login', () => {
     });
 });
 
+
+Cypress.Commands.add('getLastEmail', () => {
+  return cy
+    .request('http://localhost:8025/api/v1/messages')
+    .then(res => {
+      const messages = res.body.messages;
+      expect(messages).to.have.length.greaterThan(0);
+      const id = messages[0].ID;
+      return cy.request(`http://localhost:8025/api/v1/message/${id}`);
+    })
+    .then(res => res.body);
+});
+
+Cypress.Commands.add('clearEmails', () => {
+  return cy.request('DELETE', 'http://localhost:8025/api/v1/messages');
+});
+
 Cypress.on('window:before:load', (window) => {
     Object.defineProperty(window.navigator, 'language', { value: 'en-US' })
     Object.defineProperty(window.navigator, 'languages', { value: ['en-US'] })
