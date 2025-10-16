@@ -361,6 +361,9 @@ model Client {
   country          String
   currency         Currency?
   type             ClientType         @default(COMPANY)
+  salutation       String             @default("Mr") // Mr, Ms, Mrs (We need a default value for the invoice generation)
+  sex              String             @default("other") // male, female, other (We need a default value for the invoice generation)
+  title            String             @default("Doctor") // Doctor, Professor (We need a default value for the invoice generation)
   isActive         Boolean            @default(true)
   Quote            Quote[]
   Invoice          Invoice[]
