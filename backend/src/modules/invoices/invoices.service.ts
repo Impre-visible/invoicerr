@@ -1,15 +1,17 @@
 import * as Handlebars from 'handlebars';
+
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
-import { MailService } from '@/mail/mail.service';
 import { CreateInvoiceDto, EditInvoicesDto } from '@/modules/invoices/dto/invoices.dto';
-import { baseTemplate } from '@/modules/invoices/templates/base.template';
-import prisma from '@/prisma/prisma.service';
-import { parseAddress } from '@/utils/adress';
+import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { getInvertColor, getPDF } from '@/utils/pdf';
-import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
+
+import { MailService } from '@/mail/mail.service';
+import { baseTemplate } from '@/modules/invoices/templates/base.template';
 import { business } from '@tsclass/tsclass/dist_ts';
+import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
 import { formatDate } from '@/utils/date';
+import { parseAddress } from '@/utils/adress';
+import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class InvoicesService {
@@ -103,7 +105,7 @@ export class InvoicesService {
         const totalHT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
         let totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
- 
+
         const isVatExemptFrance = !!(company.exemptVat && (company.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
             totalVAT = 0;
@@ -175,13 +177,13 @@ export class InvoicesService {
         const totalHT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
         let totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
- 
+
         const isVatExemptFrance = !!(company.exemptVat && (company.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
             totalVAT = 0;
             totalTTC = totalHT;
         }
- 
+
         const updateInvoice = await prisma.invoice.update({
             where: { id },
             data: {
@@ -261,17 +263,17 @@ export class InvoicesService {
         }
 
         const template = Handlebars.compile(baseTemplate);
- 
+
         // Default payment display values
         let paymentMethodName = invoice.paymentMethod;
         let paymentMethodDetails = invoice.paymentDetails;
- 
-        if(invoice.client.name.length==0) {
+
+        if (invoice.client.name.length == 0) {
             invoice.client.name = invoice.client.contactFirstname + " " + invoice.client.contactLastname
         }
- 
+
         const { pdfConfig } = invoice.company;
- 
+
         // Map payment method enum -> PDFConfig label
         const paymentMethodLabels: Record<string, string> = {
             BANK_TRANSFER: pdfConfig.paymentMethodBankTransfer,
@@ -280,7 +282,7 @@ export class InvoicesService {
             CHECK: pdfConfig.paymentMethodCheck,
             OTHER: pdfConfig.paymentMethodOther,
         };
- 
+
         // Resolve payment method display values if a saved paymentMethodId is referenced
         if (invoice.paymentMethodId) {
             const pm = await prisma.paymentMethod.findUnique({ where: { id: invoice.paymentMethodId } });
@@ -295,7 +297,7 @@ export class InvoicesService {
                 paymentMethodName = paymentMethodLabels[paymentMethodName.toUpperCase()];
             }
         }
- 
+
         // Map item type enums to PDF label text (from pdfConfig)
         const itemTypeLabels: Record<string, string> = {
             HOUR: pdfConfig.hour,
@@ -304,7 +306,7 @@ export class InvoicesService {
             SERVICE: pdfConfig.service,
             PRODUCT: pdfConfig.product,
         };
- 
+
         const html = template({
             number: invoice.rawNumber || invoice.number.toString(),
             date: formatDate(invoice.company, invoice.createdAt),
@@ -484,7 +486,7 @@ export class InvoicesService {
                 unitType: item.type === 'HOUR' ? 'HUR' : item.type === 'DAY' ? 'DAY' : item.type === 'DEPOSIT' ? 'SET' : item.type === 'SERVICE' ? 'C62' : item.type === 'PRODUCT' ? 'C62' : 'C62',
             });
         });
-        
+
         const validation = await inv.validate()
 
         this.logger.log('E-Invoice validation result: ' + (validation.valid ? 'valid' : 'invalid'));
