@@ -12,5 +12,17 @@ declare namespace Cypress {
          * @example cy.resetDatabase()
          */
         resetDatabase(): Chainable<void>
+
+        /**
+         * Custom command to get the last email
+         * @example cy.getLastEmail()
+         */
+        getLastEmail(): Chainable<any>
+
+        /**
+         * Custom command to clear all emails
+         * @example cy.clearEmails()
+         */
+        clearEmails(): Chainable<any>
     }
 }

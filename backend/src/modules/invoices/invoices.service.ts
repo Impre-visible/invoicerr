@@ -1,5 +1,5 @@
 import * as Handlebars from 'handlebars';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { MailService } from '@/mail/mail.service';
 import { CreateInvoiceDto, EditInvoicesDto } from '@/modules/invoices/dto/invoices.dto';
@@ -8,11 +8,16 @@ import prisma from '@/prisma/prisma.service';
 import { parseAddress } from '@/utils/adress';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
+import { business } from '@tsclass/tsclass/dist_ts';
 import { formatDate } from '@/utils/date';
 
 @Injectable()
 export class InvoicesService {
-    constructor(private readonly mailService: MailService) { }
+    private readonly logger: Logger;
+
+    constructor(private readonly mailService: MailService) {
+        this.logger = new Logger(InvoicesService.name);
+    }
 
 
     async getInvoices(page: string) {
@@ -429,40 +434,70 @@ export class InvoicesService {
             };
         }
 
-        inv.to = {
-            name: invRec.client.name,
-            description: invRec.client.description || "N/A",
-            type: 'company',
-            foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
-            status: invRec.client.isActive ? 'active' : 'planned',
-            address: {
-                streetName: toAdress.streetName,
-                houseNumber: toAdress.houseNumber,
-                city: invRec.client.city,
-                postalCode: invRec.client.postalCode,
-                country: invRec.client.country || 'FR',
-                countryCode: invRec.client.country || 'FR'
-            },
-            registrationDetails: { vatId: invRec.client.VAT || 'N/A', registrationId: invRec.client.legalId || 'N/A', registrationName: invRec.client.name }
-        };
+        if (invRec.client.type === 'COMPANY') {
+            const companyContact: business.TCompany = {
+                type: 'company',
+                name: invRec.client.name || "N/A",
+                description: invRec.client.description || "N/A",
+                status: invRec.client.isActive ? 'active' : 'planned',
+                foundedDate: { day: clientFoundedDate.getDay(), month: clientFoundedDate.getMonth() + 1, year: clientFoundedDate.getFullYear() },
+                address: {
+                    streetName: toAdress.streetName,
+                    houseNumber: toAdress.houseNumber,
+                    city: invRec.client.city,
+                    postalCode: invRec.client.postalCode,
+                    country: invRec.client.country || 'FR',
+                    countryCode: invRec.client.country.slice(0, 2).toUpperCase() || 'FR' // TODO: Refactor the app to store country codes instead of custom country names
+                },
+                registrationDetails: { vatId: invRec.client.VAT || 'N/A', registrationId: invRec.client.legalId || 'N/A', registrationName: invRec.client.name }
+            };
 
-        invRec.items.forEach(item => {
+            inv.to = companyContact;
+        } else {
+            const personContact: business.TPerson = {
+                type: 'person',
+                name: `${invRec.client.contactFirstname} ${invRec.client.contactLastname}` || "N/A",
+                description: invRec.client.description || "N/A",
+                surname: invRec.client.contactLastname || 'N/A',
+                salutation: invRec.client.salutation as "Mr" | "Ms" | "Mrs",
+                sex: invRec.client.sex as "male" | "female" | "other",
+                title: invRec.client.title as "Doctor" | "Professor",
+                address: {
+                    streetName: toAdress.streetName,
+                    houseNumber: toAdress.houseNumber,
+                    city: invRec.client.city,
+                    postalCode: invRec.client.postalCode,
+                    country: invRec.client.country || 'FR',
+                    countryCode: invRec.client.country.slice(0, 2).toUpperCase() || 'FR' // TODO: Refactor the app to store country codes instead of custom country names
+                },
+            };
+
+            inv.to = personContact;
+        }
+
+        invRec.items.forEach((item, index) => {
             inv.addItem({
                 name: item.description,
                 unitQuantity: item.quantity,
                 unitNetPrice: item.unitPrice,
-                vatPercentage: item.vatRate || 0
+                vatPercentage: item.vatRate || 0,
+                unitType: item.type === 'HOUR' ? 'HUR' : item.type === 'DAY' ? 'DAY' : item.type === 'DEPOSIT' ? 'SET' : item.type === 'SERVICE' ? 'C62' : item.type === 'PRODUCT' ? 'C62' : 'C62',
             });
         });
+        
+        const validation = await inv.validate()
 
-        invRec.items.forEach(item => {
-            inv.addItem({
-                name: item.description,
-                unitQuantity: item.quantity,
-                unitNetPrice: item.unitPrice,
-                vatPercentage: item.vatRate || 0
-            });
-        });
+        this.logger.log('E-Invoice validation result: ' + (validation.valid ? 'valid' : 'invalid'));
+        this.logger.log('E-Invoice validation warnings: ' + (validation.warnings ? validation.warnings.length : '0'));
+        this.logger.log('E-Invoice validation errors: ' + (validation.errors ? validation.errors.length : '0'));
+
+        if (!validation.valid) {
+            validation.warnings && this.logger.warn('Validation warnings:');
+            validation.warnings && this.logger.warn(validation.warnings)
+
+            this.logger.error('Validation errors:');
+            this.logger.error(validation.errors)
+        }
 
         return inv;
     }
