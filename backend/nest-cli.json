@@ -4,6 +4,9 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "builder": "tsc",
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      "**/*.json"
+    ]
   }
 }
