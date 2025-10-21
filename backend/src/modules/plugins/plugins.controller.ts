@@ -1,10 +1,10 @@
 import { PluginsService } from '@/modules/plugins/plugins.service';
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 
 @Controller('plugins')
 export class PluginsController {
-  constructor(private readonly pluginsService: PluginsService) {}
+  constructor(private readonly pluginsService: PluginsService) { }
 
   @Get()
   async getPlugins() {
@@ -43,5 +43,24 @@ export class PluginsController {
   @Delete()
   async deletePlugin(@Body() body: { uuid: string }) {
     return { success: await this.pluginsService.deletePlugin(body.uuid) };
+  }
+
+  @Get('in-app')
+  async getInAppPlugins() {
+    return this.pluginsService.getInAppPlugins();
+  }
+
+  @Get('provider/:type')
+  async getProvider(@Param('type') type: string) {
+    const provider = await this.pluginsService.getProvider(type);
+    if (!provider) {
+      return { message: `No active provider found for type: ${type}` };
+    }
+    return {
+      id: provider.id,
+      name: provider.name,
+      type: type,
+      hasProvider: true
+    };
   }
 }

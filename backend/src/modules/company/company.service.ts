@@ -1,7 +1,8 @@
-import { EditCompanyDto, PDFConfigDto } from '@/modules/company/dto/company.dto';
-import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { EditCompanyDto, PDFConfigDto } from '@/modules/company/dto/company.dto';
 import { MailTemplate, MailTemplateType } from '@prisma/client'
+
+import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
 export interface EmailTemplate {
@@ -105,7 +106,7 @@ export class CompanyService {
                 invoiceRefer: existingCompany.pdfConfig.invoiceRefer,
                 paymentDate: existingCompany.pdfConfig.paymentDate,
                 totalReceived: existingCompany.pdfConfig.totalReceived,
-    
+
                 // Generic / shared labels
                 billTo: existingCompany.pdfConfig.billTo,
                 description: existingCompany.pdfConfig.description,
@@ -125,14 +126,14 @@ export class CompanyService {
                 notes: existingCompany.pdfConfig.notes,
                 paymentMethod: existingCompany.pdfConfig.paymentMethod,
                 paymentDetails: existingCompany.pdfConfig.paymentDetails,
-    
+
                 // Payment method display labels
                 paymentMethodBankTransfer: existingCompany.pdfConfig.paymentMethodBankTransfer,
                 paymentMethodPayPal: existingCompany.pdfConfig.paymentMethodPayPal,
                 paymentMethodCash: existingCompany.pdfConfig.paymentMethodCash,
                 paymentMethodCheck: existingCompany.pdfConfig.paymentMethodCheck,
                 paymentMethodOther: existingCompany.pdfConfig.paymentMethodOther,
-    
+
                 type: existingCompany.pdfConfig.type,
                 hour: existingCompany.pdfConfig.hour,
                 day: existingCompany.pdfConfig.day,
@@ -171,7 +172,7 @@ export class CompanyService {
                 invoiceRefer: pdfConfig.labels.invoiceRefer,
                 paymentDate: pdfConfig.labels.paymentDate,
                 totalReceived: pdfConfig.labels.totalReceived,
-    
+
                 // Generic / shared labels
                 billTo: pdfConfig.labels.billTo,
                 description: pdfConfig.labels.description,
@@ -192,7 +193,7 @@ export class CompanyService {
                 notes: pdfConfig.labels.notes,
                 paymentMethod: pdfConfig.labels.paymentMethod,
                 paymentDetails: pdfConfig.labels.paymentDetails,
-    
+
                 // Payment method display labels
                 paymentMethodBankTransfer: pdfConfig.labels.paymentMethodBankTransfer,
                 paymentMethodPayPal: pdfConfig.labels.paymentMethodPayPal,
