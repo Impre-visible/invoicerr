@@ -1,8 +1,14 @@
-export interface ISigningProvider {
+import { IPlugin } from "../types";
+
+export interface RequestSignatureProps {
   id: string;
-  name: string;
-  requestSignature: (doc: { id: string; title: string; fileUrl: string; signers: string[] }) => Promise<{ providerId: string, url: string }>;
-  verifyWebhook: (req: any) => Promise<boolean>;
+  title: string;
+  fileUrl: string;
+  signers: string[];
+}
+
+export interface ISigningProvider extends IPlugin {
+  requestSignature: (doc: RequestSignatureProps) => Promise<{ providerId: string, url: string }>;
   handleWebhook: (req: any) => Promise<void>;
 }
 

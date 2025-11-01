@@ -156,7 +156,7 @@ export class PluginsService {
     return result;
   }
 
-  async toggleInAppPlugin(id: string, isActive: boolean) {
+  async toggleInAppPlugin(id: string) {
     const plugin = await prisma.plugin.findFirst({
       where: { id },
     });
@@ -165,7 +165,8 @@ export class PluginsService {
       throw new Error(`Plugin with id "${id}" not found`);
     }
 
-    if (!isActive) {
+    // If plugin is already active, deactivate it
+    if (plugin.isActive) {
       await prisma.plugin.update({
         where: { id },
         data: { isActive: false }
@@ -175,6 +176,7 @@ export class PluginsService {
       return { success: true };
     }
 
+    // If plugin is not active, check if another plugin of the same type is active
     const existingActivePlugin = await prisma.plugin.findFirst({
       where: {
         type: plugin.type,
@@ -187,6 +189,7 @@ export class PluginsService {
       throw new BadRequestException(`Another plugin "${existingActivePlugin.name}" is already active for category "${plugin.type}". Please disable it first.`);
     }
 
+    // Check if the plugin requires configuration
     const formConfig = await this.pluginRegistry.getProviderForm(plugin.id);
 
     if (formConfig && Object.keys(formConfig).length > 0) {
@@ -197,6 +200,7 @@ export class PluginsService {
       };
     }
 
+    // Activate the plugin if no configuration is required
     await prisma.plugin.update({
       where: { id },
       data: { isActive: true }
@@ -283,8 +287,8 @@ export class PluginsService {
    * @param type Le type de plugin (signing, payment, etc.)
    * @returns Le provider actif ou null
    */
-  async getProvider(type: string): Promise<any | null> {
-    return await this.pluginRegistry.getProvider(type);
+  async getProvider<T = IPlugin>(type: string): Promise<T | null> {
+    return await this.pluginRegistry.getProvider<T>(type);
   }
 
   private getPluginTypeEnum(type: string): string {

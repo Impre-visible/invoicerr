@@ -1193,7 +1193,11 @@
                 "addSuccess": "Plugin ajouté avec succès",
                 "addError": "Erreur lors de l'ajout du plugin",
                 "deleteSuccess": "Plugin supprimé avec succès",
-                "deleteError": "Erreur lors de la suppression du plugin"
+                "deleteError": "Erreur lors de la suppression du plugin",
+                "toggleSuccess": "Plugin basculé avec succès",
+                "toggleError": "Erreur lors du basculement du plugin",
+                "configureSuccess": "Plugin configuré avec succès",
+                "configureError": "Erreur lors de la configuration du plugin"
             }
         },
         "pdfTemplates": {

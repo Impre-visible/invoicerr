@@ -2,11 +2,14 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GitBranch, Plus, Trash2 } from "lucide-react"
-import { useDelete, useGet, usePost } from "@/lib/utils"
+import { useDelete, useGet, usePost, usePut } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { DynamicFormModal } from "@/components/form-modal"
+import type { FormConfig } from "@/components/form-modal"
 import type React from "react"
 import { toast } from "sonner"
 import { useState } from "react"
@@ -18,16 +21,33 @@ interface Plugin {
     description: string
 }
 
+interface InAppPlugin {
+    id: string
+    name: string
+    isActive: boolean
+}
+
+interface InAppPluginCategories {
+    category: string
+    plugins: InAppPlugin[]
+}
+
 export default function PluginsSettings() {
     const { t } = useTranslation()
 
+    const [gitUrl, setGitUrl] = useState("")
+    const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const [configModalOpen, setConfigModalOpen] = useState(false)
+    const [configFormData, setConfigFormData] = useState<{ pluginId: string; formConfig: FormConfig; currentConfig: any } | null>(null)
+    const [togglingPluginId, setTogglingPluginId] = useState<string | null>(null)
+
     const { data: plugins, mutate } = useGet<Plugin[]>("/api/plugins")
+    const { data: inAppPlugins, mutate: mutateInAppPlugins } = useGet<InAppPluginCategories[]>("/api/plugins/in-app")
 
     const { trigger: addPlugin, loading: addLoading } = usePost("/api/plugins")
     const { trigger: deletePlugin, loading: deleteLoading } = useDelete("/api/plugins")
-
-    const [gitUrl, setGitUrl] = useState("")
-    const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const { trigger: togglePlugin } = usePut(`/api/plugins/in-app/toggle`)
+    const { trigger: configurePlugin } = usePost(`/api/plugins/in-app/configure`)
 
     const handleDeletePlugin = async (uuid: string) => {
         setIsDeleting(uuid)
@@ -75,6 +95,50 @@ export default function PluginsSettings() {
         }
     }
 
+    const handleToggleInAppPlugin = async (pluginId: string) => {
+        try {
+            setTogglingPluginId(pluginId)
+            const response = await togglePlugin({ pluginId })
+
+            if (!response) throw new Error("Failed to toggle plugin")
+
+            if (response.success === true) {
+                toast.success(t("settings.plugins.messages.toggleSuccess"))
+                mutateInAppPlugins()
+            } else if (response.requiresConfiguration) {
+                setConfigFormData({
+                    pluginId,
+                    formConfig: response.formConfig,
+                    currentConfig: response.currentConfig || {}
+                })
+                setConfigModalOpen(true)
+            }
+        } catch (error: any) {
+            toast.error(error?.message || t("settings.plugins.messages.toggleError"))
+        } finally {
+            setTogglingPluginId(null)
+        }
+    }
+
+    const handleConfigurePlugin = async (config: Record<string, any>) => {
+        if (!configFormData) return
+
+        try {
+            const response = await configurePlugin({ pluginId: configFormData.pluginId, config })
+
+            if (!response) throw new Error("Failed to configure plugin")
+
+            if (response.success === true) {
+                toast.success(t("settings.plugins.messages.configureSuccess"))
+                setConfigModalOpen(false)
+                setConfigFormData(null)
+                mutateInAppPlugins()
+            }
+        } catch (error: any) {
+            toast.error(error?.message || t("settings.plugins.messages.configureError"))
+        }
+    }    
+    
     return (
         <div className="space-y-6">
             <div>
@@ -83,6 +147,50 @@ export default function PluginsSettings() {
                     {t("settings.plugins.description")}
                 </p>
             </div>
+
+            {inAppPlugins && inAppPlugins.length > 0 && (
+                <div className="space-y-4">
+                    <div>
+                        <h2 className="text-xl font-semibold mb-4">In-app Plugins</h2>
+                    </div>
+                    {inAppPlugins.map((category) => (
+                        <Card key={category.category}>
+                            <CardHeader>
+                                <CardTitle className="capitalize">{category.category}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-3">
+                                    {category.plugins.map((plugin) => (
+                                        <div key={plugin.id} className="flex items-center justify-between p-3 border rounded-lg">
+                                            <div>
+                                                <p className="font-medium">{plugin.name}</p>
+                                            </div>
+                                            <Switch
+                                                checked={plugin.isActive}
+                                                onCheckedChange={() => handleToggleInAppPlugin(plugin.id)}
+                                                disabled={togglingPluginId === plugin.id}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            <DynamicFormModal
+                open={configModalOpen}
+                title="Configure Plugin"
+                description="Please fill in the required configuration fields"
+                config={configFormData?.formConfig || null}
+                currentValues={configFormData?.currentConfig}
+                onCancel={() => {
+                    setConfigModalOpen(false)
+                    setConfigFormData(null)
+                }}
+                onSubmit={(formData) => handleConfigurePlugin(formData)}
+            />
 
             <Card>
                 <CardHeader>

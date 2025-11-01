@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 
 // Import all providers manually
-import { DocusealProvider } from './signing/providers/docuseal';
+import { DocusealProvider } from './signing/providers/docuseal/docuseal';
 import { IPluginForm } from './signing/types';
 import { PluginType } from '@prisma/client';
 import { join } from 'path';
@@ -116,7 +116,7 @@ export class PluginRegistry {
         }
     }
 
-    async getProvider(type: string): Promise<any | null> {
+    async getProvider<T>(type: string): Promise<T | null> {
         await this.initializeIfNeeded();
 
         const pluginType = this.getPluginTypeEnum(type);
@@ -134,7 +134,7 @@ export class PluginRegistry {
         }
 
         // Retourner l'instance du provider
-        return this.providersMap.get(activePlugin.id) || null;
+        return this.providersMap.get(activePlugin.id) as T || null;
     }
 
     public getProviderForm(plugin_id: string): IPluginForm {
@@ -142,7 +142,7 @@ export class PluginRegistry {
         let path: string = "";
         for (const [type, providers] of this.inAppPluginTypes) {
             if (providers.has(plugin_id)) {
-                path = join(process.cwd(), 'src', 'plugins', type.toLowerCase(), 'providers', `${plugin_id}-form.json`);
+                path = join(process.cwd(), 'src', 'plugins', type.toLowerCase(), 'providers', plugin_id, `${plugin_id}-form.json`);
                 break;
             }
         }

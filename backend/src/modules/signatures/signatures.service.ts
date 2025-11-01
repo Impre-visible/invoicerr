@@ -1,10 +1,12 @@
 import { MailService } from '@/mail/mail.service';
 import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { PluginsService } from '../plugins/plugins.service';
+import { ISigningProvider } from '@/plugins/signing/types';
 
 @Injectable()
 export class SignaturesService {
-    constructor(private readonly mailService: MailService) { }
+    constructor(private readonly mailService: MailService, private readonly pluginsService: PluginsService) { }
 
     async getSignature(signatureId: string) {
         const signature = await prisma.signature.findUnique({
@@ -30,6 +32,7 @@ export class SignaturesService {
         const quote = await prisma.quote.findUnique({
             where: { id: quoteId },
             select: {
+                id: true,
                 client: {
                     select: {
                         contactEmail: true
@@ -42,14 +45,8 @@ export class SignaturesService {
             throw new BadRequestException('Quote not found or client information is missing.');
         }
 
-        const signature = await prisma.signature.create({
-            data: {
-                quoteId,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
-            },
-        });
 
-        await this.sendSignatureEmail(signature.id);
+        await this.sendSignatureEmail(quote.id);
 
         await prisma.quote.update({
             where: { id: quoteId },
@@ -58,7 +55,7 @@ export class SignaturesService {
             },
         });
 
-        return { message: 'Signature successfully created and email sent.', signature };
+        return { message: 'Signature successfully created and email sent.' };
     }
 
     async generateOTPCode(signatureId: string) {
@@ -98,10 +95,30 @@ export class SignaturesService {
         return { message: 'OTP code generated successfully.' };
     }
 
-    async sendSignatureEmail(signatureId: string) {
-        const signature = await prisma.signature.findFirst({
-            where: { id: signatureId, isActive: true },
+    private async sendSignatureEmailWithProvider(provider: ISigningProvider, quoteId: string) {
+        if (provider && typeof provider.requestSignature == 'function') {
+            return provider.requestSignature({
+                id: quoteId,
+                title: `Signature for Quote ${quoteId}`,
+                fileUrl: `https://example.com/quotes/${quoteId}/file.pdf`,
+                signers: ['<SIGNER_EMAIL>']
+            });
+        }
+        return { message: 'Signature email sent via provider.' };
+    }
+
+    async sendSignatureEmail(quoteId: string) {
+        const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
+        if (provider && typeof provider.requestSignature == 'function') {
+            return this.sendSignatureEmailWithProvider(provider, quoteId);
+        }
+        const signature = await prisma.signature.create({
+            data: {
+                quoteId,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
+            },
             select: {
+                id: true,
                 quoteId: true,
                 quote: {
                     select: {
@@ -122,7 +139,7 @@ export class SignaturesService {
         }
 
         await prisma.signature.updateMany({
-            where: { quoteId: signature.quoteId, isActive: true, id: { not: signatureId } },
+            where: { quoteId: signature.quoteId, isActive: true, id: { not: signature.id } },
             data: { isActive: false },
         });
 
@@ -137,8 +154,8 @@ export class SignaturesService {
 
         const envVariables = {
             APP_URL: process.env.APP_URL,
-            SIGNATURE_URL: `${process.env.APP_URL}/signature/${signatureId}`,
-            SIGNATURE_ID: signatureId,
+            SIGNATURE_URL: `${process.env.APP_URL}/signature/${signature.id}`,
+            SIGNATURE_ID: signature.id,
             SIGNATURE_NUMBER: signature.quote.number,
         };
 

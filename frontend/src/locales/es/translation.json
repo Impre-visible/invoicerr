@@ -1193,7 +1193,11 @@
                 "addSuccess": "Plugin agregado correctamente",
                 "addError": "No se pudo agregar el plugin",
                 "deleteSuccess": "Plugin eliminado correctamente",
-                "deleteError": "No se pudo eliminar el plugin"
+                "deleteError": "No se pudo eliminar el plugin",
+                "toggleSuccess": "Plugin alternado correctamente",
+                "toggleError": "No se pudo alternar el plugin",
+                "configureSuccess": "Plugin configurado correctamente",
+                "configureError": "No se pudo configurar el plugin"
             }
         },
         "pdfTemplates": {

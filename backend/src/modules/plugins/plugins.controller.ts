@@ -1,5 +1,5 @@
 import { PluginsService } from '@/modules/plugins/plugins.service';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 
 
 @Controller('plugins')
@@ -50,6 +50,18 @@ export class PluginsController {
     return this.pluginsService.getInAppPlugins();
   }
 
+  @Put('in-app/toggle')
+  async toggleInAppPlugin(@Body() body: { pluginId: string }) {
+    return this.pluginsService.toggleInAppPlugin(body.pluginId);
+  }
+
+  @Post('in-app/configure')
+  async configureInAppPlugin(
+    @Body() body: { pluginId: string; config: Record<string, any> }
+  ) {
+    return this.pluginsService.configureInAppPlugin(body.pluginId, body.config);
+  }
+
   @Get('provider/:type')
   async getProvider(@Param('type') type: string) {
     const provider = await this.pluginsService.getProvider(type);
@@ -57,7 +69,7 @@ export class PluginsController {
       return { message: `No active provider found for type: ${type}` };
     }
     return {
-      id: provider.id,
+      id: provider.__uuid,
       name: provider.name,
       type: type,
       hasProvider: true
