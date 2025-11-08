@@ -11,7 +11,7 @@ export async function getProviderConfig<T>(name: string) {
     const plugin = await prisma.plugin.findFirst({
         where: {
             isActive: true,
-            name,
+            id: name,
         }
     })
 
