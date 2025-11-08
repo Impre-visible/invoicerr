@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 
 // Import all providers manually
-import { DocusealProvider } from './signing/providers/docuseal/docuseal';
+import { DocumensoProvider } from './signing/providers/documenso/documenso';
 import { IPluginForm } from './signing/types';
 import { PluginType } from '@prisma/client';
 import { join } from 'path';
@@ -54,7 +54,7 @@ export class PluginRegistry {
 
     private initializeInAppPlugins() {
         // Register signing providers
-        this.registerProvider('signing', DocusealProvider);
+        this.registerProvider('signing', DocumensoProvider);
     }
 
     private registerProvider(type: string, provider: any) {
@@ -137,7 +137,7 @@ export class PluginRegistry {
         return this.providersMap.get(activePlugin.id) as T || null;
     }
 
-    public getProviderForm(plugin_id: string): IPluginForm {
+    public async getProviderForm(plugin_id: string): Promise<IPluginForm> {
         // Get the path to the provider form based on plugin_id
         let path: string = "";
         for (const [type, providers] of this.inAppPluginTypes) {
@@ -147,6 +147,7 @@ export class PluginRegistry {
             }
         }
         if (!path || !existsSync(path)) {
+            await prisma.plugin.delete({where: {id: plugin_id}});
             throw new Error(`Form for plugin ID "${plugin_id}" not found.`);
         }
 

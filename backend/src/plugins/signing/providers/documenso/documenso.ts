@@ -4,12 +4,12 @@ import { ISigningProvider, RequestSignatureProps } from "../../types";
 import { markInvoiceAsPaid } from "@/utils/plugins/signing";
 import prisma from "@/prisma/prisma.service";
 
-export const DocusealProvider: ISigningProvider = {
-    id: "docuseal",
-    name: "DocuSeal",
+export const DocumensoProvider: ISigningProvider = {
+    id: "documenso",
+    name: "Documenso",
 
     requestSignature: async (props: RequestSignatureProps) => {
-        const { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("docuseal");
+        const { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
         const client = new Documenso({ 
             apiKey,
             serverURL: baseUrl 
