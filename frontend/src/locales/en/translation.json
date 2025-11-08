@@ -1639,7 +1639,7 @@
                 "step3": "3. Configure webhook secret",
                 "step4": "4. Enable the following events: document.signed (minimum required)",
                 "step5": "5. Additional events you may want to enable: document.pending, document.completed, document.rejected"
-            },
+            }
         },
         "modal": {
             "title": "Webhook Configuration for {{pluginName}}",

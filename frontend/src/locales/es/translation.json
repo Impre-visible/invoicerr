@@ -750,96 +750,96 @@
         "description": "Gestiona métodos de pago reutilizables.",
         "empty": "Aún no hay métodos de pago.",
         "actions": {
-          "cancel": "Cancelar",
-          "add": "Agregar",
-          "save": "Guardar",
-          "edit": "Editar",
-          "delete": "Eliminar",
-          "deleting": "Eliminando..."
-        },
-        "search": {
-          "placeholder": "Buscar métodos de pago..."
-        },
-        "list": {
-          "add": "Agregar método de pago",
-          "empty": "No se encontraron métodos de pago"
-        },
-        "stats": {
-          "total": "Total de métodos de pago",
-          "active": "Activo",
-          "inactive": "Inactivo"
-        },
-        "fields": {
-          "name": {
-            "label": "Nombre",
-            "placeholder": "ej. Transferencia bancaria (empresarial)"
-          },
-          "details": {
-            "label": "Detalles",
-            "placeholder": "IBAN / detalles"
-          },
-          "type": {
-            "label": "Tipo",
-            "bank_transfer": "Transferencia bancaria",
-            "paypal": "PayPal",
-            "check": "Cheque",
-            "cash": "Efectivo",
-            "other": "Otro"
-          },
-          "status": {
-            "label": "Estado"
-          }
-        },
-        "upsert": {
-          "title": {
-            "create": "Agregar método de pago",
-            "edit": "Editar método de pago"
-          },
-          "form": {
-            "name": {
-              "label": "Nombre",
-              "placeholder": "ej. Transferencia bancaria (empresarial)"
-            },
-            "details": {
-              "label": "Detalles",
-              "placeholder": "IBAN / detalles"
-            },
-            "type": {
-              "label": "Tipo",
-              "bank_transfer": "Transferencia bancaria",
-              "paypal": "PayPal",
-              "check": "Cheque",
-              "cash": "Efectivo",
-              "other": "Otro"
-            }
-          },
-          "messages": {
-            "nameRequired": "El nombre es obligatorio",
-            "addSuccess": "Método de pago agregado",
-            "addError": "No se pudo agregar el método de pago",
-            "updateSuccess": "Método de pago actualizado",
-            "updateError": "No se pudo actualizar el método de pago",
-            "deleteSuccess": "Método de pago eliminado",
-            "deleteError": "No se pudo eliminar el método de pago"
-          },
-          "actions": {
             "cancel": "Cancelar",
             "add": "Agregar",
             "save": "Guardar",
             "edit": "Editar",
             "delete": "Eliminar",
             "deleting": "Eliminando..."
-          }
+        },
+        "search": {
+            "placeholder": "Buscar métodos de pago..."
+        },
+        "list": {
+            "add": "Agregar método de pago",
+            "empty": "No se encontraron métodos de pago"
+        },
+        "stats": {
+            "total": "Total de métodos de pago",
+            "active": "Activo",
+            "inactive": "Inactivo"
+        },
+        "fields": {
+            "name": {
+                "label": "Nombre",
+                "placeholder": "ej. Transferencia bancaria (empresarial)"
+            },
+            "details": {
+                "label": "Detalles",
+                "placeholder": "IBAN / detalles"
+            },
+            "type": {
+                "label": "Tipo",
+                "bank_transfer": "Transferencia bancaria",
+                "paypal": "PayPal",
+                "check": "Cheque",
+                "cash": "Efectivo",
+                "other": "Otro"
+            },
+            "status": {
+                "label": "Estado"
+            }
+        },
+        "upsert": {
+            "title": {
+                "create": "Agregar método de pago",
+                "edit": "Editar método de pago"
+            },
+            "form": {
+                "name": {
+                    "label": "Nombre",
+                    "placeholder": "ej. Transferencia bancaria (empresarial)"
+                },
+                "details": {
+                    "label": "Detalles",
+                    "placeholder": "IBAN / detalles"
+                },
+                "type": {
+                    "label": "Tipo",
+                    "bank_transfer": "Transferencia bancaria",
+                    "paypal": "PayPal",
+                    "check": "Cheque",
+                    "cash": "Efectivo",
+                    "other": "Otro"
+                }
+            },
+            "messages": {
+                "nameRequired": "El nombre es obligatorio",
+                "addSuccess": "Método de pago agregado",
+                "addError": "No se pudo agregar el método de pago",
+                "updateSuccess": "Método de pago actualizado",
+                "updateError": "No se pudo actualizar el método de pago",
+                "deleteSuccess": "Método de pago eliminado",
+                "deleteError": "No se pudo eliminar el método de pago"
+            },
+            "actions": {
+                "cancel": "Cancelar",
+                "add": "Agregar",
+                "save": "Guardar",
+                "edit": "Editar",
+                "delete": "Eliminar",
+                "deleting": "Eliminando..."
+            }
         },
         "tooltips": {
-          "view": "Ver",
-          "edit": "Editar",
-          "delete": "Eliminar"
+            "view": "Ver",
+            "edit": "Editar",
+            "delete": "Eliminar"
         },
         "delete": {
-          "description": "¿Seguro que desea eliminar \"{{name}}\"? Esta acción no puede deshacerse."
+            "description": "¿Seguro que desea eliminar \"{{name}}\"? Esta acción no puede deshacerse."
         }
-      },
+    },
     "settings": {
         "tabs": {
             "company": "Empresa",
@@ -1629,5 +1629,26 @@
         "invoiced": "Facturado (con IVA)",
         "revenue": "Ingresos (sin IVA)",
         "deposits": "Anticipos (factura pagada)"
+    },
+    "webhook": {
+        "instructions": {
+            "documenso": {
+                "title": "Instrucciones para la configuración del webhook de Documenso:",
+                "step1": "1. Accede a tu panel de administración de Documenso",
+                "step2": "2. Configura la URL del webhook",
+                "step3": "3. Configura el secreto del webhook",
+                "step4": "4. Activa los siguientes eventos: document.signed (mínimo requerido)",
+                "step5": "5. Eventos adicionales que puedes activar: document.pending, document.completed, document.rejected"
+            }
+        },
+        "modal": {
+            "title": "Configuración de webhook para {{pluginName}}",
+            "url": "URL del webhook",
+            "secret": "Secreto del webhook",
+            "secretDescription": "Mantén este secreto seguro. Se utilizará para verificar la autenticidad del webhook.",
+            "instructions": "Instrucciones de configuración",
+            "warning": "Configura tanto la URL como el secreto del webhook en la configuración de {{pluginName}} para recibir actualizaciones autenticadas en tiempo real. Almacena el secreto de forma segura - no se mostrará de nuevo.",
+            "gotIt": "¡Entendido!"
+        }
     }
 }
