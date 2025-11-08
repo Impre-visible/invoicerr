@@ -128,8 +128,6 @@ export const DocumensoProvider: ISigningProvider = {
             }
         ];
 
-        console.log(JSON.stringify(recipients, null, 2));
-
         let response: DocumentCreateDocumentTemporaryResponse;
 
         try {
@@ -163,7 +161,6 @@ export const DocumensoProvider: ISigningProvider = {
 
 
     handleWebhook: async (req: Request, body: DocumensoWebhookBody) => {
-
         let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
         baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
@@ -227,8 +224,10 @@ export const DocumensoProvider: ISigningProvider = {
             }
         });
 
-
-
+        if (!quote) {
+            // It's just a document not linked to any quote, so we can silently ignore it
+            return
+        }
 
         switch (body.payload.status) {
             case DocumentGetStatus.Draft:

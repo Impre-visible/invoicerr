@@ -216,7 +216,7 @@ function generateDefaultValues(fields: FormFieldItem[], currentValues?: Record<s
 
 export function DynamicFormModal({ open, title, description, config, currentValues, onCancel, onSubmit }: DynamicFormModalProps) {
     if (!config || JSON.stringify(config) === "{}") return null
-    console.log("Rendering DynamicFormModal with config:", config)
+
     const schema = generateZodSchema(config.form.fields)
     const defaultValues = generateDefaultValues(config.form.fields, currentValues)
 
@@ -226,7 +226,6 @@ export function DynamicFormModal({ open, title, description, config, currentValu
     })
 
     const handleSubmit = (data: Record<string, any>) => {
-        console.log("[v0] Form data before submit:", data)
         onSubmit(data)
         form.reset()
     }
