@@ -32,5 +32,6 @@ export interface IPluginFormField {
   max?: number;
   default?: boolean;
   multiple?: boolean;
+  pattern?: string;
   options?: { label: string; value: string }[];
 }

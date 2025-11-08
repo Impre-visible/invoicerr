@@ -37,6 +37,7 @@ interface TextField extends BaseField {
     placeholder?: string
     minLength?: number
     maxLength?: number
+    pattern?: string
 }
 
 interface NumberField extends BaseField {
@@ -44,6 +45,7 @@ interface NumberField extends BaseField {
     placeholder?: string
     min?: number
     max?: number
+    pattern?: string
 }
 
 interface SwitchField extends BaseField {
@@ -102,6 +104,13 @@ function generateZodSchema(fields: FormFieldItem[]) {
                     )
                 }
 
+                if (textField.pattern) {
+                    fieldSchema = (fieldSchema as z.ZodString).regex(
+                        new RegExp(textField.pattern),
+                        `${field.label} format is invalid`,
+                    )
+                }
+
                 if (!field.required) {
                     fieldSchema = fieldSchema.optional().or(z.literal(""))
                 }
@@ -131,6 +140,15 @@ function generateZodSchema(fields: FormFieldItem[]) {
                             `${field.label} must be at most ${numberField.max}`,
                         )
                     }
+
+                    if (numberField.pattern) {
+                        fieldSchema = (fieldSchema as z.ZodNumber).refine(
+                            (val) => new RegExp(numberField.pattern!).test(val.toString()),
+                            {
+                                message: `${field.label} format is invalid`,
+                            }
+                        )
+                    }
                 } else {
                     // For optional number fields, allow empty string or valid number
                     fieldSchema = z
@@ -140,10 +158,11 @@ function generateZodSchema(fields: FormFieldItem[]) {
                                 (val) => {
                                     if (numberField.min !== undefined && val < numberField.min) return false
                                     if (numberField.max !== undefined && val > numberField.max) return false
+                                    if (numberField.pattern && !new RegExp(numberField.pattern).test(val.toString())) return false
                                     return true
                                 },
                                 {
-                                    message: `${field.label} must be between ${numberField.min ?? 0} and ${numberField.max ?? "infinity"}`,
+                                    message: `${field.label} must be between ${numberField.min ?? 0} and ${numberField.max ?? "infinity"}${numberField.pattern ? " and match the required format" : ""}`,
                                 },
                             ),
                         ])

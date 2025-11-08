@@ -6,16 +6,16 @@
                 "name": "baseUrl",
                 "label": "Base URL",
                 "placeholder": "Enter the base URL",
-                "required": true
+                "required": true,
+                "pattern": "^https?://[a-zA-Z0-9.-]+(?:/[a-zA-Z0-9&%=+-]*)?$"
             },
             {
                 "type": "text",
                 "name": "apiKey",
                 "label": "API Key",
                 "placeholder": "Enter your API key",
-                "minLength": 24,
-                "maxLength": 24,
-                "required": true
+                "required": true,
+                "pattern": "^api_[0-9a-z]{16}$"
             }
         ]
     }
