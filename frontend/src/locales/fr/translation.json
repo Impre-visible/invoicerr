@@ -257,7 +257,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Il n'y a aucun client. Veuillez en créer un d'abord."
                 },
                 "currency": {
                     "label": "Devise"
@@ -445,7 +446,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Il n'y a aucun client. Veuillez en créer un d'abord."
                 },
                 "dueDate": {
                     "label": "Date d'échéance",
@@ -590,7 +592,8 @@
         },
         "emptyState": {
             "noInvoices": "Aucune facture récurrente pour le moment",
-            "noResults": "Aucune facture récurrente trouvée"
+            "noResults": "Aucune facture récurrente trouvée",
+            "startAdding": "Commencez par créer votre première facture récurrente."
         },
         "actions": {
             "addNew": "Ajouter une nouvelle facture récurrente"
@@ -610,7 +613,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Aucun client disponible. Veuillez d'abord créer un client."
                 },
                 "currency": {
                     "label": "Devise"
@@ -748,98 +752,113 @@
         "title": "Méthodes de paiement",
         "description": "Gérez des méthodes de paiement réutilisables (IBAN, PayPal, Espèces...)",
         "actions": {
-          "cancel": "Annuler",
-          "add": "Ajouter",
-          "save": "Enregistrer",
-          "edit": "Modifier",
-          "delete": "Supprimer",
-          "deleting": "Suppression..."
+            "cancel": "Annuler",
+            "add": "Ajouter",
+            "save": "Enregistrer",
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "deleting": "Suppression..."
         },
         "search": {
-          "placeholder": "Rechercher des méthodes de paiement..."
+            "placeholder": "Rechercher des méthodes de paiement..."
         },
         "list": {
-          "add": "Ajouter une méthode de paiement",
-          "empty": "Aucune méthode de paiement pour le moment"
+            "add": "Ajouter une méthode de paiement",
+            "empty": "Aucune méthode de paiement pour le moment"
         },
         "stats": {
-          "total": "Total des méthodes de paiement",
-          "active": "Actives",
-          "inactive": "Inactives"
+            "total": "Total des méthodes de paiement",
+            "active": "Actives",
+            "inactive": "Inactives"
         },
         "fields": {
-          "name": {
-            "label": "Nom",
-            "placeholder": "ex: Virement bancaire (pro)"
-          },
-          "details": {
-            "label": "Détails",
-            "placeholder": "IBAN, email PayPal, ..."
-          },
-          "type": {
-            "label": "Type",
-            "bank_transfer": "Virement bancaire",
-            "paypal": "PayPal",
-            "check": "Chèque",
-            "cash": "Espèces",
-            "other": "Autre"
-          },
-          "status": {
-            "label": "Statut"
-          }
-        },
-        "upsert": {
-          "title": {
-            "create": "Ajouter une méthode de paiement",
-            "edit": "Modifier la méthode de paiement"
-          },
-          "form": {
             "name": {
-              "label": "Nom",
-              "placeholder": "ex: Virement bancaire (pro)"
+                "label": "Nom",
+                "placeholder": "ex: Virement bancaire (pro)"
             },
             "details": {
-              "label": "Détails",
-              "placeholder": "IBAN, email PayPal, ..."
+                "label": "Détails",
+                "placeholder": "IBAN, email PayPal, ..."
             },
             "type": {
-              "label": "Type",
-              "options": {
+                "label": "Type",
                 "bank_transfer": "Virement bancaire",
                 "paypal": "PayPal",
                 "check": "Chèque",
                 "cash": "Espèces",
                 "other": "Autre"
-              }
+            },
+            "status": {
+                "label": "Statut"
             }
-          },
-          "messages": {
+        },
+        "upsert": {
+            "title": {
+                "create": "Ajouter une méthode de paiement",
+                "edit": "Modifier la méthode de paiement"
+            },
+            "form": {
+                "name": {
+                    "label": "Nom",
+                    "placeholder": "ex: Virement bancaire (pro)"
+                },
+                "details": {
+                    "label": "Détails",
+                    "placeholder": "IBAN, email PayPal, ..."
+                },
+                "type": {
+                    "label": "Type",
+                    "options": {
+                        "bank_transfer": "Virement bancaire",
+                        "paypal": "PayPal",
+                        "check": "Chèque",
+                        "cash": "Espèces",
+                        "other": "Autre"
+                    },
+                    "bank_transfer": "Virement bancaire",
+                    "paypal": "PayPal",
+                    "check": "Chèque bancaire",
+                    "cash": "Espèces",
+                    "other": "Autre"
+                }
+            },
+            "messages": {
+                "addSuccess": "Méthode de paiement ajoutée",
+                "addError": "Échec de l'ajout de la méthode de paiement",
+                "updateSuccess": "Méthode de paiement mise à jour",
+                "updateError": "Échec de la mise à jour de la méthode de paiement",
+                "deleteSuccess": "Méthode de paiement supprimée",
+                "deleteError": "Échec de la suppression de la méthode de paiement",
+                "nameRequired": "Le nom est obligatoire"
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "add": "Ajouter",
+                "save": "Enregistrer",
+                "edit": "Modifier",
+                "delete": "Supprimer",
+                "deleting": "Suppression..."
+            }
+        },
+        "messages": {
+            "nameRequired": "Le nom est requis",
             "addSuccess": "Méthode de paiement ajoutée",
             "addError": "Échec de l'ajout de la méthode de paiement",
             "updateSuccess": "Méthode de paiement mise à jour",
             "updateError": "Échec de la mise à jour de la méthode de paiement",
             "deleteSuccess": "Méthode de paiement supprimée",
             "deleteError": "Échec de la suppression de la méthode de paiement"
-          }
-        },
-        "messages": {
-          "nameRequired": "Le nom est requis",
-          "addSuccess": "Méthode de paiement ajoutée",
-          "addError": "Échec de l'ajout de la méthode de paiement",
-          "updateSuccess": "Méthode de paiement mise à jour",
-          "updateError": "Échec de la mise à jour de la méthode de paiement",
-          "deleteSuccess": "Méthode de paiement supprimée",
-          "deleteError": "Échec de la suppression de la méthode de paiement"
         },
         "tooltips": {
-          "view": "Voir",
-          "edit": "Modifier",
-          "delete": "Supprimer"
+            "view": "Voir",
+            "edit": "Modifier",
+            "delete": "Supprimer"
         },
         "delete": {
-          "description": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action ne peut pas être annulée."
-        }
-      },
+            "description": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action ne peut pas être annulée."
+        },
+        "empty": "Aucun moyen de paiement disponible pour le moment."
+    },
     "settings": {
         "tabs": {
             "company": "Entreprise",
@@ -1624,5 +1643,6 @@
         "invoiced": "Facturé (TTC)",
         "revenue": "Chiffre d'affaire (HT)",
         "deposits": "Encaissements (facture payée)"
-    }
+    },
+    "noOptions": "Aucune option disponible. Créer un nouveau client."
 }
