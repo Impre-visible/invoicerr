@@ -1,16 +1,17 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { GitBranch, Plus, Trash2 } from "lucide-react"
+import { ExternalLink, GitBranch, Plus, Trash2 } from "lucide-react"
 import { useDelete, useGet, usePost, usePut } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { DynamicFormModal } from "@/components/form-modal"
 import type { FormConfig } from "@/components/form-modal"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import type React from "react"
+import { Switch } from "@/components/ui/switch"
+import { WebhookInstructionsModal } from "@/components/webhook-instructions-modal"
 import { toast } from "sonner"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -40,6 +41,13 @@ export default function PluginsSettings() {
     const [configModalOpen, setConfigModalOpen] = useState(false)
     const [configFormData, setConfigFormData] = useState<{ pluginId: string; formConfig: FormConfig; currentConfig: any } | null>(null)
     const [togglingPluginId, setTogglingPluginId] = useState<string | null>(null)
+    const [webhookInstructionsOpen, setWebhookInstructionsOpen] = useState(false)
+    const [webhookInstructions, setWebhookInstructions] = useState<{
+        pluginName: string;
+        webhookUrl: string;
+        webhookSecret: string;
+        instructions: string[];
+    } | null>(null)
 
     const { data: plugins, mutate } = useGet<Plugin[]>("/api/plugins")
     const { data: inAppPlugins, mutate: mutateInAppPlugins } = useGet<InAppPluginCategories[]>("/api/plugins/in-app")
@@ -48,6 +56,7 @@ export default function PluginsSettings() {
     const { trigger: deletePlugin, loading: deleteLoading } = useDelete("/api/plugins")
     const { trigger: togglePlugin } = usePut(`/api/plugins/in-app/toggle`)
     const { trigger: configurePlugin } = usePost(`/api/plugins/in-app/configure`)
+    const { trigger: validatePlugin } = usePost(`/api/plugins/in-app/validate`)
 
     const handleDeletePlugin = async (uuid: string) => {
         setIsDeleting(uuid)
@@ -75,7 +84,6 @@ export default function PluginsSettings() {
         if (!gitUrl.trim()) return
 
         try {
-            // Remove .git suffix if present
             const cleanUrl = gitUrl.replace(/\.git$/, "")
 
             addPlugin({ gitUrl: cleanUrl })
@@ -105,6 +113,17 @@ export default function PluginsSettings() {
             if (response.success === true) {
                 toast.success(t("settings.plugins.messages.toggleSuccess"))
                 mutateInAppPlugins()
+
+                if (response.webhookUrl && response.instructions) {
+                    const plugin = inAppPlugins?.flatMap(cat => cat.plugins).find(p => p.id === pluginId)
+                    setWebhookInstructions({
+                        pluginName: plugin?.name || 'Plugin',
+                        webhookUrl: response.webhookUrl,
+                        webhookSecret: 'Click "Validate Plugin" to generate secure secret',
+                        instructions: response.instructions
+                    })
+                    setWebhookInstructionsOpen(true)
+                }
             } else if (response.requiresConfiguration) {
                 setConfigFormData({
                     pluginId,
@@ -133,12 +152,49 @@ export default function PluginsSettings() {
                 setConfigModalOpen(false)
                 setConfigFormData(null)
                 mutateInAppPlugins()
+
+                if (response.webhookUrl && response.instructions) {
+                    const plugin = inAppPlugins?.flatMap(cat => cat.plugins).find(p => p.id === configFormData.pluginId)
+                    setWebhookInstructions({
+                        pluginName: plugin?.name || 'Plugin',
+                        webhookUrl: response.webhookUrl,
+                        webhookSecret: 'Click "Validate Plugin" to generate secure secret',
+                        instructions: response.instructions
+                    })
+                    setWebhookInstructionsOpen(true)
+                }
             }
         } catch (error: any) {
             toast.error(error?.message || t("settings.plugins.messages.configureError"))
         }
-    }    
-    
+    }
+
+    const handleValidatePlugin = async (pluginId: string) => {
+        try {
+            const response = await validatePlugin({ pluginId })
+
+            if (!response) throw new Error("Failed to validate plugin")
+
+            if (response.success === true) {
+                toast.success("Plugin validated and webhook configured successfully!")
+                mutateInAppPlugins()
+
+                if (response.webhookUrl && response.webhookSecret && response.instructions) {
+                    const plugin = inAppPlugins?.flatMap(cat => cat.plugins).find(p => p.id === pluginId)
+                    setWebhookInstructions({
+                        pluginName: plugin?.name || 'Plugin',
+                        webhookUrl: response.webhookUrl,
+                        webhookSecret: response.webhookSecret,
+                        instructions: response.instructions
+                    })
+                    setWebhookInstructionsOpen(true)
+                }
+            }
+        } catch (error: any) {
+            toast.error(error?.message || "Failed to validate plugin")
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div>
@@ -165,11 +221,24 @@ export default function PluginsSettings() {
                                             <div>
                                                 <p className="font-medium">{plugin.name}</p>
                                             </div>
-                                            <Switch
-                                                checked={plugin.isActive}
-                                                onCheckedChange={() => handleToggleInAppPlugin(plugin.id)}
-                                                disabled={togglingPluginId === plugin.id}
-                                            />
+                                            <div className="flex items-center gap-2">
+                                                {plugin.isActive && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleValidatePlugin(plugin.id)}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <ExternalLink className="h-4 w-4" />
+                                                        Webhook
+                                                    </Button>
+                                                )}
+                                                <Switch
+                                                    checked={plugin.isActive}
+                                                    onCheckedChange={() => handleToggleInAppPlugin(plugin.id)}
+                                                    disabled={togglingPluginId === plugin.id}
+                                                />
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -190,6 +259,15 @@ export default function PluginsSettings() {
                     setConfigFormData(null)
                 }}
                 onSubmit={(formData) => handleConfigurePlugin(formData)}
+            />
+
+            <WebhookInstructionsModal
+                open={webhookInstructionsOpen}
+                onOpenChange={setWebhookInstructionsOpen}
+                pluginName={webhookInstructions?.pluginName || ""}
+                webhookUrl={webhookInstructions?.webhookUrl || ""}
+                webhookSecret={webhookInstructions?.webhookSecret || ""}
+                instructions={webhookInstructions?.instructions || []}
             />
 
             <Card>
