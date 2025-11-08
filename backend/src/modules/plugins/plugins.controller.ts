@@ -62,6 +62,25 @@ export class PluginsController {
     return this.pluginsService.configureInAppPlugin(body.pluginId, body.config);
   }
 
+  @Post('in-app/validate')
+  async validatePlugin(@Body() body: { pluginId: string }) {
+    try {
+      const validation = await this.pluginsService.pluginValidation(body.pluginId);
+      return {
+        success: true,
+        message: 'Plugin validated and webhook configured successfully',
+        webhookUrl: validation.webhookUrl,
+        webhookSecret: validation.webhookSecret,
+        instructions: validation.instructions
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Plugin validation failed'
+      };
+    }
+  }
+
   @Get('provider/:type')
   async getProvider(@Param('type') type: string) {
     const provider = await this.pluginsService.getProvider(type);
