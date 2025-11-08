@@ -1,13 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, QuoteStatus } from "@prisma/client";
 
-export async function markInvoiceAsPaid(invoiceId: string) {
+export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
     const prisma = new PrismaClient();
 
-    await prisma.invoice.update({
-        where: { id: invoiceId },
+    await prisma.quote.update({
+        where: { id: quoteId },
         data: {
-            status: 'PAID',
-            paidAt: new Date(),
+            status: status
         }
     });
 
