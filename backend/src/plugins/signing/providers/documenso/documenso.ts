@@ -214,8 +214,8 @@ export const DocumensoProvider: ISigningProvider = {
         try {
             document = await client.documents.get({ documentId });
         } catch (error) {
-            logger.error(`Error fetching document ${documentId}:`, error);
-            throw new NotFoundException(`Document with ID ${documentId} not found`);
+            // We can't fetch, because the document was deleted
+            return;
         }
 
         const quote = await prisma.quote.findFirst({
