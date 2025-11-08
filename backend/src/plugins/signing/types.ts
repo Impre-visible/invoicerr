@@ -1,4 +1,6 @@
-import { IPlugin } from "../types";
+import { IPlugin, IValidatableProvider, IWebhookProvider } from "../types";
+
+import { Request } from 'express';
 
 export interface RequestSignatureProps {
   id: string;
@@ -7,9 +9,10 @@ export interface RequestSignatureProps {
   signers: string[];
 }
 
-export interface ISigningProvider extends IPlugin {
+export interface ISigningProvider extends IPlugin, IValidatableProvider, IWebhookProvider {
+  formatServerUrl: (url: string) => string;
   requestSignature: (doc: RequestSignatureProps) => Promise<{ providerId: string, url: string }>;
-  handleWebhook: (req: any) => Promise<void>;
+  handleWebhook: (req: Request, body: any) => Promise<any>;
 }
 
 export interface IPluginForm {

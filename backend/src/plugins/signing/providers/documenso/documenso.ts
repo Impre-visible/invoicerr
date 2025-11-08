@@ -1,31 +1,62 @@
 import { DocumentCreateDocumentTemporaryRecipientRequest, DocumentCreateDocumentTemporaryResponse } from "@documenso/sdk-typescript/models/operations/documentcreatedocumenttemporary";
+import { DocumentGetResponse, DocumentGetStatus } from "@documenso/sdk-typescript/models/operations/documentget";
 import { ISigningProvider, RequestSignatureProps } from "../../types";
+import { Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { SigningPluginConfig, getProviderConfig } from "@/utils/plugins";
 import { countPdfPages, uploadQuoteFileToUrl } from "../../utils";
 
 import { Documenso } from "@documenso/sdk-typescript";
-import { Logger } from "@nestjs/common";
+import { QuoteStatus } from "@prisma/client";
 import { QuotesService } from "@/modules/quotes/quotes.service";
-import { markInvoiceAsPaid } from "@/utils/plugins/signing";
+import { Request } from 'express';
+import { markQuoteAs } from "@/utils/plugins/signing";
 import prisma from "@/prisma/prisma.service";
+import { verifyWebhookSecret } from "@/utils/webhook-security";
 
 const logger = new Logger('DocumensoProvider');
+
+interface DocumensoRecipient {
+    email: string;
+    name: string;
+    role: "SIGNER" | "APPROVER" | "CC";
+    readStatus: "NOT_OPENED" | "OPENED";
+    signingStatus: "NOT_SIGNED" | "SIGNED" | "REJECTED";
+    sendStatus: "NOT_SENT" | "SENT";
+}
+interface DocumensoWebhookPayload {
+    id: number;
+    externalId: string;
+    status: DocumentGetStatus;
+    completedAt: string | null;
+    recipients: DocumensoRecipient[];
+}
+
+interface DocumensoWebhookBody {
+    event: "DOCUMENT_SENT" | "DOCUMENT_SIGNED" | "DOCUMENT_COMPLETED" | "DOCUMENT_REJECTED" | "DOCUMENT_PENDING";
+    payload: DocumensoWebhookPayload;
+}
 
 export const DocumensoProvider: ISigningProvider = {
     id: "documenso",
     name: "Documenso",
 
+    formatServerUrl: (url: string) => {
+        if (url.endsWith("/")) {
+            url = url.slice(0, -1);
+        }
+
+        if (!url.includes("/api")) {
+            url += "/api/v2-beta";
+        }
+
+        return url;
+    },
+
     requestSignature: async (props: RequestSignatureProps) => {
         const quotesService = new QuotesService()
         let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
-        if (baseUrl.endsWith("/")) {
-            baseUrl.slice(0, -1);
-        }
-
-        if (!baseUrl.includes("/api")) {
-            baseUrl += "/api/v2-beta";
-        }
+        baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
 
         const client = new Documenso({
             apiKey,
@@ -131,13 +162,93 @@ export const DocumensoProvider: ISigningProvider = {
     },
 
 
-    handleWebhook: async (req) => {
-        const payload = req.body;
+    handleWebhook: async (req: Request, body: DocumensoWebhookBody) => {
 
-        logger.log("Documenso Webhook Payload:", JSON.stringify(payload, null, 2));
+        let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
-        if (payload.event_type === "form.completed" && payload.data?.id) {
-            await markInvoiceAsPaid(payload.data.id);
+        baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
+
+        const client = new Documenso({
+            apiKey,
+            serverURL: baseUrl,
+        });
+
+        const plugin = await prisma.plugin.findFirst({
+            where: {
+                id: "documenso",
+                isActive: true,
+                webhookUrl: {
+                    not: null
+                }
+            }
+        });
+
+        if (!plugin) {
+            throw new NotFoundException(`Plugin not found`);
         }
-    },
+
+        if (req.headers['x-documenso-secret']) {
+            const providedSecret = req.headers['x-documenso-secret'] as string;
+
+            if (!providedSecret) {
+                throw new UnauthorizedException('Webhook secret is required but not provided');
+            }
+
+            if (!verifyWebhookSecret(providedSecret, plugin.webhookSecretHash || '')) {
+                logger.warn(`Invalid webhook secret for plugin ${plugin.name}`);
+                throw new UnauthorizedException('Invalid webhook secret');
+            }
+
+            logger.log(`Webhook secret verified for plugin ${plugin.name}`);
+        } else {
+            logger.warn(`No webhook secret provided for plugin ${plugin.name}`);
+            throw new UnauthorizedException('Webhook secret is required');
+        }
+
+        logger.log('Received Documenso webhook:', body);
+
+
+        const documentId = body.payload.id;
+
+        logger.log(`Received webhook for document: ${documentId}`);
+
+        let document: DocumentGetResponse;
+
+        try {
+            document = await client.documents.get({ documentId });
+        } catch (error) {
+            logger.error(`Error fetching document ${documentId}:`, error);
+            throw new NotFoundException(`Document with ID ${documentId} not found`);
+        }
+
+        const quote = await prisma.quote.findFirst({
+            where: {
+                id: document.externalId || '',
+            }
+        });
+
+
+
+
+        switch (body.payload.status) {
+            case DocumentGetStatus.Draft:
+                logger.log(`Document draft: ${document.externalId}`);
+                await markQuoteAs(quote?.id || '', QuoteStatus.DRAFT);
+                break;
+            case DocumentGetStatus.Pending:
+                logger.log(`Document pending: ${document.externalId}`);
+                await markQuoteAs(quote?.id || '', QuoteStatus.SENT);
+                break;
+            case DocumentGetStatus.Completed:
+                logger.log(`Document completed: ${document.externalId}`);
+                await markQuoteAs(quote?.id || '', QuoteStatus.SIGNED);
+                break;
+            case DocumentGetStatus.Rejected:
+                logger.log(`Document rejected: ${document.externalId}`);
+                await markQuoteAs(quote?.id || '', QuoteStatus.REJECTED);
+                break;
+        }
+
+        return { message: 'Webhook processed successfully' };
+    }
 };
