@@ -65,7 +65,7 @@ export class PluginsService {
 
   async loadExistingPlugins(): Promise<void> {
     for (const pluginDir of PLUGIN_DIRS) {
-      console.log(`Loading plugins from directory: ${pluginDir}`);
+      this.logger.log(`Loading plugins from directory: ${pluginDir}`);
       if (!existsSync(pluginDir)) {
         this.logger.warn(`Plugin directory "${pluginDir}" does not exist.`);
         return;

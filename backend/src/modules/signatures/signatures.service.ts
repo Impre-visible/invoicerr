@@ -1,8 +1,9 @@
-import { MailService } from '@/mail/mail.service';
-import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PluginsService } from '../plugins/plugins.service';
+
 import { ISigningProvider } from '@/plugins/signing/types';
+import { MailService } from '@/mail/mail.service';
+import { PluginsService } from '../plugins/plugins.service';
+import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class SignaturesService {
