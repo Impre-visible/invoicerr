@@ -35,6 +35,8 @@ Invoicerr is a simple, open-source invoicing application designed to help freela
 
 Invoicerr uses weblate to easily manage the translations
 
+[![Translation status](https://hosted.weblate.org/widget/invoicerr/horizontal-auto.svg)](https://hosted.weblate.org/engage/invoicerr/)
+
 [![Translation status](https://hosted.weblate.org/widget/invoicerr/open-graph.png)](https://hosted.weblate.org/engage/invoicerr/)
 
 ---
