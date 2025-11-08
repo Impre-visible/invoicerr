@@ -1197,7 +1197,12 @@
                 "toggleSuccess": "Plugin alternado correctamente",
                 "toggleError": "No se pudo alternar el plugin",
                 "configureSuccess": "Plugin configurado correctamente",
-                "configureError": "No se pudo configurar el plugin"
+                "configureError": "No se pudo configurar el plugin",
+                "validateSuccess": "¡Plugin validado y webhook configurado correctamente!",
+                "validateError": "No se pudo validar el plugin"
+            },
+            "webhook": {
+                "secretPlaceholder": "Valide esta ventana emergente para generar un secreto seguro"
             }
         },
         "pdfTemplates": {

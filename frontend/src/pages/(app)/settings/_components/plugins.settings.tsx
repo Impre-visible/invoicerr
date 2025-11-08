@@ -119,7 +119,7 @@ export default function PluginsSettings() {
                     setWebhookInstructions({
                         pluginName: plugin?.name || 'Plugin',
                         webhookUrl: response.webhookUrl,
-                        webhookSecret: 'Click "Validate Plugin" to generate secure secret',
+                        webhookSecret: t("settings.plugins.webhook.secretPlaceholder"),
                         instructions: response.instructions
                     })
                     setWebhookInstructionsOpen(true)
@@ -158,7 +158,7 @@ export default function PluginsSettings() {
                     setWebhookInstructions({
                         pluginName: plugin?.name || 'Plugin',
                         webhookUrl: response.webhookUrl,
-                        webhookSecret: 'Click "Validate Plugin" to generate secure secret',
+                        webhookSecret: t("settings.plugins.webhook.secretPlaceholder"),
                         instructions: response.instructions
                     })
                     setWebhookInstructionsOpen(true)
@@ -176,7 +176,7 @@ export default function PluginsSettings() {
             if (!response) throw new Error("Failed to validate plugin")
 
             if (response.success === true) {
-                toast.success("Plugin validated and webhook configured successfully!")
+                toast.success(t("settings.plugins.messages.validateSuccess"))
                 mutateInAppPlugins()
 
                 if (response.webhookUrl && response.webhookSecret && response.instructions) {
@@ -191,7 +191,7 @@ export default function PluginsSettings() {
                 }
             }
         } catch (error: any) {
-            toast.error(error?.message || "Failed to validate plugin")
+            toast.error(error?.message || t("settings.plugins.messages.validateError"))
         }
     }
 

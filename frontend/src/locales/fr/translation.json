@@ -1197,7 +1197,12 @@
                 "toggleSuccess": "Plugin basculé avec succès",
                 "toggleError": "Erreur lors du basculement du plugin",
                 "configureSuccess": "Plugin configuré avec succès",
-                "configureError": "Erreur lors de la configuration du plugin"
+                "configureError": "Erreur lors de la configuration du plugin",
+                "validateSuccess": "Plugin validé et webhook configuré avec succès !",
+                "validateError": "Erreur lors de la validation du plugin"
+            },
+            "webhook": {
+                "secretPlaceholder": "Validez cette popup pour générer un secret sécurisé"
             }
         },
         "pdfTemplates": {
