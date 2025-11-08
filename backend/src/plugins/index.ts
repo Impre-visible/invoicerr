@@ -3,11 +3,13 @@ import { existsSync, readFileSync } from 'fs';
 // Import all providers manually
 import { DocumensoProvider } from './signing/providers/documenso/documenso';
 import { IPluginForm } from './signing/types';
+import { Logger } from '@nestjs/common';
 import { PluginType } from '@prisma/client';
 import { join } from 'path';
 import prisma from '@/prisma/prisma.service';
 
 export class PluginRegistry {
+    private readonly logger: Logger = new Logger(PluginRegistry.name);
     private static instance: PluginRegistry;
     private readonly inAppPluginTypes = new Map<string, Map<string, any>>();
     private readonly providersMap = new Map<string, any>(); // Store actual provider instances
@@ -53,8 +55,25 @@ export class PluginRegistry {
     }
 
     private initializeInAppPlugins() {
+        this.removeRemovedProviders();
         // Register signing providers
         this.registerProvider('signing', DocumensoProvider);
+    }
+
+    private removeRemovedProviders() {
+        prisma.plugin.findMany().then(plugins => {
+            plugins.forEach(plugin => {
+                if (!this.providersMap.has(plugin.id)) {
+                    prisma.plugin.delete({ where: { id: plugin.id } })
+                        .then(() => {
+                            this.logger.log(`Removed plugin "${plugin.id}" from database as it is no longer registered.`);
+                        })
+                        .catch(err => {
+                            this.logger.error(`Error removing plugin "${plugin.id}":`, err);
+                        });
+                }
+            });
+        });
     }
 
     private registerProvider(type: string, provider: any) {
@@ -66,7 +85,7 @@ export class PluginRegistry {
             const form = provider.form || {};
             this.inAppPluginTypes.get(type)!.set(provider.id, form);
             this.providersMap.set(provider.id, provider);
-            console.log(`Registered ${type} provider: ${provider.id}`);
+            this.logger.log(`Registered ${type} provider: ${provider.id}`);
         }
     }
 
@@ -93,9 +112,9 @@ export class PluginRegistry {
                             isActive: false
                         }
                     });
-                    console.log(`Synced ${type} provider "${providerId}" to database`);
+                    this.logger.log(`Synced ${type} provider "${providerId}" to database`);
                 } else {
-                    console.log(`Plugin "${providerId}" already exists in database`);
+                    this.logger.log(`Plugin "${providerId}" already exists in database`);
                 }
             }
         }
@@ -147,7 +166,7 @@ export class PluginRegistry {
             }
         }
         if (!path || !existsSync(path)) {
-            await prisma.plugin.delete({where: {id: plugin_id}});
+            await prisma.plugin.delete({ where: { id: plugin_id } });
             throw new Error(`Form for plugin ID "${plugin_id}" not found.`);
         }
 
