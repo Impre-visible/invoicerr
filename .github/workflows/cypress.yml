@@ -53,7 +53,10 @@ jobs:
           npm ci
 
       - name: Wait for DB
-        run: npx wait-on tcp:5433 --timeout 60
+        run: |
+          npx wait-on tcp:5433 --timeout 60
+          npx wait-on tcp:8025 --timeout 60
+          npx wait-on tcp:1025 --timeout 60
 
       - name: Run backend, frontend & tests
         run: |
