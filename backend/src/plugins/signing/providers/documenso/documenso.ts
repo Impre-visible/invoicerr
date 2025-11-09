@@ -254,7 +254,7 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
         const document = (await client.documents.find({})).data.find(doc => doc.externalId === quoteId);
 
         if (!document || !document.id) {
-            console.error('Document not found for quote ID:', quoteId);
+            logger.error('Document not found for quote ID:', quoteId);
             throw new NotFoundException('Document not found for the given quote ID');
         }
 

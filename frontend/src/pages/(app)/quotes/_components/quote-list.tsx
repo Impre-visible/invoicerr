@@ -5,7 +5,6 @@ import { useGetRaw, usePost } from "@/lib/utils"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "../../../../components/ui/button"
-import Loading from "@/pages/_loading/loading"
 import type { Quote } from "@/types"
 import { QuoteDeleteDialog } from "@/pages/(app)/quotes/_components/quote-delete"
 import { QuotePdfModal } from "@/pages/(app)/quotes/_components/quote-pdf-view"
