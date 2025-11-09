@@ -579,13 +579,13 @@ enum PluginType {
 }
 
 model Plugin {
-  id                String     @id @default(cuid())
-  name              String
-  type              PluginType
-  config            Json?      @default("{}")
-  isActive          Boolean    @default(true)
-  webhookUrl        String? // URL du webhook généré dynamiquement pour ce plugin
-  webhookSecretHash String? // Hash du secret webhook pour la sécurité
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  id            String     @id @default(cuid())
+  name          String
+  type          PluginType
+  config        Json?      @default("{}")
+  isActive      Boolean    @default(true)
+  webhookUrl    String?
+  webhookSecret String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
