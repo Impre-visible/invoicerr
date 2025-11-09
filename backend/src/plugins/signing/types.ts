@@ -11,7 +11,7 @@ export interface RequestSignatureProps {
 
 export interface ISigningProvider extends IPlugin, IValidatableProvider, IWebhookProvider {
   formatServerUrl: (url: string) => string;
-  requestSignature: (doc: RequestSignatureProps) => Promise<{ providerId: string, url: string }>;
+  requestSignature: (doc: RequestSignatureProps) => Promise<string>;
   handleWebhook: (req: Request, body: any) => Promise<any>;
 }
 

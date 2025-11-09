@@ -47,7 +47,7 @@ export class SignaturesService {
         }
 
 
-        await this.sendSignatureEmail(quote.id);
+        const signatureId = await this.sendSignatureEmail(quote.id);
 
         await prisma.quote.update({
             where: { id: quoteId },
@@ -56,7 +56,7 @@ export class SignaturesService {
             },
         });
 
-        return { message: 'Signature successfully created and email sent.' };
+        return { message: 'Signature successfully created and email sent.', signature: { id: signatureId } };
     }
 
     async generateOTPCode(signatureId: string) {
@@ -96,7 +96,7 @@ export class SignaturesService {
         return { message: 'OTP code generated successfully.' };
     }
 
-    private async sendSignatureEmailWithProvider(provider: ISigningProvider, quoteId: string) {
+    private async sendSignatureEmailWithProvider(provider: ISigningProvider, quoteId: string): Promise<string> {
         if (provider && typeof provider.requestSignature == 'function') {
             return provider.requestSignature({
                 id: quoteId,
@@ -105,10 +105,10 @@ export class SignaturesService {
                 signers: ['<SIGNER_EMAIL>']
             });
         }
-        return { message: 'Signature email sent via provider.' };
+        return '';
     }
 
-    async sendSignatureEmail(quoteId: string) {
+    async sendSignatureEmail(quoteId: string): Promise<string> {
         const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
         if (provider && typeof provider.requestSignature == 'function') {
             return this.sendSignatureEmailWithProvider(provider, quoteId);
@@ -173,7 +173,7 @@ export class SignaturesService {
             throw new BadRequestException('Failed to send signature email. Please check your SMTP configuration.');
         }
 
-        return { message: 'Signature email sent successfully.' };
+        return signature.id;
     }
 
     async sendOtpToUser(email: string, otpCode: string) {

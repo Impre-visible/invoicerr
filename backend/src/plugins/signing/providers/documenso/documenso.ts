@@ -52,7 +52,7 @@ export const DocumensoProvider: ISigningProvider = {
         return url;
     },
 
-    requestSignature: async (props: RequestSignatureProps) => {
+    requestSignature: async (props: RequestSignatureProps): Promise<string> => {
         const quotesService = new QuotesService()
         let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
@@ -156,7 +156,7 @@ export const DocumensoProvider: ISigningProvider = {
             documentId: document.id,
         });
 
-        return { providerId: "documenso", document: document, url: response.uploadUrl };
+        return `documenso-${document.id}`;
     },
 
 
