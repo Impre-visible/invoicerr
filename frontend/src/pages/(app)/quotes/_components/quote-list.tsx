@@ -5,12 +5,14 @@ import { useGetRaw, usePost } from "@/lib/utils"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "../../../../components/ui/button"
+import Loading from "@/pages/_loading/loading"
 import type { Quote } from "@/types"
 import { QuoteDeleteDialog } from "@/pages/(app)/quotes/_components/quote-delete"
 import { QuotePdfModal } from "@/pages/(app)/quotes/_components/quote-pdf-view"
 import { QuoteUpsert } from "@/pages/(app)/quotes/_components/quote-upsert"
 import { QuoteViewDialog } from "@/pages/(app)/quotes/_components/quote-view"
 import type React from "react"
+import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
@@ -37,12 +39,13 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
         ref,
     ) => {
         const { t } = useTranslation()
-        const { trigger: triggerSendForSignature } = usePost<{ message: string; signature: { id: string } }>(
+        const { trigger: triggerSendForSignature, loading: signatureLoading } = usePost<{ message: string; signature: { id: string } }>(
             `/api/signatures`,
         )
         const { trigger: triggerCreateInvoice } = usePost(`/api/invoices/create-from-quote`)
 
         const [createQuoteDialog, setCreateQuoteDialog] = useState<boolean>(false)
+        const [quoteIdForSignature, setQuoteIdForSignature] = useState<string | null>(null)
         const [editQuoteDialog, setEditQuoteDialog] = useState<Quote | null>(null)
         const [viewQuoteDialog, setViewQuoteDialog] = useState<Quote | null>(null)
         const [viewQuotePdfDialog, setViewQuotePdfDialog] = useState<Quote | null>(null)
@@ -99,8 +102,10 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
         }
 
         function handleSendForSignature(quoteId: string) {
+            setQuoteIdForSignature(quoteId)
             triggerSendForSignature({ quoteId: quoteId })
                 .then((data) => {
+                    setQuoteIdForSignature(null)
                     if (!data || !data.signature) {
                         toast.error(t("quotes.list.messages.sendSignatureError"))
                         return
@@ -195,7 +200,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.client")}:</span>{" "}
-                                                                {quote.client.name||quote.client.contactFirstname+" "+quote.client.contactLastname}
+                                                                {quote.client.name || quote.client.contactFirstname + " " + quote.client.contactLastname}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("quotes.list.item.issued")}:</span>{" "}
@@ -280,10 +285,11 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         }
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => handleSendForSignature(quote.id)}
+                                                        onClick={() => (!signatureLoading || quoteIdForSignature !== quote.id) && handleSendForSignature(quote.id)}
                                                         className="text-gray-600 hover:text-blue-600"
+                                                        disabled={signatureLoading && quoteIdForSignature === quote.id}
                                                     >
-                                                        <Signature className="h-4 w-4" />
+                                                        {(signatureLoading && quoteIdForSignature === quote.id) ? <Spinner className="h-4 w-4" /> : <Signature className="h-4 w-4" />}
                                                     </Button>
                                                 )}
 
