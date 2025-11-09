@@ -1,13 +1,13 @@
-import { Banknote, Trash2, Edit, Plus, Eye } from "lucide-react"
+import { Banknote, Edit, Eye, Plus, Trash2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { forwardRef, useImperativeHandle, useState } from "react"
-import { useTranslation } from "react-i18next"
-import type React from "react"
 
+import { Button } from "@/components/ui/button"
+import { PaymentMethodDeleteDialog } from "./payment-method-delete"
 import { PaymentMethodUpsert } from "./payment-method-upsert"
 import { PaymentMethodViewDialog } from "./payment-method-view"
-import { PaymentMethodDeleteDialog } from "./payment-method-delete"
+import type React from "react"
+import { useTranslation } from "react-i18next"
 
 interface PaymentMethod {
   id: string
@@ -25,7 +25,7 @@ interface PaymentMethodsListProps {
   page?: number
   pageCount?: number
   setPage?: (page: number) => void
-  mutate: () => void
+  mutate?: () => void
   emptyState: React.ReactNode
   showCreateButton?: boolean
 }
@@ -99,9 +99,8 @@ export const PaymentMethodsList = forwardRef<PaymentMethodsListHandle, PaymentMe
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="font-medium text-foreground break-words">{pm.name}</h3>
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                pm.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                              } w-fit`}
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${pm.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                                } w-fit`}
                             >
                               {pm.isActive ? t("clients.stats.active") || "Active" : t("clients.stats.inactive") || "Inactive"}
                             </span>
@@ -144,7 +143,7 @@ export const PaymentMethodsList = forwardRef<PaymentMethodsListHandle, PaymentMe
           open={createDialog}
           onOpenChange={(open: boolean) => {
             setCreateDialog(open)
-            if (!open) mutate()
+            if (!open) mutate && mutate()
           }}
         />
 
@@ -153,7 +152,7 @@ export const PaymentMethodsList = forwardRef<PaymentMethodsListHandle, PaymentMe
           paymentMethod={editDialog}
           onOpenChange={(open: boolean) => {
             if (!open) setEditDialog(null)
-            mutate()
+            mutate && mutate()
           }}
         />
 
@@ -163,7 +162,7 @@ export const PaymentMethodsList = forwardRef<PaymentMethodsListHandle, PaymentMe
           paymentMethod={deleteDialog}
           onOpenChange={(open: boolean) => {
             if (!open) setDeleteDialog(null)
-            mutate()
+            mutate && mutate()
           }}
         />
       </>

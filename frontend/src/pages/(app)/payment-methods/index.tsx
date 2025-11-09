@@ -2,7 +2,7 @@ import { Banknote, Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PaymentMethodsList, type PaymentMethodsListHandle } from "@/pages/(app)/payment-methods/_components/payment-method-list"
 import { useRef, useState } from "react"
-import { useGet } from "@/hooks/use-fetch"
+import { useSse } from "@/hooks/use-fetch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useTranslation } from "react-i18next"
@@ -12,7 +12,7 @@ export default function PaymentMethodsPage() {
   const { t } = useTranslation()
   const pmListRef = useRef<PaymentMethodsListHandle>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const { data: paymentMethods = [], mutate, loading } = useGet<any[]>("/api/payment-methods")
+  const { data: paymentMethods = [] } = useSse<any[]>("/api/payment-methods/sse")
 
   const filtered = (paymentMethods || []).filter((pm) =>
     (pm.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,10 +80,9 @@ export default function PaymentMethodsPage() {
       <PaymentMethodsList
         ref={pmListRef}
         paymentMethods={filtered}
-        loading={loading}
+        loading={false}
         title={t("paymentMethods.title")}
         description={t("paymentMethods.description")}
-        mutate={() => mutate?.()}
         emptyState={emptyState}
         showCreateButton={true}
       />
