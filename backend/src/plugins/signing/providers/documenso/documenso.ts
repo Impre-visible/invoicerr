@@ -6,6 +6,7 @@ import { SigningPluginConfig, getProviderConfig } from "@/utils/plugins";
 import { countPdfPages, uploadQuoteFileToUrl } from "../../utils";
 
 import { Documenso } from "@documenso/sdk-typescript";
+import { DocumentDownloadResponse } from "@documenso/sdk-typescript/models/operations";
 import { QuoteStatus } from "@prisma/client";
 import { QuotesService } from "@/modules/quotes/quotes.service";
 import { Request } from 'express';
@@ -35,7 +36,7 @@ interface DocumensoWebhookBody {
     payload: DocumensoWebhookPayload;
 }
 
-export const DocumensoProvider: ISigningProvider = {
+export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Documenso> } = {
     id: "documenso",
     name: "Documenso",
 
@@ -51,8 +52,7 @@ export const DocumensoProvider: ISigningProvider = {
         return url;
     },
 
-    requestSignature: async (props: RequestSignatureProps): Promise<string> => {
-        const quotesService = new QuotesService()
+    getClient: async (): Promise<Documenso> => {
         let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
         baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
@@ -61,6 +61,12 @@ export const DocumensoProvider: ISigningProvider = {
             apiKey,
             serverURL: baseUrl,
         });
+        return client;
+    },
+
+    requestSignature: async (props: RequestSignatureProps): Promise<string> => {
+        const client = await DocumensoProvider.getClient();
+        const quotesService = new QuotesService();
 
         const quote = await prisma.quote.findUnique({
             where: { id: props.id },
@@ -158,16 +164,8 @@ export const DocumensoProvider: ISigningProvider = {
         return `documenso-${document.id}`;
     },
 
-
     handleWebhook: async (req: Request, body: DocumensoWebhookBody) => {
-        let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
-
-        baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
-
-        const client = new Documenso({
-            apiKey,
-            serverURL: baseUrl,
-        });
+        const client = await DocumensoProvider.getClient();
 
         const plugin = await prisma.plugin.findFirst({
             where: {
@@ -248,5 +246,39 @@ export const DocumensoProvider: ISigningProvider = {
         }
 
         return { message: 'Webhook processed successfully' };
+    },
+
+    generatePdfPreview: async (quoteId: string): Promise<Uint8Array<ArrayBufferLike>> => {
+        const client = await DocumensoProvider.getClient();
+
+        const document = (await client.documents.find({})).data.find(doc => doc.externalId === quoteId);
+
+        if (!document || !document.id) {
+            console.error('Document not found for quote ID:', quoteId);
+            throw new NotFoundException('Document not found for the given quote ID');
+        }
+
+
+        logger.log(`Generating PDF preview for document ID: ${document.id}`);
+        let pdf: DocumentDownloadResponse;
+
+        try {
+            pdf = await client.document.documentDownload({
+                documentId: document.id,
+            });
+        } catch (error) {
+            logger.error(`Error fetching document download info:`, error);
+            throw error;
+        }
+
+        const pdfResponse = await fetch(pdf.downloadUrl);
+        if (!pdfResponse.ok) {
+            throw new Error(`Failed to download PDF: ${pdfResponse.statusText}`);
+        }
+
+        const arrayBuffer = await pdfResponse.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        return uint8Array;
     }
 };

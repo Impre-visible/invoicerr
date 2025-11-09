@@ -29,3 +29,15 @@ export interface IWebhookProvider {
    */
   handleWebhook(req: Request, body: any): Promise<any>;
 }
+
+/**
+ * Interface for providers that support pdf preview
+ */
+export interface IPdfPreviewProvider {
+  /**
+   * Generates a preview for a PDF document
+   * @param req The Express Request object
+   * @param document The PDF document to preview
+   */
+  generatePdfPreview(quoteId: string): Promise<Uint8Array<ArrayBufferLike>>;
+} 
