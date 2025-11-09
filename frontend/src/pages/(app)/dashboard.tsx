@@ -20,7 +20,7 @@ import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import type React from "react"
 import { useAuth } from "@/contexts/auth"
-import { useGet } from "@/lib/utils"
+import { useGet } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 
 interface DashboardData {

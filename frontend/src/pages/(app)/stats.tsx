@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { useTranslation } from "react-i18next";
-import { useGet } from "@/lib/utils";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect, useMemo, useState } from "react";
+
 import YearPicker from "@/components/year-picker";
+import { useGet } from "@/hooks/use-fetch";
+import { useTranslation } from "react-i18next";
 
 type MonthStat = { month: number; invoiced: number; revenue: number; deposits: number };
 type YearStat = { year: number; invoiced: number; revenue: number; deposits: number };
@@ -24,7 +25,7 @@ export default function StatsPage() {
 
   const monthlyCurrencies = monthlyData?.currencies || [];
   const yearlyCurrencies = yearlyData?.currencies || [];
-  
+
   const [selectedMonthlyCurrency, setSelectedMonthlyCurrency] = useState<string | undefined>(monthlyCurrencies[0]?.currency);
   const [selectedYearlyCurrency, setSelectedYearlyCurrency] = useState<string | undefined>(yearlyCurrencies[0]?.currency);
 

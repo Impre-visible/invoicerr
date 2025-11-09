@@ -16,7 +16,7 @@ import type React from "react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
-import { usePost } from "@/lib/utils"
+import { usePost } from "@/hooks/use-fetch"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 

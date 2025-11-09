@@ -1,18 +1,18 @@
 import {
     Building2,
     ChevronsUpDown,
+    CreditCard,
     FileText,
     LayoutDashboard,
-    TrendingUp,
     LogOut,
     Moon,
     Receipt,
     ReceiptText,
     Settings,
     Sun,
+    TrendingUp,
     User,
     Users,
-    CreditCard,
 } from "lucide-react"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -37,7 +37,7 @@ import type React from "react"
 import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
 import { useEffect } from "react"
-import { useGet } from "@/lib/utils"
+import { useGet } from "@/hooks/use-fetch"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useTheme } from "./theme-provider"
 import { useTranslation } from "react-i18next"

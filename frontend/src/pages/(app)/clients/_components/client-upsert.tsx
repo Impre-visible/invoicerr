@@ -1,13 +1,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { usePatch, usePost } from "@/lib/utils"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { usePatch, usePost } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -201,7 +201,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     )}
                                 />
                             </div>
-    
+
                             <FormField
                                 control={form.control}
                                 name="type"
@@ -227,7 +227,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     </FormItem>
                                 )}
                             />
-    
+
                             {clientType === 'COMPANY' && (
                                 <FormField
                                     control={form.control}

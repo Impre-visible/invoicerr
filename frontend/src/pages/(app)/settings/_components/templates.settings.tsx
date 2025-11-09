@@ -1,7 +1,7 @@
 import { Archive, Forward, Mail, Reply } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useEffect, useState } from "react"
-import { useGet, usePut } from "@/lib/utils"
+import { useGet, usePut } from "@/hooks/use-fetch"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

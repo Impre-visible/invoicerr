@@ -9,7 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import type { Client } from "@/types"
-import { useDelete } from "@/lib/utils"
+import { useDelete } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 
 interface ClientDeleteDialogProps {

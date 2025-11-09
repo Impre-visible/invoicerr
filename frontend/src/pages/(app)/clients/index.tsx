@@ -8,7 +8,7 @@ import { ClientDeleteDialog } from "./_components/client-delete"
 import { ClientUpsert } from "./_components/client-upsert"
 import { ClientViewDialog } from "./_components/client-view"
 import { Input } from "@/components/ui/input"
-import { useGet } from "@/lib/utils"
+import { useGet } from "@/hooks/use-fetch"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -204,12 +204,12 @@ export default function Clients() {
                                                 <div className="mt-2 flex flex-col lg:flex-row flex-wrap gap-2 text-sm text-primary">
                                                     <div className="flex items-center space-x-1">
                                                         <Mail className="h-4 w-4" />
-                                                        <span>{client.contactEmail||"-"}</span>
+                                                        <span>{client.contactEmail || "-"}</span>
                                                     </div>
                                                     {client.contactPhone && (
                                                         <div className="flex items-center space-x-1">
                                                             <Phone className="h-4 w-4" />
-                                                            <span>{client.contactPhone||"-"}</span>
+                                                            <span>{client.contactPhone || "-"}</span>
                                                         </div>
                                                     )}
                                                     {client.city && (

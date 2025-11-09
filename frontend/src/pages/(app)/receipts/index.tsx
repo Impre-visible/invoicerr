@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Receipt as ReceiptIcon, Search } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useGet, useGetRaw } from "@/lib/utils"
+import { useGet, useGetRaw } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

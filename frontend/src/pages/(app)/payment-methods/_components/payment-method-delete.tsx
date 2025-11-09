@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
+import { authenticatedFetch } from "@/hooks/use-fetch";
 import { toast } from "sonner";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { authenticatedFetch } from "@/lib/utils";
 
 interface PaymentMethod {
   id: string;

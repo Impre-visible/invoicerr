@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
 import {
-    EyeClosedIcon, EyeIcon
+    EyeClosedIcon,
+    EyeIcon
 } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import type React from "react"
 import { toast } from "sonner"
 import { useNavigate } from "react-router"
-import { usePost } from "@/lib/utils"
+import { usePost } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
@@ -98,15 +99,15 @@ export default function LoginPage() {
                                     type={showPassword ? "text" : "password"}
                                     disabled={loading}
                                 />
-                                    <Button
+                                <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => setShowPassword((prev) => !prev)}
                                 >
                                     {showPassword ? (
-                                    <EyeClosedIcon className="h-4 w-4" />
+                                        <EyeClosedIcon className="h-4 w-4" />
                                     ) : (
-                                    <EyeIcon className="h-4 w-4" />
+                                        <EyeIcon className="h-4 w-4" />
                                     )}
                                 </Button>
                             </div>

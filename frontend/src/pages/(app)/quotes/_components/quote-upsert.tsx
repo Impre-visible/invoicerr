@@ -1,15 +1,15 @@
 "use client"
 
-import type { Client, Quote, PaymentMethod } from "@/types"
-import { PaymentMethodType } from "@/types"
+import type { Client, PaymentMethod, Quote } from "@/types"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
-import { useGet, usePatch, usePost } from "@/lib/utils"
+import { useGet, usePatch, usePost } from "@/hooks/use-fetch"
 
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,7 @@ import { ClientUpsert } from "../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { PaymentMethodType } from "@/types"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
@@ -214,7 +214,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                         <FormLabel required>{t("quotes.upsert.form.client.label")}</FormLabel>
                                         <FormControl>
                                             <SearchSelect
-                                                options={(clients || []).map((c) => ({ label: c.name||c.contactFirstname+" "+c.contactLastname, value: c.id }))}
+                                                options={(clients || []).map((c) => ({ label: c.name || c.contactFirstname + " " + c.contactLastname, value: c.id }))}
                                                 value={field.value ?? ""}
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setSearchTerm}
@@ -345,18 +345,18 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                            <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
+                                                                        <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
                                                                             <SelectTrigger className="w-32 mb-0" aria-label={t("invoices.upsert.form.items.type.label") as string}>
-                                                                                    <SelectValue />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    <SelectItem value="HOUR">{t("invoices.upsert.form.items.type.hour")}</SelectItem>
-                                                                                    <SelectItem value="DAY">{t("invoices.upsert.form.items.type.day")}</SelectItem>
-                                                                                    <SelectItem value="DEPOSIT">{t("invoices.upsert.form.items.type.deposit")}</SelectItem>
-                                                                                    <SelectItem value="SERVICE">{t("invoices.upsert.form.items.type.service")}</SelectItem>
-                                                                                    <SelectItem value="PRODUCT">{t("invoices.upsert.form.items.type.product")}</SelectItem>
-                                                                                </SelectContent>
-                                                                            </Select>
+                                                                                <SelectValue />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent>
+                                                                                <SelectItem value="HOUR">{t("invoices.upsert.form.items.type.hour")}</SelectItem>
+                                                                                <SelectItem value="DAY">{t("invoices.upsert.form.items.type.day")}</SelectItem>
+                                                                                <SelectItem value="DEPOSIT">{t("invoices.upsert.form.items.type.deposit")}</SelectItem>
+                                                                                <SelectItem value="SERVICE">{t("invoices.upsert.form.items.type.service")}</SelectItem>
+                                                                                <SelectItem value="PRODUCT">{t("invoices.upsert.form.items.type.product")}</SelectItem>
+                                                                            </SelectContent>
+                                                                        </Select>
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>

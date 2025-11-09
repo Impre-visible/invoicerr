@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Download, Edit, Mail, Plus, Receipt as ReceiptIcon, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
-import { useGetRaw, usePost } from "@/lib/utils"
+import { useGetRaw, usePost } from "@/hooks/use-fetch"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "../../../../components/ui/button"

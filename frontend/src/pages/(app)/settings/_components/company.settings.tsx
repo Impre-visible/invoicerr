@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect, useState } from "react"
-import { useGet, usePost } from "@/lib/utils"
+import { useGet, usePost } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import type { Company } from "@/types"

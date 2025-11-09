@@ -5,7 +5,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Upload, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-import { useGet, usePost } from "@/lib/utils"
+import { useGet, usePost } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import Handlebars from "handlebars"
@@ -577,8 +577,8 @@ export default function PDFTemplatesSettings() {
             settings.templateType === "invoice"
                 ? defaultInvoiceTemplate
                 : settings.templateType === "quote"
-                ? defaultQuoteTemplate
-                : defaultReceiptTemplate
+                    ? defaultQuoteTemplate
+                    : defaultReceiptTemplate
         const compiledTemplate = Handlebars.compile(template)
         return compiledTemplate(sampleData)
     }, [settings, sampleData])
