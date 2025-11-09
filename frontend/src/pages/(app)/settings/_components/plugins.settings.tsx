@@ -119,7 +119,7 @@ export default function PluginsSettings() {
                     setWebhookInstructions({
                         pluginName: plugin?.name || 'Plugin',
                         webhookUrl: response.webhookUrl,
-                        webhookSecret: t("settings.plugins.webhook.secretPlaceholder"),
+                        webhookSecret: response.webhookSecret,
                         instructions: response.instructions
                     })
                     setWebhookInstructionsOpen(true)
@@ -158,7 +158,7 @@ export default function PluginsSettings() {
                     setWebhookInstructions({
                         pluginName: plugin?.name || 'Plugin',
                         webhookUrl: response.webhookUrl,
-                        webhookSecret: t("settings.plugins.webhook.secretPlaceholder"),
+                        webhookSecret: response.webhookSecret,
                         instructions: response.instructions
                     })
                     setWebhookInstructionsOpen(true)
@@ -169,14 +169,13 @@ export default function PluginsSettings() {
         }
     }
 
-    const handleValidatePlugin = async (pluginId: string) => {
+    const handlePluginInstructions = async (pluginId: string) => {
         try {
             const response = await validatePlugin({ pluginId })
 
             if (!response) throw new Error("Failed to validate plugin")
 
             if (response.success === true) {
-                toast.success(t("settings.plugins.messages.validateSuccess"))
                 mutateInAppPlugins()
 
                 if (response.webhookUrl && response.webhookSecret && response.instructions) {
@@ -191,7 +190,7 @@ export default function PluginsSettings() {
                 }
             }
         } catch (error: any) {
-            toast.error(error?.message || t("settings.plugins.messages.validateError"))
+            toast.error(error?.message)
         }
     }
 
@@ -226,7 +225,7 @@ export default function PluginsSettings() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => handleValidatePlugin(plugin.id)}
+                                                        onClick={() => handlePluginInstructions(plugin.id)}
                                                         className="flex items-center gap-2"
                                                     >
                                                         <ExternalLink className="h-4 w-4" />

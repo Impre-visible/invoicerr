@@ -1197,9 +1197,7 @@
                 "toggleSuccess": "Plugin toggled successfully",
                 "toggleError": "Failed to toggle plugin",
                 "configureSuccess": "Plugin configured successfully",
-                "configureError": "Failed to configure plugin",
-                "validateSuccess": "Plugin validated and webhook configured successfully!",
-                "validateError": "Failed to validate plugin"
+                "configureError": "Failed to configure plugin"
             },
             "webhook": {
                 "secretPlaceholder": "Validate that popup to generate secure secret"

@@ -1197,9 +1197,7 @@
         "toggleSuccess": "Plugin erfolgreich umgeschaltet",
         "toggleError": "Fehler beim Umschalten des Plugins",
         "configureSuccess": "Plugin erfolgreich konfiguriert",
-        "configureError": "Fehler beim Konfigurieren des Plugins",
-        "validateSuccess": "Plugin validiert und Webhook erfolgreich konfiguriert!",
-        "validateError": "Fehler beim Validieren des Plugins"
+        "configureError": "Fehler beim Konfigurieren des Plugins"
       },
       "webhook": {
         "secretPlaceholder": "Bestätigen Sie dieses Popup, um ein sicheres Geheimnis zu generieren"
