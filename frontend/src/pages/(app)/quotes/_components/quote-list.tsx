@@ -23,7 +23,7 @@ interface QuoteListProps {
     page?: number
     pageCount?: number
     setPage?: (page: number) => void
-    mutate: () => void
+    mutate?: () => void
     emptyState: React.ReactNode
     showCreateButton?: boolean
 }
@@ -111,7 +111,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     }
 
                     toast.success(t("quotes.list.messages.sendSignatureSuccess"))
-                    mutate()
+                    mutate && mutate()
                 })
                 .catch((error) => {
                     console.error("Error sending quote for signature:", error)
@@ -122,7 +122,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
             triggerCreateInvoice({ quoteId })
                 .then(() => {
                     toast.success(t("quotes.list.messages.invoiceCreated"))
-                    mutate()
+                    mutate && mutate()
                 })
                 .catch((error) => {
                     console.error("Error creating invoice from quote:", error)
@@ -336,7 +336,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     open={createQuoteDialog}
                     onOpenChange={(open) => {
                         setCreateQuoteDialog(open)
-                        if (!open) mutate()
+                        if (!open) mutate && mutate()
                     }}
                 />
 
@@ -345,7 +345,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     quote={editQuoteDialog}
                     onOpenChange={(open) => {
                         if (!open) setEditQuoteDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
 
@@ -367,7 +367,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                     quote={deleteQuoteDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setDeleteQuoteDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
             </>

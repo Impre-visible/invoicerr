@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Plus, Search } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useGet, useGetRaw } from "@/hooks/use-fetch"
+import { useGetRaw, useSse } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,7 +14,7 @@ export default function Quotes() {
     const { t } = useTranslation()
     const quoteListRef = useRef<QuoteListHandle>(null)
     const [page, setPage] = useState(1)
-    const { data: quotes, mutate, loading } = useGet<{ pageCount: number; quotes: Quote[] }>(`/api/quotes?page=${page}`)
+    const { data: quotes } = useSse<{ pageCount: number; quotes: Quote[] }>(`/api/quotes/sse?page=${page}`)
     const [downloadQuotePdf, setDownloadQuotePdf] = useState<Quote | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/quotes/${downloadQuotePdf?.id}/pdf`)
 
@@ -154,13 +154,12 @@ export default function Quotes() {
             <QuoteList
                 ref={quoteListRef}
                 quotes={filteredQuotes}
-                loading={loading}
+                loading={false}
                 title={t("quotes.list.title")}
                 description={t("quotes.list.description")}
                 page={page}
                 pageCount={quotes?.pageCount || 1}
                 setPage={setPage}
-                mutate={mutate}
                 emptyState={emptyState}
                 showCreateButton={true}
             />

@@ -10,18 +10,30 @@ import {
   Post,
   Query,
   Res,
+  Sse,
 } from '@nestjs/common';
 
 import { Response } from 'express';
+import { from, interval, map, startWith, switchMap } from 'rxjs';
 
 @Controller('quotes')
 export class QuotesController {
-  constructor(private readonly quotesService: QuotesService) {}
+  constructor(private readonly quotesService: QuotesService) { }
 
   @Get()
   async getQuotesInfo(@Param('page') page: string) {
     return await this.quotesService.getQuotes(page);
   }
+
+  @Sse('sse')
+  async getQuotesInfoSse(@Param('page') page: string) {
+    return interval(1000).pipe(
+      startWith(0),
+      switchMap(() => from(this.quotesService.getQuotes(page))),
+      map((data) => ({ data: JSON.stringify(data) })),
+    );
+  }
+
   @Get('search')
   async searchClients(@Query('query') query: string) {
     return await this.quotesService.searchQuotes(query);
