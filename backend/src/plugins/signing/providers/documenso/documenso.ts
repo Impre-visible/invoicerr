@@ -11,7 +11,6 @@ import { QuotesService } from "@/modules/quotes/quotes.service";
 import { Request } from 'express';
 import { markQuoteAs } from "@/utils/plugins/signing";
 import prisma from "@/prisma/prisma.service";
-import { verifyWebhookSecret } from "@/utils/webhook-security";
 
 const logger = new Logger('DocumensoProvider');
 
@@ -191,7 +190,7 @@ export const DocumensoProvider: ISigningProvider = {
                 throw new UnauthorizedException('Webhook secret is required but not provided');
             }
 
-            if (!verifyWebhookSecret(providedSecret, plugin.webhookSecretHash || '')) {
+            if (providedSecret !== plugin.webhookSecret) {
                 logger.warn(`Invalid webhook secret for plugin ${plugin.name}`);
                 throw new UnauthorizedException('Invalid webhook secret');
             }

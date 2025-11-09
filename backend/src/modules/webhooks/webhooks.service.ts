@@ -4,7 +4,6 @@ import { IWebhookProvider } from '@/plugins/types';
 import { PluginsService } from '../plugins/plugins.service';
 import { Request } from 'express';
 import prisma from '@/prisma/prisma.service';
-import { verifyWebhookSecret } from '@/utils/webhook-security';
 
 @Injectable()
 export class WebhooksService {

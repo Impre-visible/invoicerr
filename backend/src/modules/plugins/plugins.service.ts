@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { existsSync, readdirSync, rmSync, statSync } from 'fs';
 import { extname, join } from 'path';
-import { generateWebhookSecret, hashWebhookSecret } from '@/utils/webhook-security';
 
 import { EInvoice } from '@fin.cx/einvoice';
 import { IValidatableProvider } from '@/plugins/types';
 import { PluginRegistry } from '../../plugins';
+import { generateWebhookSecret } from '@/utils/webhook-security';
 import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 import { simpleGit } from 'simple-git';
@@ -211,6 +211,7 @@ export class PluginsService {
     return {
       success: true,
       webhookUrl: validation.webhookUrl,
+      webhookSecret: validation.webhookSecret,
       instructions: validation.instructions
     };
   }
@@ -240,7 +241,7 @@ export class PluginsService {
       where: { id },
       data: {
         config: config,
-        isActive: true
+        isActive: true,
       }
     });
 
@@ -251,6 +252,7 @@ export class PluginsService {
     return {
       success: true,
       webhookUrl: validation.webhookUrl,
+      webhookSecret: validation.webhookSecret,
       instructions: validation.instructions
     };
   }
@@ -367,16 +369,19 @@ export class PluginsService {
     const baseUrl = process.env.APP_URL || 'http://localhost:3000';
     const webhookUrl = `${baseUrl}/api/webhooks/${plugin.id}`;
 
-    const webhookSecret = generateWebhookSecret();
-    const webhookSecretHash = hashWebhookSecret(webhookSecret);
+    let webhookSecret = generateWebhookSecret();
 
-    await prisma.plugin.update({
-      where: { id: plugin.id },
-      data: {
-        webhookUrl,
-        webhookSecretHash
-      }
-    });
+    if (!plugin.webhookUrl || !plugin.webhookSecret) {
+      await prisma.plugin.update({
+        where: { id: plugin.id },
+        data: {
+          webhookUrl,
+          webhookSecret
+        }
+      });
+    } else {
+      webhookSecret = plugin.webhookSecret;
+    }
 
     this.logger.log(`Generated webhook URL for plugin ${plugin.name}: ${webhookUrl}`);
     this.logger.log(`Generated webhook secret hash for plugin ${plugin.name}`);
