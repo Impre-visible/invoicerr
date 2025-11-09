@@ -13,7 +13,7 @@ export default function Receipts() {
     const { t } = useTranslation()
     const receiptListRef = useRef<ReceiptListHandle>(null)
     const [page, setPage] = useState(1)
-    const { data: receipts, mutate, loading } = useGet<{ pageCount: number; receipts: Receipt[] }>(`/api/receipts?page=${page}`)
+    const { data: receipts } = useGet<{ pageCount: number; receipts: Receipt[] }>(`/api/receipts/sse?page=${page}`)
     const [downloadReceiptPdf, setDownloadReceiptPdf] = useState<Receipt | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/receipts/${downloadReceiptPdf?.id}/pdf`)
 
@@ -121,13 +121,12 @@ export default function Receipts() {
             <ReceiptList
                 ref={receiptListRef}
                 receipts={filteredReceipts}
-                loading={loading}
+                loading={false}
                 title={t("receipts.list.title")}
                 description={t("receipts.list.description")}
                 page={page}
                 pageCount={receipts?.pageCount || 1}
                 setPage={setPage}
-                mutate={mutate}
                 emptyState={emptyState}
                 showCreateButton={true}
             />
