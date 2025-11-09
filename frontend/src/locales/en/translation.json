@@ -750,96 +750,96 @@
         "description": "Manage reusable payment methods.",
         "empty": "No payment methods yet.",
         "actions": {
-          "cancel": "Cancel",
-          "add": "Add",
-          "save": "Save",
-          "edit": "Edit",
-          "delete": "Delete",
-          "deleting": "Deleting..."
-        },
-        "search": {
-          "placeholder": "Search payment methods..."
-        },
-        "list": {
-          "add": "Add payment method",
-          "empty": "No payment methods found"
-        },
-        "stats": {
-          "total": "Total Payment Methods",
-          "active": "Active",
-          "inactive": "Inactive"
-        },
-        "fields": {
-          "name": {
-            "label": "Name",
-            "placeholder": "e.g. Bank transfer (business)"
-          },
-          "details": {
-            "label": "Details",
-            "placeholder": "IBAN / details"
-          },
-          "type": {
-            "label": "Type",
-            "bank_transfer": "Bank transfer",
-            "paypal": "PayPal",
-            "check": "Check",
-            "cash": "Cash",
-            "other": "Other"
-          },
-          "status": {
-            "label": "Status"
-          }
-        },
-        "upsert": {
-          "title": {
-            "create": "Add payment method",
-            "edit": "Edit payment method"
-          },
-          "form": {
-            "name": {
-              "label": "Name",
-              "placeholder": "e.g. Bank transfer (business)"
-            },
-            "details": {
-              "label": "Details",
-              "placeholder": "IBAN / details"
-            },
-            "type": {
-              "label": "Type",
-              "bank_transfer": "Bank transfer",
-              "paypal": "PayPal",
-              "check": "Check",
-              "cash": "Cash",
-              "other": "Other"
-            }
-          },
-          "messages": {
-            "nameRequired": "Name is required",
-            "addSuccess": "Payment method added",
-            "addError": "Failed to add payment method",
-            "updateSuccess": "Payment method updated",
-            "updateError": "Failed to update payment method",
-            "deleteSuccess": "Payment method deleted",
-            "deleteError": "Failed to delete payment method"
-          },
-          "actions": {
             "cancel": "Cancel",
             "add": "Add",
             "save": "Save",
             "edit": "Edit",
             "delete": "Delete",
             "deleting": "Deleting..."
-          }
+        },
+        "search": {
+            "placeholder": "Search payment methods..."
+        },
+        "list": {
+            "add": "Add payment method",
+            "empty": "No payment methods found"
+        },
+        "stats": {
+            "total": "Total Payment Methods",
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "fields": {
+            "name": {
+                "label": "Name",
+                "placeholder": "e.g. Bank transfer (business)"
+            },
+            "details": {
+                "label": "Details",
+                "placeholder": "IBAN / details"
+            },
+            "type": {
+                "label": "Type",
+                "bank_transfer": "Bank transfer",
+                "paypal": "PayPal",
+                "check": "Check",
+                "cash": "Cash",
+                "other": "Other"
+            },
+            "status": {
+                "label": "Status"
+            }
+        },
+        "upsert": {
+            "title": {
+                "create": "Add payment method",
+                "edit": "Edit payment method"
+            },
+            "form": {
+                "name": {
+                    "label": "Name",
+                    "placeholder": "e.g. Bank transfer (business)"
+                },
+                "details": {
+                    "label": "Details",
+                    "placeholder": "IBAN / details"
+                },
+                "type": {
+                    "label": "Type",
+                    "bank_transfer": "Bank transfer",
+                    "paypal": "PayPal",
+                    "check": "Check",
+                    "cash": "Cash",
+                    "other": "Other"
+                }
+            },
+            "messages": {
+                "nameRequired": "Name is required",
+                "addSuccess": "Payment method added",
+                "addError": "Failed to add payment method",
+                "updateSuccess": "Payment method updated",
+                "updateError": "Failed to update payment method",
+                "deleteSuccess": "Payment method deleted",
+                "deleteError": "Failed to delete payment method"
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "add": "Add",
+                "save": "Save",
+                "edit": "Edit",
+                "delete": "Delete",
+                "deleting": "Deleting..."
+            }
         },
         "tooltips": {
-          "view": "View",
-          "edit": "Edit",
-          "delete": "Delete"
+            "view": "View",
+            "edit": "Edit",
+            "delete": "Delete"
         },
         "delete": {
-          "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+            "description": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
         }
-      },
+    },
     "settings": {
         "tabs": {
             "company": "Company",
@@ -1193,7 +1193,14 @@
                 "addSuccess": "Plugin added successfully",
                 "addError": "Failed to add plugin",
                 "deleteSuccess": "Plugin deleted successfully",
-                "deleteError": "Failed to delete plugin"
+                "deleteError": "Failed to delete plugin",
+                "toggleSuccess": "Plugin toggled successfully",
+                "toggleError": "Failed to toggle plugin",
+                "configureSuccess": "Plugin configured successfully",
+                "configureError": "Failed to configure plugin"
+            },
+            "webhook": {
+                "secretPlaceholder": "Validate that popup to generate secure secret"
             }
         },
         "pdfTemplates": {
@@ -1625,5 +1632,26 @@
         "invoiced": "Invoiced (incl. VAT)",
         "revenue": "Revenue (excl. VAT)",
         "deposits": "Deposits (invoice paid)"
+    },
+    "webhook": {
+        "instructions": {
+            "documenso": {
+                "title": "Instructions for Documenso webhook configuration:",
+                "step1": "1. Go to your Documenso admin panel",
+                "step2": "2. Configure webhook URL",
+                "step3": "3. Configure webhook secret",
+                "step4": "4. Enable the following events: document.signed (minimum required)",
+                "step5": "5. Additional events you may want to enable: document.pending, document.completed, document.rejected"
+            }
+        },
+        "modal": {
+            "title": "Webhook Configuration for {{pluginName}}",
+            "url": "Webhook URL",
+            "secret": "Webhook Secret",
+            "secretDescription": "Keep this secret secure. It will be used to verify webhook authenticity.",
+            "instructions": "Configuration Instructions",
+            "warning": "Configure both the webhook URL and secret in your {{pluginName}} settings to receive authenticated real-time updates. Store the secret securely - it won't be shown again.",
+            "gotIt": "Got it!"
+        }
     }
 }

@@ -14,6 +14,7 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
   const { t } = useTranslation()
   const { data } = useGetRaw<Response>(`/api/quotes/${quote?.id}/pdf`)
   const [pdfData, setPdfData] = useState<Uint8Array | null>(null)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (data) {
@@ -23,6 +24,20 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
     }
   }, [data])
 
+  useEffect(() => {
+    if (pdfData) {
+      const blob = new Blob([pdfData], { type: "application/pdf" })
+      const url = URL.createObjectURL(blob)
+      setPdfUrl(url)
+
+      return () => {
+        URL.revokeObjectURL(url)
+      }
+    } else {
+      setPdfUrl(null)
+    }
+  }, [pdfData])
+
   if (!quote) return null
 
   return (
@@ -31,6 +46,7 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
       onOpenChange={(open) => {
         if (!open) {
           setPdfData(null)
+          setPdfUrl(null)
         }
         onOpenChange(open)
       }}
@@ -41,11 +57,11 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
         </DialogHeader>
 
         <section className="h-full overflow-auto">
-          {pdfData ? (
+          {pdfUrl ? (
             <div className="flex justify-center h-full overflow-auto">
               <iframe
                 className="w-full h-full"
-                src={`data:application/pdf;base64,${btoa(String.fromCharCode(...pdfData))}`}
+                src={pdfUrl}
                 title={t("quotes.pdf.title", { number: quote?.number })}
               />
             </div>
@@ -56,6 +72,6 @@ export function QuotePdfModal({ quote, onOpenChange }: QuotePdfModalProps) {
           )}
         </section>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   )
 }

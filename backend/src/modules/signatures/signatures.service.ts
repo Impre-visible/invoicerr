@@ -1,10 +1,13 @@
-import { MailService } from '@/mail/mail.service';
-import prisma from '@/prisma/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+
+import { ISigningProvider } from '@/plugins/signing/types';
+import { MailService } from '@/mail/mail.service';
+import { PluginsService } from '../plugins/plugins.service';
+import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class SignaturesService {
-    constructor(private readonly mailService: MailService) { }
+    constructor(private readonly mailService: MailService, private readonly pluginsService: PluginsService) { }
 
     async getSignature(signatureId: string) {
         const signature = await prisma.signature.findUnique({
@@ -30,6 +33,7 @@ export class SignaturesService {
         const quote = await prisma.quote.findUnique({
             where: { id: quoteId },
             select: {
+                id: true,
                 client: {
                     select: {
                         contactEmail: true
@@ -42,14 +46,8 @@ export class SignaturesService {
             throw new BadRequestException('Quote not found or client information is missing.');
         }
 
-        const signature = await prisma.signature.create({
-            data: {
-                quoteId,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
-            },
-        });
 
-        await this.sendSignatureEmail(signature.id);
+        const signatureId = await this.sendSignatureEmail(quote.id);
 
         await prisma.quote.update({
             where: { id: quoteId },
@@ -58,7 +56,7 @@ export class SignaturesService {
             },
         });
 
-        return { message: 'Signature successfully created and email sent.', signature };
+        return { message: 'Signature successfully created and email sent.', signature: { id: signatureId } };
     }
 
     async generateOTPCode(signatureId: string) {
@@ -98,10 +96,30 @@ export class SignaturesService {
         return { message: 'OTP code generated successfully.' };
     }
 
-    async sendSignatureEmail(signatureId: string) {
-        const signature = await prisma.signature.findFirst({
-            where: { id: signatureId, isActive: true },
+    private async sendSignatureEmailWithProvider(provider: ISigningProvider, quoteId: string): Promise<string> {
+        if (provider && typeof provider.requestSignature == 'function') {
+            return provider.requestSignature({
+                id: quoteId,
+                title: `Signature for Quote ${quoteId}`,
+                fileUrl: `https://example.com/quotes/${quoteId}/file.pdf`,
+                signers: ['<SIGNER_EMAIL>']
+            });
+        }
+        return '';
+    }
+
+    async sendSignatureEmail(quoteId: string): Promise<string> {
+        const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
+        if (provider && typeof provider.requestSignature == 'function') {
+            return this.sendSignatureEmailWithProvider(provider, quoteId);
+        }
+        const signature = await prisma.signature.create({
+            data: {
+                quoteId,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Signature valid for 30 days
+            },
             select: {
+                id: true,
                 quoteId: true,
                 quote: {
                     select: {
@@ -122,7 +140,7 @@ export class SignaturesService {
         }
 
         await prisma.signature.updateMany({
-            where: { quoteId: signature.quoteId, isActive: true, id: { not: signatureId } },
+            where: { quoteId: signature.quoteId, isActive: true, id: { not: signature.id } },
             data: { isActive: false },
         });
 
@@ -137,8 +155,8 @@ export class SignaturesService {
 
         const envVariables = {
             APP_URL: process.env.APP_URL,
-            SIGNATURE_URL: `${process.env.APP_URL}/signature/${signatureId}`,
-            SIGNATURE_ID: signatureId,
+            SIGNATURE_URL: `${process.env.APP_URL}/signature/${signature.id}`,
+            SIGNATURE_ID: signature.id,
             SIGNATURE_NUMBER: signature.quote.number,
         };
 
@@ -155,7 +173,7 @@ export class SignaturesService {
             throw new BadRequestException('Failed to send signature email. Please check your SMTP configuration.');
         }
 
-        return { message: 'Signature email sent successfully.' };
+        return signature.id;
     }
 
     async sendOtpToUser(email: string, otpCode: string) {

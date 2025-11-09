@@ -814,12 +814,7 @@
                         "check": "Chèque",
                         "cash": "Espèces",
                         "other": "Autre"
-                    },
-                    "bank_transfer": "Virement bancaire",
-                    "paypal": "PayPal",
-                    "check": "Chèque bancaire",
-                    "cash": "Espèces",
-                    "other": "Autre"
+                    }
                 }
             },
             "messages": {
@@ -828,16 +823,7 @@
                 "updateSuccess": "Méthode de paiement mise à jour",
                 "updateError": "Échec de la mise à jour de la méthode de paiement",
                 "deleteSuccess": "Méthode de paiement supprimée",
-                "deleteError": "Échec de la suppression de la méthode de paiement",
-                "nameRequired": "Le nom est obligatoire"
-            },
-            "actions": {
-                "cancel": "Annuler",
-                "add": "Ajouter",
-                "save": "Enregistrer",
-                "edit": "Modifier",
-                "delete": "Supprimer",
-                "deleting": "Suppression..."
+                "deleteError": "Échec de la suppression de la méthode de paiement"
             }
         },
         "messages": {
@@ -1212,7 +1198,14 @@
                 "addSuccess": "Plugin ajouté avec succès",
                 "addError": "Erreur lors de l'ajout du plugin",
                 "deleteSuccess": "Plugin supprimé avec succès",
-                "deleteError": "Erreur lors de la suppression du plugin"
+                "deleteError": "Erreur lors de la suppression du plugin",
+                "toggleSuccess": "Plugin basculé avec succès",
+                "toggleError": "Erreur lors du basculement du plugin",
+                "configureSuccess": "Plugin configuré avec succès",
+                "configureError": "Erreur lors de la configuration du plugin"
+            },
+            "webhook": {
+                "secretPlaceholder": "Validez cette popup pour générer un secret sécurisé"
             }
         },
         "pdfTemplates": {
@@ -1643,6 +1636,27 @@
         "invoiced": "Facturé (TTC)",
         "revenue": "Chiffre d'affaire (HT)",
         "deposits": "Encaissements (facture payée)"
+    },
+    "webhook": {
+        "instructions": {
+            "documenso": {
+                "title": "Instructions pour la configuration du webhook Documenso :",
+                "step1": "1. Accédez à votre panneau d'administration Documenso",
+                "step2": "2. Configurez l'URL du webhook",
+                "step3": "3. Configurez le secret du webhook",
+                "step4": "4. Activez les événements suivants : document.signed (minimum requis)",
+                "step5": "5. Événements supplémentaires que vous pouvez activer : document.pending, document.completed, document.rejected"
+            }
+        },
+        "modal": {
+            "title": "Configuration du webhook pour {{pluginName}}",
+            "url": "URL du webhook",
+            "secret": "Secret du webhook",
+            "secretDescription": "Gardez ce secret sécurisé. Il sera utilisé pour vérifier l'authenticité du webhook.",
+            "instructions": "Instructions de configuration",
+            "warning": "Configurez à la fois l'URL et le secret du webhook dans les paramètres de {{pluginName}} pour recevoir des mises à jour authentifiées en temps réel. Stockez le secret en sécurité - il ne sera plus affiché.",
+            "gotIt": "Compris !"
+        }
     },
     "noOptions": "Aucune option disponible. Créer un nouveau client."
 }

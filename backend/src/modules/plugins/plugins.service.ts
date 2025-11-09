@@ -1,8 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { existsSync, readdirSync, rmSync, statSync } from 'fs';
 import { extname, join } from 'path';
 
 import { EInvoice } from '@fin.cx/einvoice';
+import { IValidatableProvider } from '@/plugins/types';
+import { PluginRegistry } from '../../plugins';
+import { generateWebhookSecret } from '@/utils/webhook-security';
+import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 import { simpleGit } from 'simple-git';
 
@@ -11,26 +15,42 @@ export interface PdfFormatInfo {
   format_key: string;
 }
 
-export interface Plugin {
+export interface IPlugin {
   __uuid: string;
   __filepath: string;
   name: string;
   description: string;
   init?: () => void;
+  config?: any;
+  type?: string;
+  isActive?: boolean;
+}
+
+export interface InvoicePlugin extends IPlugin {
   pdf_format_info: () => PdfFormatInfo;
   pdf_format: (invoice: EInvoice) => Promise<string>;
 }
 
 const PLUGIN_DIR = process.env.PLUGIN_DIR || '/root/invoicerr-plugins';
+const PLUGIN_DIRS = [PLUGIN_DIR, join(process.cwd(), 'src', 'in-app-plugins')];
 
 @Injectable()
 export class PluginsService {
   private readonly logger = new Logger(PluginsService.name);
-  private readonly plugins: Plugin[] = [];
+  private readonly plugins: IPlugin[] = [];
+  private pluginRegistry = PluginRegistry.getInstance();
+  private static isInitialized = false;
 
   constructor() {
-    this.logger.log('Loading plugins...');
-    this.loadExistingPlugins();
+    if (!PluginsService.isInitialized) {
+      this.logger.log('Loading plugins...');
+      this.loadExistingPlugins();
+
+      this.pluginRegistry.initializeIfNeeded().catch(err => {
+        this.logger.error('Failed to initialize plugin registry:', err);
+      });
+      PluginsService.isInitialized = true;
+    }
   }
 
   async cloneRepo(gitUrl: string, name: string): Promise<string> {
@@ -46,25 +66,28 @@ export class PluginsService {
 
 
   async loadExistingPlugins(): Promise<void> {
-    if (!existsSync(PLUGIN_DIR)) {
-      this.logger.warn(`Plugin directory "${PLUGIN_DIR}" does not exist.`);
-      return;
-    }
+    for (const pluginDir of PLUGIN_DIRS) {
+      this.logger.log(`Loading plugins from directory: ${pluginDir}`);
+      if (!existsSync(pluginDir)) {
+        this.logger.warn(`Plugin directory "${pluginDir}" does not exist.`);
+        return;
+      }
 
-    const dirs = readdirSync(PLUGIN_DIR).filter((f) =>
-      statSync(join(PLUGIN_DIR, f)).isDirectory()
-    );
+      const dirs = readdirSync(pluginDir).filter((f) =>
+        statSync(join(pluginDir, f)).isDirectory()
+      );
 
-    for (const dir of dirs) {
-      try {
-        await this.loadPluginFromPath(join(PLUGIN_DIR, dir));
-      } catch (err) {
-        this.logger.error(`Failed to load plugin "${dir}": ${err.message}`);
+      for (const dir of dirs) {
+        try {
+          await this.loadPluginFromPath(join(pluginDir, dir));
+        } catch (err) {
+          this.logger.error(`Failed to load plugin "${dir}": ${err.message}`);
+        }
       }
     }
   }
 
-  async loadPluginFromPath(pluginPath: string): Promise<Plugin> {
+  async loadPluginFromPath(pluginPath: string): Promise<IPlugin> {
     if (pluginPath.startsWith('http')) {
       pluginPath = await this.cloneRepo(pluginPath, pluginPath.split('/').pop() || `unknown-plugin-${Date.now()}`);
     }
@@ -79,7 +102,7 @@ export class PluginsService {
     const pluginModule = await import(pluginFile);
     const PluginClass = pluginModule.default;
 
-    const plugin: Plugin = new PluginClass();
+    const plugin: IPlugin = new PluginClass();
 
     plugin.init?.();
     let uuid = randomUUID();
@@ -106,12 +129,207 @@ export class PluginsService {
     }
   }
 
-  getPlugins(): Plugin[] {
+  getPlugins(): IPlugin[] {
     return this.plugins;
   }
 
-  getFormats(): PdfFormatInfo[] {
-    return this.plugins.map((p) => p.pdf_format_info());
+  async getInAppPlugins(): Promise<{ category: string, plugins: { name: string, isActive: boolean }[] }[]> {
+    const categories = await prisma.plugin.findMany({
+      select: { type: true },
+      distinct: ['type'],
+    });
+
+    const result: { category: string, plugins: { id: string, name: string, isActive: boolean }[] }[] = [];
+
+    for (const category of categories) {
+      const pluginsInCategory = await prisma.plugin.findMany({
+        where: { type: category.type },
+        select: { name: true, isActive: true, id: true },
+      });
+
+      const title = category.type.toLowerCase()
+
+      result.push({
+        category: title.charAt(0).toUpperCase() + title.slice(1),
+        plugins: pluginsInCategory.map(p => ({ id: p.id, name: p.name, isActive: p.isActive })),
+      });
+    }
+
+    return result;
+  }
+
+  async toggleInAppPlugin(id: string) {
+    const plugin = await prisma.plugin.findFirst({
+      where: { id },
+    });
+
+    if (!plugin) {
+      throw new Error(`Plugin with id "${id}" not found`);
+    }
+
+    if (plugin.isActive) {
+      await prisma.plugin.update({
+        where: { id },
+        data: { isActive: false }
+      });
+
+      this.logger.log(`Plugin "${plugin.name}" is now inactive.`);
+      return { success: true };
+    }
+
+    const existingActivePlugin = await prisma.plugin.findFirst({
+      where: {
+        type: plugin.type,
+        isActive: true,
+        id: { not: plugin.id }
+      },
+    });
+
+    if (existingActivePlugin) {
+      throw new BadRequestException(`Another plugin "${existingActivePlugin.name}" is already active for category "${plugin.type}". Please disable it first.`);
+    }
+
+    const formConfig = await this.pluginRegistry.getProviderForm(plugin.id);
+
+    if (formConfig && Object.keys(formConfig).length > 0) {
+      return {
+        requiresConfiguration: true,
+        formConfig: formConfig,
+        currentConfig: plugin.config || {}
+      };
+    }
+
+    await prisma.plugin.update({
+      where: { id },
+      data: { isActive: true }
+    });
+
+    this.logger.log(`Plugin "${plugin.name}" is now active.`);
+
+    const validation = await this.pluginValidation(id);
+
+    return {
+      success: true,
+      webhookUrl: validation.webhookUrl,
+      webhookSecret: validation.webhookSecret,
+      instructions: validation.instructions
+    };
+  }
+
+  async configureInAppPlugin(id: string, config: Record<string, any>) {
+    const plugin = await prisma.plugin.findFirst({
+      where: { id },
+    });
+
+    if (!plugin) {
+      throw new BadRequestException(`Plugin with id "${id}" not found`);
+    }
+
+    const existingActivePlugin = await prisma.plugin.findFirst({
+      where: {
+        type: plugin.type,
+        isActive: true,
+        id: { not: plugin.id }
+      },
+    });
+
+    if (existingActivePlugin) {
+      throw new BadRequestException(`Another plugin "${existingActivePlugin.name}" is already active for category "${plugin.type}". Please disable it first.`);
+    }
+
+    await prisma.plugin.update({
+      where: { id },
+      data: {
+        config: config,
+        isActive: true,
+      }
+    });
+
+    this.logger.log(`Plugin "${plugin.name}" configured and activated.`);
+
+    const validation = await this.pluginValidation(id);
+
+    return {
+      success: true,
+      webhookUrl: validation.webhookUrl,
+      webhookSecret: validation.webhookSecret,
+      instructions: validation.instructions
+    };
+  }
+
+  async getActivePlugin(type: string): Promise<IPlugin | null> {
+    const provider = await this.pluginRegistry.getProvider(type);
+
+    if (!provider) {
+      return null;
+    }
+
+    const pluginType = this.getPluginTypeEnum(type);
+    const activePlugin = await prisma.plugin.findFirst({
+      where: {
+        type: pluginType as any,
+        isActive: true,
+      },
+    });
+
+    if (!activePlugin) {
+      return null;
+    }
+
+    const inAppPlugin: IPlugin = {
+      __uuid: activePlugin.id,
+      __filepath: '',
+      name: activePlugin.name,
+      description: `Plugin ${activePlugin.name} de type ${activePlugin.type}`,
+      config: activePlugin.config,
+      type: activePlugin.type,
+      isActive: activePlugin.isActive,
+      ...provider
+    };
+
+    return inAppPlugin;
+  }
+
+  /**
+   * Get the active provider for a given type
+   * @param type The plugin type (signing, payment, etc.)
+   * @returns The active provider or null
+   */
+  async getProvider<T = IPlugin>(type: string): Promise<T | null> {
+    return await this.pluginRegistry.getProvider<T>(type);
+  }
+
+  private getPluginTypeEnum(type: string): string {
+    switch (type.toLowerCase()) {
+      case 'signing':
+        return 'SIGNING';
+      case 'pdf_format':
+        return 'PDF_FORMAT';
+      case 'payment':
+        return 'PAYMENT';
+      case 'oidc':
+        return 'OIDC';
+      default:
+        throw new Error(`Unknown plugin type: ${type}`);
+    }
+  }
+
+  canGenerateXml(format: string): boolean {
+    // Check if any plugin can generate the requested XML format
+    // For now, return false
+    return false;
+  }
+
+  async generateXml(format: string, xmlInvoice: any): Promise<string> {
+    // Return XML using a plugin
+    // For now, throw an error as this feature is not yet implemented
+    throw new Error(`XML generation for format "${format}" not implemented yet`);
+  }
+
+  getFormats(): any[] {
+    // Return formats provided by plugins
+    // For now, return an empty array
+    return [];
   }
 
   async deletePlugin(uuid: string): Promise<boolean> {
@@ -132,17 +350,85 @@ export class PluginsService {
     return true
   }
 
-  canGenerateXml(formatKey: string): boolean {
-    const plugin = this.plugins.find((p) => p.pdf_format_info().format_key === formatKey);
-    return !!plugin;
+  /**
+   * Validate a plugin and configure its webhook
+   * @param pluginId The ID of the plugin to validate
+   * @returns Instructions for configuring the webhook with the secret
+   */
+  async pluginValidation(pluginId: string): Promise<{ webhookUrl: string; webhookSecret: string; instructions: string[] }> {
+    const plugin = await prisma.plugin.findFirst({
+      where: { id: pluginId, isActive: true },
+    });
+
+    if (!plugin) {
+      throw new BadRequestException(`Active plugin with id "${pluginId}" not found`);
+    }
+
+    this.logger.log(`Validating plugin: ${plugin.name} (${plugin.type})`);
+
+    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const webhookUrl = `${baseUrl}/api/webhooks/${plugin.id}`;
+
+    let webhookSecret = generateWebhookSecret();
+
+    if (!plugin.webhookUrl || !plugin.webhookSecret) {
+      await prisma.plugin.update({
+        where: { id: plugin.id },
+        data: {
+          webhookUrl,
+          webhookSecret
+        }
+      });
+    } else {
+      webhookSecret = plugin.webhookSecret;
+    }
+
+    this.logger.log(`Generated webhook URL for plugin ${plugin.name}: ${webhookUrl}`);
+    this.logger.log(`Generated webhook secret hash for plugin ${plugin.name}`);
+
+    const provider = await this.pluginRegistry.getProvider<IValidatableProvider>(plugin.type.toLowerCase());
+    if (provider && typeof provider.validatePlugin === 'function') {
+      try {
+        await provider.validatePlugin(plugin.id, webhookUrl, plugin.config);
+        this.logger.log(`Plugin ${plugin.name} validated successfully by provider`);
+      } catch (error) {
+        this.logger.error(`Provider validation failed for plugin ${plugin.name}:`, error);
+        throw new BadRequestException(`Plugin validation failed: ${error.message}`);
+      }
+    }
+
+    const instructions = this.generatePluginInstructions(plugin, webhookUrl, webhookSecret);
+
+    return { webhookUrl, webhookSecret, instructions };
   }
 
-  async generateXml(formatKey: string, invoice: EInvoice): Promise<string> {
-    const plugin = this.plugins.find((p) => p.pdf_format_info().format_key === formatKey);
-    if (!plugin) {
-      this.logger.warn(`No plugin found for format_key="${formatKey}"`);
-      throw new Error(`No plugin found for format_key="${formatKey}"`);
+  /**
+   * Generate specific instructions to configure webhooks based on plugin type
+   * @returns Instructions as an array of strings
+   */
+  private generatePluginInstructions(plugin: any, webhookUrl: string, webhookSecret: string): string[] {
+    const instructions: string[] = [];
+
+    switch (plugin.type.toLowerCase()) {
+      case 'signing':
+        if (plugin.id === 'documenso') {
+          instructions.push('webhook.instructions.documenso.title');
+          instructions.push('webhook.instructions.documenso.step1');
+          instructions.push('webhook.instructions.documenso.step2');
+          instructions.push('webhook.instructions.documenso.step3');
+          instructions.push('webhook.instructions.documenso.step4');
+          instructions.push('webhook.instructions.documenso.step5');
+        } else if (plugin.id === 'docuseal') {
+          // TODO: Add instructions for DocuSeal when implemented
+        }
+        break;
+
+      default:
+        break;
     }
-    return await plugin.pdf_format(invoice);
+
+    instructions.forEach(instruction => this.logger.log(instruction));
+
+    return instructions;
   }
 }

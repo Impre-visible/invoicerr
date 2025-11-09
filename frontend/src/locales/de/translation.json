@@ -89,18 +89,18 @@
           "placeholder": "Geben Sie die Postleitzahl ein"
         },
         "city": {
-            "label": "Stadt",
-            "placeholder": "Geben Sie der Stadt ein"
+          "label": "Stadt",
+          "placeholder": "Geben Sie der Stadt ein"
         },
         "type": {
-            "label": "Kundentyp",
-            "company": "Unternehmen",
-            "individual": "Privatperson",
-            "description": "Wählen Sie, ob der Kunde eine Privatperson oder ein Unternehmen ist"
+          "label": "Kundentyp",
+          "company": "Unternehmen",
+          "individual": "Privatperson",
+          "description": "Wählen Sie, ob der Kunde eine Privatperson oder ein Unternehmen ist"
         },
         "country": {
-            "label": "Land",
-            "placeholder": "Geben Sie dem Land ein"
+          "label": "Land",
+          "placeholder": "Geben Sie dem Land ein"
         }
       },
       "validation": {
@@ -479,21 +479,21 @@
             }
           },
           "vatRate": {
-              "placeholder": "MEHRWERTSTEUER %",
-              "errors": {
-                  "required": "Mehrwertsteuersatz ist erforderlich",
-                  "min": "Der Mehrwertsteuersatz muss positiv sein"
-              }
+            "placeholder": "MEHRWERTSTEUER %",
+            "errors": {
+              "required": "Mehrwertsteuersatz ist erforderlich",
+              "min": "Der Mehrwertsteuersatz muss positiv sein"
+            }
           },
           "type": {
-              "label": "Typ",
-              "hour": "Stunde",
-              "day": "Tag",
-              "deposit": "Anzahlung",
-              "service": "Service",
-              "product": "Produkt"
+            "label": "Typ",
+            "hour": "Stunde",
+            "day": "Tag",
+            "deposit": "Anzahlung",
+            "service": "Service",
+            "product": "Produkt"
           }
-      },
+        },
         "notes": {
           "label": "Anmerkungen",
           "placeholder": "Zusätzliche Hinweise oder Begriffe"
@@ -686,12 +686,12 @@
             }
           },
           "type": {
-              "label": "Typ",
-              "hour": "Stunde",
-              "day": "Tag",
-              "deposit": "Anzahlung",
-              "service": "Service",
-              "product": "Produkt"
+            "label": "Typ",
+            "hour": "Stunde",
+            "day": "Tag",
+            "deposit": "Anzahlung",
+            "service": "Service",
+            "product": "Produkt"
           }
         }
       },
@@ -1193,7 +1193,14 @@
         "addSuccess": "Plugin erfolgreich hinzugefügt",
         "addError": "Fehler beim Hinzufügen des Plugins",
         "deleteSuccess": "Plugin erfolgreich gelöscht",
-        "deleteError": "Fehler beim Löschen des Plugins"
+        "deleteError": "Fehler beim Löschen des Plugins",
+        "toggleSuccess": "Plugin erfolgreich umgeschaltet",
+        "toggleError": "Fehler beim Umschalten des Plugins",
+        "configureSuccess": "Plugin erfolgreich konfiguriert",
+        "configureError": "Fehler beim Konfigurieren des Plugins"
+      },
+      "webhook": {
+        "secretPlaceholder": "Bestätigen Sie dieses Popup, um ein sicheres Geheimnis zu generieren"
       }
     },
     "pdfTemplates": {
@@ -1625,5 +1632,26 @@
     "invoiced": "Fakturiert (inkl. MwSt.)",
     "revenue": "Umsatz (ohne MwSt.)",
     "deposits": "Einzahlungen (Rechnung bezahlt)"
+  },
+  "webhook": {
+    "instructions": {
+      "documenso": {
+        "title": "Anweisungen für die Documenso-Webhook-Konfiguration:",
+        "step1": "1. Gehen Sie zu Ihrem Documenso-Admin-Panel",
+        "step2": "2. Konfigurieren Sie die Webhook-URL",
+        "step3": "3. Konfigurieren Sie das Webhook-Secret",
+        "step4": "4. Aktivieren Sie die folgenden Ereignisse: document.signed (mindestens erforderlich)",
+        "step5": "5. Zusätzliche Ereignisse, die Sie aktivieren können: document.pending, document.completed, document.rejected"
+      }
+    },
+    "modal": {
+      "title": "Webhook-Konfiguration für {{pluginName}}",
+      "url": "Webhook-URL",
+      "secret": "Webhook-Secret",
+      "secretDescription": "Halten Sie dieses Secret sicher. Es wird verwendet, um die Webhook-Authentizität zu überprüfen.",
+      "instructions": "Konfigurationsanweisungen",
+      "warning": "Konfigurieren Sie sowohl die Webhook-URL als auch das Secret in Ihren {{pluginName}}-Einstellungen, um authentifizierte Echtzeit-Updates zu erhalten. Bewahren Sie das Secret sicher auf - es wird nicht wieder angezeigt.",
+      "gotIt": "Verstanden!"
+    }
   }
 }

@@ -198,6 +198,7 @@ enum QuoteStatus {
   VIEWED
   SIGNED
   EXPIRED
+  REJECTED
 }
 
 // Invoice status
@@ -353,7 +354,7 @@ model Client {
   foundedAt        DateTime? // Date when the client company was founded
   contactFirstname String?
   contactLastname  String?
-  contactEmail     String?             @unique
+  contactEmail     String?            @unique
   contactPhone     String?
   address          String
   postalCode       String
@@ -384,38 +385,38 @@ model MailTemplate {
 
 // Quote model
 model Quote {
-  id             String      @id @default(uuid())
-  number         Int         @default(autoincrement())
-  rawNumber      String? // Raw number for custom formats
-  title          String?
-  client         Client      @relation(fields: [clientId], references: [id])
-  clientId       String
-  company        Company     @relation(fields: [companyId], references: [id])
-  companyId      String
-  items          QuoteItem[]
-  status         QuoteStatus @default(DRAFT)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  validUntil     DateTime?
-  signedAt       DateTime?
-  viewedAt       DateTime?
-  signedBy       String?
-  totalHT        Float
-  totalVAT       Float
-  totalTTC       Float
-  currency       Currency
-  paymentMethod  String? // Ex: "Bank Transfer", "PayPal", "Cash"
-  paymentDetails String? // Details for the payment method (e.g., bank account number)
+  id              String      @id @default(uuid())
+  number          Int         @default(autoincrement())
+  rawNumber       String? // Raw number for custom formats
+  title           String?
+  client          Client      @relation(fields: [clientId], references: [id])
+  clientId        String
+  company         Company     @relation(fields: [companyId], references: [id])
+  companyId       String
+  items           QuoteItem[]
+  status          QuoteStatus @default(DRAFT)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  validUntil      DateTime?
+  signedAt        DateTime?
+  viewedAt        DateTime?
+  signedBy        String?
+  totalHT         Float
+  totalVAT        Float
+  totalTTC        Float
+  currency        Currency
+  paymentMethod   String? // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails  String? // Details for the payment method (e.g., bank account number)
   paymentMethodId String?
-  notes          String?     @default("")
-  isActive       Boolean     @default(true)
-  Invoice        Invoice[]
-  signatures     Signature[]
+  notes           String?     @default("")
+  isActive        Boolean     @default(true)
+  Invoice         Invoice[]
+  signatures      Signature[]
 }
 
 model QuoteItem {
-  id          String @id @default(uuid())
-  quote       Quote  @relation(fields: [quoteId], references: [id])
+  id          String   @id @default(uuid())
+  quote       Quote    @relation(fields: [quoteId], references: [id])
   quoteId     String
   description String
   quantity    Int
@@ -464,7 +465,7 @@ model InvoiceItem {
   quantity     Int
   unitPrice    Float
   vatRate      Float // 20 for 20%
-  type         ItemType @default(SERVICE)
+  type         ItemType      @default(SERVICE)
   order        Int
   receiptItems ReceiptItem[]
 }
@@ -504,7 +505,7 @@ model RecurringInvoiceItem {
   quantity           Int
   unitPrice          Float
   vatRate            Float // 20 for 20%
-  type               ItemType @default(SERVICE)
+  type               ItemType         @default(SERVICE)
   order              Int
 }
 
@@ -519,30 +520,30 @@ model ReceiptItem {
 }
 
 model Receipt {
-  id             String        @id @default(cuid())
-  number         Int           @default(autoincrement())
-  rawNumber      String? // Raw number for custom formats
-  invoiceId      String
-  invoice        Invoice       @relation(fields: [invoiceId], references: [id])
-  items          ReceiptItem[]
-  totalPaid      Float
-  paymentMethod  String        @default("") // Ex: "Bank Transfer", "PayPal", "Cash"
-  paymentDetails String        @default("") // Details for the payment method (e.g., bank account number)
+  id              String        @id @default(cuid())
+  number          Int           @default(autoincrement())
+  rawNumber       String? // Raw number for custom formats
+  invoiceId       String
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id])
+  items           ReceiptItem[]
+  totalPaid       Float
+  paymentMethod   String        @default("") // Ex: "Bank Transfer", "PayPal", "Cash"
+  paymentDetails  String        @default("") // Details for the payment method (e.g., bank account number)
   paymentMethodId String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model PaymentMethod {
-  id        String   @id @default(cuid())
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id        String            @id @default(cuid())
+  company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   name      String
-  details   String?                        // Use this to store IBAN or other textual details
+  details   String? // Use this to store IBAN or other textual details
   type      PaymentMethodType @default(BANK_TRANSFER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 }
 
 // Signature model
@@ -566,4 +567,25 @@ model CurrencyConversion {
   expiresAt    DateTime
 
   @@unique([fromCurrency, toCurrency])
+}
+
+// IN-APP PLUGINS
+
+enum PluginType {
+  SIGNING
+  PDF_FORMAT
+  PAYMENT
+  OIDC
+}
+
+model Plugin {
+  id            String     @id @default(cuid())
+  name          String
+  type          PluginType
+  config        Json?      @default("{}")
+  isActive      Boolean    @default(true)
+  webhookUrl    String?
+  webhookSecret String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
