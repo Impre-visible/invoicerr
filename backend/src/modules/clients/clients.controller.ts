@@ -1,3 +1,4 @@
+import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
 import { ClientsService } from '@/modules/clients/clients.service';
 import { EditClientsDto } from '@/modules/clients/dto/clients.dto';
 import {
@@ -9,15 +10,26 @@ import {
   Patch,
   Post,
   Query,
+  Sse,
 } from '@nestjs/common';
+import { from, interval, map, startWith, switchMap } from 'rxjs';
 
 @Controller('clients')
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(private readonly clientsService: ClientsService) { }
 
   @Get()
   async getClientsInfo(@Param('page') page: string) {
     return await this.clientsService.getClients(page);
+  }
+
+  @Sse('sse')
+  async getClientsInfoSse(@Param('page') page: string) {
+    return interval(1000).pipe(
+      startWith(0),
+      switchMap(() => from(this.clientsService.getClients(page))),
+      map((clients) => ({ data: JSON.stringify(clients) })),
+    );
   }
 
   @Get('search')

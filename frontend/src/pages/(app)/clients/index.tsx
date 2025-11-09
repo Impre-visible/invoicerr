@@ -8,7 +8,7 @@ import { ClientDeleteDialog } from "./_components/client-delete"
 import { ClientUpsert } from "./_components/client-upsert"
 import { ClientViewDialog } from "./_components/client-view"
 import { Input } from "@/components/ui/input"
-import { useGet } from "@/hooks/use-fetch"
+import { useSse } from "@/hooks/use-fetch"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -16,10 +16,8 @@ export default function Clients() {
     const { t } = useTranslation()
     const [page, setPage] = useState(1)
     const {
-        data: clients,
-        mutate,
-        loading,
-    } = useGet<{ pageCount: number; clients: Client[] }>(`/api/clients?page=${page}`)
+        data: clients
+    } = useSse<{ pageCount: number; clients: Client[] }>(`/api/clients/sse?page=${page}`)
 
     const [createClientDialog, setCreateClientDialog] = useState<boolean>(false)
     const [editClientDialog, setEditClientDialog] = useState<Client | null>(null)
@@ -170,11 +168,7 @@ export default function Clients() {
                 </CardHeader>
 
                 <CardContent className="p-0">
-                    {loading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
-                        </div>
-                    ) : filteredClients.length === 0 ? (
+                    {filteredClients.length === 0 ? (
                         emptyState
                     ) : (
                         <div className="divide-y">
@@ -259,7 +253,7 @@ export default function Clients() {
                 </CardContent>
 
                 <CardFooter>
-                    {!loading && filteredClients.length > 0 && (
+                    {filteredClients.length > 0 && (
                         <BetterPagination pageCount={clients?.pageCount || 1} page={page} setPage={setPage} />
                     )}
                 </CardFooter>
@@ -269,7 +263,6 @@ export default function Clients() {
                 open={createClientDialog}
                 onOpenChange={(open) => {
                     setCreateClientDialog(open)
-                    mutate()
                 }}
             />
 
@@ -278,7 +271,6 @@ export default function Clients() {
                 client={editClientDialog}
                 onOpenChange={(open) => {
                     if (!open) setEditClientDialog(null)
-                    mutate()
                 }}
             />
 
@@ -293,7 +285,6 @@ export default function Clients() {
                 client={deleteClientDialog}
                 onOpenChange={(open) => {
                     if (!open) setDeleteClientDialog(null)
-                    mutate()
                 }}
             />
         </div>
