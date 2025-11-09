@@ -1,12 +1,14 @@
 import * as Handlebars from 'handlebars';
+
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
+import { CreateReceiptDto, EditReceiptDto } from '@/modules/receipts/dto/receipts.dto';
+import { getInvertColor, getPDF } from '@/utils/pdf';
+
 import { MailService } from '@/mail/mail.service';
 import { baseTemplate } from '@/modules/receipts/templates/base.template';
-import { CreateReceiptDto, EditReceiptDto } from '@/modules/receipts/dto/receipts.dto';
-import prisma from '@/prisma/prisma.service';
-import { getInvertColor, getPDF } from '@/utils/pdf';
 import { formatDate } from '@/utils/date';
+import prisma from '@/prisma/prisma.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ReceiptsService {
@@ -290,11 +292,11 @@ export class ReceiptsService {
 
         const { pdfConfig } = receipt.invoice.company;
         const template = Handlebars.compile(baseTemplate); // ton template reçu ici
- 
-        if(receipt.invoice.client.name.length==0){
+
+        if (receipt.invoice.client.name.length == 0) {
             receipt.invoice.client.name = receipt.invoice.client.contactFirstname + " " + receipt.invoice.client.contactLastname
         }
- 
+
         // Map payment method enum -> PDFConfig label
         const paymentMethodLabels: Record<string, string> = {
             BANK_TRANSFER: pdfConfig.paymentMethodBankTransfer,
@@ -303,11 +305,11 @@ export class ReceiptsService {
             CHECK: pdfConfig.paymentMethodCheck,
             OTHER: pdfConfig.paymentMethodOther,
         };
- 
+
         // Default payment display values
         let paymentMethodName = receipt.paymentMethod;
         let paymentDetails = receipt.paymentDetails;
- 
+
         // Prefer the saved payment method record if referenced
         if (receipt.paymentMethodId) {
             const pm = await prisma.paymentMethod.findUnique({ where: { id: receipt.paymentMethodId } });
@@ -322,7 +324,7 @@ export class ReceiptsService {
                 paymentMethodName = paymentMethodLabels[paymentMethodName.toUpperCase()];
             }
         }
- 
+
         // Map item type enums to PDF label text (from pdfConfig)
         const itemTypeLabels: Record<string, string> = {
             HOUR: pdfConfig.hour,
@@ -331,7 +333,7 @@ export class ReceiptsService {
             SERVICE: pdfConfig.service,
             PRODUCT: pdfConfig.product,
         };
- 
+
         const html = template({
             number: receipt.rawNumber || receipt.number.toString(),
             paymentDate: formatDate(receipt.invoice.company, new Date()), // TODO: Add a payment date
@@ -341,7 +343,7 @@ export class ReceiptsService {
             currency: receipt.invoice.currency,
             paymentMethod: paymentMethodName,
             totalAmount: receipt.totalPaid.toFixed(2),
- 
+
             items: receipt.items.map(item => {
                 const invoiceItem = receipt.invoice.items.find(i => i.id === item.invoiceItemId);
                 return {

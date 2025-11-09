@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Receipt as ReceiptIcon, Search } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useGet, useGetRaw } from "@/hooks/use-fetch"
+import { useGetRaw, useSse } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,7 @@ export default function Receipts() {
     const { t } = useTranslation()
     const receiptListRef = useRef<ReceiptListHandle>(null)
     const [page, setPage] = useState(1)
-    const { data: receipts } = useGet<{ pageCount: number; receipts: Receipt[] }>(`/api/receipts/sse?page=${page}`)
+    const { data: receipts } = useSse<{ pageCount: number; receipts: Receipt[] }>(`/api/receipts/sse?page=${page}`)
     const [downloadReceiptPdf, setDownloadReceiptPdf] = useState<Receipt | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/receipts/${downloadReceiptPdf?.id}/pdf`)
 
