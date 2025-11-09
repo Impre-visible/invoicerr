@@ -62,7 +62,7 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/logs
           npm install -D dotenv-cli
-          (cd $GITHUB_WORKSPACE/backend && npx dotenv -e .env.test -- npx prisma migrate dev > /dev/null 2>&1)
+          (cd $GITHUB_WORKSPACE/backend && npx dotenv -e .env.test -- npx prisma migrate dev 2>&1)
           (cd $GITHUB_WORKSPACE/backend && npm run start:test > $GITHUB_WORKSPACE/logs/backend.log 2>&1 &)
           (cd $GITHUB_WORKSPACE/frontend && npm run start:test > /dev/null 2>&1 &)
           (cd $GITHUB_WORKSPACE/e2e && npm run e2e:run)
