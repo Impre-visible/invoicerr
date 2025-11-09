@@ -1,6 +1,6 @@
 
 import { clsx, type ClassValue } from "clsx"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -48,6 +48,7 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
   }
   return res;
 }
+
 export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -135,6 +136,65 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
     error,
     mutate: () => setRefetchIndex((i) => i + 1),
   };
+}
+
+export interface UseSSEResult<T = any> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+  close: () => void;
+}
+
+
+export function useSSE<T = any>(url: string, options?: EventSourceInit): UseSSEResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  useEffect(() => {
+    let newURL = url;
+    if (!url.startsWith("http")) {
+      newURL = `${import.meta.env.VITE_BACKEND_URL || ""}${url}`;
+    }
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const es = new EventSource(newURL, options);
+    eventSourceRef.current = es;
+    setLoading(true);
+    setError(null);
+
+    es.onmessage = (event) => {
+      try {
+        const parsed = JSON.parse(event.data);
+        setData(parsed);
+      } catch {
+        setData(event.data as T);
+      }
+      setLoading(false);
+    };
+
+    es.onerror = () => {
+      setError(new Error("SSE connection error"));
+      setLoading(false);
+    };
+
+    return () => {
+      es.close();
+    };
+  }, [url]);
+
+  const close = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+  };
+
+  return { data, loading, error, close };
 }
 
 type UseRequestOptions = RequestInit & { body?: any };
