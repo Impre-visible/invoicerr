@@ -1,15 +1,24 @@
 import * as Handlebars from 'handlebars';
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from '@/modules/quotes/dto/quotes.dto';
-import { baseTemplate } from '@/modules/quotes/templates/base.template';
-import prisma from '@/prisma/prisma.service';
 import { getInvertColor, getPDF } from '@/utils/pdf';
-import { formatDate } from '@/utils/date';
 
+import { ISigningProvider } from '@/plugins/signing/types';
+import { PluginsService } from '../plugins/plugins.service';
+import { baseTemplate } from '@/modules/quotes/templates/base.template';
+import { formatDate } from '@/utils/date';
+import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class QuotesService {
+    private readonly pluginsService: PluginsService
+    private readonly logger: Logger;
+
+    constructor() {
+        this.pluginsService = new PluginsService();
+        this.logger = new Logger(QuotesService.name);
+    }
 
     async getQuotes(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -121,7 +130,7 @@ export class QuotesService {
         const totalHT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
         let totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
- 
+
         const isVatExemptFrance = !!(company.exemptVat && (company.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
             totalVAT = 0;
@@ -179,7 +188,7 @@ export class QuotesService {
         const totalHT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
         let totalVAT = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (item.vatRate || 0) / 100), 0);
         let totalTTC = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice * (1 + (item.vatRate || 0) / 100)), 0);
- 
+
         const company = await prisma.company.findFirst();
         const isVatExemptFrance = !!(company?.exemptVat && (company?.country || '').toUpperCase() === 'FRANCE');
         if (isVatExemptFrance) {
@@ -251,6 +260,7 @@ export class QuotesService {
     }
 
     async getQuotePdf(id: string): Promise<Uint8Array> {
+
         const quote = await prisma.quote.findUnique({
             where: { id },
             include: {
@@ -266,14 +276,27 @@ export class QuotesService {
             throw new BadRequestException('Quote or associated PDF config not found');
         }
 
+        // Only use signing provider to generate PDF if quote is signed
+        if (quote.status === 'SIGNED') {
+            const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
+            try {
+                if (provider && typeof provider.generatePdfPreview == 'function') {
+                    const pdf = await provider.generatePdfPreview(id);
+                    return pdf;
+                }
+            } catch (error) {
+                this.logger.error(`Error generating PDF via signing provider, falling back to built-in PDF generation`);
+            }
+        }
+
         const config = quote.company.pdfConfig;
         const templateHtml = baseTemplate;
         const template = Handlebars.compile(templateHtml);
 
-        if (quote.client.name.length==0) {
+        if (quote.client.name.length == 0) {
             quote.client.name = quote.client.contactFirstname + " " + quote.client.contactLastname
         }
- 
+
         // Map payment method enum -> PDFConfig label
         const paymentMethodLabels: Record<string, string> = {
             BANK_TRANSFER: config.paymentMethodBankTransfer,
@@ -302,7 +325,7 @@ export class QuotesService {
             SERVICE: config.service,
             PRODUCT: config.product,
         };
- 
+
         const html = template({
             number: quote.rawNumber || quote.number.toString(),
             date: formatDate(quote.company, quote.createdAt),
