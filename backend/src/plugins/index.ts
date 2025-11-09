@@ -165,6 +165,9 @@ export class PluginRegistry {
                 break;
             }
         }
+
+        this.logger.log(`Looking for plugin form at path: ${path}`);
+
         if (!path || !existsSync(path)) {
             await prisma.plugin.delete({ where: { id: plugin_id } });
             throw new Error(`Form for plugin ID "${plugin_id}" not found.`);
