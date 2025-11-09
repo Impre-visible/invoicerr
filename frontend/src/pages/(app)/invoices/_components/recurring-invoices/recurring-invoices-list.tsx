@@ -19,7 +19,7 @@ interface RecurringInvoiceListProps {
     page?: number
     pageCount?: number
     setPage?: (page: number) => void
-    mutate: () => void
+    mutate?: () => void
     emptyState: React.ReactNode
     showCreateButton?: boolean
 }
@@ -100,7 +100,7 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("recurringInvoices.list.item.client")}:</span>{" "}
-                                                                {recurringInvoice.client.name || recurringInvoice.client.contactFirstname+ " " +recurringInvoice.client.contactLastname}
+                                                                {recurringInvoice.client.name || recurringInvoice.client.contactFirstname + " " + recurringInvoice.client.contactLastname}
                                                             </span>
                                                             {recurringInvoice.paymentMethod && (
                                                                 <span>
@@ -180,7 +180,7 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                     open={createRecurringInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         setCreateRecurringInvoiceDialog(open)
-                        if (!open) mutate()
+                        if (!open) mutate && mutate()
                     }}
                 />
 
@@ -189,7 +189,7 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                     recurringInvoice={editRecurringInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setEditRecurringInvoiceDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
 
@@ -204,7 +204,7 @@ export const RecurringInvoiceList = forwardRef<RecurringInvoiceListHandle, Recur
                     recurringInvoice={deleteRecurringInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setDeleteRecurringInvoiceDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
             </>
