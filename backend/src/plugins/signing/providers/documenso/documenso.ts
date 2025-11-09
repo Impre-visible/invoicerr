@@ -80,6 +80,17 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
             throw new Error("Quote or client not found");
         }
 
+
+        const existingDocument = (await client.documents.find({})).data.find(doc => doc.externalId === props.id);
+
+        if (existingDocument && existingDocument.id) {
+            await client.documents.distribute({
+                documentId: existingDocument.id,
+            });
+            logger.log(`Document already exists for quote ID: ${props.id}, re-sent to recipients.`);
+            return `documenso-${existingDocument.id}`;
+        }
+
         const pdfFileUint8Array: Uint8Array = await quotesService.getQuotePdf(props.id);
 
         const pageCount = await countPdfPages(pdfFileUint8Array);
@@ -198,9 +209,6 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
             logger.warn(`No webhook secret provided for plugin ${plugin.name}`);
             throw new UnauthorizedException('Webhook secret is required');
         }
-
-        logger.log('Received Documenso webhook:', body);
-
 
         const documentId = body.payload.id;
 
