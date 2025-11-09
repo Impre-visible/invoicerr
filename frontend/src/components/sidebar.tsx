@@ -36,9 +36,8 @@ import type { Company } from "@/types"
 import type React from "react"
 import { Skeleton } from "./ui/skeleton"
 import { useAuth } from "@/contexts/auth"
-import { useEffect } from "react"
-import { useGet } from "@/hooks/use-fetch"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useSse } from "@/hooks/use-fetch"
 import { useTheme } from "./theme-provider"
 import { useTranslation } from "react-i18next"
 
@@ -49,7 +48,7 @@ export function Sidebar() {
     const location = useLocation()
     const { user, loading: userLoading, logout } = useAuth()
     const { setTheme } = useTheme()
-    const { data: company, loading: companyLoading, mutate } = useGet<Company>("/api/company/info")
+    const { data: company } = useSse<Company>("/api/company/info/sse")
     const navigate = useNavigate()
 
     const items: { title: string; icon: React.ReactNode; url: string }[] = [
@@ -95,12 +94,6 @@ export function Sidebar() {
         },
     ]
 
-    useEffect(() => {
-        if (!company) {
-            mutate()
-        }
-    }, [location])
-
     const handleLogout = () => {
         logout()
     }
@@ -127,17 +120,10 @@ export function Sidebar() {
                                 <div className="bg-accent text-accent-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                                     <Building2 className="size-4" />
                                 </div>
-                                {companyLoading ? (
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <Skeleton className="h-3 w-3/4" />
-                                        <Skeleton className="h-2 w-1/4 mt-1" />
-                                    </div>
-                                ) : (
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-medium">{company?.name}</span>
-                                        <span className="truncate text-xs">{t("sidebar.company.plan")}</span>
-                                    </div>
-                                )}
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="truncate font-medium">{company?.name}</span>
+                                    <span className="truncate text-xs">{t("sidebar.company.plan")}</span>
+                                </div>
                             </section>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -131,7 +131,7 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
     };
 }
 
-export interface UseSSEResult<T = any> {
+export interface useSseResult<T = any> {
     data: T | null;
     loading: boolean;
     error: Error | null;
@@ -139,7 +139,7 @@ export interface UseSSEResult<T = any> {
 }
 
 
-export function useSSE<T = any>(url: string, options?: EventSourceInit): UseSSEResult<T> {
+export function useSse<T = any>(url: string, options?: EventSourceInit): useSseResult<T> {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -155,6 +155,11 @@ export function useSSE<T = any>(url: string, options?: EventSourceInit): UseSSER
             eventSourceRef.current.close();
         }
 
+        options = {
+            ...options,
+            withCredentials: true,
+        }
+
         const es = new EventSource(newURL, options);
         eventSourceRef.current = es;
         setLoading(true);
@@ -167,7 +172,6 @@ export function useSSE<T = any>(url: string, options?: EventSourceInit): UseSSER
             } catch {
                 setData(event.data as T);
             }
-            setLoading(false);
         };
 
         es.onerror = () => {

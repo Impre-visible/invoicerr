@@ -20,7 +20,7 @@ import { InvoiceList } from "@/pages/(app)/invoices/_components/invoice-list"
 import { QuoteList } from "@/pages/(app)/quotes/_components/quote-list"
 import type React from "react"
 import { useAuth } from "@/contexts/auth"
-import { useGet } from "@/hooks/use-fetch"
+import { useSse } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 
 interface DashboardData {
@@ -61,7 +61,7 @@ interface DashboardData {
 export default function Dashboard() {
     const { t } = useTranslation()
     const { user } = useAuth()
-    const { data: dashboardData } = useGet<DashboardData>("/api/dashboard")
+    const { data: dashboardData } = useSse<DashboardData>("/api/dashboard/sse")
 
     const formatCurrency = (amount: number | null | undefined) => {
         return new Intl.NumberFormat("en-US", {
@@ -171,6 +171,7 @@ export default function Dashboard() {
                                                 strokeWidth={2}
                                                 dataKey="revenue"
                                                 stroke="var(--color-white)"
+                                                isAnimationActive={false}
                                                 activeDot={{
                                                     r: 6,
                                                 }}
@@ -245,6 +246,7 @@ export default function Dashboard() {
                                             <Line
                                                 type="bump"
                                                 strokeWidth={2}
+                                                isAnimationActive={false}
                                                 dataKey="revenue"
                                                 stroke="var(--color-white)"
                                                 activeDot={{
