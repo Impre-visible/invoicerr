@@ -2,7 +2,7 @@ import { ReceiptText, Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { InvoiceList, type InvoiceListHandle } from "@/pages/(app)/invoices/_components/invoice-list"
 import { useEffect, useRef, useState } from "react"
-import { useGet, useGetRaw } from "@/hooks/use-fetch"
+import { useGetRaw, useSse } from "@/hooks/use-fetch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Invoice, RecurringInvoice } from "@/types"
@@ -16,11 +16,9 @@ export default function Invoices() {
 
     const [page, setPage] = useState(1)
     const {
-        data: invoices,
-        mutate,
-        loading,
-    } = useGet<{ pageCount: number; invoices: Invoice[] }>(`/api/invoices?page=${page}`)
-    const { data: recurringInvoices } = useGet<{ pageCount: number; data: RecurringInvoice[] }>("/api/recurring-invoices")
+        data: invoices
+    } = useSse<{ pageCount: number; invoices: Invoice[] }>(`/api/invoices/sse?page=${page}`)
+    const { data: recurringInvoices } = useSse<{ pageCount: number; data: RecurringInvoice[] }>("/api/recurring-invoices/sse")
     const [downloadInvoicePdf, setDownloadInvoicePdf] = useState<Invoice | null>(null)
     const { data: pdf } = useGetRaw<Response>(`/api/invoices/${downloadInvoicePdf?.id}/pdf`)
 
@@ -191,13 +189,12 @@ export default function Invoices() {
             <InvoiceList
                 ref={invoiceListRef}
                 invoices={filteredInvoices}
-                loading={loading}
+                loading={false}
                 title={t("invoices.list.title")}
                 description={t("invoices.list.description")}
                 page={page}
                 pageCount={invoices?.pageCount || 1}
                 setPage={setPage}
-                mutate={mutate}
                 emptyState={invoiceEmptyState}
                 showCreateButton={true}
             />
