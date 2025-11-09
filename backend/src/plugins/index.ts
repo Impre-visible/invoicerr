@@ -166,6 +166,8 @@ export class PluginRegistry {
             }
         }
 
+        path = path.replace('src/src', 'src');
+
         this.logger.log(`Looking for plugin form at path: ${path}`);
 
         if (!path || !existsSync(path)) {
