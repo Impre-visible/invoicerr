@@ -257,7 +257,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Il n'y a aucun client. Veuillez en créer un d'abord."
                 },
                 "currency": {
                     "label": "Devise"
@@ -445,7 +446,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Il n'y a aucun client. Veuillez en créer un d'abord."
                 },
                 "dueDate": {
                     "label": "Date d'échéance",
@@ -590,7 +592,8 @@
         },
         "emptyState": {
             "noInvoices": "Aucune facture récurrente pour le moment",
-            "noResults": "Aucune facture récurrente trouvée"
+            "noResults": "Aucune facture récurrente trouvée",
+            "startAdding": "Commencez par créer votre première facture récurrente."
         },
         "actions": {
             "addNew": "Ajouter une nouvelle facture récurrente"
@@ -610,7 +613,8 @@
                     "placeholder": "Sélectionner un client",
                     "errors": {
                         "required": "Veuillez sélectionner un client"
-                    }
+                    },
+                    "noOptions": "Aucun client disponible. Veuillez d'abord créer un client."
                 },
                 "currency": {
                     "label": "Devise"
@@ -838,7 +842,8 @@
         },
         "delete": {
             "description": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action ne peut pas être annulée."
-        }
+        },
+        "empty": "Aucun moyen de paiement disponible pour le moment."
     },
     "settings": {
         "tabs": {
@@ -1652,5 +1657,6 @@
             "warning": "Configurez à la fois l'URL et le secret du webhook dans les paramètres de {{pluginName}} pour recevoir des mises à jour authentifiées en temps réel. Stockez le secret en sécurité - il ne sera plus affiché.",
             "gotIt": "Compris !"
         }
-    }
+    },
+    "noOptions": "Aucune option disponible. Créer un nouveau client."
 }
