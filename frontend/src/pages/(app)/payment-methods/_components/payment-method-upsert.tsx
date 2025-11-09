@@ -1,18 +1,18 @@
 "use client"
 
-import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { authenticatedFetch, usePatch, usePost } from "@/hooks/use-fetch";
+
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { usePost, usePatch, authenticatedFetch } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
-
 
 const paymentMethodSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),

@@ -10,18 +10,30 @@ import {
   Post,
   Query,
   Res,
+  Sse,
 } from '@nestjs/common';
 
 import { Response } from 'express';
+import { interval, from, map, startWith, switchMap } from 'rxjs';
 
 @Controller('receipts')
 export class ReceiptsController {
-  constructor(private readonly receiptsService: ReceiptsService) {}
+  constructor(private readonly receiptsService: ReceiptsService) { }
 
   @Get()
   async getReceiptsInfo(@Param('page') page: string) {
     return await this.receiptsService.getReceipts(page);
   }
+
+  @Sse('sse')
+  async getReceiptsInfoSse(@Param('page') page: string) {
+    return interval(1000).pipe(
+      startWith(0),
+      switchMap(() => from(this.receiptsService.getReceipts(page))),
+      map((data) => ({ data: JSON.stringify(data) })),
+    );
+  }
+
   @Get('search')
   async searchClients(@Query('query') query: string) {
     return await this.receiptsService.searchReceipts(query);

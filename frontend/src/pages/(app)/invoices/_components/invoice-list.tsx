@@ -2,7 +2,7 @@ import { Banknote, Code, Download, Edit, Eye, FileText, Mail, Plus, ReceiptText,
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
-import { useGet, useGetRaw, usePost } from "@/lib/utils"
+import { useGet, useGetRaw, usePost } from "@/hooks/use-fetch"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,7 @@ interface InvoiceListProps {
     page?: number
     pageCount?: number
     setPage?: (page: number) => void
-    mutate: () => void
+    mutate?: () => void
     emptyState: React.ReactNode
     showCreateButton?: boolean
 }
@@ -108,7 +108,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
             triggerMarkAsPaid({ invoiceId })
                 .then(() => {
                     toast.success(t("invoices.list.messages.markAsPaidSuccess"))
-                    mutate()
+                    mutate && mutate()
                 })
                 .catch((error) => {
                     console.error("Error marking invoice as paid:", error)
@@ -124,7 +124,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
             triggerCreateReceipt({ id: invoiceId })
                 .then(() => {
                     toast.success(t("invoices.list.messages.createReceiptSuccess"))
-                    mutate()
+                    mutate && mutate()
                 })
                 .catch((error) => {
                     console.error("Error creating receipt from invoice:", error)
@@ -215,7 +215,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                         <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.client")}:</span>{" "}
-                                                                {invoice.client.name||invoice.client.contactFirstname+" "+invoice.client.contactLastname}
+                                                                {invoice.client.name || invoice.client.contactFirstname + " " + invoice.client.contactLastname}
                                                             </span>
                                                             <span>
                                                                 <span className="font-medium text-foreground">{t("invoices.list.item.issued")}:</span>{" "}
@@ -410,7 +410,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     open={createInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         setCreateInvoiceDialog(open)
-                        if (!open) mutate()
+                        if (!open) mutate && mutate()
                     }}
                 />
 
@@ -419,7 +419,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     invoice={editInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setEditInvoiceDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
 
@@ -441,7 +441,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                     invoice={deleteInvoiceDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setDeleteInvoiceDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
             </>

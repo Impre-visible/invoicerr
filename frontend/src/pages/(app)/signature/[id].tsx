@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle, Clock, Download, FileText, Mail, RefreshCw, Z
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
 import { useEffect, useState } from "react"
-import { useGet, useGetRaw, usePost } from "@/lib/utils"
+import { useGet, useGetRaw, usePost } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"

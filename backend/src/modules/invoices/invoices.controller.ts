@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   Res,
+  Sse,
 } from '@nestjs/common';
 
 import { Response } from 'express';
@@ -15,17 +16,28 @@ import { ExportFormat } from '@fin.cx/einvoice';
 import { CreateInvoiceDto, EditInvoicesDto } from '@/modules/invoices/dto/invoices.dto';
 import { InvoicesService } from '@/modules/invoices/invoices.service';
 import { PluginsService } from '@/modules/plugins/plugins.service';
+import { interval } from 'rxjs/internal/observable/interval';
+import { from, map, startWith, switchMap } from 'rxjs';
 
 @Controller('invoices')
 export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
     private readonly pluginService: PluginsService,
-  ) {}
+  ) { }
 
   @Get()
   async getInvoicesInfo(@Param('page') page: string) {
     return await this.invoicesService.getInvoices(page);
+  }
+
+  @Sse('sse')
+  async getInvoicesInfoSse(@Param('page') page: string) {
+    return interval(1000).pipe(
+      startWith(0),
+      switchMap(() => from(this.invoicesService.getInvoices(page))),
+      map((data) => ({ data: JSON.stringify(data) })),
+    );
   }
 
   @Get('search')

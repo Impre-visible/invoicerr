@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useEffect, useState } from "react"
 
 import type { Receipt } from "@/types"
-import { useGetRaw } from "@/lib/utils"
+import { useGetRaw } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 
 type ReceiptPdfModalProps = {

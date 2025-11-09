@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import Loading from "@/pages/_loading/loading";
-import { authenticatedFetch } from "@/lib/utils";
+import { authenticatedFetch } from "@/hooks/use-fetch";
 
 interface User {
     id: string;

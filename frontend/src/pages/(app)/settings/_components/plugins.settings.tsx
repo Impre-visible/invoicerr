@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ExternalLink, GitBranch, Plus, Trash2 } from "lucide-react"
-import { useDelete, useGet, usePost, usePut } from "@/lib/utils"
+import { useDelete, useGet, usePost, usePut } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { DynamicFormModal } from "@/components/form-modal"

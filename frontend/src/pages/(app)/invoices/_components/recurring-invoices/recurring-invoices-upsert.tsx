@@ -1,5 +1,4 @@
-import type { Client, Quote, RecurringInvoice, PaymentMethod } from "@/types"
-import { PaymentMethodType } from "@/types"
+import type { Client, PaymentMethod, Quote, RecurringInvoice } from "@/types"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DndContext, MouseSensor, TouchSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -8,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
-import { useGet, usePatch, usePost } from "@/lib/utils"
+import { useGet, usePatch, usePost } from "@/hooks/use-fetch"
 
 import { BetterInput } from "@/components/better-input"
 import { Button } from "@/components/ui/button"
@@ -17,6 +16,7 @@ import { ClientUpsert } from "../../../clients/_components/client-upsert"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { PaymentMethodType } from "@/types"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Separator } from "@/components/ui/separator"
@@ -323,7 +323,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                                     <SelectContent>
                                                         {paymentMethods?.map((pm: PaymentMethod) => (
                                                             <SelectItem key={pm.id} value={pm.id}>
-                                                                {pm.name} - {pm.type==PaymentMethodType.BANK_TRANSFER?t("paymentMethods.fields.type.bank_transfer"):pm.type==PaymentMethodType.PAYPAL?t("paymentMethods.fields.type.paypal"):pm.type==PaymentMethodType.CHECK?t("paymentMethods.fields.type.check"):pm.type==PaymentMethodType.CASH?t("paymentMethods.fields.type.cash"):pm.type==PaymentMethodType.OTHER?t("paymentMethods.fields.type.other"):pm.type}
+                                                                {pm.name} - {pm.type == PaymentMethodType.BANK_TRANSFER ? t("paymentMethods.fields.type.bank_transfer") : pm.type == PaymentMethodType.PAYPAL ? t("paymentMethods.fields.type.paypal") : pm.type == PaymentMethodType.CHECK ? t("paymentMethods.fields.type.check") : pm.type == PaymentMethodType.CASH ? t("paymentMethods.fields.type.cash") : pm.type == PaymentMethodType.OTHER ? t("paymentMethods.fields.type.other") : pm.type}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -464,18 +464,18 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                            <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
-                                                                                <SelectTrigger className="w-32" size="sm" aria-label={t("recurringInvoices.upsert.form.items.type.label") as string}>
-                                                                                    <SelectValue />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    <SelectItem value="HOUR">{t("recurringInvoices.upsert.form.items.type.hour")}</SelectItem>
-                                                                                    <SelectItem value="DAY">{t("recurringInvoices.upsert.form.items.type.day")}</SelectItem>
-                                                                                    <SelectItem value="DEPOSIT">{t("recurringInvoices.upsert.form.items.type.deposit")}</SelectItem>
-                                                                                    <SelectItem value="SERVICE">{t("recurringInvoices.upsert.form.items.type.service")}</SelectItem>
-                                                                                    <SelectItem value="PRODUCT">{t("recurringInvoices.upsert.form.items.type.product")}</SelectItem>
-                                                                                </SelectContent>
-                                                                            </Select>
+                                                                        <Select value={field.value ?? 'SERVICE'} onValueChange={(val) => field.onChange(val as any)}>
+                                                                            <SelectTrigger className="w-32" size="sm" aria-label={t("recurringInvoices.upsert.form.items.type.label") as string}>
+                                                                                <SelectValue />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent>
+                                                                                <SelectItem value="HOUR">{t("recurringInvoices.upsert.form.items.type.hour")}</SelectItem>
+                                                                                <SelectItem value="DAY">{t("recurringInvoices.upsert.form.items.type.day")}</SelectItem>
+                                                                                <SelectItem value="DEPOSIT">{t("recurringInvoices.upsert.form.items.type.deposit")}</SelectItem>
+                                                                                <SelectItem value="SERVICE">{t("recurringInvoices.upsert.form.items.type.service")}</SelectItem>
+                                                                                <SelectItem value="PRODUCT">{t("recurringInvoices.upsert.form.items.type.product")}</SelectItem>
+                                                                            </SelectContent>
+                                                                        </Select>
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Download, Edit, Mail, Plus, Receipt as ReceiptIcon, Trash2 } from "lucide-react"
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
-import { useGetRaw, usePost } from "@/lib/utils"
+import { useGetRaw, usePost } from "@/hooks/use-fetch"
 
 import BetterPagination from "../../../../components/pagination"
 import { Button } from "../../../../components/ui/button"
@@ -21,7 +21,7 @@ interface ReceiptListProps {
     page?: number
     pageCount?: number
     setPage?: (page: number) => void
-    mutate: () => void
+    mutate?: () => void
     emptyState: React.ReactNode
     showCreateButton?: boolean
 }
@@ -91,7 +91,7 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
             triggerSendToClient({ id: receipt.id })
                 .then(() => {
                     toast.success(t("receipts.list.messages.emailSent"))
-                    mutate()
+                    mutate && mutate()
                 })
                 .catch((error) => {
                     console.error("Error sending receipt to client:", error)
@@ -238,7 +238,7 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
                     open={createReceiptDialog}
                     onOpenChange={(open) => {
                         setCreateReceiptDialog(open)
-                        if (!open) mutate()
+                        if (!open) mutate && mutate()
                     }}
                 />
 
@@ -247,7 +247,7 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
                     receipt={editReceiptDialog}
                     onOpenChange={(open) => {
                         if (!open) setEditReceiptDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
 
@@ -263,7 +263,7 @@ export const ReceiptList = forwardRef<ReceiptListHandle, ReceiptListProps>(
                     receipt={deleteReceiptDialog}
                     onOpenChange={(open: boolean) => {
                         if (!open) setDeleteReceiptDialog(null)
-                        mutate()
+                        mutate && mutate()
                     }}
                 />
             </>
