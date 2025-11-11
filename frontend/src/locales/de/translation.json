@@ -1640,7 +1640,7 @@
         "step1": "1. Gehen Sie zu Ihrem Documenso-Admin-Panel",
         "step2": "2. Konfigurieren Sie die Webhook-URL",
         "step3": "3. Konfigurieren Sie das Webhook-Secret",
-        "step4": "4. Aktivieren Sie die folgenden Ereignisse: document.signed (mindestens erforderlich)",
+        "step4": "4. Aktivieren Sie die folgenden Ereignisse: document.signed, document.completed (mindestens erforderlich)",
         "step5": "5. Zusätzliche Ereignisse, die Sie aktivieren können: document.pending, document.completed, document.rejected"
       }
     },

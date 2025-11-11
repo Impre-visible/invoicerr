@@ -1640,7 +1640,7 @@
                 "step1": "1. Accede a tu panel de administración de Documenso",
                 "step2": "2. Configura la URL del webhook",
                 "step3": "3. Configura el secreto del webhook",
-                "step4": "4. Activa los siguientes eventos: document.signed (mínimo requerido)",
+                "step4": "4. Activa los siguientes eventos: document.signed, document.completed (mínimo requerido)",
                 "step5": "5. Eventos adicionales que puedes activar: document.pending, document.completed, document.rejected"
             }
         },
