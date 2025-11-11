@@ -1644,7 +1644,7 @@
                 "step1": "1. Accédez à votre panneau d'administration Documenso",
                 "step2": "2. Configurez l'URL du webhook",
                 "step3": "3. Configurez le secret du webhook",
-                "step4": "4. Activez les événements suivants : document.signed (minimum requis)",
+                "step4": "4. Activez les événements suivants : document.signed, document.completed (minimum requis)",
                 "step5": "5. Événements supplémentaires que vous pouvez activer : document.pending, document.completed, document.rejected"
             }
         },
