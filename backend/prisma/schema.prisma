@@ -787,14 +787,14 @@ enum WebhookType {
 }
 
 model Webhook {
-  id        String         @id @default(cuid())
-  url       String
-  secret    String?
-  type      WebhookType    @default(GENERIC)
-  events    WebhookEvent[]
+  id     String         @id @default(cuid())
+  url    String
+  secret String?
+  type   WebhookType    @default(GENERIC)
+  events WebhookEvent[]
 
   // Link webhooks to a company (required)
-  company   Company        @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
   companyId String
 
   @@index([companyId])
