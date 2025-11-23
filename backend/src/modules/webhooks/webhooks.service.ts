@@ -1,18 +1,38 @@
-import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Webhook, WebhookEvent, WebhookType } from '@prisma/client';
 
+import { DiscordDriver } from './drivers/discord.driver';
+import { GenericDriver } from './drivers/generic.driver';
 import { IWebhookProvider } from '@/plugins/types';
+import { MattermostDriver } from './drivers/mattermost.driver';
 import { PluginsService } from '../plugins/plugins.service';
 import { Request } from 'express';
+import { RocketChatDriver } from './drivers/rocketchat.driver';
+import { SlackDriver } from './drivers/slack.driver';
+import { TeamsDriver } from './drivers/teams.driver';
+import { WebhookDriver } from './drivers/webhook-driver.interface';
+import { ZapierDriver } from './drivers/zapier.driver';
+import crypto from "crypto";
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class WebhooksService {
     private readonly logger = new Logger(WebhooksService.name);
 
+    private drivers: WebhookDriver[] = [
+        new DiscordDriver(),
+        new GenericDriver(),
+        new MattermostDriver(),
+        new RocketChatDriver(),
+        new SlackDriver(),
+        new TeamsDriver(),
+        new ZapierDriver(),
+    ];
+
     constructor(private readonly pluginsService: PluginsService) { }
 
     /**
-     * Traite un webhook reçu pour un plugin spécifique
+     * Handle a received webhook for a specific plugin
      */
     async handlePluginWebhook(pluginId: string, body: any, req: Request): Promise<any> {
         this.logger.log(`Processing webhook for plugin: ${pluginId}`);
@@ -59,48 +79,34 @@ export class WebhooksService {
     }
 
     /**
-     * Génère une URL de webhook pour un plugin donné
+     * Generate a webhook URL for a given plugin ID
      */
     generateWebhookUrl(pluginId: string): string {
         const baseUrl = process.env.APP_URL || 'http://localhost:3000';
         return `${baseUrl}/api/webhooks/${pluginId}`;
     }
 
+    private getDriver(type: WebhookType): WebhookDriver {
+        const driver = this.drivers.find((d) => d.supports(type));
+        if (!driver) {
+            this.logger.warn(`No webhook driver found for type: ${type}, using GenericDriver as fallback`);
+            return new GenericDriver();
+        }
+        return driver;
+    }
+
+
     /**
-     * Extrait le secret webhook de la requête
-     * Supporte plusieurs méthodes communes d'envoi de secrets
+     * Send a webhook to a specified URL with HMAC signature
      */
-    private extractSecretFromRequest(req: Request): string | null {
-        // Vérifier les headers communs pour les secrets de webhook
-        const authHeader = req.headers.authorization;
-        const secretHeader = req.headers['x-webhook-secret'] as string;
-        const signatureHeader = req.headers['x-signature'] as string;
-
-        // Méthode 1: Header Authorization Bearer
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            return authHeader.substring(7);
-        }
-
-        // Méthode 2: Header X-Webhook-Secret
-        if (secretHeader) {
-            return secretHeader;
-        }
-
-        // Méthode 3: Header X-Signature
-        if (signatureHeader) {
-            return signatureHeader;
-        }
-
-        // Méthode 4: Query parameter
-        if (req.query.secret) {
-            return req.query.secret as string;
-        }
-
-        // Méthode 5: Dans le body (certains providers)
-        if (req.body && req.body.webhook_secret) {
-            return req.body.webhook_secret;
-        }
-
-        return null;
+    async send(webhooks: Webhook[], event: WebhookEvent, payload: any) {
+        const results = await Promise.all(webhooks.map(async (webhook) => {
+            const driver = this.getDriver(webhook.type);
+            return await driver.send(webhook.url, {
+                event,
+                ...payload,
+            }, webhook.secret ?? null);
+        }));
+        return results;
     }
 }

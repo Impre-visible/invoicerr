@@ -1,9 +1,17 @@
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+
 import { EditClientsDto } from '@/modules/clients/dto/clients.dto';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
+import { WebhookEvent } from '@prisma/client';
 import prisma from '@/prisma/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ClientsService {
+    private readonly logger: Logger;
+
+    constructor(private readonly webhookDispatcher: WebhookDispatcherService) {
+        this.logger = new Logger(ClientsService.name);
+    }
 
     async getClients(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -34,7 +42,7 @@ export class ClientsService {
             });
         }
 
-        return prisma.client.findMany({
+        const results = await prisma.client.findMany({
             where: {
                 isActive: true,
                 OR: [
@@ -54,6 +62,17 @@ export class ClientsService {
                 name: 'asc',
             },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.CLIENT_SEARCHED, {
+                query,
+                results: results.length,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch CLIENT_SEARCHED webhook', error);
+        }
+
+        return results;
     }
 
     async createClient(editClientsDto: EditClientsDto) {
@@ -80,7 +99,17 @@ export class ClientsService {
             }
         }
 
-        return prisma.client.create({ data });
+        const newClient = await prisma.client.create({ data });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.CLIENT_CREATED, {
+                client: newClient,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch CLIENT_CREATED webhook', error);
+        }
+
+        return newClient;
     }
 
     async editClientsInfo(editClientsDto: EditClientsDto) {
@@ -113,16 +142,42 @@ export class ClientsService {
             }
         }
 
-        return await prisma.client.update({
+        const updatedClient = await prisma.client.update({
             where: { id: editClientsDto.id },
             data: { ...editClientsDto, isActive: true },
-        })
+        });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.CLIENT_UPDATED, {
+                client: updatedClient,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch CLIENT_UPDATED webhook', error);
+        }
+
+        return updatedClient;
     }
 
-    deleteClient(id: string) {
-        return prisma.client.update({
+    async deleteClient(id: string) {
+        const existingClient = await prisma.client.findUnique({ where: { id } });
+
+        if (!existingClient) {
+            throw new BadRequestException('Client not found');
+        }
+
+        const deletedClient = await prisma.client.update({
             where: { id },
             data: { isActive: false },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.CLIENT_DELETED, {
+                client: existingClient,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch CLIENT_DELETED webhook', error);
+        }
+
+        return deletedClient;
     }
 }

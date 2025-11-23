@@ -6,6 +6,8 @@ import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { MailService } from '@/mail/mail.service';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
+import { WebhookEvent } from '@prisma/client';
 import { baseTemplate } from '@/modules/invoices/templates/base.template';
 import { business } from '@tsclass/tsclass/dist_ts';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';
@@ -17,7 +19,10 @@ import prisma from '@/prisma/prisma.service';
 export class InvoicesService {
     private readonly logger: Logger;
 
-    constructor(private readonly mailService: MailService) {
+    constructor(
+        private readonly mailService: MailService,
+        private readonly webhookDispatcher: WebhookDispatcherService
+    ) {
         this.logger = new Logger(InvoicesService.name);
     }
 
@@ -135,8 +140,23 @@ export class InvoicesService {
                     })),
                 },
                 dueDate: data.dueDate ? new Date(data.dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-            }
+            },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_CREATED, {
+                invoice,
+                client,
+                company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_CREATED webhook', error);
+        }
 
         return invoice;
     }
@@ -228,22 +248,56 @@ export class InvoicesService {
                         })),
                 },
             },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_UPDATED, {
+                invoice: updateInvoice,
+                client: updateInvoice.client,
+                company: updateInvoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_UPDATED webhook', error);
+        }
 
         return updateInvoice;
     }
 
     async deleteInvoice(id: string) {
-        const existingInvoice = await prisma.invoice.findUnique({ where: { id } });
+        const existingInvoice = await prisma.invoice.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            }
+        });
 
         if (!existingInvoice) {
             throw new BadRequestException('Invoice not found');
         }
 
-        return prisma.invoice.update({
+        const deletedInvoice = await prisma.invoice.update({
             where: { id },
             data: { isActive: false },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_DELETED, {
+                invoice: existingInvoice,
+                client: existingInvoice.client,
+                company: existingInvoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_DELETED webhook', error);
+        }
+
+        return deletedInvoice;
     }
 
     async getInvoicePdf(id: string): Promise<Uint8Array> {
@@ -520,13 +574,20 @@ export class InvoicesService {
     }
 
     async createInvoiceFromQuote(quoteId: string) {
-        const quote = await prisma.quote.findUnique({ where: { id: quoteId }, include: { items: true } });
+        const quote = await prisma.quote.findUnique({
+            where: { id: quoteId },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            }
+        });
 
         if (!quote) {
             throw new BadRequestException('Quote not found');
         }
 
-        return this.createInvoice({
+        const newInvoice = await this.createInvoice({
             clientId: quote.clientId,
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             items: quote.items,
@@ -536,19 +597,52 @@ export class InvoicesService {
             paymentMethod: (quote as any).paymentMethod || undefined,
             paymentDetails: (quote as any).paymentDetails || undefined,
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_CREATED_FROM_QUOTE, {
+                invoice: newInvoice,
+                quote,
+                client: quote.client,
+                company: quote.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_CREATED_FROM_QUOTE webhook', error);
+        }
+
+        return newInvoice;
     }
 
     async markInvoiceAsPaid(invoiceId: string) {
-        const invoice = await prisma.invoice.findUnique({ where: { id: invoiceId } });
+        const invoice = await prisma.invoice.findUnique({
+            where: { id: invoiceId },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            }
+        });
 
         if (!invoice) {
             throw new BadRequestException('Invoice not found');
         }
 
-        return prisma.invoice.update({
+        const paidInvoice = await prisma.invoice.update({
             where: { id: invoiceId },
             data: { status: 'PAID', paidAt: new Date() }
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_MARKED_AS_PAID, {
+                invoice: paidInvoice,
+                client: invoice.client,
+                company: invoice.company,
+                paidAt: paidInvoice.paidAt,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_MARKED_AS_PAID webhook', error);
+        }
+
+        return paidInvoice;
     }
 
     async sendInvoiceByEmail(invoiceId: string) {
@@ -603,6 +697,17 @@ export class InvoicesService {
             await this.mailService.sendMail(mailOptions);
         } catch (error) {
             throw new BadRequestException('Failed to send invoice email. Please check your SMTP configuration.');
+        }
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.INVOICE_SENT, {
+                invoice,
+                client: invoice.client,
+                company: invoice.company,
+                sentAt: new Date(),
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch INVOICE_SENT webhook', error);
         }
 
         return { message: 'Invoice sent successfully' };

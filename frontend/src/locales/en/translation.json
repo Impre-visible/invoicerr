@@ -847,7 +847,8 @@
             "emailTemplates": "Email Templates",
             "account": "Account",
             "dangerZone": "Danger Zone",
-            "plugins": "Plugins"
+            "plugins": "Plugins",
+            "webhooks": "Webhooks"
         },
         "company": {
             "title": "Company Settings",
@@ -1352,6 +1353,18 @@
             "messages": {
                 "saveSuccess": "{{name}} template saved successfully",
                 "saveError": "Failed to save template"
+            }
+        },
+        "webhooks": {
+            "title": "Webhook Settings",
+            "description": "Manage outgoing webhooks for events in your application",
+            "create": {
+                "title": "Create Webhook",
+                "description": "Create a new webhook to receive events",
+                "url": "Webhook URL",
+                "type": "Type",
+                "events": "Events",
+                "button": "Create Webhook"
             }
         }
     },

@@ -6,6 +6,8 @@ import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { ISigningProvider } from '@/plugins/signing/types';
 import { PluginsService } from '../plugins/plugins.service';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
+import { WebhookEvent } from '@prisma/client';
 import { baseTemplate } from '@/modules/quotes/templates/base.template';
 import { formatDate } from '@/utils/date';
 import prisma from '@/prisma/prisma.service';
@@ -15,7 +17,7 @@ export class QuotesService {
     private readonly pluginsService: PluginsService
     private readonly logger: Logger;
 
-    constructor() {
+    constructor(private readonly webhookDispatcher: WebhookDispatcherService) {
         this.pluginsService = new PluginsService();
         this.logger = new Logger(QuotesService.name);
     }
@@ -137,7 +139,7 @@ export class QuotesService {
             totalTTC = totalHT;
         }
 
-        return prisma.quote.create({
+        const quote = await prisma.quote.create({
             data: {
                 ...data,
                 notes: body.notes,
@@ -160,8 +162,25 @@ export class QuotesService {
                     })),
                 },
                 validUntil: body.validUntil ? new Date(body.validUntil) : null,
-            }
+            },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.QUOTE_CREATED, {
+                quote,
+                client,
+                company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch QUOTE_CREATED webhook', error);
+        }
+
+        return quote;
     }
 
     async editQuote(body: EditQuotesDto) {
@@ -236,6 +255,11 @@ export class QuotesService {
                         })),
                 },
             },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
         });
 
         await prisma.signature.updateMany({
@@ -243,20 +267,49 @@ export class QuotesService {
             data: { isActive: false },
         });
 
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.QUOTE_UPDATED, {
+                quote: updateQuote,
+                client: updateQuote.client,
+                company: updateQuote.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch QUOTE_UPDATED webhook', error);
+        }
+
         return updateQuote;
     }
 
     async deleteQuote(id: string) {
-        const existingQuote = await prisma.quote.findUnique({ where: { id } });
+        const existingQuote = await prisma.quote.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
+        });
 
         if (!existingQuote) {
             throw new BadRequestException('Quote not found');
         }
 
-        return prisma.quote.update({
+        const deletedQuote = await prisma.quote.update({
             where: { id },
             data: { isActive: false },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.QUOTE_DELETED, {
+                quote: existingQuote,
+                client: existingQuote.client,
+                company: existingQuote.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch QUOTE_DELETED webhook', error);
+        }
+
+        return deletedQuote;
     }
 
     async getQuotePdf(id: string): Promise<Uint8Array> {
@@ -396,16 +449,41 @@ export class QuotesService {
             throw new BadRequestException('Quote ID is required');
         }
 
-        const existingQuote = await prisma.quote.findUnique({ where: { id } });
+        const existingQuote = await prisma.quote.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
+        });
 
         if (!existingQuote) {
             throw new BadRequestException('Quote not found');
         }
 
-        return prisma.quote.update({
+        const signedQuote = await prisma.quote.update({
             where: { id },
             data: { signedAt: new Date(), status: "SIGNED" },
+            include: {
+                items: true,
+                client: true,
+                company: true,
+            },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.QUOTE_SIGNED, {
+                quote: signedQuote,
+                client: signedQuote.client,
+                company: signedQuote.company,
+                signedAt: signedQuote.signedAt,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch QUOTE_SIGNED webhook', error);
+        }
+
+        return signedQuote;
     }
 
 }

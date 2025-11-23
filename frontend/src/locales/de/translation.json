@@ -847,7 +847,8 @@
       "emailTemplates": "E-Mail-Vorlagen",
       "account": "Konto",
       "dangerZone": "Gefahrenzone",
-      "plugins": "Plugins"
+      "plugins": "Plugins",
+      "webhooks": "Webhooks"
     },
     "company": {
       "title": "Unternehmenseinstellungen",
@@ -1352,6 +1353,18 @@
       "messages": {
         "saveSuccess": "Vorlage {{name}} erfolgreich gespeichert",
         "saveError": "Vorlage konnte nicht gespeichert werden"
+      }
+    },
+    "webhooks": {
+      "title": "Webhook Settings",
+      "description": "Manage outgoing webhooks for events",
+      "create": {
+        "title": "Create Webhook",
+        "description": "Create a new webhook",
+        "url": "Webhook URL",
+        "type": "Type",
+        "events": "Events",
+        "button": "Create Webhook"
       }
     }
   },
