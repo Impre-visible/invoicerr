@@ -1,4 +1,4 @@
-import { AlertTriangle, Building2, External, FileText, Mail, Plug, User } from "lucide-react"
+import { AlertTriangle, Building2, FileText, Mail, Plug, User, Webhook } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useNavigate, useParams } from "react-router"
@@ -43,7 +43,7 @@ export default function Settings() {
         {
             value: "webhooks",
             label: t("settings.tabs.webhooks"),
-            icon: External,
+            icon: Webhook,
         },
         {
             value: "account",
@@ -65,7 +65,7 @@ export default function Settings() {
     const currentTabConfig = tabsConfig.find((tab) => tab.value === currentTab)
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <div className="h-full max-w-7xl mx-auto space-y-6 p-6">
             {/* Mobile/Tablet Select */}
             <div className="lg:hidden">
                 <Select value={currentTab} onValueChange={handleTabChange}>
