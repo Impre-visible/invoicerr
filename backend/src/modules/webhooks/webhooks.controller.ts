@@ -5,12 +5,22 @@ import { WebhooksService } from './webhooks.service';
 import prisma from '@/prisma/prisma.service';
 import { LoginRequiredGuard } from '@/guards/login-required.guard';
 import crypto from 'crypto';
+import { WebhookEvent, WebhookType } from '@prisma/client';
 
 @Controller('webhooks')
 export class WebhooksController {
     private readonly logger = new Logger(WebhooksController.name);
 
     constructor(private readonly webhooksService: WebhooksService) { }
+
+    @Get('options')
+    @UseGuards(LoginRequiredGuard)
+    async options() {
+        const types = Object.values(WebhookType);
+        const events = Object.values(WebhookEvent);
+
+        return { types, events };
+    }
 
     @Post(':uuid')
     @AllowAnonymous()
