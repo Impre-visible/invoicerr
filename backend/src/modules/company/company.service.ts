@@ -346,6 +346,7 @@ export class CompanyService {
     async updateEmailTemplate(id: MailTemplate['id'], subject: string, body: string) {
         let existingTemplate = await prisma.mailTemplate.findUnique({
             where: { id },
+            include: { company: true }
         });
         if (!existingTemplate) {
             throw new BadRequestException(`Email template with id ${id} not found`);
@@ -356,11 +357,13 @@ export class CompanyService {
             data: {
                 subject,
                 body
-            }
+            },
+            include: { company: true }
         });
 
         try {
             await this.webhookDispatcher.dispatch(WebhookEvent.COMPANY_EMAIL_TEMPLATE_UPDATED, {
+                company: existingTemplate.company,
                 template: existingTemplate,
             });
         } catch (error) {

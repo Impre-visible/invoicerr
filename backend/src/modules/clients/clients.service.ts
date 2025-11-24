@@ -84,6 +84,7 @@ export class ClientsService {
         const type = (data as any).type || 'COMPANY';
 
         if (type === 'INDIVIDUAL') {
+            data.name = ``;
             if (!data.contactFirstname || (data.contactFirstname as string).trim() === '') {
                 throw new BadRequestException('First name is required for individual clients');
             }
@@ -91,6 +92,8 @@ export class ClientsService {
                 throw new BadRequestException('Last name is required for individual clients');
             }
         } else {
+            data.contactFirstname = undefined;
+            data.contactLastname = undefined;
             if (!data.name || (data.name as string).trim() === '') {
                 throw new BadRequestException('Company name is required for company clients');
             }
