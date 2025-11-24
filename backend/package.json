@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.0.0",
     "@prisma/client": "^6.15.0",
+    "@teever/ez-hook": "npm:@jsr/teever__ez-hook@^0.3.5",
     "@types/pdfkit": "^0.14.0",
     "@types/stream-buffers": "^3.0.7",
     "bcrypt": "^6.0.0",
