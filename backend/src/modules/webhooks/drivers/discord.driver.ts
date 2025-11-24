@@ -1,5 +1,8 @@
+import { EVENT_STYLES, formatPayloadForEvent } from "./event-formatters";
+import { Embed, Webhook } from "@teever/ez-hook";
+import { WebhookEvent, WebhookType } from "@prisma/client";
+
 import { WebhookDriver } from "./webhook-driver.interface";
-import { WebhookType } from "@prisma/client";
 
 export class DiscordDriver implements WebhookDriver {
     supports(type: WebhookType) {
@@ -7,16 +10,42 @@ export class DiscordDriver implements WebhookDriver {
     }
 
     async send(url: string, payload: any): Promise<boolean> {
-        const body = {
-            content: payload.text || payload.message || JSON.stringify(payload)
+        const hook = new Webhook(url);
+
+        hook.setUsername('Invoicerr').setAvatarUrl('https://invoicerr.app/favicon.svg');
+
+        // Get event from payload
+        const eventType = payload.event as WebhookEvent;
+        const eventStyle = EVENT_STYLES[eventType] || {
+            color: "#5865F2",
+            emoji: "📢",
+            title: "Événement"
         };
 
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
+        // Format description based on event type
+        const description = formatPayloadForEvent(eventType, payload);
 
-        return res.ok;
+        const embed = new Embed()
+            .setTitle(`${eventStyle.emoji} ${eventStyle.title}`)
+            .setDescription(description)
+            .setTimestamp()
+            .setColor(eventStyle.color)
+            .setAuthor({
+                name: 'Invoicerr',
+                url: 'https://invoicerr.app',
+                icon_url: 'https://invoicerr.app/favicon.svg',
+            })
+            .setFooter({
+                text: 'Invoicerr Webhooks',
+                icon_url: 'https://invoicerr.app/favicon.svg',
+            });
+
+        // Add company information if available
+        if (payload.company?.name) {
+            embed.addField('Entreprise', payload.company.name, true);
+        }
+
+        const res = await hook.addEmbed(embed).send();
+        return res;
     }
 }
