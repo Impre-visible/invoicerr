@@ -1365,6 +1365,12 @@
                 "type": "Type",
                 "events": "Events",
                 "button": "Create Webhook"
+            },
+            "card": {
+                "events": "Listening to events: {{events}}",
+                "edit": "Edit",
+                "delete": "Delete",
+                "editPrompt": "Enter new webhook URL"
             }
         }
     },

@@ -1,13 +1,15 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useDelete, useGet, usePost, authenticatedFetch } from "@/hooks/use-fetch"
+import { authenticatedFetch, useGet, usePost } from "@/hooks/use-fetch"
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { MultiSelect } from "@/components/ui/multi-select"
+import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 
 interface Webhook {
@@ -22,41 +24,39 @@ export default function WebhooksSettings() {
     const { t } = useTranslation()
     const { data: webhooks, mutate } = useGet<Webhook[]>('/api/webhooks')
     const { trigger: createWebhook, loading: creating } = usePost('/api/webhooks')
-    // const { trigger: deleteWebhook } = useDelete('/api/webhooks')
+    const { data: options } = useGet<{ types: string[]; events: string[] }>('/api/webhooks/options')
 
-    const [newUrl, setNewUrl] = useState('')
-    const [newType, setNewType] = useState('GENERIC')
-    const [newEvents, setNewEvents] = useState<string[]>([])
     const [createdSecret, setCreatedSecret] = useState<string | null>(null)
+    const [multiResetKey, setMultiResetKey] = useState(0)
 
-    const eventOptions = [
-        'INVOICE_CREATED', 'INVOICE_UPDATED', 'INVOICE_DELETED',
-        'QUOTE_CREATED', 'QUOTE_UPDATED', 'QUOTE_DELETED',
-        'RECEIPT_CREATED', 'RECEIPT_UPDATED', 'RECEIPT_DELETED',
-        'USER_CREATED', 'COMPANY_UPDATED'
-    ]
+    // options.events will be populated from the backend
 
     useEffect(() => {
-        // initialize if needed
-    }, [])
+        if (options?.types && options.types.length) {
+            form.reset({ ...form.getValues(), type: options.types[0] })
+        }
+    }, [options])
 
-    const handleCreate = async () => {
-        if (!newUrl.trim()) return
+    const form = useForm<{ url: string; type: string; events: string[] }>({
+        defaultValues: { url: '', type: options?.types?.[0] ?? 'GENERIC', events: [] }
+    })
+
+    const handleCreate = form.handleSubmit(async (values) => {
+        if (!values.url?.trim()) return
         try {
-            const res = await createWebhook({ url: newUrl, type: newType, events: newEvents })
-            // res expected: { success: true, data: { ...createdWebhook, secret } }
+            const res = await createWebhook(values)
             if (res && (res as any).success) {
                 const secret = (res as any).data?.secret
                 if (secret) setCreatedSecret(secret)
-                setNewUrl('')
-                setNewType('GENERIC')
-                setNewEvents([])
+                form.reset({ url: '', type: options?.types?.[0] ?? 'GENERIC', events: [] })
+                // force remount of MultiSelect so it picks up cleared value
+                setMultiResetKey(k => k + 1)
                 mutate()
             }
         } catch (e) {
-            // ignore
+            console.error('Error creating webhook:', e)
         }
-    }
+    })
 
     const handleDelete = async (id: string) => {
         try {
@@ -68,8 +68,29 @@ export default function WebhooksSettings() {
         } catch { }
     }
 
+    const handleEdit = async (id: string, currentUrl: string) => {
+        try {
+            const newUrl = window.prompt(t('settings.webhooks.card.editPrompt') || 'New webhook URL', currentUrl)
+            if (!newUrl) return
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || ''
+            const res = await authenticatedFetch(`${backendUrl}/api/webhooks/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: newUrl })
+            })
+            if (!res.ok) {
+                console.error('Failed to update webhook', res.status)
+                return
+            }
+            const json = await res.json()
+            if (json && json.success) mutate()
+        } catch (e) {
+            console.error('Error updating webhook:', e)
+        }
+    }
+
     return (
-        <div>
+        <div className="h-full">
             <div className="mb-4">
                 <h1 className="text-3xl font-bold">{t("settings.webhooks.title")}</h1>
                 <p className="text-muted-foreground">{t("settings.webhooks.description")}</p>
@@ -88,17 +109,25 @@ export default function WebhooksSettings() {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
+                <div className="lg:col-span-2 space-y-4 pr-2 overflow-hidden">
                     {webhooks?.map((wh) => (
-                        <Card key={wh.id}>
+                        <Card key={wh.id} className="w-full">
+                            <CardHeader className="w-full">
+                                <CardTitle className="text-sm flex items-center gap-2">
+                                    <span className="font-medium">{wh.type}</span>
+                                    <span className={`inline-block w-1/2 max-w-full text-xs text-muted-foreground truncate overflow-hidden`}>{wh.url}</span>
+                                </CardTitle>
+                                <CardDescription
+                                    className="w-4/5 overflow-hidden text-ellipsis text-nowrap"
+                                >{t('settings.webhooks.card.events', { events: wh.events.join(', ') })}</CardDescription>
+                            </CardHeader>
                             <CardContent>
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <CardTitle className="text-lg">{wh.type} - {wh.url}</CardTitle>
-                                        <CardDescription className="mt-1">{wh.events.join(', ')}</CardDescription>
-                                    </div>
-                                    <Button variant="outline" size="icon" onClick={() => handleDelete(wh.id)}>
-                                        Delete
+                                <div className="w-full flex items-center gap-2">
+                                    <Button variant="outline" size="sm" onClick={() => handleEdit(wh.id, wh.url)}>
+                                        {t('settings.webhooks.card.edit') || 'Edit'}
+                                    </Button>
+                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(wh.id)}>
+                                        {t('settings.webhooks.card.delete') || 'Delete'}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -113,48 +142,68 @@ export default function WebhooksSettings() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="url">{t("settings.webhooks.create.url")}</Label>
-                                <Input id="url" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-                            </div>
+                            <Form {...form}>
+                                <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
+                                    <FormField
+                                        name="url"
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("settings.webhooks.create.url")}</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <div>
-                                <Label>{t("settings.webhooks.create.type")}</Label>
-                                <Select value={newType} onValueChange={setNewType}>
-                                    <SelectTrigger className="w-full h-10">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="GENERIC">GENERIC</SelectItem>
-                                        <SelectItem value="SLACK">SLACK</SelectItem>
-                                        <SelectItem value="DISCORD">DISCORD</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    <FormField
+                                        name="type"
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("settings.webhooks.create.type")}</FormLabel>
+                                                <FormControl>
+                                                    <Select value={field.value} onValueChange={field.onChange}>
+                                                        <SelectTrigger className="w-full h-10">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {(options?.types || []).map((type) => (
+                                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <div>
-                                <Label>{t("settings.webhooks.create.events")}</Label>
-                                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-auto">
-                                    {eventOptions.map((evt) => (
-                                        <button
-                                            key={evt}
-                                            type="button"
-                                            className={`p-2 border rounded ${newEvents.includes(evt) ? 'bg-primary text-white' : ''}`}
-                                            onClick={() => setNewEvents((prev) => prev.includes(evt) ? prev.filter(e => e !== evt) : [...prev, evt])}
-                                        >
-                                            {evt}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+                                    <FormField
+                                        name="events"
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("settings.webhooks.create.events")}</FormLabel>
+                                                <FormControl>
+                                                    <MultiSelect key={multiResetKey} defaultValue={field.value || []} options={(options?.events || []).map((event) => ({ label: event, value: event }))} onValueChange={field.onChange} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <div className="flex justify-end">
-                                <Button onClick={handleCreate} disabled={creating}>{t("settings.webhooks.create.button")}</Button>
-                            </div>
+                                    <div className="flex justify-end">
+                                        <Button type="submit" disabled={creating}>{t("settings.webhooks.create.button")}</Button>
+                                    </div>
+                                </form>
+                            </Form>
                         </div>
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </div >
     )
 }

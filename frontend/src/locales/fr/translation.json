@@ -1370,6 +1370,9 @@
                 "type": "Type",
                 "events": "Événements",
                 "button": "Créer le webhook"
+            },
+            "card": {
+                "events": "Écoute les événements : {{events}}"
             }
         }
     },
