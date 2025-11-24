@@ -8,7 +8,6 @@ import { countPdfPages, uploadQuoteFileToUrl } from "../../utils";
 import { Documenso } from "@documenso/sdk-typescript";
 import { DocumentDownloadResponse } from "@documenso/sdk-typescript/models/operations";
 import { QuoteStatus } from "@prisma/client";
-import { QuotesService } from "@/modules/quotes/quotes.service";
 import { Request } from 'express';
 import { generateQuotePdf } from "@/utils/quote-pdf";
 import { markQuoteAs } from "@/utils/plugins/signing";
@@ -226,7 +225,8 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
         const quote = await prisma.quote.findFirst({
             where: {
                 id: document.externalId || '',
-            }
+            },
+            include: { client: true, company: true }
         });
 
         if (!quote) {
@@ -246,6 +246,7 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
             case DocumentGetStatus.Completed:
                 logger.log(`Document completed: ${document.externalId}`);
                 await markQuoteAs(quote?.id || '', QuoteStatus.SIGNED);
+
                 break;
             case DocumentGetStatus.Rejected:
                 logger.log(`Document rejected: ${document.externalId}`);
