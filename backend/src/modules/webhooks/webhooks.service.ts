@@ -12,7 +12,6 @@ import { SlackDriver } from './drivers/slack.driver';
 import { TeamsDriver } from './drivers/teams.driver';
 import { WebhookDriver } from './drivers/webhook-driver.interface';
 import { ZapierDriver } from './drivers/zapier.driver';
-import crypto from "crypto";
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()

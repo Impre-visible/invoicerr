@@ -1,14 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
+
 import { WebhookEvent } from "@prisma/client";
 import { WebhooksService } from "./webhooks.service";
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class WebhookDispatcherService {
+    private readonly logger = new Logger(WebhookDispatcherService.name);
+
     constructor(private readonly webhookService: WebhooksService) { }
 
     async dispatch(event: WebhookEvent, payload: any) {
-        // Try to determine companyId from payload
+        this.logger.log(`Dispatching webhook event: ${event}`);
         const companyId = payload?.company?.id || payload?.companyId || null;
 
         const where: any = { events: { has: event } };
