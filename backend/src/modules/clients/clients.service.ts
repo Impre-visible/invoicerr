@@ -78,9 +78,6 @@ export class ClientsService {
     async createClient(editClientsDto: EditClientsDto) {
         const { id, ...data } = editClientsDto;
 
-        // Server-side validation to mirror frontend rules:
-        // - INDIVIDUAL: contactFirstname & contactLastname are required
-        // - COMPANY: name & legalId (SIRET/SIREN) are required
         const type = (data as any).type || 'COMPANY';
 
         if (type === 'INDIVIDUAL') {
