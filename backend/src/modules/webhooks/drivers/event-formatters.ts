@@ -198,7 +198,7 @@ export function formatPayloadForEvent(event: WebhookEvent, payload: any): string
         [WebhookEvent.QUOTE_SENT]: (p) =>
             `**Quote #${p.quote?.number || p.quoteId}**\nClient: ${(p.client.type === 'COMPANY' ? p.client?.name : p.client?.contactFirstname + ' ' + p.client?.contactLastname) || 'N/A'}`,
         [WebhookEvent.QUOTE_SIGNED]: (p) =>
-            `**Quote #${p.quote?.number || p.quoteId}**\nClient: ${(p.client.type === 'COMPANY' ? p.client?.name : p.client?.contactFirstname + ' ' + p.client?.contactLastname) || 'N/A'}\n✅ Signed by: ${p.signedBy || 'N/A'}`,
+            `**Quote #${p.quote?.number || p.quoteId}**\nClient: ${(p.client.type === 'COMPANY' ? p.client?.name : p.client?.contactFirstname + ' ' + p.client?.contactLastname) || 'N/A'}`,
         [WebhookEvent.QUOTE_EXPIRED]: (p) =>
             `**Quote #${p.quote?.number || p.quoteId}**\nExpired on: ${p.quote?.expiresAt ? new Date(p.quote.expiresAt).toLocaleDateString('en-US') : 'N/A'}`,
         [WebhookEvent.QUOTE_REJECTED]: (p) =>
