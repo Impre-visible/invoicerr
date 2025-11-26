@@ -132,7 +132,6 @@ export class MattermostDriver implements WebhookDriver {
         }
     
         const res = await hook
-            .setText(`**Invoicerr**`)
             .addCard(card)
             .send();
     
