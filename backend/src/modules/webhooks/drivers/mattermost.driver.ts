@@ -68,6 +68,8 @@ export interface CardField {
     private webhook: string;
     private cards: Card[] = [];
     private text: string = '';
+    private username: string = '';
+    private iconUrl: string = '';
   
     constructor(webhookUrl: string) {
       this.webhook = webhookUrl;
@@ -77,6 +79,16 @@ export interface CardField {
       this.text = text;
       return this;
     }
+
+    setUsername(username: string): this {
+      this.username = username;
+      return this;
+    }
+  
+    setIconUrl(iconUrl: string): this {
+      this.iconUrl = iconUrl;
+      return this;
+    }
   
     addCard(card: Card): this {
       this.cards.push(card);
@@ -84,23 +96,27 @@ export interface CardField {
     }
   
     async send(): Promise<Response> {
-      const payload = {
-        text: this.text,
-        attachments: this.cards.map(card => card.build())
-      };
-  
-      const response = await fetch(this.webhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-  
-      // Reset after sending
-      this.text = '';
-      this.cards = [];
-  
-      return response;
-    }
+        const payload: any = {
+          text: this.text,
+          attachments: this.cards.map(card => card.build())
+        };
+    
+        if (this.username) payload.username = this.username;
+        if (this.iconUrl) payload.icon_url = this.iconUrl;
+    
+        const response = await fetch(this.webhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+    
+        this.text = '';
+        this.cards = [];
+        this.username = '';
+        this.iconUrl = '';
+    
+        return response;
+      }
   }
   
 
@@ -125,13 +141,18 @@ export class MattermostDriver implements WebhookDriver {
             .setTitle(`${eventStyle.emoji} ${eventStyle.title}`)
             .setText(description)
             .setColor(eventStyle.color)
-            .setFooter('Invoicerr Webhooks', 'https://invoicerr.app/favicon.png');
+            .setFooter(
+                `Invoicerr Webhooks • ${new Date().toLocaleString()}`,
+                'https://invoicerr.app/favicon.png'
+            )
     
         if (payload.company?.name) {
             card.addField({ title: 'Entreprise', value: payload.company.name, short: true });
         }
     
         const res = await hook
+            .setUsername('Invoicerr')
+            .setIconUrl('https://invoicerr.app/favicon.svg')
             .addCard(card)
             .send();
     
