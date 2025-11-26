@@ -152,7 +152,7 @@ export class MattermostDriver implements WebhookDriver {
     
         const res = await hook
             .setUsername('Invoicerr')
-            .setIconUrl('https://invoicerr.app/favicon.svg')
+            .setIconUrl('https://invoicerr.app/favicon.png')
             .addCard(card)
             .send();
     
