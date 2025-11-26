@@ -9,4 +9,4 @@ import { execSync } from "child_process";
 
 const schemaPath = path.resolve(__dirname, "./schema.prisma");
 
-execSync(`npx prisma migrate reset --force --skip-seed --schema=${schemaPath}`, { stdio: "inherit" });
+execSync(`npx prisma migrate reset --force --schema=${schemaPath}`, { stdio: "inherit" });
