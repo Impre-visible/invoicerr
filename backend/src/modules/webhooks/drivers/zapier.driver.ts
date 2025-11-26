@@ -7,7 +7,6 @@ export class ZapierDriver implements WebhookDriver {
     }
 
     async send(url: string, payload: any): Promise<boolean> {
-        // Zapier attend généralement un POST JSON
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

@@ -14,15 +14,13 @@ export class DiscordDriver implements WebhookDriver {
 
         hook.setUsername('Invoicerr').setAvatarUrl('https://invoicerr.app/favicon.png');
 
-        // Get event from payload
         const eventType = payload.event as WebhookEvent;
         const eventStyle = EVENT_STYLES[eventType] || {
             color: "#5865F2",
             emoji: "📢",
-            title: "Événement"
+            title: "Event"
         };
 
-        // Format description based on event type
         const description = formatPayloadForEvent(eventType, payload);
 
         const embed = new Embed()
@@ -40,7 +38,6 @@ export class DiscordDriver implements WebhookDriver {
                 icon_url: 'https://invoicerr.app/favicon.png',
             });
 
-        // Add company information if available
         if (payload.company?.name) {
             embed.addField('Entreprise', payload.company.name, true);
         }

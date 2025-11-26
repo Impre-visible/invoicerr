@@ -132,7 +132,7 @@ export class MattermostDriver implements WebhookDriver {
         const eventStyle = EVENT_STYLES[eventType] || {
             color: "#5865F2",
             emoji: "📢",
-            title: "Événement"
+            title: "Event"
         };
     
         const description = formatPayloadForEvent(eventType, payload);

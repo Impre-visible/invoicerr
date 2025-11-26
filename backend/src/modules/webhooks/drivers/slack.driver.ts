@@ -127,7 +127,7 @@ export class SlackDriver implements WebhookDriver {
         const eventStyle = EVENT_STYLES[eventType] || {
             color: "#439FE0",
             emoji: "📢",
-            title: "Événement"
+            title: "Event"
         };
     
         const description = formatPayloadForEvent(eventType, payload);
