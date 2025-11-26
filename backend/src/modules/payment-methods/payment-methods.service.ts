@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { PaymentMethod, PaymentMethodType, WebhookEvent } from '@prisma/client';
+
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
 import prisma from '@/prisma/prisma.service';
-import { PaymentMethod, PaymentMethodType } from '@prisma/client';
 
 export interface CreatePaymentMethodDto {
   name: string;
@@ -17,6 +19,11 @@ export interface EditPaymentMethodDto {
 
 @Injectable()
 export class PaymentMethodsService {
+  private readonly logger: Logger;
+
+  constructor(private readonly webhookDispatcher: WebhookDispatcherService) {
+    this.logger = new Logger(PaymentMethodsService.name);
+  }
   async create(dto: CreatePaymentMethodDto): Promise<PaymentMethod> {
     const company = await prisma.company.findFirst();
     if (!company) {
@@ -31,6 +38,15 @@ export class PaymentMethodsService {
         type: dto.type ?? PaymentMethodType.BANK_TRANSFER,
       },
     });
+
+    try {
+      await this.webhookDispatcher.dispatch(WebhookEvent.PAYMENT_METHOD_CREATED, {
+        paymentMethod: pm,
+        company,
+      });
+    } catch (error) {
+      this.logger.error('Failed to dispatch PAYMENT_METHOD_CREATED webhook', error);
+    }
 
     return pm;
   }
@@ -68,7 +84,7 @@ export class PaymentMethodsService {
       throw new BadRequestException('Payment method not found');
     }
 
-    return prisma.paymentMethod.update({
+    const updatedPm = await prisma.paymentMethod.update({
       where: { id },
       data: {
         name: dto.name ?? existing.name,
@@ -77,6 +93,25 @@ export class PaymentMethodsService {
         isActive: dto.isActive ?? existing.isActive,
       },
     });
+
+    try {
+      await this.webhookDispatcher.dispatch(WebhookEvent.PAYMENT_METHOD_UPDATED, {
+        paymentMethod: updatedPm,
+        company,
+      });
+
+      if (dto.isActive !== undefined && dto.isActive !== existing.isActive) {
+        const event = dto.isActive ? WebhookEvent.PAYMENT_METHOD_ACTIVATED : WebhookEvent.PAYMENT_METHOD_DEACTIVATED;
+        await this.webhookDispatcher.dispatch(event, {
+          paymentMethod: updatedPm,
+          company,
+        });
+      }
+    } catch (error) {
+      this.logger.error('Failed to dispatch PAYMENT_METHOD webhook', error);
+    }
+
+    return updatedPm;
   }
 
   async softDelete(id: string): Promise<PaymentMethod> {
@@ -90,9 +125,20 @@ export class PaymentMethodsService {
       throw new BadRequestException('Payment method not found');
     }
 
-    return prisma.paymentMethod.update({
+    const deletedPm = await prisma.paymentMethod.update({
       where: { id },
       data: { isActive: false },
     });
+
+    try {
+      await this.webhookDispatcher.dispatch(WebhookEvent.PAYMENT_METHOD_DELETED, {
+        paymentMethod: existing,
+        company,
+      });
+    } catch (error) {
+      this.logger.error('Failed to dispatch PAYMENT_METHOD_DELETED webhook', error);
+    }
+
+    return deletedPm;
   }
 }

@@ -1,11 +1,17 @@
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Currency, WebhookEvent } from '@prisma/client'
+
 import { UpsertInvoicesDto } from '@/modules/recurring-invoices/dto/invoices.dto';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
 import prisma from '@/prisma/prisma.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Currency } from '@prisma/client'
 
 @Injectable()
 export class RecurringInvoicesService {
-    constructor() { }
+    private readonly logger: Logger;
+
+    constructor(private readonly webhookDispatcher: WebhookDispatcherService) {
+        this.logger = new Logger(RecurringInvoicesService.name);
+    }
 
     async getRecurringInvoices(page: string = "1") {
         const pageNumber = parseInt(page, 10) || 1;
@@ -102,6 +108,16 @@ export class RecurringInvoicesService {
             },
         });
 
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECURRING_INVOICE_CREATED, {
+                recurringInvoice,
+                client: recurringInvoice.client,
+                company: recurringInvoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECURRING_INVOICE_CREATED webhook', error);
+        }
+
         return recurringInvoice;
     }
 
@@ -159,6 +175,16 @@ export class RecurringInvoicesService {
             },
         });
 
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECURRING_INVOICE_UPDATED, {
+                recurringInvoice,
+                client: recurringInvoice.client,
+                company: recurringInvoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECURRING_INVOICE_UPDATED webhook', error);
+        }
+
         return recurringInvoice;
     }
 
@@ -188,21 +214,37 @@ export class RecurringInvoicesService {
 
     async deleteRecurringInvoice(id: string) {
         const existingRecurringInvoice = await prisma.recurringInvoice.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                client: true,
+                company: true,
+                items: true,
+            }
         });
 
         if (!existingRecurringInvoice) {
             throw new BadRequestException('Recurring invoice not found');
         }
 
-        // Supprimer en cascade les items puis la facture récurrente
         await prisma.recurringInvoiceItem.deleteMany({
             where: { recurringInvoiceId: id }
         });
 
-        return prisma.recurringInvoice.delete({
+        const deletedRecurringInvoice = await prisma.recurringInvoice.delete({
             where: { id }
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECURRING_INVOICE_DELETED, {
+                recurringInvoice: existingRecurringInvoice,
+                client: existingRecurringInvoice.client,
+                company: existingRecurringInvoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECURRING_INVOICE_DELETED webhook', error);
+        }
+
+        return deletedRecurringInvoice;
     }
 
     private calculateNextInvoiceDate(from: Date, frequency: string): Date {

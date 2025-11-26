@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EditCompanyDto, PDFConfigDto } from '@/modules/company/dto/company.dto';
-import { MailTemplate, MailTemplateType } from '@prisma/client'
+import { MailTemplate, MailTemplateType, WebhookEvent } from '@prisma/client'
 
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
 import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';
 
@@ -17,6 +18,11 @@ export interface EmailTemplate {
 
 @Injectable()
 export class CompanyService {
+    private readonly logger: Logger;
+
+    constructor(private readonly webhookDispatcher: WebhookDispatcherService) {
+        this.logger = new Logger(CompanyService.name);
+    }
 
     async getCompanyInfo() {
         const company = await prisma.company.findFirst({ include: { emailTemplates: true } });
@@ -156,7 +162,7 @@ export class CompanyService {
             throw new BadRequestException('No PDF configuration found for the company');
         }
 
-        return prisma.pDFConfig.update({
+        const updatedConfig = await prisma.pDFConfig.update({
             where: { id: existingCompany.pdfConfig.id }, // ✅ ici on utilise un identifiant unique
             data: {
                 fontFamily: pdfConfig.fontFamily,
@@ -212,6 +218,17 @@ export class CompanyService {
                 VATId: pdfConfig.labels.VATId,
             }
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.COMPANY_PDF_CONFIG_UPDATED, {
+                config: updatedConfig,
+                company: existingCompany,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch COMPANY_PDF_CONFIG_UPDATED webhook', error);
+        }
+
+        return updatedConfig;
     }
 
 
@@ -222,14 +239,24 @@ export class CompanyService {
         if (existingCompany) {
             const { pdfConfig, ...rest } = data;
 
-            return prisma.company.update({
+            const updatedCompany = await prisma.company.update({
                 where: { id: existingCompany.id },
                 data: {
                     ...rest
                 }
             });
+
+            try {
+                await this.webhookDispatcher.dispatch(WebhookEvent.COMPANY_UPDATED, {
+                    company: updatedCompany,
+                });
+            } catch (error) {
+                this.logger.error('Failed to dispatch COMPANY_UPDATED webhook', error);
+            }
+
+            return updatedCompany;
         } else {
-            return prisma.company.create({
+            const newCompany = await prisma.company.create({
                 data: {
                     ...data,
                     pdfConfig: {
@@ -258,6 +285,16 @@ export class CompanyService {
                     }
                 }
             });
+
+            try {
+                await this.webhookDispatcher.dispatch(WebhookEvent.COMPANY_CREATED, {
+                    company: newCompany,
+                });
+            } catch (error) {
+                this.logger.error('Failed to dispatch COMPANY_CREATED webhook', error);
+            }
+
+            return newCompany;
         }
     }
 
@@ -309,6 +346,7 @@ export class CompanyService {
     async updateEmailTemplate(id: MailTemplate['id'], subject: string, body: string) {
         let existingTemplate = await prisma.mailTemplate.findUnique({
             where: { id },
+            include: { company: true }
         });
         if (!existingTemplate) {
             throw new BadRequestException(`Email template with id ${id} not found`);
@@ -319,9 +357,19 @@ export class CompanyService {
             data: {
                 subject,
                 body
-            }
+            },
+            include: { company: true }
         });
 
-        return existingTemplate
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.COMPANY_EMAIL_TEMPLATE_UPDATED, {
+                company: existingTemplate.company,
+                template: existingTemplate,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch COMPANY_EMAIL_TEMPLATE_UPDATED webhook', error);
+        }
+
+        return existingTemplate;
     }
 }

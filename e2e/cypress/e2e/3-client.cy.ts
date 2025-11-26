@@ -7,10 +7,6 @@ describe('Client E2E', () => {
   it('allows to create a new client (Company)', () => {
     cy.visit('/clients')
     cy.get('#root .md\\:inline-flex').click({ force: true });
-    cy.get('[name="contactFirstname"]').clear({ force: true });
-    cy.get('[name="contactFirstname"]').type('John', { force: true });
-    cy.get('[name="contactLastname"]').clear({ force: true });
-    cy.get('[name="contactLastname"]').type('Doe');
 
     cy.get('[name="name"]').clear({ force: true });
     cy.get('[name="name"]').type('ACME', { force: true });
@@ -54,13 +50,13 @@ describe('Client E2E', () => {
   it('allows to create a new client (Individual)', () => {
     cy.visit('/clients')
     cy.get('#root .md\\:inline-flex').click({ force: true });
+    cy.get('select').select('INDIVIDUAL', { force: true });
     cy.get('[name="contactFirstname"]').clear();
     cy.get('[name="contactFirstname"]').type('Jane');
     cy.get('[name="contactLastname"]').clear();
     cy.get('[name="contactLastname"]').type('Doe');
 
     //cy.get('button.border-input').click();
-    cy.get('select').select('INDIVIDUAL', { force: true });
 
     cy.get('[name="description"]').click();
     cy.get('[name="description"]').clear();

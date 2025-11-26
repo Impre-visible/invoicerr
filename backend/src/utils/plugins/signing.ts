@@ -1,14 +1,65 @@
-import { PrismaClient, QuoteStatus } from "@prisma/client";
+import { PrismaClient, QuoteStatus, WebhookEvent } from "@prisma/client";
+
+import { PluginsService } from "@/modules/plugins/plugins.service";
+import { WebhookDispatcherService } from "@/modules/webhooks/webhook-dispatcher.service";
+import { WebhooksService } from "@/modules/webhooks/webhooks.service";
 
 export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
     const prisma = new PrismaClient();
 
-    await prisma.quote.update({
+    const quote = await prisma.quote.update({
         where: { id: quoteId },
         data: {
             status: status
+        },
+        include: {
+            client: true,
+            company: true,
         }
     });
 
-    prisma.$disconnect();
+    let event: WebhookEvent | null = null;
+    switch (status) {
+        case QuoteStatus.SIGNED:
+            event = WebhookEvent.QUOTE_SIGNED;
+            break;
+        case QuoteStatus.REJECTED:
+            event = WebhookEvent.QUOTE_REJECTED;
+            break;
+        case QuoteStatus.SENT:
+            event = WebhookEvent.QUOTE_SENT;
+            break;
+        case QuoteStatus.EXPIRED:
+            event = WebhookEvent.QUOTE_EXPIRED;
+            break;
+        default:
+            event = WebhookEvent.QUOTE_STATUS_CHANGED;
+    }
+
+    if (event) {
+        const webhooks = await prisma.webhook.findMany({
+            where: {
+                companyId: quote.companyId,
+                events: {
+                    has: event
+                }
+            }
+        });
+
+        if (webhooks.length > 0) {
+            const pluginsService = new PluginsService();
+            const webhooksService = new WebhooksService(pluginsService);
+            const dispatcher = new WebhookDispatcherService(webhooksService);
+
+            await dispatcher.dispatch(event, {
+                quote,
+                client: quote.client,
+                company: quote.company,
+                signedAt: quote.signedAt,
+                newStatus: status,
+            });
+        }
+    }
+
+    await prisma.$disconnect();
 }

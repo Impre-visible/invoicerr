@@ -54,7 +54,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
             }, t("clients.upsert.validation.contactPhone.format")),
         contactEmail: z
             .string()
-            .optional()
+            .min(1, t("clients.upsert.validation.contactEmail.required"))
             .refine((val) => {
                 if (!val) return true;
                 return z.string().email().safeParse(val).success
@@ -165,7 +165,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={(status) => { form.reset(); onOpenChange(status); }}>
             <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-auto">
                     <DialogHeader>
@@ -173,34 +173,6 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                     </DialogHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="contactFirstname"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder={t("clients.upsert.fields.contactFirstname.placeholder")} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="contactLastname"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} placeholder={t("clients.upsert.fields.contactLastname.placeholder")} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
 
                             <FormField
                                 control={form.control}
@@ -228,7 +200,8 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                 )}
                             />
 
-                            {clientType === 'COMPANY' && (
+
+                            {clientType === 'COMPANY' ? (
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -242,6 +215,35 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                         </FormItem>
                                     )}
                                 />
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="contactFirstname"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("clients.upsert.fields.contactFirstname.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} placeholder={t("clients.upsert.fields.contactFirstname.placeholder")} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="contactLastname"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("clients.upsert.fields.contactLastname.label")}</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} placeholder={t("clients.upsert.fields.contactLastname.placeholder")} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             )}
 
                             <FormField
@@ -265,7 +267,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                         name="legalId"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t("clients.upsert.fields.legalId.label")}</FormLabel>
+                                                <FormLabel required>{t("clients.upsert.fields.legalId.label")}</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} placeholder={t("clients.upsert.fields.legalId.placeholder")} />
                                                 </FormControl>
@@ -329,7 +331,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                     name="contactEmail"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
+                                            <FormLabel required>{t("clients.upsert.fields.contactEmail.label")}</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder={t("clients.upsert.fields.contactEmail.placeholder")} />
                                             </FormControl>

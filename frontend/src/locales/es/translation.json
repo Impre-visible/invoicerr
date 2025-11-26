@@ -847,7 +847,8 @@
             "emailTemplates": "Plantillas de correo",
             "account": "Cuenta",
             "dangerZone": "Zona de peligro",
-            "plugins": "Plugins"
+            "plugins": "Plugins",
+            "webhooks": "Webhooks"
         },
         "company": {
             "title": "Configuración de la empresa",
@@ -877,7 +878,7 @@
                     "description": "Nombre legal de tu negocio",
                     "errors": {
                         "required": "El nombre de la empresa es obligatorio",
-                        "empty": "El nombre de la empresa no puede estar vacío",
+                        "empty": "El nombre de la empresa no puede estar vacía",
                         "maxLength": "El nombre de la empresa debe tener menos de 100 caracteres"
                     }
                 },
@@ -1352,6 +1353,18 @@
             "messages": {
                 "saveSuccess": "Plantilla {{name}} guardada correctamente",
                 "saveError": "No se pudo guardar la plantilla"
+            }
+        },
+        "webhooks": {
+            "title": "Webhook Settings",
+            "description": "Manage outgoing webhooks for events",
+            "create": {
+                "title": "Create Webhook",
+                "description": "Create a new webhook",
+                "url": "Webhook URL",
+                "type": "Type",
+                "events": "Events",
+                "button": "Create Webhook"
             }
         }
     },

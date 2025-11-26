@@ -1,10 +1,12 @@
 import * as Handlebars from 'handlebars';
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateReceiptDto, EditReceiptDto } from '@/modules/receipts/dto/receipts.dto';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { MailService } from '@/mail/mail.service';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
+import { WebhookEvent } from '@prisma/client';
 import { baseTemplate } from '@/modules/receipts/templates/base.template';
 import { formatDate } from '@/utils/date';
 import prisma from '@/prisma/prisma.service';
@@ -12,7 +14,14 @@ import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ReceiptsService {
-    constructor(private readonly mailService: MailService) { }
+    private readonly logger: Logger;
+
+    constructor(
+        private readonly mailService: MailService,
+        private readonly webhookDispatcher: WebhookDispatcherService
+    ) {
+        this.logger = new Logger(ReceiptsService.name);
+    }
 
     async getReceipts(page: string) {
         const pageNumber = parseInt(page, 10) || 1;
@@ -181,7 +190,18 @@ export class ReceiptsService {
             },
         });
 
-        await this.checkInvoiceAfterReceipt(invoice.id)
+        await this.checkInvoiceAfterReceipt(invoice.id);
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECEIPT_CREATED, {
+                receipt,
+                invoice,
+                client: invoice.client,
+                company: invoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECEIPT_CREATED webhook', error);
+        }
 
         return receipt;
     }
@@ -190,14 +210,16 @@ export class ReceiptsService {
         const invoice = await prisma.invoice.findUnique({
             where: { id: invoiceId },
             include: {
-                items: true
+                items: true,
+                client: true,
+                company: true,
             },
         });
         if (!invoice) {
             throw new BadRequestException('Invoice not found');
         }
 
-        return await this.createReceipt({
+        const newReceipt = await this.createReceipt({
             invoiceId: invoice.id,
             items: invoice.items.map(item => ({
                 invoiceItemId: item.id,
@@ -207,6 +229,19 @@ export class ReceiptsService {
             paymentMethod: invoice.paymentMethod || '',
             paymentDetails: invoice.paymentDetails || '',
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECEIPT_CREATED_FROM_INVOICE, {
+                receipt: newReceipt,
+                invoice,
+                client: invoice.client,
+                company: invoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECEIPT_CREATED_FROM_INVOICE webhook', error);
+        }
+
+        return newReceipt;
     }
 
     async editReceipt(body: EditReceiptDto) {
@@ -241,16 +276,44 @@ export class ReceiptsService {
             },
             include: {
                 items: true,
+                invoice: {
+                    include: {
+                        client: true,
+                        company: true,
+                    }
+                },
             },
         });
 
         await this.checkInvoiceAfterReceipt(existingReceipt.invoiceId);
 
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECEIPT_UPDATED, {
+                receipt: updatedReceipt,
+                invoice: updatedReceipt.invoice,
+                client: updatedReceipt.invoice.client,
+                company: updatedReceipt.invoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECEIPT_UPDATED webhook', error);
+        }
+
         return updatedReceipt;
     }
 
     async deleteReceipt(id: string) {
-        const existingReceipt = await prisma.receipt.findUnique({ where: { id } });
+        const existingReceipt = await prisma.receipt.findUnique({
+            where: { id },
+            include: {
+                items: true,
+                invoice: {
+                    include: {
+                        client: true,
+                        company: true,
+                    }
+                }
+            }
+        });
 
         if (!existingReceipt) {
             throw new BadRequestException('Receipt not found');
@@ -265,6 +328,17 @@ export class ReceiptsService {
         });
 
         await this.checkInvoiceAfterReceipt(existingReceipt.invoiceId);
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.RECEIPT_DELETED, {
+                receipt: existingReceipt,
+                invoice: existingReceipt.invoice,
+                client: existingReceipt.invoice.client,
+                company: existingReceipt.invoice.company,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch RECEIPT_DELETED webhook', error);
+        }
 
         return { message: 'Receipt deleted successfully' };
     }

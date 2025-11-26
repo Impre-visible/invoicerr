@@ -852,7 +852,8 @@
             "emailTemplates": "Modèles d'email",
             "account": "Compte",
             "dangerZone": "Zone de danger",
-            "plugins": "Plugins"
+            "plugins": "Plugins",
+            "webhooks": "Webhooks"
         },
         "company": {
             "title": "Paramètres de l'entreprise",
@@ -1357,6 +1358,21 @@
             "messages": {
                 "saveSuccess": "Modèle {{name}} enregistré avec succès",
                 "saveError": "Échec de l'enregistrement du modèle"
+            }
+        },
+        "webhooks": {
+            "title": "Paramètres Webhooks",
+            "description": "Gérez les webhooks sortants pour les événements de l'application",
+            "create": {
+                "title": "Créer un webhook",
+                "description": "Créez un nouveau webhook pour recevoir des événements",
+                "url": "URL du webhook",
+                "type": "Type",
+                "events": "Événements",
+                "button": "Créer le webhook"
+            },
+            "card": {
+                "events": "Écoute les événements : {{events}}"
             }
         }
     },

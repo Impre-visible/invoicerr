@@ -2,10 +2,11 @@ FROM node:22-bullseye AS backend-builder
 
 WORKDIR /app
 
-COPY backend/package.json ./package.json
+COPY backend/package.json backend/package-lock.json ./
+COPY backend/.npmrc .npmrc
 COPY backend/prisma ./prisma
 
-RUN npm install
+RUN npm ci
 
 COPY backend/. .
 
@@ -16,8 +17,8 @@ FROM node:22-bullseye AS frontend-builder
 
 WORKDIR /app
 
-COPY frontend/package.json ./package.json
-RUN npm install
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
 
 COPY frontend/. .
 

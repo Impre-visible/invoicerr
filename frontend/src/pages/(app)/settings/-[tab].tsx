@@ -1,4 +1,4 @@
-import { AlertTriangle, Building2, FileText, Mail, Plug, User } from "lucide-react"
+import { AlertTriangle, Building2, FileText, Mail, Plug, User, Webhook } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useNavigate, useParams } from "react-router"
@@ -9,6 +9,7 @@ import DangerZoneSettings from "./_components/danger.settings"
 import EmailTemplatesSettings from "./_components/templates.settings"
 import PDFTemplatesSettings from "./_components/pdf.settings"
 import PluginsSettings from "./_components/plugins.settings"
+import WebhooksSettings from "./_components/webhooks.settings"
 import { useTranslation } from "react-i18next"
 
 export default function Settings() {
@@ -16,7 +17,7 @@ export default function Settings() {
     const { tab } = useParams()
     const navigate = useNavigate()
 
-    const validTabs = ["company", "template", "email", "account", "plugins", "danger"]
+    const validTabs = ["company", "template", "email", "webhooks", "account", "plugins", "danger"]
     const currentTab = validTabs.includes(tab!) ? tab! : "company"
 
     const handleTabChange = (newTab: string) => {
@@ -40,6 +41,11 @@ export default function Settings() {
             icon: Mail,
         },
         {
+            value: "webhooks",
+            label: t("settings.tabs.webhooks"),
+            icon: Webhook,
+        },
+        {
             value: "account",
             label: t("settings.tabs.account"),
             icon: User,
@@ -59,7 +65,7 @@ export default function Settings() {
     const currentTabConfig = tabsConfig.find((tab) => tab.value === currentTab)
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <div className="h-full max-w-7xl mx-auto space-y-6 p-6">
             {/* Mobile/Tablet Select */}
             <div className="lg:hidden">
                 <Select value={currentTab} onValueChange={handleTabChange}>
@@ -104,6 +110,9 @@ export default function Settings() {
                     </TabsContent>
                     <TabsContent value="email" className="h-full">
                         <EmailTemplatesSettings />
+                    </TabsContent>
+                    <TabsContent value="webhooks" className="h-full">
+                        <WebhooksSettings />
                     </TabsContent>
                     <TabsContent value="account" className="h-full">
                         <AccountSettings />

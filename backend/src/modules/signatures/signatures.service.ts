@@ -1,13 +1,23 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { ISigningProvider } from '@/plugins/signing/types';
 import { MailService } from '@/mail/mail.service';
 import { PluginsService } from '../plugins/plugins.service';
+import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
+import { WebhookEvent } from '@prisma/client';
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()
 export class SignaturesService {
-    constructor(private readonly mailService: MailService, private readonly pluginsService: PluginsService) { }
+    private readonly logger: Logger;
+
+    constructor(
+        private readonly mailService: MailService,
+        private readonly pluginsService: PluginsService,
+        private readonly webhookDispatcher: WebhookDispatcherService
+    ) {
+        this.logger = new Logger(SignaturesService.name);
+    }
 
     async getSignature(signatureId: string) {
         const signature = await prisma.signature.findUnique({
@@ -56,6 +66,16 @@ export class SignaturesService {
             },
         });
 
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.SIGNATURE_CREATED, {
+                quoteId: quote.id,
+                signatureId,
+                client: quote.client,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch SIGNATURE_CREATED webhook', error);
+        }
+
         return { message: 'Signature successfully created and email sent.', signature: { id: signatureId } };
     }
 
@@ -92,6 +112,17 @@ export class SignaturesService {
         });
 
         await this.sendOtpToUser(signature.quote.client.contactEmail, otpCode);
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.SIGNATURE_OTP_GENERATED, {
+                signatureId,
+                quoteId: signature.quoteId,
+                clientEmail: signature.quote.client.contactEmail,
+                otpCode,
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch SIGNATURE_OTP_GENERATED webhook', error);
+        }
 
         return { message: 'OTP code generated successfully.' };
     }
@@ -245,6 +276,16 @@ export class SignaturesService {
                 status: 'SIGNED',
             },
         });
+
+        try {
+            await this.webhookDispatcher.dispatch(WebhookEvent.SIGNATURE_COMPLETED, {
+                signatureId,
+                quoteId: signature.quoteId,
+                signedAt: new Date(),
+            });
+        } catch (error) {
+            this.logger.error('Failed to dispatch SIGNATURE_COMPLETED webhook', error);
+        }
 
         return { message: 'Quote signed successfully.' };
     }
