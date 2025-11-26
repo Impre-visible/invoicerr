@@ -3,6 +3,7 @@ FROM node:22-bullseye AS backend-builder
 WORKDIR /app
 
 COPY backend/package.json ./package.json
+COPY backend/.npmrc .npmrc
 COPY backend/prisma ./prisma
 
 RUN npm install
