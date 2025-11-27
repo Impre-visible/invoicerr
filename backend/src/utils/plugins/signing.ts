@@ -1,8 +1,10 @@
 import { PrismaClient, QuoteStatus, WebhookEvent } from "@prisma/client";
 
 import { PluginsService } from "@/modules/plugins/plugins.service";
+import { StorageUploadService } from "@/utils/storage-upload";
 import { WebhookDispatcherService } from "@/modules/webhooks/webhook-dispatcher.service";
 import { WebhooksService } from "@/modules/webhooks/webhooks.service";
+import { generateQuotePdf } from "@/utils/generate-quote-pdf";
 
 export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
     const prisma = new PrismaClient();
@@ -58,6 +60,15 @@ export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
                 signedAt: quote.signedAt,
                 newStatus: status,
             });
+        }
+    }
+
+    if (status === QuoteStatus.SIGNED) {
+        try {
+            const pdfBuffer = await generateQuotePdf(quoteId);
+            await StorageUploadService.uploadSignedQuotePdf(quoteId, pdfBuffer);
+        } catch  {
+            // Do nothing on failure
         }
     }
 
