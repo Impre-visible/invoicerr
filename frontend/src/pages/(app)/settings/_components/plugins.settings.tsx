@@ -26,6 +26,7 @@ interface InAppPlugin {
     id: string
     name: string
     isActive: boolean
+    hasWebhook?: boolean
 }
 
 interface InAppPluginCategories {
@@ -169,6 +170,7 @@ export default function PluginsSettings() {
         }
     }
 
+
     const handlePluginInstructions = async (pluginId: string) => {
         try {
             const response = await validatePlugin({ pluginId })
@@ -221,7 +223,7 @@ export default function PluginsSettings() {
                                                 <p className="font-medium">{plugin.name}</p>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {plugin.isActive && (
+                                                {plugin.isActive && plugin.hasWebhook && (
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
