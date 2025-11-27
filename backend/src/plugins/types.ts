@@ -11,11 +11,10 @@ export interface IPlugin {
 export interface IValidatableProvider {
   /**
    * Validates the plugin and configures the necessary webhooks
-   * @param pluginId The ID of the plugin
-   * @param webhookUrl The generated webhook URL
    * @param config The plugin configuration
+   * @return True if the plugin is valid, false otherwise
    */
-  validatePlugin?(pluginId: string, webhookUrl: string, config: any): Promise<void>;
+  validatePlugin(config: any): Promise<boolean>;
 }
 
 /**

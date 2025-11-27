@@ -36,11 +36,15 @@ interface DocumensoWebhookBody {
     payload: DocumensoWebhookPayload;
 }
 
-export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Documenso> } = {
-    id: "documenso",
-    name: "Documenso",
+export class DocumensoProvider implements ISigningProvider {
+    id = "documenso";
+    name = "Documenso";
 
-    formatServerUrl: (url: string) => {
+    formatServerUrl(url: string) {
+        return DocumensoProvider.formatServerUrl(url);
+    }
+
+    static formatServerUrl(url: string) {
         if (url.endsWith("/")) {
             url = url.slice(0, -1);
         }
@@ -50,9 +54,9 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
         }
 
         return url;
-    },
+    }
 
-    getClient: async (): Promise<Documenso> => {
+    static async getClient(): Promise<Documenso> {
         let { baseUrl, apiKey } = await getProviderConfig<SigningPluginConfig>("documenso");
 
         baseUrl = DocumensoProvider.formatServerUrl(baseUrl);
@@ -62,9 +66,9 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
             serverURL: baseUrl,
         });
         return client;
-    },
+    }
 
-    requestSignature: async (props: RequestSignatureProps): Promise<string> => {
+    async requestSignature(props: RequestSignatureProps): Promise<string> {
         const client = await DocumensoProvider.getClient();
 
         const quote = await prisma.quote.findUnique({
@@ -172,9 +176,9 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
         });
 
         return `documenso-${document.id}`;
-    },
+    }
 
-    handleWebhook: async (req: Request, body: DocumensoWebhookBody) => {
+    async handleWebhook(req: Request, body: DocumensoWebhookBody) {
         const client = await DocumensoProvider.getClient();
 
         const plugin = await prisma.plugin.findFirst({
@@ -255,9 +259,9 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
         }
 
         return { message: 'Webhook processed successfully' };
-    },
+    }
 
-    generatePdfPreview: async (quoteId: string): Promise<Uint8Array<ArrayBufferLike>> => {
+    async generatePdfPreview(quoteId: string): Promise<Uint8Array<ArrayBufferLike>> {
         const client = await DocumensoProvider.getClient();
 
         const document = (await client.documents.find({})).data.find(doc => doc.externalId === quoteId);
@@ -290,4 +294,12 @@ export const DocumensoProvider: ISigningProvider & { getClient: () => Promise<Do
 
         return uint8Array;
     }
-};
+
+    async validatePlugin(config: any): Promise<boolean> {
+        console.log('Validating Documenso plugin with config:', config);
+        // Add actual validation logic here (e.g., test connection to Documenso)
+        return true;
+    }
+}
+
+export const documensoProvider = new DocumensoProvider();
