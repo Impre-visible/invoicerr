@@ -6,6 +6,7 @@ import { EInvoice, ExportFormat } from '@fin.cx/einvoice';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { MailService } from '@/mail/mail.service';
+import { StorageUploadService } from '@/utils/storage-upload';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
 import { WebhookEvent } from '@prisma/client';
 import { baseTemplate } from '@/modules/invoices/templates/base.template';
@@ -640,6 +641,20 @@ export class InvoicesService {
             });
         } catch (error) {
             this.logger.error('Failed to dispatch INVOICE_MARKED_AS_PAID webhook', error);
+        }
+
+        try {
+            this.logger.log(`Uploading paid invoice ${invoiceId} to storage providers...`);
+            const pdfBuffer = await this.getInvoicePdf(invoiceId);
+            const uploadedUrls = await StorageUploadService.uploadPaidInvoicePdf(invoiceId, pdfBuffer);
+            if (uploadedUrls.length > 0) {
+                this.logger.log(`Invoice ${invoiceId} successfully uploaded to ${uploadedUrls.length} storage provider(s)`);
+            }
+        } catch (error) {
+            this.logger.error(
+                `Failed to upload paid invoice ${invoiceId} to storage providers`,
+                error instanceof Error ? error.message : String(error)
+            );
         }
 
         return paidInvoice;

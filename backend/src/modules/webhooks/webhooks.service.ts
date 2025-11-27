@@ -54,7 +54,7 @@ export class WebhooksService {
         this.logger.log(`Found plugin: ${plugin.name} (${plugin.type})`);
 
         // Récupérer le provider du plugin
-        const provider = await this.pluginsService.getProvider<IWebhookProvider>(plugin.type.toLowerCase());
+        const provider = await this.pluginsService.getProviderByType<IWebhookProvider>(plugin.type.toLowerCase());
 
         if (!provider) {
             throw new NotFoundException(`No provider found for plugin type: ${plugin.type}`);

@@ -2,12 +2,13 @@ import * as Handlebars from 'handlebars';
 
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from '@/modules/quotes/dto/quotes.dto';
+import { PluginType, WebhookEvent } from '@prisma/client';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { ISigningProvider } from '@/plugins/signing/types';
 import { PluginsService } from '../plugins/plugins.service';
+import { StorageUploadService } from '@/utils/storage-upload';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
-import { WebhookEvent } from '@prisma/client';
 import { baseTemplate } from '@/modules/quotes/templates/base.template';
 import { formatDate } from '@/utils/date';
 import prisma from '@/prisma/prisma.service';
@@ -331,7 +332,7 @@ export class QuotesService {
 
         // Only use signing provider to generate PDF if quote is signed
         if (quote.status === 'SIGNED') {
-            const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
+            const provider = await this.pluginsService.getProviderByType<ISigningProvider>(PluginType.SIGNING);
             try {
                 if (provider && typeof provider.generatePdfPreview == 'function') {
                     const pdf = await provider.generatePdfPreview(id);
@@ -483,7 +484,22 @@ export class QuotesService {
             this.logger.error('Failed to dispatch QUOTE_SIGNED webhook', error);
         }
 
+        try {
+            this.logger.log(`Uploading signed quote ${id} to storage providers...`);
+            const pdfBuffer = await this.getQuotePdf(id);
+            const uploadedUrls = await StorageUploadService.uploadSignedQuotePdf(id, pdfBuffer);
+            if (uploadedUrls.length > 0) {
+                this.logger.log(`Quote ${id} successfully uploaded to ${uploadedUrls.length} storage provider(s)`);
+            }
+        } catch (error) {
+            this.logger.error(
+                `Failed to upload signed quote ${id} to storage providers`,
+                error instanceof Error ? error.message : String(error)
+            );
+        }
+
         return signedQuote;
     }
 
 }
+
