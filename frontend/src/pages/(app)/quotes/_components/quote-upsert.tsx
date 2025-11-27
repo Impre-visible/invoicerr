@@ -114,6 +114,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                     .sort((a, b) => a.order - b.order)
                     .map((item) => ({
                         id: item.id,
+                        type: item.type,
                         description: item.description || "",
                         quantity: item.quantity || 1,
                         unitPrice: item.unitPrice || 0,
