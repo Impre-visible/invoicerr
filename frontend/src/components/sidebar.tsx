@@ -100,7 +100,7 @@ export function Sidebar() {
 
     return (
         <RootSidebar collapsible="icon">
-            <Dialog open={!!company && !company.name && location.pathname !== "/settings/company"}>
+            <Dialog open={(!company || !company.name) && location.pathname !== "/settings/company"}>
                 <DialogContent className="[&>button]:hidden">
                     <DialogHeader>
                         <DialogTitle>{t("sidebar.companyDialog.title")}</DialogTitle>
