@@ -82,7 +82,7 @@ export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetRe
     };
 }
 
-export function useGet<T = any>(url: string, options?: RequestInit): UseGetResult<T> {
+export function useGet<T = any>(url: string | null, options?: RequestInit): UseGetResult<T> {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -91,6 +91,11 @@ export function useGet<T = any>(url: string, options?: RequestInit): UseGetResul
     useEffect(() => {
         let cancelled = false;
         setLoading(true);
+        if (!url) {
+            setData(null);
+            setLoading(false);
+            return;
+        }
 
         let newURL = url;
         if (!url.startsWith("http")) {
