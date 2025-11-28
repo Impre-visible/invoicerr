@@ -1666,5 +1666,17 @@
       "warning": "Konfigurieren Sie sowohl die Webhook-URL als auch das Secret in Ihren {{pluginName}}-Einstellungen, um authentifizierte Echtzeit-Updates zu erhalten. Bewahren Sie das Secret sicher auf - es wird nicht wieder angezeigt.",
       "gotIt": "Verstanden!"
     }
+  },
+  "folderSelect": {
+    "placeholder": "Ordner auswählen...",
+    "browse": "Durchsuchen",
+    "title": "Ordner auswählen",
+    "newFolder": "Neuer Ordner",
+    "folderName": "Ordnername...",
+    "create": "Erstellen",
+    "cancel": "Abbrechen",
+    "selectThisFolder": "Diesen Ordner auswählen",
+    "noSubdirectories": "Keine Unterordner gefunden",
+    "loading": "Verzeichnisse werden geladen..."
   }
 }

@@ -7,6 +7,7 @@ import { useGet, usePost } from "@/hooks/use-fetch"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useTranslation } from "react-i18next"
 
 interface DirectoryItem {
     name: string
@@ -32,6 +33,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
     const [currentPath, setCurrentPath] = useState(value || "/home")
     const [creatingFolder, setCreatingFolder] = useState(false)
     const [newFolderName, setNewFolderName] = useState("")
+    const { t } = useTranslation()
 
     const { data, loading, error } = useGet<DirectoryInfo>(
         open ? `/api/directories?path=${encodeURIComponent(currentPath || "/")}` : null,
@@ -94,7 +96,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                 <input
                     type="text"
                     value={currentPath || ""}
-                    placeholder="Select a folder..."
+                    placeholder={t("folderSelect.placeholder")}
                     readOnly
                     disabled={disabled}
                     className="flex-1 bg-transparent border-0 outline-none text-sm placeholder:text-muted-foreground cursor-pointer"
@@ -104,7 +106,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>Select a Folder</DialogTitle>
+                        <DialogTitle>{t("folderSelect.title")}</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-4">
@@ -132,7 +134,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                                 disabled={loading}
                             >
                                 <FolderPlus className="w-4 h-4 mr-2" />
-                                New Folder
+                                {t("folderSelect.newFolder")}
                             </Button>
                         </div>
 
@@ -148,7 +150,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                             <div className="p-3 border rounded-md bg-muted/50 space-y-2">
                                 <Input
                                     type="text"
-                                    placeholder="Folder name..."
+                                    placeholder={t("folderSelect.folderName")}
                                     value={newFolderName}
                                     onChange={(e) => setNewFolderName(e.target.value)}
                                     onKeyDown={(e) => {
@@ -170,7 +172,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                                         onClick={handleCreateFolder}
                                         disabled={!newFolderName.trim() || loading}
                                     >
-                                        Create
+                                        {t("folderSelect.create")}
                                     </Button>
                                     <Button
                                         type="button"
@@ -182,7 +184,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                                         }}
                                         disabled={loading}
                                     >
-                                        Cancel
+                                        {t("folderSelect.cancel")}
                                     </Button>
                                 </div>
                             </div>
@@ -192,7 +194,7 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
                         {loading && (
                             <div className="flex items-center justify-center py-8">
                                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                                <span className="ml-2 text-sm text-muted-foreground">Loading directories...</span>
+                                <span className="ml-2 text-sm text-muted-foreground">{t("folderSelect.loading")}</span>
                             </div>
                         )}
 
@@ -230,16 +232,16 @@ export function FolderSelect({ value, onChange, disabled }: FolderSelectProps) {
 
                         {/* No directories message */}
                         {!loading && data?.directories && data.directories.length === 0 && !data?.parent && (
-                            <div className="text-sm text-muted-foreground text-center py-8">No subdirectories found</div>
+                            <div className="text-sm text-muted-foreground text-center py-8">{t("folderSelect.noSubdirectories")}</div>
                         )}
                     </div>
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                            Cancel
+                            {t("folderSelect.cancel")}
                         </Button>
                         <Button type="button" onClick={handleSelectThisFolder} disabled={loading}>
-                            Select This Folder
+                            {t("folderSelect.selectThisFolder")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

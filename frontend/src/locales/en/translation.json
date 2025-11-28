@@ -1672,5 +1672,17 @@
             "warning": "Configure both the webhook URL and secret in your {{pluginName}} settings to receive authenticated real-time updates. Store the secret securely - it won't be shown again.",
             "gotIt": "Got it!"
         }
+    },
+    "folderSelect": {
+        "placeholder": "Select a folder...",
+        "browse": "Browse",
+        "title": "Select a Folder",
+        "newFolder": "New Folder",
+        "folderName": "Folder name...",
+        "create": "Create",
+        "cancel": "Cancel",
+        "selectThisFolder": "Select This Folder",
+        "noSubdirectories": "No subdirectories found",
+        "loading": "Loading directories..."
     }
 }
