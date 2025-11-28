@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'fs';
 
-// Import all providers manually
 import { DocumensoProvider } from './signing/providers/documenso/documenso';
 import { IPluginForm } from './signing/types';
+import { LocalStorageProvider } from './storage/providers/local/local';
 import { Logger } from '@nestjs/common';
 import { PluginType } from '@prisma/client';
 import { S3StorageProvider } from './storage/providers/s3/s3';
@@ -59,6 +59,7 @@ export class PluginRegistry {
         this.removeRemovedProviders();
         this.registerProvider(PluginType.SIGNING, new DocumensoProvider());
         this.registerProvider(PluginType.STORAGE, new S3StorageProvider());
+        this.registerProvider(PluginType.STORAGE, new LocalStorageProvider());
     }
 
     private removeRemovedProviders() {
