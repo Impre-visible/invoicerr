@@ -34,6 +34,9 @@ describe('Quotes E2E', () => {
         cy.wait(50);
         // Select a day in the calendar
         cy.get('table tbody tr:nth-child(3) td:nth-child(4) button').click();
+        // Close the calendar by pressing Escape
+        cy.get('body').type('{esc}');
+        cy.wait(100);
 
         // Set "notes"
         cy.get('[name="notes"]').type('These are some notes');
@@ -97,9 +100,12 @@ describe('Quotes E2E', () => {
         cy.get('[aria-label="Go to the Next Month"]').click();
         cy.wait(50);
         cy.get('table tbody tr:nth-child(3) td:nth-child(4) button').click();
+        // Close the calendar by pressing Escape
+        cy.get('body').type('{esc}');
+        cy.wait(100);
 
         // Set "notes"
-        cy.get('[name="notes"]').type('These are some other notes');
+        cy.get('[name="notes"]').type('These are some notes');
 
         // Select Payment Method
         cy.contains('label', 'Payment Method').parent().find('button[role="combobox"]').click();
