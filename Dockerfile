@@ -37,6 +37,8 @@ COPY --from=backend-builder /app/package*.json /usr/share/nginx/backend/
 COPY --from=backend-builder /app/prisma /usr/share/nginx/backend/prisma
 COPY --from=backend-builder /app/package.json /usr/share/nginx/
 COPY --from=backend-builder /app/prisma.config.ts /usr/share/nginx/backend
+COPY --from=backend-builder /app/prisma.config.ts /usr/share/nginx/backend/prisma
+COPY --from=backend-builder /app/prisma.config.ts /usr/share/nginx/backend/src
 
 COPY entrypoint.sh /usr/share/nginx/entrypoint.sh
 COPY nginx.conf /etc/nginx/conf.d/default.conf
