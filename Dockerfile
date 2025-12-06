@@ -31,7 +31,7 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
-COPY --from=backend-builder /app/dist /usr/share/nginx/backend/src
+COPY --from=backend-builder /app/dist /usr/share/nginx/backend
 COPY --from=backend-builder /app/node_modules /usr/share/nginx/backend/node_modules
 COPY --from=backend-builder /app/package*.json /usr/share/nginx/backend/
 COPY --from=backend-builder /app/prisma /usr/share/nginx/backend/prisma
