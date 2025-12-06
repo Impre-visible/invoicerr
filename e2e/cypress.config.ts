@@ -1,4 +1,3 @@
-
 import { defineConfig } from "cypress";
 import { exec } from "child_process";
 
@@ -9,6 +8,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       on('before:run', (details) => {
         return new Promise((resolve, reject) => {
+          return;
           exec('node ../backend/prisma/reset-db.test.ts', (err: any, stdout: any, stderr: any) => {
             if (err) {
               console.error(stderr);

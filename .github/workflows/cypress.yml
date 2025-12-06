@@ -41,6 +41,8 @@ jobs:
         run: |
           cd backend
           npm ci
+          DATABASE_URL="postgresql://invoicerr:invoicerr@localhost:5433/invoicerr_db" npx prisma generate
+          DATABASE_URL="postgresql://invoicerr:invoicerr@localhost:5433/invoicerr_db" npx prisma migrate deploy
 
       - name: Install frontend dependencies
         run: |
