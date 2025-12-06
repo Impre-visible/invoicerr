@@ -5,34 +5,25 @@ import {
     InputBaseInput,
 } from "@/components/ui/input-base";
 
-interface BetterInputProps {
+interface BetterInputProps extends React.ComponentProps<"input"> {
     prefixAdornment?: React.ReactNode;
     postAdornment?: React.ReactNode;
-    type?: React.HTMLInputTypeAttribute;
-    placeholder?: string;
-    props?: React.ComponentProps<"input">;
-    step?: string | number;
-    disabled?: boolean;
-    min?: string | number;
-    max?: string | number;
-    defaultValue?: string | number;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function BetterInput(fields: BetterInputProps) {
+export function BetterInput({ prefixAdornment, postAdornment, ...inputProps }: BetterInputProps) {
     return (
         <InputBase>
-            {fields.prefixAdornment && (
+            {prefixAdornment && (
                 <InputBaseAdornment>
-                    {fields.prefixAdornment}
+                    {prefixAdornment}
                 </InputBaseAdornment>
             )}
             <InputBaseControl>
-                <InputBaseInput {...fields.props} type={fields.type} placeholder={fields.placeholder} onChange={fields.onChange} step={fields.step} defaultValue={fields.defaultValue} disabled={fields.disabled} min={fields.min} max={fields.max} />
+                <InputBaseInput {...inputProps} />
             </InputBaseControl>
-            {fields.postAdornment && (
+            {postAdornment && (
                 <InputBaseAdornment>
-                    {fields.postAdornment}
+                    {postAdornment}
                 </InputBaseAdornment>
             )}
         </InputBase>

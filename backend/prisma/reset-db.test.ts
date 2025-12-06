@@ -12,5 +12,6 @@ const schemaPath = path.resolve(__dirname, "./schema.prisma");
 try {
     execSync(`npx prisma migrate reset --force --schema=${schemaPath}`, { stdio: "inherit" })
 } catch (error) {
+    console.error("Error resetting the database:", error);
     //Do nothing
 }
