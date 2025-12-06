@@ -1,4 +1,4 @@
-import { ClientType, Currency } from "@prisma/client";
+import { ClientType, Currency } from "../../../../prisma/generated/prisma/client";
 
 export class EditClientsDto {
     description?: string

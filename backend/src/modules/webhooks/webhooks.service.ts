@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Webhook, WebhookEvent, WebhookType } from '@prisma/client';
+import { Webhook, WebhookEvent, WebhookType } from '../../../prisma/generated/prisma/client';
 
 import { DiscordDriver } from './drivers/discord.driver';
 import { GenericDriver } from './drivers/generic.driver';

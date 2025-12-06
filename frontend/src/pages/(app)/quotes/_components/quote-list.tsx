@@ -277,6 +277,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
 
                                                 {quote.status !== "SIGNED" && (
                                                     <Button
+                                                        data-cy={`send-signature-${quote.id}`}
                                                         tooltip={
                                                             quote.status !== "SENT"
                                                                 ? t("quotes.list.tooltips.sendSignature")
@@ -294,6 +295,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
 
                                                 {quote.status === "SIGNED" && (
                                                     <Button
+                                                        data-cy={`create-invoice-${quote.id}`}
                                                         tooltip={t("quotes.list.tooltips.createInvoice")}
                                                         variant="ghost"
                                                         size="icon"

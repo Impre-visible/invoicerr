@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { Currency, WebhookEvent } from '@prisma/client'
+import { Currency, WebhookEvent } from '../../../prisma/generated/prisma/client'
 
 import { UpsertInvoicesDto } from '@/modules/recurring-invoices/dto/invoices.dto';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';

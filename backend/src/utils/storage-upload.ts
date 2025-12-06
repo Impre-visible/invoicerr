@@ -1,6 +1,6 @@
 import { IStorageProvider } from '@/plugins/storage/types';
 import { Logger } from '@nestjs/common';
-import { PluginType } from '@prisma/client';
+import { PluginType } from '../../prisma/generated/prisma/client';
 import { PluginsService } from '@/modules/plugins/plugins.service';
 
 const logger = new Logger('StorageUploadService');

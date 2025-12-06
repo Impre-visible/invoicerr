@@ -193,7 +193,7 @@ export default function Signature() {
                             <p className="text-sm text-muted-foreground">
                                 To sign this quote, click the button below. A verification code will be sent by email.
                             </p>
-                            <Button onClick={handleSendOtp} disabled={optCodeloading} className="w-full">
+                            <Button data-cy="send-otp-btn" onClick={handleSendOtp} disabled={optCodeloading} className="w-full">
                                 <Mail className="h-4 w-4 mr-2" />
                                 {optCodeloading ? "Sending..." : "Send verification code"}
                             </Button>
@@ -239,7 +239,7 @@ export default function Signature() {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <Button type="submit" disabled={signingLoading || !otpCode.trim()} className="flex-1">
+                                    <Button data-cy="sign-quote-btn" type="submit" disabled={signingLoading || !otpCode.trim()} className="flex-1">
                                         {signingLoading ? "Signing in progress..." : "Sign quote"}
                                     </Button>
                                     <Button type="button" variant="outline" onClick={() => setState("ready")} disabled={signingLoading}>

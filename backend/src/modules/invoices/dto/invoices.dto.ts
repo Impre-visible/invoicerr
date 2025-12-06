@@ -1,5 +1,5 @@
-import { Currency, ItemType } from "@prisma/client";
- 
+import { Currency, ItemType } from "../../../../prisma/generated/prisma/client";
+
 export class CreateInvoiceDto {
     clientId: string;
     quoteId?: string;
@@ -19,7 +19,7 @@ export class CreateInvoiceDto {
         order: number;
     }[];
 }
- 
+
 export class EditInvoicesDto {
     id: string;
     quoteId?: string;

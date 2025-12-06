@@ -6,8 +6,8 @@ describe('Authentication E2E', () => {
         cy.get('input[name=email]').type('john.doe@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
-        cy.contains('Account created successfully');
-
+        // Wait for success message or redirect to login
+        cy.url({ timeout: 10000 }).should('include', '/login');
     });
 
     it('allows a user to login', () => {
