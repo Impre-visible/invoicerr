@@ -13,7 +13,7 @@ COPY backend/. .
 RUN DATABASE_URL=not_required npx prisma generate --schema=prisma/schema.prisma
 RUN npm run build
 
-FROM --platform=$BUILDPLATFORM node:22-bullseye AS frontend-builder
+FROM --platform=$BUILDPLATFORM node:22-bullseye AS backend-builder
 
 WORKDIR /app
 
