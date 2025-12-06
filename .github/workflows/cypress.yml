@@ -1,10 +1,6 @@
 name: Cypress Tests
 
 on:
-  push:
-    branches: [main]
-  release:
-    types: ["created"]
   pull_request:
 
 jobs:
