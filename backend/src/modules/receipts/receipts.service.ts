@@ -6,7 +6,7 @@ import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { MailService } from '@/mail/mail.service';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
-import { WebhookEvent } from '@prisma/client';
+import { WebhookEvent } from '../../../prisma/generated/prisma/client';
 import { baseTemplate } from '@/modules/receipts/templates/base.template';
 import { formatDate } from '@/utils/date';
 import prisma from '@/prisma/prisma.service';

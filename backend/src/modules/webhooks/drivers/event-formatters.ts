@@ -1,4 +1,4 @@
-import { Company, WebhookEvent } from "@prisma/client";
+import { Company, WebhookEvent } from "../../../../prisma/generated/prisma/client";
 
 export interface EventStyle {
     color: string;

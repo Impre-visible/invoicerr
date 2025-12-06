@@ -1,4 +1,4 @@
-import { WebhookType } from "@prisma/client";
+import { WebhookType } from "../../../../prisma/generated/prisma/client";
 
 export interface WebhookDriver {
     supports(type: WebhookType): boolean;

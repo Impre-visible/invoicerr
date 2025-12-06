@@ -1,7 +1,13 @@
-import { formatPattern } from '@/utils/pdf';
-import { Prisma, PrismaClient } from '@prisma/client';
+import 'dotenv/config'
 
-const prisma = new PrismaClient().$extends({
+import { Prisma, PrismaClient } from '../../prisma/generated/prisma/client';
+
+import { PrismaPg } from '@prisma/adapter-pg';
+import { formatPattern } from '@/utils/pdf';
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+
+const prisma = new PrismaClient({ adapter }).$extends({
     query: {
         $allModels: {
             async findMany({ model, operation, args, query }) {

@@ -4,7 +4,7 @@ import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
 import { WebhooksService } from './webhooks.service';
 import prisma from '@/prisma/prisma.service';
 import { LoginRequiredGuard } from '@/guards/login-required.guard';
-import { WebhookEvent, WebhookType } from '@prisma/client';
+import { WebhookEvent, WebhookType } from '../../../prisma/generated/prisma/client';
 import { WebhookDispatcherService } from './webhook-dispatcher.service';
 
 @Controller('webhooks')

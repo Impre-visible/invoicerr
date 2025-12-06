@@ -1,13 +1,17 @@
-import { PrismaClient, QuoteStatus, WebhookEvent } from "@prisma/client";
+import 'dotenv/config'
+
+import { PrismaClient, QuoteStatus, WebhookEvent } from "../../../prisma/generated/prisma/client";
 
 import { PluginsService } from "@/modules/plugins/plugins.service";
+import { PrismaPg } from '@prisma/adapter-pg';
 import { StorageUploadService } from "@/utils/storage-upload";
 import { WebhookDispatcherService } from "@/modules/webhooks/webhook-dispatcher.service";
 import { WebhooksService } from "@/modules/webhooks/webhooks.service";
 import { generateQuotePdf } from "@/utils/generate-quote-pdf";
 
 export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
-    const prisma = new PrismaClient();
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+    const prisma = new PrismaClient({ adapter });
 
     const quote = await prisma.quote.update({
         where: { id: quoteId },
@@ -67,7 +71,7 @@ export async function markQuoteAs(quoteId: string, status: QuoteStatus) {
         try {
             const pdfBuffer = await generateQuotePdf(quoteId);
             await StorageUploadService.uploadSignedQuotePdf(quoteId, pdfBuffer);
-        } catch  {
+        } catch {
             // Do nothing on failure
         }
     }

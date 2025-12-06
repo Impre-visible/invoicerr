@@ -7,7 +7,7 @@ import { countPdfPages, uploadQuoteFileToUrl } from "../../utils";
 
 import { Documenso } from "@documenso/sdk-typescript";
 import { DocumentDownloadResponse } from "@documenso/sdk-typescript/models/operations";
-import { QuoteStatus } from "@prisma/client";
+import { QuoteStatus } from "../../../../../prisma/generated/prisma/client";
 import { Request } from 'express';
 import { generateQuotePdf } from "@/utils/quote-pdf";
 import { markQuoteAs } from "@/utils/plugins/signing";

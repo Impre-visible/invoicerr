@@ -1,4 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config'
+
+import { PrismaClient } from '../../prisma/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 export interface SigningPluginConfig {
     baseUrl: string;
@@ -6,7 +9,8 @@ export interface SigningPluginConfig {
 }
 
 export async function getProviderConfig<T>(name: string) {
-    const prisma = new PrismaClient();
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+    const prisma = new PrismaClient({ adapter });
 
     const plugin = await prisma.plugin.findFirst({
         where: {

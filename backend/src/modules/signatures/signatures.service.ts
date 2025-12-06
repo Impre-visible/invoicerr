@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { PluginType, WebhookEvent } from '@prisma/client';
+import { PluginType, WebhookEvent } from '../../../prisma/generated/prisma/client';
 
 import { ISigningProvider } from '@/plugins/signing/types';
 import { MailService } from '@/mail/mail.service';

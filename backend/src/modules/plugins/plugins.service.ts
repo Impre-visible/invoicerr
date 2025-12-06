@@ -4,7 +4,7 @@ import { extname, join } from 'path';
 
 import { EInvoice } from '@fin.cx/einvoice';
 import { PluginRegistry } from '../../plugins';
-import { PluginType } from '@prisma/client';
+import { PluginType } from '../../../prisma/generated/prisma/client';
 import { generateWebhookSecret } from '@/utils/webhook-security';
 import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { EditClientsDto } from '@/modules/clients/dto/clients.dto';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
-import { WebhookEvent } from '@prisma/client';
+import { WebhookEvent } from '../../../prisma/generated/prisma/client';
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()

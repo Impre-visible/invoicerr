@@ -1,5 +1,5 @@
 import { WebhookDriver } from "./webhook-driver.interface";
-import { WebhookType } from "@prisma/client";
+import { WebhookType } from "../../../../prisma/generated/prisma/client";
 import crypto from "crypto";
 
 export class GenericDriver implements WebhookDriver {

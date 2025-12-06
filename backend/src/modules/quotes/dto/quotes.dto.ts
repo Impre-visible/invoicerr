@@ -1,5 +1,5 @@
-import { Currency, ItemType } from "@prisma/client";
- 
+import { Currency, ItemType } from "../../../../prisma/generated/prisma/client";
+
 export class CreateQuoteDto {
     // number is auto generated
     title?: string;
@@ -19,7 +19,7 @@ export class CreateQuoteDto {
         order: number;
     }[];
 }
- 
+
 export class EditQuotesDto {
     id: string;
     title?: string;

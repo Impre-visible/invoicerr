@@ -4,7 +4,7 @@ import { DocumensoProvider } from './signing/providers/documenso/documenso';
 import { IPluginForm } from './signing/types';
 import { LocalStorageProvider } from './storage/providers/local/local';
 import { Logger } from '@nestjs/common';
-import { PluginType } from '@prisma/client';
+import { PluginType } from '../../prisma/generated/prisma/client';
 import { S3StorageProvider } from './storage/providers/s3/s3';
 import { join } from 'path';
 import prisma from '@/prisma/prisma.service';
