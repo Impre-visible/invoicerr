@@ -1666,5 +1666,17 @@
             "warning": "Configura tanto la URL como el secreto del webhook en la configuración de {{pluginName}} para recibir actualizaciones autenticadas en tiempo real. Almacena el secreto de forma segura - no se mostrará de nuevo.",
             "gotIt": "¡Entendido!"
         }
+    },
+    "folderSelect": {
+        "placeholder": "Seleccionar una carpeta...",
+        "browse": "Examinar",
+        "title": "Seleccionar una carpeta",
+        "newFolder": "Nueva carpeta",
+        "folderName": "Nombre de la carpeta...",
+        "create": "Crear",
+        "cancel": "Cancelar",
+        "selectThisFolder": "Seleccionar esta carpeta",
+        "noSubdirectories": "No se encontraron subcarpetas",
+        "loading": "Cargando directorios..."
     }
 }

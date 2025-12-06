@@ -81,16 +81,16 @@ export class PluginsController {
     }
   }
 
-  @Get('provider/:type')
-  async getProvider(@Param('type') type: string) {
-    const provider = await this.pluginsService.getProvider(type);
+  @Get('provider/:id')
+  async getProvider(@Param('id') id: string) {
+    const provider = await this.pluginsService.getProviderById(id);
     if (!provider) {
-      return { message: `No active provider found for type: ${type}` };
+      return { message: `No active provider found` };
     }
     return {
       id: provider.__uuid,
       name: provider.name,
-      type: type,
+      type: provider.type,
       hasProvider: true
     };
   }

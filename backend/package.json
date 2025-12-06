@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.940.0",
+    "@aws-sdk/s3-request-presigner": "^3.940.0",
     "@documenso/sdk-typescript": "^0.4.0",
     "@fin.cx/einvoice": "^5.1.4",
     "@nestjs/common": "^11.0.1",

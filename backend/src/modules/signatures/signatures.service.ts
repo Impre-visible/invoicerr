@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { PluginType, WebhookEvent } from '@prisma/client';
 
 import { ISigningProvider } from '@/plugins/signing/types';
 import { MailService } from '@/mail/mail.service';
 import { PluginsService } from '../plugins/plugins.service';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
-import { WebhookEvent } from '@prisma/client';
 import prisma from '@/prisma/prisma.service';
 
 @Injectable()
@@ -140,7 +140,7 @@ export class SignaturesService {
     }
 
     async sendSignatureEmail(quoteId: string): Promise<string> {
-        const provider = await this.pluginsService.getProvider<ISigningProvider>("signing");
+        const provider = await this.pluginsService.getProviderByType<ISigningProvider>(PluginType.SIGNING);
         if (provider && typeof provider.requestSignature == 'function') {
             return this.sendSignatureEmailWithProvider(provider, quoteId);
         }

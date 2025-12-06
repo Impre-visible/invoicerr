@@ -8,6 +8,7 @@ import { CompanyModule } from './modules/company/company.module';
 import { ConfigModule } from '@nestjs/config';
 import { DangerModule } from './modules/danger/danger.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DirectoryModule } from './modules/directory/directory.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LoginRequiredGuard } from 'src/guards/login-required.guard';
@@ -43,6 +44,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
     DashboardModule,
     SignaturesModule,
     DangerModule,
+    DirectoryModule,
     PluginsModule,
     RecurringInvoicesModule,
     PaymentMethodsModule,

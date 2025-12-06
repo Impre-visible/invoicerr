@@ -1674,5 +1674,17 @@
             "gotIt": "Compris !"
         }
     },
+    "folderSelect": {
+        "placeholder": "Sélectionnez un dossier...",
+        "browse": "Parcourir",
+        "title": "Sélectionner un dossier",
+        "newFolder": "Nouveau dossier",
+        "folderName": "Nom du dossier...",
+        "create": "Créer",
+        "cancel": "Annuler",
+        "selectThisFolder": "Sélectionner ce dossier",
+        "noSubdirectories": "Aucun sous-dossier trouvé",
+        "loading": "Chargement des répertoires..."
+    },
     "noOptions": "Aucune option disponible. Créer un nouveau client."
 }

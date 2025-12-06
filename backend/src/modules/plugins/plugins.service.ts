@@ -3,8 +3,8 @@ import { existsSync, readdirSync, rmSync, statSync } from 'fs';
 import { extname, join } from 'path';
 
 import { EInvoice } from '@fin.cx/einvoice';
-import { IValidatableProvider } from '@/plugins/types';
 import { PluginRegistry } from '../../plugins';
+import { PluginType } from '@prisma/client';
 import { generateWebhookSecret } from '@/utils/webhook-security';
 import prisma from '@/prisma/prisma.service';
 import { randomUUID } from 'crypto';
@@ -133,25 +133,30 @@ export class PluginsService {
     return this.plugins;
   }
 
-  async getInAppPlugins(): Promise<{ category: string, plugins: { name: string, isActive: boolean }[] }[]> {
+  async getInAppPlugins(): Promise<{ category: string, plugins: { name: string, isActive: boolean, id: string, hasWebhook: boolean }[] }[]> {
     const categories = await prisma.plugin.findMany({
       select: { type: true },
       distinct: ['type'],
     });
 
-    const result: { category: string, plugins: { id: string, name: string, isActive: boolean }[] }[] = [];
+    const result: { category: string, plugins: { id: string, name: string, isActive: boolean, hasWebhook: boolean }[] }[] = [];
 
     for (const category of categories) {
       const pluginsInCategory = await prisma.plugin.findMany({
         where: { type: category.type },
-        select: { name: true, isActive: true, id: true },
+        select: { id: true, name: true, isActive: true, webhookUrl: true }
       });
 
       const title = category.type.toLowerCase()
 
       result.push({
         category: title.charAt(0).toUpperCase() + title.slice(1),
-        plugins: pluginsInCategory.map(p => ({ id: p.id, name: p.name, isActive: p.isActive })),
+        plugins: pluginsInCategory.map(p => ({
+          id: p.id,
+          name: p.name,
+          isActive: p.isActive,
+          hasWebhook: p.webhookUrl !== null
+        })),
       });
     }
 
@@ -170,7 +175,7 @@ export class PluginsService {
     if (plugin.isActive) {
       await prisma.plugin.update({
         where: { id },
-        data: { isActive: false }
+        data: { isActive: false, webhookUrl: null, webhookSecret: null }
       });
 
       this.logger.log(`Plugin "${plugin.name}" is now inactive.`);
@@ -185,7 +190,7 @@ export class PluginsService {
       },
     });
 
-    if (existingActivePlugin) {
+    if (existingActivePlugin && !PluginRegistry.multiInstancePluginTypes.has(plugin.type)) {
       throw new BadRequestException(`Another plugin "${existingActivePlugin.name}" is already active for category "${plugin.type}". Please disable it first.`);
     }
 
@@ -210,8 +215,8 @@ export class PluginsService {
 
     return {
       success: true,
-      webhookUrl: validation.webhookUrl,
-      webhookSecret: validation.webhookSecret,
+      ...(validation.webhookUrl && { webhookUrl: validation.webhookUrl }),
+      ...(validation.webhookSecret && { webhookSecret: validation.webhookSecret }),
       instructions: validation.instructions
     };
   }
@@ -251,20 +256,30 @@ export class PluginsService {
 
     return {
       success: true,
-      webhookUrl: validation.webhookUrl,
-      webhookSecret: validation.webhookSecret,
+      ...(validation.webhookUrl && { webhookUrl: validation.webhookUrl }),
+      ...(validation.webhookSecret && { webhookSecret: validation.webhookSecret }),
       instructions: validation.instructions
     };
   }
 
-  async getActivePlugin(type: string): Promise<IPlugin | null> {
-    const provider = await this.pluginRegistry.getProvider(type);
+  async getActivePlugin(id: string): Promise<IPlugin | null> {
+    const dbProvider = await prisma.plugin.findFirst({
+      where: {
+        id,
+        isActive: true
+      }
+    });
+
+    if (!dbProvider) {
+      return null;
+    }
+    const provider = await this.pluginRegistry.getProvider(id);
 
     if (!provider) {
       return null;
     }
 
-    const pluginType = this.getPluginTypeEnum(type);
+    const pluginType = this.getPluginTypeEnum(dbProvider.type);
     const activePlugin = await prisma.plugin.findFirst({
       where: {
         type: pluginType as any,
@@ -295,8 +310,26 @@ export class PluginsService {
    * @param type The plugin type (signing, payment, etc.)
    * @returns The active provider or null
    */
-  async getProvider<T = IPlugin>(type: string): Promise<T | null> {
-    return await this.pluginRegistry.getProvider<T>(type);
+  async getProviderByType<T = IPlugin>(type: string): Promise<T | null> {
+    return await this.pluginRegistry.getProviderByType<T>(type);
+  }
+
+  /**
+   * Get all active providers for a given type
+   * @param type The plugin type (signing, payment, etc.)
+   * @returns Array of active providers
+   */
+  async getProvidersByType<T = IPlugin>(type: string): Promise<T[]> {
+    return await this.pluginRegistry.getProvidersByType<T>(type);
+  }
+
+  /**
+   * Get the active provider by its ID
+   * @param id The plugin ID
+   * @returns The active provider or null
+   */
+  async getProviderById<T = IPlugin>(id: string): Promise<T | null> {
+    return await this.pluginRegistry.getProvider<T>(id);
   }
 
   private getPluginTypeEnum(type: string): string {
@@ -351,11 +384,11 @@ export class PluginsService {
   }
 
   /**
-   * Validate a plugin and configure its webhook
+   * Validate a plugin and configure its webhook (only if the provider implements handleWebhook)
    * @param pluginId The ID of the plugin to validate
-   * @returns Instructions for configuring the webhook with the secret
+   * @returns Instructions for configuring the webhook with the secret (only if webhook is supported)
    */
-  async pluginValidation(pluginId: string): Promise<{ webhookUrl: string; webhookSecret: string; instructions: string[] }> {
+  async pluginValidation(pluginId: string): Promise<{ webhookUrl?: string; webhookSecret?: string; instructions: string[] }> {
     const plugin = await prisma.plugin.findFirst({
       where: { id: pluginId, isActive: true },
     });
@@ -366,12 +399,20 @@ export class PluginsService {
 
     this.logger.log(`Validating plugin: ${plugin.name} (${plugin.type})`);
 
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
-    const webhookUrl = `${baseUrl}/api/webhooks/${plugin.id}`;
+    // Get the provider to check if it implements handleWebhook
+    const provider = await this.pluginRegistry.getProvider<any>(plugin.type.toLowerCase());
 
-    let webhookSecret = generateWebhookSecret();
+    let webhookUrl: string | undefined = undefined;
+    let webhookSecret: string | undefined = undefined;
 
-    if (!plugin.webhookUrl || !plugin.webhookSecret) {
+    // Only configure webhook if the provider implements handleWebhook
+    if (provider && typeof provider.handleWebhook === 'function') {
+      this.logger.log(`Plugin ${plugin.name} supports webhooks (handleWebhook method found)`);
+
+      const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+      webhookUrl = `${baseUrl}/api/webhooks/${plugin.id}`;
+      webhookSecret = generateWebhookSecret();
+
       await prisma.plugin.update({
         where: { id: plugin.id },
         data: {
@@ -379,17 +420,25 @@ export class PluginsService {
           webhookSecret
         }
       });
+
+      this.logger.log(`Generated webhook URL for plugin ${plugin.name}: ${webhookUrl}`);
+      this.logger.log(`Generated webhook secret for plugin ${plugin.name}`);
     } else {
-      webhookSecret = plugin.webhookSecret;
+      this.logger.log(`Plugin ${plugin.name} does not support webhooks (handleWebhook method not found)`);
+      // Clear webhook configuration if provider doesn't support it
+      await prisma.plugin.update({
+        where: { id: plugin.id },
+        data: {
+          webhookUrl: null,
+          webhookSecret: null
+        }
+      });
     }
 
-    this.logger.log(`Generated webhook URL for plugin ${plugin.name}: ${webhookUrl}`);
-    this.logger.log(`Generated webhook secret hash for plugin ${plugin.name}`);
-
-    const provider = await this.pluginRegistry.getProvider<IValidatableProvider>(plugin.type.toLowerCase());
+    // Validate plugin configuration using validatePlugin if available
     if (provider && typeof provider.validatePlugin === 'function') {
       try {
-        await provider.validatePlugin(plugin.id, webhookUrl, plugin.config);
+        await provider.validatePlugin(plugin.config);
         this.logger.log(`Plugin ${plugin.name} validated successfully by provider`);
       } catch (error) {
         this.logger.error(`Provider validation failed for plugin ${plugin.name}:`, error);
@@ -399,15 +448,21 @@ export class PluginsService {
 
     const instructions = this.generatePluginInstructions(plugin, webhookUrl, webhookSecret);
 
-    return { webhookUrl, webhookSecret, instructions };
+    return { ...(webhookUrl && { webhookUrl }), ...(webhookSecret && { webhookSecret }), instructions };
   }
 
   /**
    * Generate specific instructions to configure webhooks based on plugin type
    * @returns Instructions as an array of strings
    */
-  private generatePluginInstructions(plugin: any, webhookUrl: string, webhookSecret: string): string[] {
+  private generatePluginInstructions(plugin: any, webhookUrl?: string, webhookSecret?: string): string[] {
     const instructions: string[] = [];
+
+    // Only generate webhook-related instructions if webhooks are supported
+    if (!webhookUrl || !webhookSecret) {
+      this.logger.log(`No webhook configuration for plugin ${plugin.name}`);
+      return instructions;
+    }
 
     switch (plugin.type.toLowerCase()) {
       case 'signing':

@@ -12,13 +12,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { Button } from "@/components/ui/button"
+import { FolderSelect } from "@/components/folder-select"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-type FieldType = "text" | "number" | "switch" | "select"
+type FieldType = "text" | "number" | "switch" | "select" | "folder"
 
 interface SelectOption {
     label: string
@@ -60,7 +61,12 @@ interface SelectField extends BaseField {
     options: SelectOption[]
 }
 
-type FormFieldItem = TextField | NumberField | SwitchField | SelectField
+interface FolderField extends BaseField {
+    type: "folder"
+    placeholder?: string
+}
+
+type FormFieldItem = TextField | NumberField | SwitchField | SelectField | FolderField
 
 export interface FormConfig {
     form: {
@@ -184,6 +190,15 @@ function generateZodSchema(fields: FormFieldItem[]) {
                 }
                 break
             }
+
+            case "folder": {
+                fieldSchema = z.string()
+
+                if (!field.required) {
+                    fieldSchema = fieldSchema.optional()
+                }
+                break
+            }
         }
 
         schemaFields[field.name] = fieldSchema
@@ -285,6 +300,15 @@ export function DynamicFormModal({ open, title, description, config, currentValu
                             ))}
                         </SelectContent>
                     </Select>
+                )
+
+            case "folder":
+                return (
+                    <FolderSelect
+                        value={value}
+                        onChange={onChange}
+                        disabled={false}
+                    />
                 )
 
             default:

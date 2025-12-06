@@ -1,24 +1,26 @@
 import { existsSync, readFileSync } from 'fs';
 
-// Import all providers manually
 import { DocumensoProvider } from './signing/providers/documenso/documenso';
 import { IPluginForm } from './signing/types';
+import { LocalStorageProvider } from './storage/providers/local/local';
 import { Logger } from '@nestjs/common';
 import { PluginType } from '@prisma/client';
+import { S3StorageProvider } from './storage/providers/s3/s3';
 import { join } from 'path';
 import prisma from '@/prisma/prisma.service';
 
 export class PluginRegistry {
     private readonly logger: Logger = new Logger(PluginRegistry.name);
     private static instance: PluginRegistry;
-    private readonly inAppPluginTypes = new Map<string, Map<string, any>>();
-    private readonly providersMap = new Map<string, any>(); // Store actual provider instances
+    private readonly inAppPluginTypes = new Map<PluginType, Map<string, any>>();
+    private readonly providersMap = new Map<string, any>();
     private static isInitialized = false;
     private static initializationPromise: Promise<void> | null = null;
+    public static readonly multiInstancePluginTypes: Set<PluginType> = new Set([
+        PluginType.STORAGE,
+    ]);
 
-    private constructor() {
-        // Ne pas initialiser ici car on a besoin de PrismaService
-    }
+    private constructor() { }
 
     static getInstance(): PluginRegistry {
         if (!PluginRegistry.instance) {
@@ -32,7 +34,6 @@ export class PluginRegistry {
             return;
         }
 
-        // Si une initialisation est déjà en cours, attendre qu'elle se termine
         if (PluginRegistry.initializationPromise) {
             await PluginRegistry.initializationPromise;
             return;
@@ -56,8 +57,9 @@ export class PluginRegistry {
 
     private initializeInAppPlugins() {
         this.removeRemovedProviders();
-        // Register signing providers
-        this.registerProvider('signing', DocumensoProvider);
+        this.registerProvider(PluginType.SIGNING, new DocumensoProvider());
+        this.registerProvider(PluginType.STORAGE, new S3StorageProvider());
+        this.registerProvider(PluginType.STORAGE, new LocalStorageProvider());
     }
 
     private removeRemovedProviders() {
@@ -76,7 +78,7 @@ export class PluginRegistry {
         });
     }
 
-    private registerProvider(type: string, provider: any) {
+    private registerProvider(type: PluginType, provider: { id: string; name: string; form?: IPluginForm }) {
         if (!this.inAppPluginTypes.has(type)) {
             this.inAppPluginTypes.set(type, new Map());
         }
@@ -93,8 +95,7 @@ export class PluginRegistry {
         for (const [type, providers] of this.inAppPluginTypes) {
             const pluginType = this.getPluginTypeEnum(type);
 
-            for (const [providerId, form] of providers) {
-                // Vérifier si le plugin existe déjà dans la DB par ID
+            for (const [providerId, _form] of providers) {
                 const existingPlugin = await prisma.plugin.findUnique({
                     where: {
                         id: providerId
@@ -102,7 +103,6 @@ export class PluginRegistry {
                 });
 
                 if (!existingPlugin) {
-                    // Créer le plugin dans la DB
                     await prisma.plugin.create({
                         data: {
                             id: providerId,
@@ -113,8 +113,6 @@ export class PluginRegistry {
                         }
                     });
                     this.logger.log(`Synced ${type} provider "${providerId}" to database`);
-                } else {
-                    this.logger.log(`Plugin "${providerId}" already exists in database`);
                 }
             }
         }
@@ -124,40 +122,79 @@ export class PluginRegistry {
         switch (type.toLowerCase()) {
             case 'signing':
                 return PluginType.SIGNING;
-            case 'pdf_format':
-                return PluginType.PDF_FORMAT;
-            case 'payment':
-                return PluginType.PAYMENT;
-            case 'oidc':
-                return PluginType.OIDC;
+            case 'storage':
+                return PluginType.STORAGE;
             default:
                 throw new Error(`Unknown plugin type: ${type}`);
         }
     }
 
-    async getProvider<T>(type: string): Promise<T | null> {
+    async getProvidersByType<T>(type: string): Promise<T[]> {
         await this.initializeIfNeeded();
 
-        const pluginType = this.getPluginTypeEnum(type);
+        const results = await Promise.all(Array.from(this.providersMap.entries()).map(async ([pluginId, provider]) => {
+            const plugin = await prisma.plugin.findFirst({
+                where: {
+                    id: pluginId,
+                    isActive: true
+                }
+            });
+            if (!plugin || plugin.type.toLowerCase() !== type.toLowerCase()) {
+                return null;
+            }
+            return [pluginId, provider];
+        }));
 
-        // Chercher le plugin actif dans la DB
-        const activePlugin = await prisma.plugin.findFirst({
+        const pluginEntries = results.filter((entry): entry is [string, any] => entry !== null);
+
+        return pluginEntries.map(([_, provider]) => provider as T);
+    }
+
+    async getProviderByType<T>(type: string): Promise<T | null> {
+        await this.initializeIfNeeded();
+
+        const results = await Promise.all(Array.from(this.providersMap.entries()).map(async ([pluginId, provider]) => {
+            const plugin = await prisma.plugin.findFirst({
+                where: {
+                    id: pluginId,
+                    isActive: true
+                }
+            });
+            if (!plugin || plugin.type.toLowerCase() !== type.toLowerCase()) {
+                return null;
+            }
+            return [pluginId, provider];
+        }));
+
+        const pluginEntries = results.filter((entry): entry is [string, any] => entry !== null);
+
+
+        if (pluginEntries.length === 0) {
+            return null;
+        }
+
+        return pluginEntries[0][1] as T;
+    }
+
+    async getProvider<T>(id: string): Promise<T | null> {
+        await this.initializeIfNeeded();
+
+        const plugin = await prisma.plugin.findFirst({
             where: {
-                type: pluginType,
+                id,
                 isActive: true
             }
         });
 
-        if (!activePlugin) {
+
+        if (!plugin) {
             return null;
         }
 
-        // Retourner l'instance du provider
-        return this.providersMap.get(activePlugin.id) as T || null;
+        return this.providersMap.get(plugin.id) as T || null;
     }
 
     public async getProviderForm(plugin_id: string): Promise<IPluginForm> {
-        // Get the path to the provider form based on plugin_id
         let path: string = "";
         for (const [type, providers] of this.inAppPluginTypes) {
             if (providers.has(plugin_id)) {

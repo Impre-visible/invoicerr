@@ -574,9 +574,7 @@ model CurrencyConversion {
 
 enum PluginType {
   SIGNING
-  PDF_FORMAT
-  PAYMENT
-  OIDC
+  STORAGE
 }
 
 model Plugin {
