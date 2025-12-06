@@ -10,7 +10,7 @@ RUN npm ci
 
 COPY backend/. .
 
-RUN npx prisma generate --schema=prisma/schema.prisma
+RUN DATABASE_URL=not_required npx prisma generate --schema=prisma/schema.prisma
 RUN npm run build
 
 FROM node:22-bullseye AS frontend-builder
