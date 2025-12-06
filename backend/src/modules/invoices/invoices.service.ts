@@ -8,7 +8,7 @@ import { getInvertColor, getPDF } from '@/utils/pdf';
 import { MailService } from '@/mail/mail.service';
 import { StorageUploadService } from '@/utils/storage-upload';
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
-import { WebhookEvent } from '@prisma/client';
+import { WebhookEvent } from '../../../prisma/generated/prisma/client';
 import { baseTemplate } from '@/modules/invoices/templates/base.template';
 import { business } from '@tsclass/tsclass/dist_ts';
 import { finance } from '@fin.cx/einvoice/dist_ts/plugins';

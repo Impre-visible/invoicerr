@@ -1,4 +1,5 @@
-import { $Enums, Company, Invoice, Quote } from '@prisma/client'
+import { $Enums, Company, Invoice, Quote } from '../../../prisma/generated/prisma/client'
+
 import { Injectable } from '@nestjs/common';
 import prisma from '@/prisma/prisma.service';
 

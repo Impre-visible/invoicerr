@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EditCompanyDto, PDFConfigDto } from '@/modules/company/dto/company.dto';
-import { MailTemplate, MailTemplateType, WebhookEvent } from '@prisma/client'
+import { MailTemplate, MailTemplateType, WebhookEvent } from '../../../prisma/generated/prisma/client'
 
 import { WebhookDispatcherService } from '../webhooks/webhook-dispatcher.service';
 import prisma from '@/prisma/prisma.service';

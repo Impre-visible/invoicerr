@@ -1,12 +1,16 @@
+import 'dotenv/config'
+
 import * as puppeteer from 'puppeteer';
 
 import { BadRequestException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../prisma/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 type PatternType = "receipt" | "invoice" | "quote";
 
 export async function formatPattern(type: PatternType, number: number, date: Date = new Date()): Promise<string> {
-    const prisma = new PrismaClient();
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+    const prisma = new PrismaClient({ adapter });
     const company = await prisma.company.findFirst();
     if (!company) {
         throw new BadRequestException('No company found. Please create a company first.');

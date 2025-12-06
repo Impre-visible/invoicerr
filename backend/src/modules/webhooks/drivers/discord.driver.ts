@@ -1,6 +1,6 @@
 import { EVENT_STYLES, formatPayloadForEvent } from "./event-formatters";
 import { Embed, Webhook } from "@teever/ez-hook";
-import { WebhookEvent, WebhookType } from "@prisma/client";
+import { WebhookEvent, WebhookType } from "../../../../prisma/generated/prisma/client";
 
 import { WebhookDriver } from "./webhook-driver.interface";
 

@@ -1,5 +1,5 @@
 import { WebhookDriver } from "./webhook-driver.interface";
-import { WebhookType } from "@prisma/client";
+import { WebhookType } from "../../../../prisma/generated/prisma/client";
 
 export class ZapierDriver implements WebhookDriver {
     supports(type: WebhookType) {

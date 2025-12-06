@@ -2,7 +2,7 @@ import * as Handlebars from 'handlebars';
 
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateQuoteDto, EditQuotesDto } from '@/modules/quotes/dto/quotes.dto';
-import { PluginType, WebhookEvent } from '@prisma/client';
+import { PluginType, WebhookEvent } from '../../../prisma/generated/prisma/client';
 import { getInvertColor, getPDF } from '@/utils/pdf';
 
 import { ISigningProvider } from '@/plugins/signing/types';
