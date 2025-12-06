@@ -40,7 +40,7 @@ services:
       - invoicerr_db
 
   invoicerr_db:
-    image: postgres:15
+    image: postgres:17
     environment:
       POSTGRES_USER: invoicerr
       POSTGRES_PASSWORD: invoicerr
