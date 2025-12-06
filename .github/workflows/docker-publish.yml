@@ -60,7 +60,7 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ steps.set-vars.outputs.repo-name-lower }}:${{ steps.set-vars.outputs.image-tag }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
           cache-from: type=gha,mode=max,scope=${{ steps.set-vars.outputs.cache-ref }}
           cache-to: type=gha,mode=max,scope=${{ steps.set-vars.outputs.cache-ref }}
 
@@ -69,4 +69,4 @@ jobs:
           echo "✅ Build completed successfully!"
           echo "  Image pushed: ${{ steps.set-vars.outputs.repo-name-lower }}:${{ steps.set-vars.outputs.image-tag }}"
           echo "  Cache scope used: ${{ steps.set-vars.outputs.cache-ref }}"
-          echo "  Platforms built: linux/amd64, linux/arm64"
+          echo "  Platforms built: linux/amd64, linux/arm64/v8, linux/arm/v7"
