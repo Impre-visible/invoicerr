@@ -20,7 +20,6 @@ import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
 type SignupFormData = {
     firstname: string;
