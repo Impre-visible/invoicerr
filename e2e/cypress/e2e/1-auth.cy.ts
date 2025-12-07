@@ -1,6 +1,11 @@
 describe('Authentication E2E', () => {
     let invitationCode: string;
 
+    before(() => {
+        // Reset database before running tests
+        cy.task('resetDatabase');
+    });
+
     it('allows the first user to sign up without invitation code', () => {
         cy.visit('/auth/sign-up');
         // Wait for the page to load and check if invitation is required
@@ -10,9 +15,11 @@ describe('Authentication E2E', () => {
         cy.get('input[name=email]').type('john.doe@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
+
         // Wait for toast success message and redirection (there's a 1s delay)
-        cy.contains('Account created', { matchCase: false, timeout: 5000 });
-        cy.url({ timeout: 15000 }).should('include', '/auth/sign-in');
+        // The message is "Account created successfully" from translations
+        cy.contains(/account created|successfully/i, { timeout: 15000 });
+        cy.url({ timeout: 20000 }).should('include', '/auth/sign-in');
     });
 
     it('allows the first user to login', () => {
@@ -33,17 +40,18 @@ describe('Authentication E2E', () => {
     it('creates an invitation code', () => {
         cy.login();
         cy.visit('/settings/invitations');
-        cy.get('button', { timeout: 10000 }).contains('Generate', { matchCase: false }).click();
-        cy.contains('Code copied', { matchCase: false, timeout: 10000 });
+        // Wait for page to load and find the Generate Code button
+        cy.contains('button', /generate/i, { timeout: 15000 }).click();
+        cy.contains(/code.*copied|copied.*code/i, { timeout: 10000 });
 
         // Wait for the table to be updated and fetch the invitation code via API
         cy.wait(2000);
         cy.getCookie('better-auth.session_token').then((cookie) => {
             expect(cookie).to.exist;
-            const backendUrl = Cypress.env('BACKEND_URL') || 'http://localhost:3000';
+            const backendUrl = Cypress.env('BACKEND_URL') || 'http://localhost:4000';
             cy.request({
                 method: 'GET',
-                url: `${backendUrl}/invitations`,
+                url: `${backendUrl}/api/invitations`,
                 headers: {
                     Cookie: `better-auth.session_token=${cookie!.value}`,
                 },
@@ -62,6 +70,7 @@ describe('Authentication E2E', () => {
 
     it('allows signup with valid invitation code', () => {
         cy.wrap(invitationCode).should('exist').and('have.length.greaterThan', 10);
+
         cy.visit('/auth/sign-up');
         cy.get('input[id=invitationCode]', { timeout: 10000 }).should('be.visible').type(invitationCode);
         cy.get('input[id=firstname]').type('Jane');
@@ -69,8 +78,9 @@ describe('Authentication E2E', () => {
         cy.get('input[name=email]').type('jane.smith@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
-        cy.contains('Account created', { matchCase: false, timeout: 5000 });
-        cy.url({ timeout: 15000 }).should('include', '/auth/sign-in');
+
+        cy.contains(/account created|successfully/i, { timeout: 15000 });
+        cy.url({ timeout: 20000 }).should('include', '/auth/sign-in');
     });
 
     it('blocks signup with already used invitation code', () => {

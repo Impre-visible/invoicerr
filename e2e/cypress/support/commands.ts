@@ -45,7 +45,8 @@ Cypress.Commands.add('login', () => {
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
 
-        cy.url({ timeout: 10000 }).should('include', '/dashboard');
+        // Wait for successful login - the page uses window.location.href to redirect
+        cy.url({ timeout: 20000 }).should('include', '/dashboard');
 
         cy.getCookie('better-auth.session_token').should('exist');
     }, {

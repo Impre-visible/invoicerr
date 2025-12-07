@@ -1,9 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { IS_PUBLIC_KEY } from '@/decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
 import { auth } from '@/lib/auth';
 import { fromNodeHeaders } from 'better-auth/node';
+
+// Use the same metadata key as @thallesp/nestjs-better-auth
+const IS_PUBLIC_KEY = 'PUBLIC';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

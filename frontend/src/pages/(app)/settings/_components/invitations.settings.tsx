@@ -1,13 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CopyIcon, PlusIcon, RefreshCwIcon, TrashIcon } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useCallback, useEffect, useState } from "react"
+import { authenticatedFetch, useGet, usePost } from "@/hooks/use-fetch"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 type InvitationCode = {
@@ -21,86 +22,40 @@ type InvitationCode = {
         email: string;
         firstname: string;
         lastname: string;
-    } | null;
-};
-
-const getEnvVariable = (key: string): string | undefined => {
-    return (window as any).__APP_CONFIG__?.[key] || import.meta.env[key];
+    };
 };
 
 export default function InvitationsSettings() {
     const { t } = useTranslation()
-    const [invitations, setInvitations] = useState<InvitationCode[]>([])
-    const [loading, setLoading] = useState(true)
-    const [creating, setCreating] = useState(false)
     const [expiresInDays, setExpiresInDays] = useState<number | "">("")
 
-    const backendUrl = getEnvVariable("VITE_BACKEND_URL") || "";
-
-    const fetchInvitations = useCallback(async () => {
-        setLoading(true)
-        try {
-            const response = await fetch(`${backendUrl}/invitations`, {
-                credentials: "include",
-            })
-            if (response.ok) {
-                const data = await response.json()
-                setInvitations(data)
-            }
-        } catch (error) {
-            console.error("Error fetching invitations:", error)
-            toast.error(t("settings.invitations.messages.fetchError"))
-        } finally {
-            setLoading(false)
-        }
-    }, [backendUrl, t])
-
-    useEffect(() => {
-        fetchInvitations()
-    }, [fetchInvitations])
+    const { data: invitations, loading, mutate } = useGet<InvitationCode[]>("/api/invitations")
+    const { trigger: createInvitationApi, loading: creating } = usePost<InvitationCode>("/api/invitations")
 
     const createInvitation = async () => {
-        setCreating(true)
-        try {
-            const response = await fetch(`${backendUrl}/invitations`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    expiresInDays: expiresInDays || undefined,
-                }),
-            })
+        const result = await createInvitationApi({ expiresInDays: expiresInDays || undefined })
+        if (result) {
+            toast.success(t("settings.invitations.messages.createSuccess"))
+            setExpiresInDays("")
+            mutate()
 
-            if (response.ok) {
-                const newInvitation = await response.json()
-                toast.success(t("settings.invitations.messages.createSuccess"))
-                setExpiresInDays("")
-                fetchInvitations()
-
-                // Copy code to clipboard
-                await navigator.clipboard.writeText(newInvitation.code)
-                toast.info(t("settings.invitations.messages.codeCopied"))
-            } else {
-                toast.error(t("settings.invitations.messages.createError"))
-            }
-        } catch (error) {
-            console.error("Error creating invitation:", error)
+            // Copy code to clipboard
+            await navigator.clipboard.writeText(result.code)
+            toast.info(t("settings.invitations.messages.codeCopied"))
+        } else {
             toast.error(t("settings.invitations.messages.createError"))
-        } finally {
-            setCreating(false)
         }
     }
 
     const deleteInvitation = async (id: string) => {
         try {
-            const response = await fetch(`${backendUrl}/invitations/${id}`, {
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || ""
+            const response = await authenticatedFetch(`${backendUrl}/api/invitations/${id}`, {
                 method: "DELETE",
-                credentials: "include",
             })
-
             if (response.ok) {
                 toast.success(t("settings.invitations.messages.deleteSuccess"))
-                fetchInvitations()
+                mutate()
             } else {
                 toast.error(t("settings.invitations.messages.deleteError"))
             }
@@ -175,7 +130,7 @@ export default function InvitationsSettings() {
                             {t("settings.invitations.list.description")}
                         </CardDescription>
                     </div>
-                    <Button variant="outline" size="icon" onClick={fetchInvitations} disabled={loading}>
+                    <Button variant="outline" size="icon" onClick={() => mutate()} disabled={loading}>
                         <RefreshCwIcon className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
                 </CardHeader>

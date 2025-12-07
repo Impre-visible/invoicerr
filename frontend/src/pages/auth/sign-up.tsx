@@ -50,7 +50,7 @@ export default function SignupPage() {
     useEffect(() => {
         const checkInvitationRequired = async () => {
             try {
-                const response = await fetch(`${backendUrl}/invitations/is-first-user`);
+                const response = await fetch(`${backendUrl}/api/invitations/is-first-user`);
                 const data = await response.json();
                 setRequiresInvitation(!data.isFirstUser);
             } catch (error) {
@@ -67,7 +67,7 @@ export default function SignupPage() {
 
     const validateInvitationCode = async (code: string, email: string): Promise<boolean> => {
         try {
-            const response = await fetch(`${backendUrl}/invitations/validate`, {
+            const response = await fetch(`${backendUrl}/api/invitations/validate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code, email }),
