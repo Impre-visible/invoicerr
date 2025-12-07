@@ -181,14 +181,14 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                         <FormLabel>{t("clients.upsert.fields.type.label") || "Client type"}</FormLabel>
                                         <FormControl>
                                             <Select value={field.value || "COMPANY"} onValueChange={(value) => field.onChange(value)}>
-                                                <SelectTrigger>
+                                                <SelectTrigger {...dataCy('client-type-select')}>
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="COMPANY">
+                                                    <SelectItem value="COMPANY" {...dataCy('client-type-company')}>
                                                         {t("clients.upsert.fields.type.company") || "Company"}
                                                     </SelectItem>
-                                                    <SelectItem value="INDIVIDUAL">
+                                                    <SelectItem value="INDIVIDUAL" {...dataCy('client-type-individual')}>
                                                         {t("clients.upsert.fields.type.individual") || "Individual"}
                                                     </SelectItem>
                                                 </SelectContent>

@@ -20,6 +20,7 @@ import { PaymentMethodType } from "@/types"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
+import { dataCy } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -196,12 +197,12 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="max-w-sm lg:max-w-4xl">
+                <DialogContent className="max-w-sm lg:max-w-4xl" {...dataCy('invoice-dialog')}>
                     <DialogHeader>
                         <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" {...dataCy('invoice-form')}>
                             <FormField
                                 control={control}
                                 name="quoteId"
@@ -256,6 +257,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setClientsSearchTerm}
                                                 placeholder={t("invoices.upsert.form.client.placeholder")}
+                                                data-cy="invoice-client-select"
                                                 noResultsComponent={
                                                     <Button
                                                         variant="link"
@@ -278,7 +280,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                     <FormItem>
                                         <FormLabel>{t("invoices.upsert.form.currency.label")}</FormLabel>
                                         <FormControl>
-                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} data-cy="invoice-currency-select" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -514,7 +516,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                     {t("invoices.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">
+                                <Button type="submit" {...dataCy('invoice-submit')}>
                                     {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
                                 </Button>
                             </div>

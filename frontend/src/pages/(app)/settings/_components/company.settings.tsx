@@ -220,7 +220,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.company.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.company.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.company.placeholder")} {...field} data-cy="company-name-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.company.description")}</FormDescription>
                                             <FormMessage />
@@ -235,7 +235,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel>{t("settings.company.form.description.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.description.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.description.placeholder")} {...field} data-cy="company-description-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.description.description")}</FormDescription>
                                             <FormMessage />
@@ -273,6 +273,7 @@ export default function CompanySettings() {
                                                 <CurrencySelect
                                                     value={field.value}
                                                     onChange={(value) => field.onChange(value)}
+                                                    data-cy="company-currency-select"
                                                 />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.currency.description")}</FormDescription>
@@ -288,7 +289,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel>{t("settings.company.form.legalId.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} data-cy="company-legalid-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.legalId.description")}</FormDescription>
                                             <FormMessage />
@@ -303,7 +304,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel>{t("settings.company.form.vat.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} data-cy="company-vat-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.vat.description")}</FormDescription>
                                             <FormMessage />
@@ -327,7 +328,7 @@ export default function CompanySettings() {
                                     <FormItem>
                                         <FormLabel required>{t("settings.company.form.address.label")}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t("settings.company.form.address.placeholder")} {...field} />
+                                            <Input placeholder={t("settings.company.form.address.placeholder")} {...field} data-cy="company-address-input" />
                                         </FormControl>
                                         <FormDescription>{t("settings.company.form.address.description")}</FormDescription>
                                         <FormMessage />
@@ -343,7 +344,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.postalCode.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.postalCode.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.postalCode.placeholder")} {...field} data-cy="company-postalcode-input" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -357,7 +358,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.city.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.city.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.city.placeholder")} {...field} data-cy="company-city-input" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -371,7 +372,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.country.label")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder={t("settings.company.form.country.placeholder")} {...field} />
+                                                <Input placeholder={t("settings.company.form.country.placeholder")} {...field} data-cy="company-country-input" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -395,7 +396,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.phone.label")}</FormLabel>
                                             <FormControl>
-                                                <Input type="tel" placeholder={t("settings.company.form.phone.placeholder")} {...field} />
+                                                <Input type="tel" placeholder={t("settings.company.form.phone.placeholder")} {...field} data-cy="company-phone-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.phone.description")}</FormDescription>
                                             <FormMessage />
@@ -410,7 +411,7 @@ export default function CompanySettings() {
                                         <FormItem>
                                             <FormLabel required>{t("settings.company.form.email.label")}</FormLabel>
                                             <FormControl>
-                                                <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} />
+                                                <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} data-cy="company-email-input" />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.email.description")}</FormDescription>
                                             <FormMessage />
@@ -618,7 +619,7 @@ export default function CompanySettings() {
                     </Card>
 
                     <div className="flex justify-end">
-                        <Button type="submit" disabled={isLoading} className="min-w-32">
+                        <Button type="submit" disabled={isLoading} className="min-w-32" data-cy="company-submit-btn">
                             {isLoading ? t("settings.company.form.saving") : t("settings.company.form.saveSettings")}
                         </Button>
                     </div>
