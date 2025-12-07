@@ -10,12 +10,14 @@ import { ConfigModule } from '@nestjs/config';
 import { DangerModule } from './modules/danger/danger.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DirectoryModule } from './modules/directory/directory.module';
+import { InvitationsModule } from './modules/invitations/invitations.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MailService } from './mail/mail.service';
 import { Module } from '@nestjs/common';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { PluginsModule } from './modules/plugins/plugins.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { QuotesModule } from './modules/quotes/quotes.module';
 import { ReceiptsModule } from './modules/receipts/receipts.module';
 import { RecurringInvoicesModule } from './modules/recurring-invoices/recurring-invoices.module';
@@ -49,6 +51,8 @@ import { auth } from "./lib/auth"
     PaymentMethodsModule,
     StatsModule,
     WebhooksModule,
+    InvitationsModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [

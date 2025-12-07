@@ -789,6 +789,24 @@ model Webhook {
   @@index([companyId])
 }
 
+// ======= INVITATION SYSTEM ======= //
+
+model InvitationCode {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  usedAt      DateTime?
+  createdById String
+  createdBy   User      @relation("CreatedInvitations", fields: [createdById], references: [id], onDelete: Cascade)
+  usedById    String?   @unique
+  usedBy      User?     @relation("UsedInvitation", fields: [usedById], references: [id], onDelete: SetNull)
+
+  @@index([code])
+  @@index([createdById])
+  @@map("invitation_code")
+}
+
 // ======= BETTER AUTH INTEGRATION ======= //
 
 model User {
@@ -803,6 +821,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  // Invitation relations
+  createdInvitations InvitationCode[] @relation("CreatedInvitations")
+  usedInvitation     InvitationCode?  @relation("UsedInvitation")
 
   @@unique([email])
   @@map("user")

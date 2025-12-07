@@ -1,15 +1,16 @@
-import { AlertTriangle, Building2, FileText, Mail, Plug, User, Webhook } from "lucide-react"
+import { AlertTriangle, Building2, FileText, Mail, Plug, TicketIcon, User, Webhook } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useNavigate, useParams } from "react-router"
 
 import AccountSettings from "./_components/account.settings"
 import CompanySettings from "./_components/company.settings"
 import DangerZoneSettings from "./_components/danger.settings"
 import EmailTemplatesSettings from "./_components/templates.settings"
+import InvitationsSettings from "./_components/invitations.settings"
 import PDFTemplatesSettings from "./_components/pdf.settings"
 import PluginsSettings from "./_components/plugins.settings"
 import WebhooksSettings from "./_components/webhooks.settings"
+import { cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 
 export default function Settings() {
@@ -17,14 +18,14 @@ export default function Settings() {
     const { tab } = useParams()
     const navigate = useNavigate()
 
-    const validTabs = ["company", "template", "email", "webhooks", "account", "plugins", "danger"]
+    const validTabs = ["company", "template", "email", "webhooks", "account", "invitations", "plugins", "danger"]
     const currentTab = validTabs.includes(tab!) ? tab! : "company"
 
     const handleTabChange = (newTab: string) => {
         navigate(`/settings/${newTab}`)
     }
 
-    const tabsConfig = [
+    const menuItems = [
         {
             value: "company",
             label: t("settings.tabs.company"),
@@ -51,6 +52,11 @@ export default function Settings() {
             icon: User,
         },
         {
+            value: "invitations",
+            label: t("settings.tabs.invitations"),
+            icon: TicketIcon,
+        },
+        {
             value: "plugins",
             label: t("settings.tabs.plugins"),
             icon: Plug,
@@ -62,27 +68,49 @@ export default function Settings() {
         },
     ]
 
-    const currentTabConfig = tabsConfig.find((tab) => tab.value === currentTab)
+    const currentMenuItem = menuItems.find((item) => item.value === currentTab)
+
+    const renderContent = () => {
+        switch (currentTab) {
+            case "company":
+                return <CompanySettings />
+            case "template":
+                return <PDFTemplatesSettings />
+            case "email":
+                return <EmailTemplatesSettings />
+            case "webhooks":
+                return <WebhooksSettings />
+            case "account":
+                return <AccountSettings />
+            case "invitations":
+                return <InvitationsSettings />
+            case "plugins":
+                return <PluginsSettings />
+            case "danger":
+                return <DangerZoneSettings />
+            default:
+                return <CompanySettings />
+        }
+    }
 
     return (
-        <div className="h-full max-w-7xl mx-auto space-y-6 p-6">
-            {/* Mobile/Tablet Select */}
-            <div className="lg:hidden">
+        <div className="h-full flex flex-col lg:flex-row">
+            <div className="lg:hidden p-4">
                 <Select value={currentTab} onValueChange={handleTabChange}>
                     <SelectTrigger className="w-full h-12">
                         <SelectValue>
                             <div className="flex items-center gap-2">
-                                {currentTabConfig?.icon && <currentTabConfig.icon className="h-4 w-4" />}
-                                {currentTabConfig?.label}
+                                {currentMenuItem?.icon && <currentMenuItem.icon className="h-4 w-4" />}
+                                {currentMenuItem?.label}
                             </div>
                         </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                        {tabsConfig.map((tab) => (
-                            <SelectItem key={tab.value} value={tab.value}>
+                        {menuItems.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
                                 <div className="flex items-center gap-2">
-                                    <tab.icon className="h-4 w-4" />
-                                    {tab.label}
+                                    <item.icon className="h-4 w-4" />
+                                    {item.label}
                                 </div>
                             </SelectItem>
                         ))}
@@ -90,41 +118,37 @@ export default function Settings() {
                 </Select>
             </div>
 
-            {/* Desktop Tabs */}
-            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full h-fit">
-                <TabsList className="hidden lg:flex w-full h-12">
-                    {tabsConfig.map((tab) => (
-                        <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
-                            <tab.icon className="h-4 w-4" />
-                            <span className="inline">{tab.label}</span>
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
+            <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r bg-muted/30">
+                <div className="p-6">
+                    <h2 className="text-lg font-semibold">{t("settings.title") || "Settings"}</h2>
+                </div>
+                <nav className="flex-1 px-3 pb-6">
+                    <ul className="space-y-1">
+                        {menuItems.map((item) => (
+                            <li key={item.value}>
+                                <button
+                                    onClick={() => handleTabChange(item.value)}
+                                    className={cn(
+                                        "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                                        currentTab === item.value
+                                            ? "bg-primary text-primary-foreground"
+                                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    )}
+                                >
+                                    <item.icon className="h-4 w-4" />
+                                    {item.label}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </aside>
 
-                <section className="h-full w-full rounded-lg pt-4">
-                    <TabsContent value="company" className="h-full">
-                        <CompanySettings />
-                    </TabsContent>
-                    <TabsContent value="template" className="h-full">
-                        <PDFTemplatesSettings />
-                    </TabsContent>
-                    <TabsContent value="email" className="h-full">
-                        <EmailTemplatesSettings />
-                    </TabsContent>
-                    <TabsContent value="webhooks" className="h-full">
-                        <WebhooksSettings />
-                    </TabsContent>
-                    <TabsContent value="account" className="h-full">
-                        <AccountSettings />
-                    </TabsContent>
-                    <TabsContent value="plugins" className="h-full">
-                        <PluginsSettings />
-                    </TabsContent>
-                    <TabsContent value="danger" className="h-full">
-                        <DangerZoneSettings />
-                    </TabsContent>
-                </section>
-            </Tabs>
+            <main className="flex-1 overflow-auto p-6">
+                <div className="max-w-4xl mx-auto">
+                    {renderContent()}
+                </div>
+            </main>
         </div>
     )
 }

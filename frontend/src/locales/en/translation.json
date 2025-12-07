@@ -841,14 +841,51 @@
         }
     },
     "settings": {
+        "title": "Settings",
         "tabs": {
             "company": "Company",
             "pdfTemplates": "PDF Templates",
             "emailTemplates": "Email Templates",
             "account": "Account",
+            "invitations": "Invitations",
             "dangerZone": "Danger Zone",
             "plugins": "Plugins",
             "webhooks": "Webhooks"
+        },
+        "invitations": {
+            "create": {
+                "title": "Create Invitation Code",
+                "description": "Generate a new invitation code to invite someone to create an account",
+                "expiresIn": "Expires in (days)",
+                "expiresPlaceholder": "Leave empty for no expiration",
+                "button": "Generate Code",
+                "creating": "Generating..."
+            },
+            "list": {
+                "title": "Your Invitation Codes",
+                "description": "Manage the invitation codes you have created",
+                "code": "Code",
+                "status": "Status",
+                "createdAt": "Created",
+                "expiresAt": "Expires",
+                "usedBy": "Used By",
+                "actions": "Actions",
+                "empty": "You haven't created any invitation codes yet",
+                "noExpiry": "Never"
+            },
+            "status": {
+                "active": "Active",
+                "used": "Used",
+                "expired": "Expired"
+            },
+            "messages": {
+                "fetchError": "Failed to load invitation codes",
+                "createSuccess": "Invitation code created successfully",
+                "createError": "Failed to create invitation code",
+                "deleteSuccess": "Invitation code deleted",
+                "deleteError": "Failed to delete invitation code",
+                "codeCopied": "Code copied to clipboard"
+            }
         },
         "company": {
             "title": "Company Settings",
@@ -1457,6 +1494,11 @@
                     "placeholder": "Create a password",
                     "requirements": "Password requirements:"
                 },
+                "invitationCode": {
+                    "label": "Invitation Code",
+                    "placeholder": "Enter your invitation code",
+                    "hint": "You need an invitation code from an existing user to register"
+                },
                 "creatingAccount": "Creating account...",
                 "createButton": "Create Account"
             },
@@ -1469,7 +1511,10 @@
                 "passwordMinLength": "Password must be at least 8 characters",
                 "passwordLetter": "Password must contain at least one letter",
                 "passwordNumber": "Password must contain at least one number",
-                "passwordSpecial": "Password must contain at least one special character"
+                "passwordSpecial": "Password must contain at least one special character",
+                "invitationCodeRequired": "An invitation code is required to register",
+                "invalidInvitationCode": "Invalid or expired invitation code",
+                "genericError": "An error occurred while creating your account"
             },
             "messages": {
                 "accountCreated": "Account created successfully"

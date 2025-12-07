@@ -12,6 +12,7 @@ const adapter = new PrismaPg({ connectionString: env("DATABASE_URL")! });
 
 const prisma = new PrismaClient({ adapter });
 
+export const pendingInvitationCodes = new Map<string, string>();
 
 const createOidcConfig = (): GenericOAuthConfig[] => {
     const config: GenericOAuthConfig = {
@@ -43,6 +44,44 @@ const createOidcConfig = (): GenericOAuthConfig[] => {
     return [config];
 };
 
+const validateInvitationForSignup = async (email: string): Promise<{ valid: boolean; invitationCode?: string }> => {
+    const userCount = await prisma.user.count();
+
+    if (userCount === 0) {
+        return { valid: true };
+    }
+
+    const invitationCode = pendingInvitationCodes.get(email);
+    if (!invitationCode) {
+        return { valid: false };
+    }
+
+    const invitation = await prisma.invitationCode.findUnique({
+        where: { code: invitationCode },
+    });
+
+    if (!invitation || invitation.usedAt || (invitation.expiresAt && invitation.expiresAt < new Date())) {
+        pendingInvitationCodes.delete(email);
+        return { valid: false };
+    }
+
+    return { valid: true, invitationCode };
+};
+
+const markInvitationAsUsed = async (email: string, userId: string) => {
+    const invitationCode = pendingInvitationCodes.get(email);
+    if (invitationCode) {
+        await prisma.invitationCode.update({
+            where: { code: invitationCode },
+            data: {
+                usedAt: new Date(),
+                usedById: userId,
+            },
+        });
+        pendingInvitationCodes.delete(email);
+    }
+};
+
 const userHookFunction = async (user) => {
     const data = user;
 
@@ -55,8 +94,22 @@ const userHookFunction = async (user) => {
         data["name"] = `${user.firstname} ${user.lastname}`;
     }
 
+    if (user.email) {
+        const validation = await validateInvitationForSignup(user.email);
+        if (!validation.valid) {
+            throw new Error("An invitation code is required to register");
+        }
+    }
+
     return { data };
-}
+};
+
+const userAfterCreateHook = async (user) => {
+    if (user.email) {
+        await markInvitationAsUsed(user.email, user.id);
+    }
+    return user;
+};
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -89,7 +142,7 @@ export const auth = betterAuth({
         user: {
             create: {
                 before: userHookFunction,
-                update: (ctx) => userHookFunction(ctx.data),
+                after: userAfterCreateHook,
             },
         },
     },

@@ -7,8 +7,10 @@ import {
 } from "@/components/ui/card";
 import {
     EyeClosedIcon,
-    EyeIcon
+    EyeIcon,
+    TicketIcon
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +19,6 @@ import type React from "react";
 import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -26,6 +27,7 @@ type SignupFormData = {
     lastname: string;
     email: string;
     password: string;
+    invitationCode?: string;
 };
 
 export default function SignupPage() {
@@ -36,7 +38,55 @@ export default function SignupPage() {
     >({});
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [requiresInvitation, setRequiresInvitation] = useState<boolean | null>(null);
+    const [checkingInvitation, setCheckingInvitation] = useState(true);
 
+    const getEnvVariable = (key: string): string | undefined => {
+        return (window as any).__APP_CONFIG__?.[key] || import.meta.env[key];
+    };
+
+    const backendUrl = getEnvVariable("VITE_BACKEND_URL") || "";
+
+    // Check if invitation is required on page load
+    useEffect(() => {
+        const checkInvitationRequired = async () => {
+            try {
+                const response = await fetch(`${backendUrl}/invitations/is-first-user`);
+                const data = await response.json();
+                setRequiresInvitation(!data.isFirstUser);
+            } catch (error) {
+                console.error("Error checking invitation requirement:", error);
+                // Default to requiring invitation on error for security
+                setRequiresInvitation(true);
+            } finally {
+                setCheckingInvitation(false);
+            }
+        };
+
+        checkInvitationRequired();
+    }, [backendUrl]);
+
+    const validateInvitationCode = async (code: string, email: string): Promise<boolean> => {
+        try {
+            const response = await fetch(`${backendUrl}/invitations/validate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code, email }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || t("auth.signup.errors.invalidInvitationCode"));
+            }
+
+            return true;
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            }
+            return false;
+        }
+    };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -48,9 +98,25 @@ export default function SignupPage() {
             lastname: formData.get("lastname") as string,
             email: formData.get("email") as string,
             password: formData.get("password") as string,
+            invitationCode: formData.get("invitationCode") as string,
         };
 
-        setLoading(true);
+        // Validate invitation code if required
+        if (requiresInvitation) {
+            if (!data.invitationCode) {
+                setErrors({ invitationCode: [t("auth.signup.errors.invitationCodeRequired")] });
+                return;
+            }
+
+            setLoading(true);
+            const isValid = await validateInvitationCode(data.invitationCode, data.email);
+            if (!isValid) {
+                setLoading(false);
+                return;
+            }
+        } else {
+            setLoading(true);
+        }
 
         const result = await authClient.signUp.email({
             email: data.email,
@@ -76,10 +142,6 @@ export default function SignupPage() {
         }
     };
 
-    const getEnvVariable = (key: string): string | undefined => {
-        return (window as any).__APP_CONFIG__?.[key] || import.meta.env[key];
-    }
-
     const handleOIDCLogin = () => {
         const oidcProviderId = getEnvVariable("VITE_OIDC_PROVIDER_ID");
 
@@ -87,6 +149,14 @@ export default function SignupPage() {
             providerId: oidcProviderId || 'oidc',
             callbackURL: "/dashboard",
         });
+    };
+
+    if (checkingInvitation) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
 
@@ -185,6 +255,31 @@ export default function SignupPage() {
                                 </div>
                             )}
                         </div>
+
+                        {requiresInvitation && (
+                            <div className="space-y-2">
+                                <Label htmlFor="invitationCode">
+                                    {t("auth.signup.form.invitationCode.label")}
+                                </Label>
+                                <div className="flex items-center gap-2">
+                                    <TicketIcon className="h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="invitationCode"
+                                        name="invitationCode"
+                                        placeholder={t("auth.signup.form.invitationCode.placeholder")}
+                                        disabled={loading}
+                                        className="font-mono uppercase"
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {t("auth.signup.form.invitationCode.hint")}
+                                </p>
+                                {errors.invitationCode && (
+                                    <p className="text-sm text-red-600">{errors.invitationCode[0]}</p>
+                                )}
+                            </div>
+                        )}
+
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading
                                 ? t("auth.signup.form.creatingAccount")
