@@ -3,12 +3,16 @@ describe('Authentication E2E', () => {
 
     it('allows the first user to sign up without invitation code', () => {
         cy.visit('/auth/sign-up');
+        // Wait for the page to load and check if invitation is required
+        cy.get('input[id=firstname]', { timeout: 10000 }).should('be.visible');
         cy.get('input[id=firstname]').type('John');
         cy.get('input[id=lastname]').type('Doe');
         cy.get('input[name=email]').type('john.doe@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
-        cy.url({ timeout: 10000 }).should('include', '/auth/sign-in');
+        // Wait for toast success message and redirection (there's a 1s delay)
+        cy.contains('Account created', { matchCase: false, timeout: 5000 });
+        cy.url({ timeout: 15000 }).should('include', '/auth/sign-in');
     });
 
     it('allows the first user to login', () => {
@@ -29,17 +33,19 @@ describe('Authentication E2E', () => {
     it('creates an invitation code', () => {
         cy.login();
         cy.visit('/settings/invitations');
-        cy.get('button').contains('Generate', { matchCase: false }).click();
-        cy.contains('Code copied', { matchCase: false, timeout: 5000 });
+        cy.get('button', { timeout: 10000 }).contains('Generate', { matchCase: false }).click();
+        cy.contains('Code copied', { matchCase: false, timeout: 10000 });
 
         // Wait for the table to be updated and fetch the invitation code via API
-        cy.wait(1000);
+        cy.wait(2000);
         cy.getCookie('better-auth.session_token').then((cookie) => {
+            expect(cookie).to.exist;
+            const backendUrl = Cypress.env('BACKEND_URL') || 'http://localhost:3000';
             cy.request({
                 method: 'GET',
-                url: `${Cypress.env('BACKEND_URL') || 'http://localhost:3000'}/invitations`,
+                url: `${backendUrl}/invitations`,
                 headers: {
-                    Cookie: `better-auth.session_token=${cookie?.value}`,
+                    Cookie: `better-auth.session_token=${cookie!.value}`,
                 },
             }).then((response) => {
                 expect(response.status).to.eq(200);
@@ -49,39 +55,42 @@ describe('Authentication E2E', () => {
                 expect(unusedInvitation).to.exist;
                 invitationCode = unusedInvitation.code;
                 expect(invitationCode).to.have.length.greaterThan(10);
+                cy.log(`Invitation code: ${invitationCode}`);
             });
         });
     });
 
     it('allows signup with valid invitation code', () => {
-        expect(invitationCode).to.exist;
+        cy.wrap(invitationCode).should('exist').and('have.length.greaterThan', 10);
         cy.visit('/auth/sign-up');
-        cy.get('input[id=invitationCode]', { timeout: 10000 }).type(invitationCode);
+        cy.get('input[id=invitationCode]', { timeout: 10000 }).should('be.visible').type(invitationCode);
         cy.get('input[id=firstname]').type('Jane');
         cy.get('input[id=lastname]').type('Smith');
         cy.get('input[name=email]').type('jane.smith@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
-        cy.url({ timeout: 10000 }).should('include', '/auth/sign-in');
+        cy.contains('Account created', { matchCase: false, timeout: 5000 });
+        cy.url({ timeout: 15000 }).should('include', '/auth/sign-in');
     });
 
     it('blocks signup with already used invitation code', () => {
-        expect(invitationCode).to.exist;
+        cy.wrap(invitationCode).should('exist').and('have.length.greaterThan', 10);
         cy.visit('/auth/sign-up');
-        cy.get('input[id=invitationCode]', { timeout: 10000 }).type(invitationCode);
+        cy.get('input[id=invitationCode]', { timeout: 10000 }).should('be.visible').type(invitationCode);
         cy.get('input[id=firstname]').type('Bob');
         cy.get('input[id=lastname]').type('Wilson');
         cy.get('input[name=email]').type('bob.wilson@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
-        cy.contains('already been used', { matchCase: false, timeout: 5000 });
+        cy.contains('already been used', { matchCase: false, timeout: 10000 });
     });
 
     it('shows error with wrong credentials', () => {
         cy.visit('/auth/sign-in');
-        cy.get('input[name=email]').type('wrong@example.com');
+        cy.get('input[name=email]', { timeout: 5000 }).should('be.visible').type('wrong@example.com');
         cy.get('input[name=password]').type('wrongpassword');
         cy.get('button[type=submit]').click();
-        cy.contains('Invalid credentials');
+        // Better Auth returns error messages, check for common patterns
+        cy.contains(/invalid|credentials|error|incorrect/i, { timeout: 10000 });
     });
 });

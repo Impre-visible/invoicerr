@@ -45,14 +45,12 @@ Cypress.Commands.add('login', () => {
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
 
-        cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
+        cy.url({ timeout: 10000 }).should('include', '/dashboard');
 
-        cy.getCookie('access_token').should('exist');
-        cy.getCookie('refresh_token').should('exist');
+        cy.getCookie('better-auth.session_token').should('exist');
     }, {
         validate: () => {
-            cy.getCookie('access_token').should('exist');
-            cy.getCookie('refresh_token').should('exist');
+            cy.getCookie('better-auth.session_token').should('exist');
         },
     });
 });
