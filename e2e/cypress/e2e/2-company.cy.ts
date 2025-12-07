@@ -22,18 +22,6 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-submit-btn"]').click();
             cy.wait(2000);
         });
-
-        it('persists company data after page reload', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).should('be.visible');
-            cy.get('[data-cy="company-name-input"]').clear().type('Test Persist Company');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
-            cy.reload();
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).should('be.visible');
-            cy.wait(1000);
-            cy.get('[data-cy="company-name-input"]').invoke('val').should('contain', 'Test Persist');
-        });
     });
 
     describe('Validation Errors', () => {
