@@ -151,8 +151,6 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
     const onSubmit = (data: z.infer<typeof clientSchema>) => {
         const trigger = isEditing ? updateClient : createClient
 
-        console.debug(isEditing ? "Updating client with data:" : "Creating client with data:", data)
-
         trigger(data)
             .then((createdClient) => {
                 if (!isEditing && onCreate) {

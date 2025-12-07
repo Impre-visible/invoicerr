@@ -9,15 +9,15 @@ import {
     EyeClosedIcon,
     EyeIcon
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type React from "react";
+import { authClient } from "@/lib/auth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { usePost } from "@/hooks/use-fetch";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -34,33 +34,9 @@ export default function SignupPage() {
     const [errors, setErrors] = useState<
         Partial<Record<keyof SignupFormData, string[]>>
     >({});
-    const { trigger: post, loading, data, error } = usePost("/api/auth/signup");
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // Move schema inside component to access t function
-    const SignupSchema = z.object({
-        firstname: z
-            .string()
-            .min(2, { message: t("auth.signup.errors.firstnameMinLength") })
-            .trim(),
-        lastname: z
-            .string()
-            .min(2, { message: t("auth.signup.errors.lastnameMinLength") })
-            .trim(),
-        email: z
-            .string()
-            .email({ message: t("auth.signup.errors.invalidEmail") })
-            .trim(),
-        password: z
-            .string()
-            .min(8, { message: t("auth.signup.errors.passwordMinLength") })
-            .regex(/[a-zA-Z]/, { message: t("auth.signup.errors.passwordLetter") })
-            .regex(/[0-9]/, { message: t("auth.signup.errors.passwordNumber") })
-            .regex(/[^a-zA-Z0-9]/, {
-                message: t("auth.signup.errors.passwordSpecial"),
-            })
-            .trim(),
-    });
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -74,25 +50,45 @@ export default function SignupPage() {
             password: formData.get("password") as string,
         };
 
-        const result = SignupSchema.safeParse(data);
+        setLoading(true);
 
-        if (!result.success) {
-            const fieldErrors = result.error.flatten().fieldErrors;
-            setErrors(fieldErrors);
-            return;
+        const result = await authClient.signUp.email({
+            email: data.email,
+            password: data.password,
+            // @ts-ignore additional fields
+            firstname: data.firstname,
+            lastname: data.lastname,
+        });
+
+        setLoading(false);
+
+        if (result.error) {
+            toast.error(
+                result.error.message || t("auth.signup.errors.genericError")
+            );
         }
 
-        post(result.data);
-    };
-
-    useEffect(() => {
-        if (data && !error) {
+        if (result.data?.user.createdAt) {
             toast.success(t("auth.signup.messages.accountCreated"));
             setTimeout(() => {
                 navigate("/auth/sign-in");
             }, 1000);
         }
-    }, [data, error, navigate, t]);
+    };
+
+    const getEnvVariable = (key: string): string | undefined => {
+        return (window as any).__APP_CONFIG__?.[key] || import.meta.env[key];
+    }
+
+    const handleOIDCLogin = () => {
+        const oidcProviderId = getEnvVariable("VITE_OIDC_PROVIDER_ID");
+
+        authClient.signIn.oauth2({
+            providerId: oidcProviderId || 'oidc',
+            callbackURL: "/dashboard",
+        });
+    }
+
 
     return (
         <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -205,15 +201,12 @@ export default function SignupPage() {
                                 {t("auth.signup.signInLink")}
                             </a>
                         </div>
-                        {((window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT) && (
+                        {(getEnvVariable("VITE_OIDC_PROVIDER_ID")) && (
                             <div className="text-center text-sm">
-                                {t("auth.signup.oidc")}{" "}
-                                <a
-                                    href={(window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT}
-                                    className="underline hover:text-primary"
-                                >
-                                    {t("auth.signup.oidcLink")}
-                                </a>
+                                {t("auth.login.oidc")}{" "}
+                                <Button variant="link" onClick={handleOIDCLogin} className="underline hover:text-primary p-0">
+                                    {t("auth.login.oidcLink")}
+                                </Button>
                             </div>
                         )}
                     </section>

@@ -1,11 +1,17 @@
-import { Navigate } from "react-router"
-import { useAuth } from "@/contexts/auth"
+import Loading from "./_loading/loading";
+import { Navigate } from "react-router";
+import { authClient } from "@/lib/auth";
 
 export default function Home() {
-    const { user } = useAuth()
-    if (!user) {
-        return <Navigate to="/auth/sign-in" />
+    const { data: session, isPending } = authClient.useSession();
+
+    if (isPending) {
+        return <Loading />;
     }
 
-    return <Navigate to="/dashboard" />
+    if (!session && !isPending) {
+        return <Navigate to="/auth/sign-in" replace />;
+    }
+
+    return <Navigate to="/dashboard" replace />;
 }

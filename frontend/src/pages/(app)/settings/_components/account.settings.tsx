@@ -3,22 +3,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth"
 import { toast } from "sonner"
-import { useAuth } from "@/contexts/auth"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { usePatch } from "@/hooks/use-fetch"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 export default function AccountSettings() {
     const { t } = useTranslation()
-    const { trigger: updateUser, loading: updateUserLoading } = usePatch("/api/auth/me")
-    const { trigger: updatePassword, loading: updatePasswordLoading } = usePatch("/api/auth/password")
-    const { user } = useAuth()
 
-    // Move schemas inside component to access t function
+    const [updateUserLoading, setUpdateUserLoading] = useState(false)
+    const [updatePasswordLoading, setUpdatePasswordLoading] = useState(false)
+
     const profileSchema = z
         .object({
             firstname: z.string().min(1, { message: t("settings.account.form.firstname.errors.required") }),
@@ -66,18 +64,10 @@ export default function AccountSettings() {
         },
     })
 
-    useEffect(() => {
-        if (user) {
-            profileForm.reset({
-                firstname: user.firstname || "",
-                lastname: user.lastname || "",
-                email: user.email || "",
-            })
-        }
-    }, [user, profileForm])
-
     const handleProfileUpdate = async (values: z.infer<typeof profileSchema>) => {
-        updateUser({
+        setUpdateUserLoading(true);
+        authClient.updateUser({
+            // @ts-ignore additional fields
             firstname: values.firstname,
             lastname: values.lastname,
             email: values.email,
@@ -89,10 +79,14 @@ export default function AccountSettings() {
                 console.error("Error updating profile:", error)
                 toast.error(t("settings.account.messages.profileUpdateError"))
             })
+            .finally(() => {
+                setUpdateUserLoading(false);
+            });
     }
 
     const handlePasswordUpdate = async (values: z.infer<typeof passwordSchema>) => {
-        updatePassword({
+        setUpdatePasswordLoading(true);
+        authClient.changePassword({
             currentPassword: values.currentPassword,
             newPassword: values.password,
         })
@@ -104,6 +98,9 @@ export default function AccountSettings() {
                 console.error("Error updating password:", error)
                 toast.error(t("settings.account.messages.passwordUpdateError"))
             })
+            .finally(() => {
+                setUpdatePasswordLoading(false);
+            });
     }
 
     return (

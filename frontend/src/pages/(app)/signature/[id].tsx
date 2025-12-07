@@ -121,7 +121,6 @@ export default function Signature() {
             URL.revokeObjectURL(pdfUrl)
             setPdfUrl(null)
         }
-        window.location.reload()
     }
 
     const handleOtpPaste = (e: React.ClipboardEvent) => {

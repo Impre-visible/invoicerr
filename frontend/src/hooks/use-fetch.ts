@@ -7,38 +7,23 @@ type UseGetResult<T> = {
     mutate: () => void;
 };
 
-export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}, retry = true): Promise<Response> {
+export async function authenticatedFetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
     const res = await fetch(input, {
         ...init,
         credentials: "include",
         headers: {
+            "Content-Type": "application/json",
             ...(init.headers || {})
         },
     });
 
-    const isExpired = res.headers.get("Www-Authenticate") === "expired_token";
-    if (isExpired && retry) {
-        console.warn("Access token expired, attempting to refresh...");
-        let refreshRes: Response;
-        refreshRes = await fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth/refresh`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            method: "POST"
-        });
-
-        if (refreshRes.status >= 400 && window.location.href.endsWith("/auth/sign-in") === false) {
-            window.location.href = "/auth/sign-out";
-        }
-
-        if (refreshRes.ok) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            return authenticatedFetch(input, init, false);
-        } else {
-            throw new Error("Token refresh failed");
+    if (res.status === 401) {
+        if (!window.location.pathname.includes("/sign-in") && !window.location.pathname.includes("/auth")) {
+            window.location.href = "/auth/sign-in";
+            console.warn("Session expirée ou invalide");
         }
     }
+
     return res;
 }
 
@@ -51,12 +36,14 @@ export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetRe
         let cancelled = false;
         setLoading(true);
 
-        authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}${url}`, {
+        const fullUrl = url.startsWith("http") ? url : `${import.meta.env.VITE_BACKEND_URL || ''}${url}`;
+
+        authenticatedFetch(fullUrl, {
             ...options,
             method: "GET",
         })
             .then(async (res) => {
-                if (!res.ok) throw new Error(`GET ${url} failed`);
+                if (!res.ok) throw new Error(`GET ${url} failed: ${res.statusText}`);
                 if (!cancelled) {
                     setData(res as unknown as T);
                     setError(null);
@@ -74,12 +61,7 @@ export function useGetRaw<T = any>(url: string, options?: RequestInit): UseGetRe
         };
     }, [url]);
 
-    return {
-        data,
-        loading,
-        error,
-        mutate: () => { },
-    };
+    return { data, loading, error, mutate: () => { } };
 }
 
 export function useGet<T = any>(url: string | null, options?: RequestInit): UseGetResult<T> {
@@ -97,17 +79,16 @@ export function useGet<T = any>(url: string | null, options?: RequestInit): UseG
             return;
         }
 
-        let newURL = url;
-        if (!url.startsWith("http")) {
-            newURL = `${import.meta.env.VITE_BACKEND_URL || ''}${url}`;
-        }
+        const fullUrl = url.startsWith("http") ? url : `${import.meta.env.VITE_BACKEND_URL || ''}${url}`;
 
-        authenticatedFetch(newURL, {
+        authenticatedFetch(fullUrl, {
             ...options,
             method: "GET",
         })
             .then(async (res) => {
-                if (!res.ok) throw new Error(`GET ${url} failed`);
+                if (!res.ok) {
+                    throw new Error(`GET ${url} failed with status ${res.status}`);
+                }
                 return res.json();
             })
             .then((json) => {
@@ -143,7 +124,6 @@ export interface useSseResult<T = any> {
     close: () => void;
 }
 
-
 export function useSse<T = any>(url: string, options?: EventSourceInit): useSseResult<T> {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
@@ -151,24 +131,24 @@ export function useSse<T = any>(url: string, options?: EventSourceInit): useSseR
     const eventSourceRef = useRef<EventSource | null>(null);
 
     useEffect(() => {
-        let newURL = url;
-        if (!url.startsWith("http")) {
-            newURL = `${import.meta.env.VITE_BACKEND_URL || ""}${url}`;
-        }
+        const fullUrl = url.startsWith("http") ? url : `${import.meta.env.VITE_BACKEND_URL || ""}${url}`;
 
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
         }
 
-        options = {
+        const es = new EventSource(fullUrl, {
             ...options,
             withCredentials: true,
-        }
+        });
 
-        const es = new EventSource(newURL, options);
         eventSourceRef.current = es;
         setLoading(true);
         setError(null);
+
+        es.onopen = () => {
+            // Optionnel : gérer l'ouverture
+        };
 
         es.onmessage = (event) => {
             try {
@@ -179,9 +159,11 @@ export function useSse<T = any>(url: string, options?: EventSourceInit): useSseR
             }
         };
 
-        es.onerror = () => {
+        es.onerror = (err) => {
+            console.error("SSE Error", err);
             setError(new Error("SSE connection error"));
             setLoading(false);
+            es.close();
         };
 
         return () => {
@@ -218,20 +200,23 @@ function createMethodHook(method: string) {
             setLoading(true);
             setError(null);
 
+            const fullUrl = url.startsWith("http") ? url : `${import.meta.env.VITE_BACKEND_URL || ''}${url}`;
+
             try {
-                const res = await authenticatedFetch(`${import.meta.env.VITE_BACKEND_URL || ''}${url}`, {
+                const res = await authenticatedFetch(fullUrl, {
                     method,
                     headers: {
-                        "Content-Type": "application/json",
                         ...(options.headers || {}),
                         ...(extraOptions.headers || {}),
                     },
-                    body: JSON.stringify(body ?? options.body),
+                    // Gestion intelligente du body : si c'est un objet, on JSON.stringify, sinon on passe tel quel
+                    body: body ? JSON.stringify(body) : (options.body ? JSON.stringify(options.body) : undefined),
                     ...options,
                     ...extraOptions,
                 });
 
                 if (!res.ok) throw new Error(`${method} ${url} failed`);
+
                 const json: T = await res.json();
                 setData(json);
                 return json;
@@ -246,7 +231,6 @@ function createMethodHook(method: string) {
         return { trigger, data, loading, error };
     };
 }
-
 
 export const usePost = createMethodHook("POST");
 export const usePut = createMethodHook("PUT");

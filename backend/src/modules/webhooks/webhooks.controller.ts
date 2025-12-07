@@ -1,9 +1,9 @@
 import { Controller, Post, Param, Body, Req, Res, Logger, HttpException, HttpStatus, Get, Delete, UseGuards, Patch } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { WebhooksService } from './webhooks.service';
 import prisma from '@/prisma/prisma.service';
-import { LoginRequiredGuard } from '@/guards/login-required.guard';
+import { AuthGuard } from '@/guards/auth.guard';
 import { WebhookEvent, WebhookType } from '../../../prisma/generated/prisma/client';
 import { WebhookDispatcherService } from './webhook-dispatcher.service';
 
@@ -17,7 +17,7 @@ export class WebhooksController {
     ) { }
 
     @Get('options')
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async options() {
         const types = Object.values(WebhookType);
         const events = Object.values(WebhookEvent);
@@ -26,7 +26,7 @@ export class WebhooksController {
     }
 
     @Get(':id')
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async findOne(@Param('id') id: string) {
         const wh = await prisma.webhook.findUnique({ where: { id } });
         if (!wh) throw new HttpException('Webhook not found', HttpStatus.NOT_FOUND);
@@ -66,7 +66,7 @@ export class WebhooksController {
 
     // Protected CRUD endpoints for managing webhooks (company-scoped)
     @Get()
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async list() {
         const company = await prisma.company.findFirst();
         if (!company) return [];
@@ -78,7 +78,7 @@ export class WebhooksController {
     }
 
     @Post()
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async create(@Body() body: any) {
         const company = await prisma.company.findFirst();
         if (!company) throw new HttpException('No company found', HttpStatus.BAD_REQUEST);
@@ -106,7 +106,7 @@ export class WebhooksController {
     }
 
     @Patch(':id')
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async update(@Param('id') id: string, @Body() body: any) {
         const existing = await prisma.webhook.findUnique({ where: { id } });
         if (!existing) throw new HttpException('Webhook not found', HttpStatus.NOT_FOUND);
@@ -134,7 +134,7 @@ export class WebhooksController {
     }
 
     @Delete(':id')
-    @UseGuards(LoginRequiredGuard)
+    @UseGuards(AuthGuard)
     async remove(@Param('id') id: string) {
         const existing = await prisma.webhook.findUnique({ where: { id } });
         if (!existing) throw new HttpException('Webhook not found', HttpStatus.NOT_FOUND);

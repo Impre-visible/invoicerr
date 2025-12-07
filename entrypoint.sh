@@ -26,7 +26,7 @@ echo "[DEBUG] - Writing frontend runtime config to /usr/share/nginx/html/config.
 mkdir -p /usr/share/nginx/html
 cat > /usr/share/nginx/html/config.json <<EOF
 {
-  "VITE_OIDC_ENDPOINT": "${VITE_OIDC_ENDPOINT:-}"
+  "VITE_OIDC_PROVIDER_ID": "${OIDC_NAME:-}"
 }
 EOF
 

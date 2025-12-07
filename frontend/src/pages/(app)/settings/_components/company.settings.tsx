@@ -13,14 +13,12 @@ import { Switch } from "@/components/ui/switch"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 export default function CompanySettings() {
     const { t } = useTranslation()
-    const navigate = useNavigate()
 
     const ALLOWED_DATE_FORMATS = ['dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'dd-MM-yyyy', 'yyyy-MM-dd', 'EEEE, dd MMM yyyy'];
 
@@ -185,9 +183,6 @@ export default function CompanySettings() {
         trigger(values)
             .then(() => {
                 toast.success(t("settings.company.messages.updateSuccess"))
-                setTimeout(() => {
-                    navigate(0)
-                }, 150)
             })
             .catch((error) => {
                 console.error("Error updating company settings:", error)

@@ -2,32 +2,23 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 import { Sidebar } from "@/components/sidebar";
-import { useAuth } from "@/contexts/auth";
+import { authClient } from "@/lib/auth";
 
 const Layout = () => {
-    const { user } = useAuth()
-    const location = useLocation();
+    const {
+        data: session,
+        isPending,
+    } = authClient.useSession();
 
-    const ALLOWED_PATHS = [
-        '/signature/[^/]+',
-    ]
-
-    if (!user) {
-        if (ALLOWED_PATHS.some(path => location.pathname.match(new RegExp(path)))) {
-            // Do not redirect if the path matches the allowed paths
-        } else {
-            return <Navigate to="/auth/sign-in" />
-        }
-    }
 
     return (
         <SidebarProvider>
             <section className="flex flex-col min-h-screen h-screen max-h-screen w-full max-w-screen overflow-y-auto overflow-x-hidden">
                 <main className="flex flex-1 h-full w-full max-w-screen overflow-y-auto overflow-x-hidden">
-                    {user && <Sidebar />}
+                    {session && !isPending && <Sidebar />}
                     <section className="flex flex-col flex-1 h-full w-full max-w-screen overflow-hidden">
                         <header className="p-4 bg-header border-b">
-                            {user && <SidebarTrigger />}
+                            {session && !isPending && <SidebarTrigger />}
                         </header>
                         <section className="h-full overflow-y-auto overflow-x-hidden">
                             <Outlet />

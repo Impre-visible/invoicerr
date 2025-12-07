@@ -1,9 +1,8 @@
 import { Navigate } from "react-router"
-import { useAuth } from "@/contexts/auth"
+import { authClient } from "@/lib/auth"
 
 export default function LogoutPage() {
-    const { logout } = useAuth()
-    logout()
+    authClient.signOut()
 
     return <Navigate to="/auth/sign-in" />
 }
