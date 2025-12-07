@@ -10,13 +10,12 @@ import { Label } from "@/components/ui/label"
 import type React from "react"
 import { authClient } from "@/lib/auth"
 import { toast } from "sonner"
-import { useNavigate } from "react-router"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 export default function LoginPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate()
+
     const [errors] = useState<Record<string, string[]>>({})
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
