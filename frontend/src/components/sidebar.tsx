@@ -50,7 +50,7 @@ export function Sidebar() {
     const { data, isPending: userLoading } = authClient.useSession()
 
     const { setTheme } = useTheme()
-    const { data: company } = useSse<Company>("/api/company/info/sse")
+    const { data: company, loading: companyLoading } = useSse<Company>("/api/company/info/sse")
     const navigate = useNavigate()
 
     const items: { title: string; icon: React.ReactNode; url: string }[] = [
@@ -96,13 +96,14 @@ export function Sidebar() {
         },
     ]
 
-    const handleLogout = () => {
-        authClient.signOut()
+    const handleLogout = async () => {
+        await authClient.signOut()
+        navigate("/auth/sign-in")
     }
 
     return (
         <RootSidebar collapsible="icon">
-            <Dialog open={(!company || !company.name) && location.pathname !== "/settings/company"}>
+            <Dialog open={!companyLoading && (!company || !company.name) && location.pathname !== "/settings/company"}>
                 <DialogContent className="[&>button]:hidden">
                     <DialogHeader>
                         <DialogTitle>{t("sidebar.companyDialog.title")}</DialogTitle>
