@@ -14,7 +14,7 @@ describe('Payment Methods E2E', () => {
     cy.get('[name="details"]').clear();
     cy.get('[name="details"]').type('Transfer funds directly to the bank account');
 
-    cy.get('#radix-«r7» > form > div.flex.justify-end.gap-2 > button[type="submit"]').click();
+    cy.get('[data-cy="payment-method-submit"]').click();
 
     cy.wait(2000); // wait for the toast to appear
     cy.contains('Bank Transfer')
@@ -31,11 +31,11 @@ describe('Payment Methods E2E', () => {
     cy.get('[name="details"]').clear();
     cy.get('[name="details"]').type('Pay via PayPal; you can pay with your credit card if you don\'t have a PayPal account');
 
-    cy.get('[aria-label="Type"]').click();
+    cy.get('[data-cy="payment-method-type-trigger"]').click();
     cy.wait(200); // wait for the dropdown to open
-    cy.get('#radix-«rm» > div > div:nth-child(2)').click(); // Select PayPal
+    cy.get('[data-cy="payment-method-type-paypal"]').click(); // Select PayPal
 
-    cy.get('#radix-«r7» > form > div.flex.justify-end.gap-2 > button[type="submit"]').click(); // submit the form
+    cy.get('[data-cy="payment-method-submit"]').click(); // submit the form
 
     cy.wait(2000); // wait for the toast to appear
     cy.contains('PayPal')

@@ -13,10 +13,10 @@ describe('Quotes E2E', () => {
         cy.get('[name="title"]').type('Quote 1');
 
         // Select client - click on the client dropdown button
-        cy.contains('label', 'Client').parent().find('button').first().click();
+        cy.get('[data-cy="quote-client-select"] button').first().click();
         cy.wait(200);
         // Select ACME from the dropdown
-        cy.get('button').contains('ACME').click();
+        cy.get('[data-cy="quote-client-select-option-acme"]').click();
 
         // Select currency - click on the currency dropdown
         cy.contains('label', 'Currency').parent().find('button').first().click();
@@ -61,7 +61,7 @@ describe('Quotes E2E', () => {
         cy.get('[name="items.0.vatRate"]').type('10', { force: true });
 
         // Submit the form
-        cy.contains('button', 'Create Quote').click();
+        cy.get('[data-cy="quote-submit"]').click();
 
         cy.wait(1000);
 
@@ -80,10 +80,10 @@ describe('Quotes E2E', () => {
         cy.get('[name="title"]').type('Quote 2');
 
         // Select client - click on the client dropdown button
-        cy.contains('label', 'Client').parent().find('button').first().click();
+        cy.get('[data-cy="quote-client-select"] button').first().click();
         cy.wait(200);
         // Select Jane Doe from the dropdown
-        cy.get('button').contains('Jane Doe').click();
+        cy.get('[data-cy="quote-client-select-option-jane-doe"]').click();
 
         // Select currency
         cy.contains('label', 'Currency').parent().find('button').first().click();
@@ -127,7 +127,7 @@ describe('Quotes E2E', () => {
         cy.get('[name="items.0.vatRate"]').type('20', { force: true });
 
         // Submit the form
-        cy.contains('button', 'Create Quote').click();
+        cy.get('[data-cy="quote-submit"]').click();
 
         cy.wait(1000);
 
