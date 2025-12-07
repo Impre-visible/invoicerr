@@ -244,7 +244,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                     <FormItem>
                                         <FormLabel>{t("quotes.upsert.form.currency.label")}</FormLabel>
                                         <FormControl>
-                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} data-cy="quote-currency-select" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

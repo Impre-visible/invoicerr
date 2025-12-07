@@ -8,6 +8,7 @@ import type { Client } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { dataCy } from "@/lib/utils"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -164,13 +165,13 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
 
     return (
         <Dialog open={open} onOpenChange={(status) => { form.reset(); onOpenChange(status); }}>
-            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
+            <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden" {...dataCy('client-dialog')}>
                 <div className="flex-1 overflow-auto">
                     <DialogHeader>
                         <DialogTitle>{t(`clients.upsert.title.${isEditing ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4" {...dataCy('client-form')}>
 
                             <FormField
                                 control={form.control}
@@ -297,7 +298,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                         <FormItem>
                                             <FormLabel>{t("clients.upsert.fields.currency.label")}</FormLabel>
                                             <FormControl>
-                                                <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                                <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} data-cy="client-currency-select" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -412,7 +413,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                     {t("clients.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">
+                                <Button type="submit" {...dataCy('client-submit')}>
                                     {isEditing ? t("clients.upsert.actions.save") : t("clients.upsert.actions.create")}
                                 </Button>
                             </div>

@@ -19,10 +19,10 @@ describe('Client E2E', () => {
     cy.get('[name="legalId"]').clear();
     cy.get('[name="legalId"]').type('US12345678');
 
-    cy.get('#radix-«r7» .flex-wrap span').click();
-    cy.get('#radix-«r7» .h-8').clear();
-    cy.get('#radix-«r7» .h-8').type('Euro');
-    cy.get('#radix-«r7» .rounded-sm span').click();
+    cy.get('[data-cy="client-currency-select"] button').click();
+    cy.get('[data-cy="client-currency-select"] input').clear();
+    cy.get('[data-cy="client-currency-select"] input').type('Euro');
+    cy.get('[data-cy="client-currency-select-option-euro-(€)"]').click();
 
     cy.get('[name="contactEmail"]').clear();
     cy.get('[name="contactEmail"]').type('john.doe@acme.org');
@@ -41,7 +41,8 @@ describe('Client E2E', () => {
 
     cy.get('[name="country"]').clear();
     cy.get('[name="country"]').type('Country');
-    cy.get('#radix-«r7» .text-primary-foreground').click();
+    
+    cy.get('[data-cy="client-submit"]').click();
 
     cy.contains('ACME')
     cy.contains('+1 23 456 789')
@@ -56,16 +57,14 @@ describe('Client E2E', () => {
     cy.get('[name="contactLastname"]').clear();
     cy.get('[name="contactLastname"]').type('Doe');
 
-    //cy.get('button.border-input').click();
-
     cy.get('[name="description"]').click();
     cy.get('[name="description"]').clear();
     cy.get('[name="description"]').type('ACME Description');
 
-    cy.get('#radix-«r7» .flex-wrap span').click();
-    cy.get('#radix-«r7» .h-8').clear();
-    cy.get('#radix-«r7» .h-8').type('Euro');
-    cy.get('#radix-«r7» .rounded-sm span').click();
+    cy.get('[data-cy="client-currency-select"] button').click();
+    cy.get('[data-cy="client-currency-select"] input').clear();
+    cy.get('[data-cy="client-currency-select"] input').type('Euro');
+    cy.get('[data-cy="client-currency-select-option-euro-(€)"]').click();
 
     cy.get('[name="contactEmail"]').clear();
     cy.get('[name="contactEmail"]').type('jane.doe@acme.org');
@@ -84,7 +83,8 @@ describe('Client E2E', () => {
 
     cy.get('[name="country"]').clear();
     cy.get('[name="country"]').type('Country');
-    cy.get('#radix-«r7» .text-primary-foreground').click();
+    
+    cy.get('[data-cy="client-submit"]').click();
 
     cy.contains('Jane Doe')
     cy.contains('+1 34 567 890')
