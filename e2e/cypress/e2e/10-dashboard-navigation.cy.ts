@@ -50,7 +50,7 @@ describe('Navigation E2E', () => {
             cy.visit('/clients');
             cy.wait(1000);
 
-            cy.get('nav a, aside a').contains(/dashboard|accueil/i).click({ force: true });
+            cy.get('[data-cy="sidebar-dashboard-link"]').click({ force: true });
             cy.url().should('include', '/dashboard');
         });
 
@@ -58,7 +58,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(1000);
 
-            cy.get('nav a, aside a').contains(/clients/i).click({ force: true });
+            cy.get('[data-cy="sidebar-clients-link"]').click({ force: true });
             cy.url().should('include', '/clients');
         });
 
@@ -66,7 +66,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(1000);
 
-            cy.get('nav a, aside a').contains(/quotes|devis/i).click({ force: true });
+            cy.get('[data-cy="sidebar-quotes-link"]').click({ force: true });
             cy.url().should('include', '/quotes');
         });
 
@@ -74,7 +74,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(1000);
 
-            cy.get('nav a, aside a').contains(/invoices|factures/i).click({ force: true });
+            cy.get('[data-cy="sidebar-invoices-link"]').click({ force: true });
             cy.url().should('include', '/invoices');
         });
 
@@ -82,7 +82,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(1000);
 
-            cy.get('nav a, aside a').contains(/receipts|reçus/i).click({ force: true });
+            cy.get('[data-cy="sidebar-receipts-link"]').click({ force: true });
             cy.url().should('include', '/receipts');
         });
 
@@ -90,7 +90,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(1000);
 
-            cy.get('nav a, aside a, button').contains(/settings|paramètres/i).click({ force: true });
+            cy.get('[data-cy="sidebar-settings-link"]').click({ force: true });
             cy.url().should('include', '/settings');
         });
     });
@@ -132,7 +132,7 @@ describe('Navigation E2E', () => {
             cy.visit('/dashboard');
             cy.wait(500);
 
-            cy.get('nav a, aside a').contains(/clients/i).click({ force: true });
+            cy.get('[data-cy="sidebar-clients-link"]').click({ force: true });
             cy.wait(500);
             cy.url().should('include', '/clients');
 
