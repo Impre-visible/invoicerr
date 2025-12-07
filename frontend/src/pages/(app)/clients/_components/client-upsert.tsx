@@ -410,7 +410,7 @@ export function ClientUpsert({ client, open, onOpenChange, onCreate }: ClientUps
                             </div>
 
                             <div className="flex justify-end space-x-2">
-                                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} {...dataCy('client-cancel')}>
                                     {t("clients.upsert.actions.cancel")}
                                 </Button>
                                 <Button type="submit" {...dataCy('client-submit')}>

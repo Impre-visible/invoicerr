@@ -306,12 +306,9 @@ describe('Clients E2E', () => {
         it('views a client details', () => {
             cy.visit('/clients');
             cy.wait(2000);
-            cy.contains('ACME Corporation', { timeout: 5000 }).closest('[class*="card"], [class*="Card"]').within(() => {
-                cy.get('button').first().click();
-            });
-            cy.contains(/view|voir|details|détails/i).click();
-            cy.contains('ACME Corporation');
-            cy.contains('contact@acme.org');
+            cy.get('[data-cy="view-client-button-jane.doe@freelance.org"]').click();
+            cy.contains('Jane Doe');
+            cy.contains('jane.doe@freelance.org');
         });
     });
 
@@ -320,18 +317,19 @@ describe('Clients E2E', () => {
             cy.visit('/clients');
             cy.wait(2000);
 
-            cy.contains('ACME Corporation', { timeout: 5000 }).closest('[class*="card"], [class*="Card"]').within(() => {
-                cy.get('button').first().click();
-            });
-
-            cy.contains(/edit|modifier/i).click();
+            cy.get('[data-cy="edit-client-button-jane.doe@freelance.org"]').click();
 
             cy.get('[data-cy="client-dialog"]', { timeout: 5000 }).should('be.visible');
-            cy.get('[name="description"]').clear().type('Updated: A global technology leader');
+            cy.get('[name="description"]').clear().type('A global technology leader');
             cy.get('[data-cy="client-submit"]').click();
 
             cy.get('[data-cy="client-dialog"]').should('not.exist');
-            cy.contains('Updated: A global technology leader', { timeout: 10000 });
+
+            cy.get('[data-cy="edit-client-button-jane.doe@freelance.org"]').click();
+            cy.get('[data-cy="client-dialog"]', { timeout: 5000 }).should('be.visible');
+            cy.get('[name="description"]').should('have.value', 'A global technology leader');
+
+            cy.get('[data-cy="client-cancel"]').click();
         });
     });
 
@@ -340,18 +338,14 @@ describe('Clients E2E', () => {
             cy.visit('/clients');
             cy.wait(2000);
 
-            cy.contains('German Company', { timeout: 5000 }).closest('[class*="card"], [class*="Card"]').within(() => {
-                cy.get('button').first().click();
-            });
+            
+            cy.get('[data-cy="delete-client-button-contact@german.de"]').click();
 
-            cy.contains(/delete|supprimer/i).click();
-
-            cy.get('[role="alertdialog"], [role="dialog"]').within(() => {
-                cy.contains('button', /delete|confirm|supprimer|confirmer/i).click();
-            });
+            cy.get('[data-cy="confirm-delete-client-button"]', { timeout: 5000 }).should('be.visible');
+            cy.get('[data-cy="confirm-delete-client-button"]').click();
 
             cy.wait(2000);
-            cy.contains('German Company').should('not.exist');
+            cy.get('[data-cy="client-status-inactive-contact@german.de"]').should('exist');
         });
     });
 });

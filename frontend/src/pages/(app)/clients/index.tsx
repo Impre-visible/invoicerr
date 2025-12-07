@@ -185,6 +185,7 @@ export default function Clients() {
                                                     <span
                                                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${client.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                                                             } w-fit`}
+                                                        data-cy={client.isActive ? `client-status-active-${client.contactEmail}` : `client-status-inactive-${client.contactEmail}`}
                                                     >
                                                         {client.isActive ? t("clients.list.status.active") : t("clients.list.status.inactive")}
                                                     </span>
@@ -223,6 +224,7 @@ export default function Clients() {
                                                 size="icon"
                                                 onClick={() => handleView(client)}
                                                 className="text-gray-600 hover:text-blue-600 mr-2"
+                                                dataCy={`view-client-button-${client.contactEmail}`}
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </Button>
@@ -232,6 +234,7 @@ export default function Clients() {
                                                 size="icon"
                                                 onClick={() => handleEdit(client)}
                                                 className="text-gray-600 hover:text-green-600 mr-2"
+                                                dataCy={`edit-client-button-${client.contactEmail}`}
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
@@ -241,6 +244,7 @@ export default function Clients() {
                                                 size="icon"
                                                 onClick={() => handleDelete(client)}
                                                 className="text-gray-600 hover:text-red-600 mr-2"
+                                                dataCy={`delete-client-button-${client.contactEmail}`}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
