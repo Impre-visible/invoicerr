@@ -1,6 +1,7 @@
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthExtendedModule } from './modules/auth-extended/auth-extended.module';
 import { AuthGuard } from '@/guards/auth.guard';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { ClientsModule } from './modules/clients/clients.module';
@@ -33,6 +34,7 @@ import { auth } from "./lib/auth"
     AuthModule.forRoot({
       auth
     }),
+    AuthExtendedModule,
     CompanyModule,
     ClientsModule,
     QuotesModule,

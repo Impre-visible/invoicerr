@@ -1073,7 +1073,9 @@
             },
             "password": {
                 "title": "Password & Security",
-                "description": "Change your password and security settings"
+                "description": "Change your password and security settings",
+                "loading": "Loading...",
+                "noPasswordSet": "You signed in with an external provider (OIDC). You can set a password to also sign in with email and password."
             },
             "form": {
                 "firstname": {
@@ -1106,6 +1108,7 @@
                 },
                 "password": {
                     "label": "New Password",
+                    "labelNew": "Password",
                     "placeholder": "Enter new password",
                     "errors": {
                         "minLength": "Password must be at least 8 characters",
@@ -1127,7 +1130,8 @@
                 "updatingProfile": "Updating...",
                 "updateProfile": "Update Profile",
                 "updatingPassword": "Updating...",
-                "updatePassword": "Update Password"
+                "updatePassword": "Update Password",
+                "setPassword": "Set Password"
             },
             "messages": {
                 "profileUpdateSuccess": "Profile updated successfully",

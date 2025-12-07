@@ -38,7 +38,9 @@ export default function LoginPage() {
 
         if (result.data?.user.createdAt) {
             toast.success(t("auth.login.messages.loginSuccess"))
-            navigate("/");
+            // Force a full page reload to refresh the session state
+            window.location.href = "/dashboard";
+            return;
         }
 
         setLoading(false);

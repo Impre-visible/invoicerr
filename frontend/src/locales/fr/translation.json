@@ -1078,7 +1078,9 @@
             },
             "password": {
                 "title": "Mot de passe et sécurité",
-                "description": "Changez votre mot de passe et les paramètres de sécurité"
+                "description": "Changez votre mot de passe et les paramètres de sécurité",
+                "loading": "Chargement...",
+                "noPasswordSet": "Vous vous êtes connecté via un fournisseur externe (OIDC). Vous pouvez définir un mot de passe pour également vous connecter par email et mot de passe."
             },
             "form": {
                 "firstname": {
@@ -1111,6 +1113,7 @@
                 },
                 "password": {
                     "label": "Nouveau mot de passe",
+                    "labelNew": "Mot de passe",
                     "placeholder": "Saisir le nouveau mot de passe",
                     "errors": {
                         "minLength": "Le mot de passe doit faire au moins 8 caractères",
@@ -1132,7 +1135,8 @@
                 "updatingProfile": "Mise à jour...",
                 "updateProfile": "Mettre à jour le profil",
                 "updatingPassword": "Mise à jour...",
-                "updatePassword": "Mettre à jour le mot de passe"
+                "updatePassword": "Mettre à jour le mot de passe",
+                "setPassword": "Définir le mot de passe"
             },
             "messages": {
                 "profileUpdateSuccess": "Profil mis à jour avec succès",

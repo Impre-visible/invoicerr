@@ -65,6 +65,12 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    account: {
+        accountLinking: {
+            enabled: true,
+            trustedProviders: [process.env.OIDC_NAME || "Generic OIDC"],
+        },
+    },
     user: {
         additionalFields: {
             firstname: {

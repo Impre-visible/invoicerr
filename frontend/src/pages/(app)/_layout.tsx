@@ -4,12 +4,24 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/sidebar";
 import { authClient } from "@/lib/auth";
 
+const ALLOWED_PATHS = [
+    '/signature/[^/]+',
+];
+
 const Layout = () => {
+    const location = useLocation();
     const {
         data: session,
         isPending,
     } = authClient.useSession();
 
+    // Rediriger vers sign-in si pas de session et pas sur un chemin autorisé
+    if (!isPending && !session) {
+        const isAllowedPath = ALLOWED_PATHS.some(path => location.pathname.match(new RegExp(path)));
+        if (!isAllowedPath) {
+            return <Navigate to="/auth/sign-in" />;
+        }
+    }
 
     return (
         <SidebarProvider>
