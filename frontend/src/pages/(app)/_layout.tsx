@@ -16,7 +16,7 @@ const Layout = () => {
         if (ALLOWED_PATHS.some(path => location.pathname.match(new RegExp(path)))) {
             // Do not redirect if the path matches the allowed paths
         } else {
-            return <Navigate to="/login" />
+            return <Navigate to="/auth/sign-in" />
         }
     }
 

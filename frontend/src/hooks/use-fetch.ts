@@ -28,8 +28,8 @@ export async function authenticatedFetch(input: RequestInfo, init: RequestInit =
             method: "POST"
         });
 
-        if (refreshRes.status >= 400 && window.location.href.endsWith("/login") === false) {
-            window.location.href = "/logout";
+        if (refreshRes.status >= 400 && window.location.href.endsWith("/auth/sign-in") === false) {
+            window.location.href = "/auth/sign-out";
         }
 
         if (refreshRes.ok) {

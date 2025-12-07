@@ -5,5 +5,5 @@ export default function LogoutPage() {
     const { logout } = useAuth()
     logout()
 
-    return <Navigate to="/login" />
+    return <Navigate to="/auth/sign-in" />
 }

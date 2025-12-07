@@ -120,7 +120,7 @@ export default function LoginPage() {
                     <section className="flex flex-col mt-4 gap-1">
                         <div className="text-center text-sm">
                             {t("auth.login.noAccount")}{" "}
-                            <a href="/signup" className="underline hover:text-primary">
+                            <a href="/auth/sign-up" className="underline hover:text-primary">
                                 {t("auth.login.signUpLink")}
                             </a>
                         </div>

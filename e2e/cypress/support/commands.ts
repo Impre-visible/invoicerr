@@ -40,7 +40,7 @@ Cypress.Commands.add('resetDatabase', () => {
 
 Cypress.Commands.add('login', () => {
     cy.session('user-session', () => {
-        cy.visit('/login');
+        cy.visit('/auth/sign-in');
         cy.get('input[name=email]').type('john.doe@acme.org');
         cy.get('input[name=password]').type('Super_Secret_Password123!');
         cy.get('button[type=submit]').click();
@@ -59,19 +59,19 @@ Cypress.Commands.add('login', () => {
 
 
 Cypress.Commands.add('getLastEmail', () => {
-  return cy
-    .request('http://localhost:8025/api/v1/messages')
-    .then(res => {
-      const messages = res.body.messages;
-      expect(messages).to.have.length.greaterThan(0);
-      const id = messages[0].ID;
-      return cy.request(`http://localhost:8025/api/v1/message/${id}`);
-    })
-    .then(res => res.body);
+    return cy
+        .request('http://localhost:8025/api/v1/messages')
+        .then(res => {
+            const messages = res.body.messages;
+            expect(messages).to.have.length.greaterThan(0);
+            const id = messages[0].ID;
+            return cy.request(`http://localhost:8025/api/v1/message/${id}`);
+        })
+        .then(res => res.body);
 });
 
 Cypress.Commands.add('clearEmails', () => {
-  return cy.request('DELETE', 'http://localhost:8025/api/v1/messages');
+    return cy.request('DELETE', 'http://localhost:8025/api/v1/messages');
 });
 
 Cypress.on('window:before:load', (window) => {
