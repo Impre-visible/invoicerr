@@ -3,78 +3,60 @@ import {
     EyeClosedIcon,
     EyeIcon
 } from "lucide-react"
-import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type React from "react"
+import { authClient } from "@/lib/auth"
 import { toast } from "sonner"
-import { useNavigate } from "react-router"
-import { usePost } from "@/hooks/use-fetch"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { z } from "zod"
-
-interface LoginResponse {
-    user: {
-        id: string
-        firstname: string
-        lastname: string
-        email: string
-    }
-}
 
 export default function LoginPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate()
-    const [errors, setErrors] = useState<Record<string, string[]>>({})
-    const { trigger: post, loading, data, error } = usePost<LoginResponse>("/api/auth/login")
-    const [hasToasted, setHasToasted] = useState(false)
-    const [showPassword, setShowPassword] = useState(false);
 
-    // Move schema inside component to access t function
-    const loginSchema = z.object({
-        email: z.string().email(t("auth.login.errors.invalidEmail")),
-        password: z.string().min(1, t("auth.login.errors.passwordRequired")),
-    })
+    const [errors] = useState<Record<string, string[]>>({})
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
-        const formData = new FormData(event.currentTarget)
-        const data = {
-            email: formData.get("email") as string,
-            password: formData.get("password") as string,
+        setLoading(true);
+
+        const result = await authClient.signIn.email({
+            email: (event.currentTarget.elements.namedItem("email") as HTMLInputElement).value,
+            password: (event.currentTarget.elements.namedItem("password") as HTMLInputElement).value,
+            rememberMe: true,
+        })
+
+        if (result.error) {
+            toast.error(result.error.message || t("auth.login.messages.loginError"));
         }
 
-        const parsed = loginSchema.safeParse(data)
-
-        if (!parsed.success) {
-            const fieldErrors: Record<string, string[]> = {}
-            for (const issue of parsed.error.issues) {
-                const key = issue.path[0] as string
-                if (!fieldErrors[key]) fieldErrors[key] = []
-                fieldErrors[key].push(issue.message)
-            }
-            setErrors(fieldErrors)
-            return
+        if (result.data?.user.createdAt) {
+            toast.success(t("auth.login.messages.loginSuccess"))
+            // Force a full page reload to refresh the session state
+            window.location.href = "/dashboard";
+            return;
         }
 
-        setErrors({})
-        post(data)
+        setLoading(false);
     }
 
-    useEffect(() => {
-        if (data && !error && !hasToasted) {
-            setHasToasted(true)
-            setTimeout(() => {
-                window.location.href = "/"
-            }, 1000)
-            toast.success(t("auth.login.messages.loginSuccess"))
-        } else if (error) {
-            toast.error(t("auth.login.messages.loginError"))
-        }
-    }, [data, error, navigate, t, hasToasted])
+    const getEnvVariable = (key: string): string | undefined => {
+        return (window as any).__APP_CONFIG__?.[key] || import.meta.env[key];
+    }
+
+    const handleOIDCLogin = () => {
+        const oidcProviderId = getEnvVariable("VITE_OIDC_PROVIDER_ID");
+
+        authClient.signIn.oauth2({
+            providerId: oidcProviderId || 'oidc',
+            callbackURL: "/dashboard",
+        });
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center">
@@ -120,19 +102,16 @@ export default function LoginPage() {
                     <section className="flex flex-col mt-4 gap-1">
                         <div className="text-center text-sm">
                             {t("auth.login.noAccount")}{" "}
-                            <a href="/signup" className="underline hover:text-primary">
+                            <a href="/auth/sign-up" className="underline hover:text-primary">
                                 {t("auth.login.signUpLink")}
                             </a>
                         </div>
-                        {((window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT) && (
+                        {(getEnvVariable("VITE_OIDC_PROVIDER_ID")) && (
                             <div className="text-center text-sm">
                                 {t("auth.login.oidc")}{" "}
-                                <a
-                                    href={(window as any).__APP_CONFIG__?.VITE_OIDC_ENDPOINT || import.meta.env.VITE_OIDC_ENDPOINT}
-                                    className="underline hover:text-primary"
-                                >
+                                <Button variant="link" onClick={handleOIDCLogin} className="underline hover:text-primary p-0">
                                     {t("auth.login.oidcLink")}
-                                </a>
+                                </Button>
                             </div>
                         )}
                     </section>

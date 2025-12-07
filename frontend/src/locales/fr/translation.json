@@ -851,9 +851,45 @@
             "pdfTemplates": "Modèles PDF",
             "emailTemplates": "Modèles d'email",
             "account": "Compte",
+            "invitations": "Invitations",
             "dangerZone": "Zone de danger",
             "plugins": "Plugins",
             "webhooks": "Webhooks"
+        },
+        "invitations": {
+            "create": {
+                "title": "Créer un code d'invitation",
+                "description": "Générez un nouveau code d'invitation pour inviter quelqu'un à créer un compte",
+                "expiresIn": "Expire dans (jours)",
+                "expiresPlaceholder": "Laisser vide pour pas d'expiration",
+                "button": "Générer le code",
+                "creating": "Génération..."
+            },
+            "list": {
+                "title": "Vos codes d'invitation",
+                "description": "Gérez les codes d'invitation que vous avez créés",
+                "code": "Code",
+                "status": "Statut",
+                "createdAt": "Créé le",
+                "expiresAt": "Expire le",
+                "usedBy": "Utilisé par",
+                "actions": "Actions",
+                "empty": "Vous n'avez pas encore créé de codes d'invitation",
+                "noExpiry": "Jamais"
+            },
+            "status": {
+                "active": "Actif",
+                "used": "Utilisé",
+                "expired": "Expiré"
+            },
+            "messages": {
+                "fetchError": "Échec du chargement des codes d'invitation",
+                "createSuccess": "Code d'invitation créé avec succès",
+                "createError": "Échec de la création du code d'invitation",
+                "deleteSuccess": "Code d'invitation supprimé",
+                "deleteError": "Échec de la suppression du code d'invitation",
+                "codeCopied": "Code copié dans le presse-papiers"
+            }
         },
         "company": {
             "title": "Paramètres de l'entreprise",
@@ -1078,7 +1114,9 @@
             },
             "password": {
                 "title": "Mot de passe et sécurité",
-                "description": "Changez votre mot de passe et les paramètres de sécurité"
+                "description": "Changez votre mot de passe et les paramètres de sécurité",
+                "loading": "Chargement...",
+                "noPasswordSet": "Vous vous êtes connecté via un fournisseur externe (OIDC). Vous pouvez définir un mot de passe pour également vous connecter par email et mot de passe."
             },
             "form": {
                 "firstname": {
@@ -1111,6 +1149,7 @@
                 },
                 "password": {
                     "label": "Nouveau mot de passe",
+                    "labelNew": "Mot de passe",
                     "placeholder": "Saisir le nouveau mot de passe",
                     "errors": {
                         "minLength": "Le mot de passe doit faire au moins 8 caractères",
@@ -1132,7 +1171,8 @@
                 "updatingProfile": "Mise à jour...",
                 "updateProfile": "Mettre à jour le profil",
                 "updatingPassword": "Mise à jour...",
-                "updatePassword": "Mettre à jour le mot de passe"
+                "updatePassword": "Mettre à jour le mot de passe",
+                "setPassword": "Définir le mot de passe"
             },
             "messages": {
                 "profileUpdateSuccess": "Profil mis à jour avec succès",
@@ -1455,6 +1495,11 @@
                     "placeholder": "Créer un mot de passe",
                     "requirements": "Exigences du mot de passe :"
                 },
+                "invitationCode": {
+                    "label": "Code d'invitation",
+                    "placeholder": "Entrez votre code d'invitation",
+                    "hint": "Vous avez besoin d'un code d'invitation d'un utilisateur existant pour vous inscrire"
+                },
                 "creatingAccount": "Création du compte...",
                 "createButton": "Créer le compte"
             },
@@ -1467,7 +1512,10 @@
                 "passwordMinLength": "Le mot de passe doit faire au moins 8 caractères",
                 "passwordLetter": "Le mot de passe doit contenir au moins une lettre",
                 "passwordNumber": "Le mot de passe doit contenir au moins un chiffre",
-                "passwordSpecial": "Le mot de passe doit contenir au moins un caractère spécial"
+                "passwordSpecial": "Le mot de passe doit contenir au moins un caractère spécial",
+                "invitationCodeRequired": "Un code d'invitation est requis pour s'inscrire",
+                "invalidInvitationCode": "Code d'invitation invalide ou expiré",
+                "genericError": "Une erreur s'est produite lors de la création de votre compte"
             },
             "messages": {
                 "accountCreated": "Compte créé avec succès"

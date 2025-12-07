@@ -1,24 +1,34 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth"
 import { toast } from "sonner"
-import { useAuth } from "@/contexts/auth"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { usePatch } from "@/hooks/use-fetch"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 export default function AccountSettings() {
     const { t } = useTranslation()
-    const { trigger: updateUser, loading: updateUserLoading } = usePatch("/api/auth/me")
-    const { trigger: updatePassword, loading: updatePasswordLoading } = usePatch("/api/auth/password")
-    const { user } = useAuth()
 
-    // Move schemas inside component to access t function
+    const [updateUserLoading, setUpdateUserLoading] = useState(false)
+    const [updatePasswordLoading, setUpdatePasswordLoading] = useState(false)
+    const [hasCredentialAccount, setHasCredentialAccount] = useState<boolean | null>(null)
+
+    // Check if user has a credential account (email/password)
+    useEffect(() => {
+        authClient.listAccounts().then(({ data }) => {
+            console.log("User accounts:", data)
+            const hasCredential = data?.some(account => account.providerId === "credential") ?? false
+            setHasCredentialAccount(hasCredential)
+        }).catch(() => {
+            setHasCredentialAccount(false)
+        })
+    }, [])
+
     const profileSchema = z
         .object({
             firstname: z.string().min(1, { message: t("settings.account.form.firstname.errors.required") }),
@@ -31,7 +41,9 @@ export default function AccountSettings() {
 
     const passwordSchema = z
         .object({
-            currentPassword: z.string().min(1, { message: t("settings.account.form.currentPassword.errors.required") }),
+            currentPassword: hasCredentialAccount
+                ? z.string().min(1, { message: t("settings.account.form.currentPassword.errors.required") })
+                : z.string().optional(),
             password: z
                 .string()
                 .min(8, { message: t("settings.account.form.password.errors.minLength") })
@@ -66,18 +78,10 @@ export default function AccountSettings() {
         },
     })
 
-    useEffect(() => {
-        if (user) {
-            profileForm.reset({
-                firstname: user.firstname || "",
-                lastname: user.lastname || "",
-                email: user.email || "",
-            })
-        }
-    }, [user, profileForm])
-
     const handleProfileUpdate = async (values: z.infer<typeof profileSchema>) => {
-        updateUser({
+        setUpdateUserLoading(true);
+        authClient.updateUser({
+            // @ts-ignore additional fields
             firstname: values.firstname,
             lastname: values.lastname,
             email: values.email,
@@ -89,21 +93,57 @@ export default function AccountSettings() {
                 console.error("Error updating profile:", error)
                 toast.error(t("settings.account.messages.profileUpdateError"))
             })
+            .finally(() => {
+                setUpdateUserLoading(false);
+            });
     }
 
     const handlePasswordUpdate = async (values: z.infer<typeof passwordSchema>) => {
-        updatePassword({
-            currentPassword: values.currentPassword,
-            newPassword: values.password,
-        })
-            .then(() => {
-                toast.success(t("settings.account.messages.passwordUpdateSuccess"))
-                passwordForm.reset()
+        setUpdatePasswordLoading(true);
+
+        if (hasCredentialAccount) {
+            // User has a password, use changePassword
+            authClient.changePassword({
+                currentPassword: values.currentPassword!,
+                newPassword: values.password,
             })
-            .catch((error) => {
-                console.error("Error updating password:", error)
-                toast.error(t("settings.account.messages.passwordUpdateError"))
+                .then(() => {
+                    toast.success(t("settings.account.messages.passwordUpdateSuccess"))
+                    passwordForm.reset()
+                })
+                .catch((error) => {
+                    console.error("Error updating password:", error)
+                    toast.error(t("settings.account.messages.passwordUpdateError"))
+                })
+                .finally(() => {
+                    setUpdatePasswordLoading(false);
+                });
+        } else {
+            // User doesn't have a password (OIDC only), use setPassword endpoint
+            fetch(`${import.meta.env.VITE_BACKEND_URL || ''}/api/auth-extended/set-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ newPassword: values.password }),
             })
+                .then(async (res) => {
+                    if (!res.ok) {
+                        throw new Error('Failed to set password')
+                    }
+                    toast.success(t("settings.account.messages.passwordUpdateSuccess"))
+                    passwordForm.reset()
+                    setHasCredentialAccount(true) // Now user has a credential account
+                })
+                .catch((error) => {
+                    console.error("Error setting password:", error)
+                    toast.error(t("settings.account.messages.passwordUpdateError"))
+                })
+                .finally(() => {
+                    setUpdatePasswordLoading(false);
+                });
+        }
     }
 
     return (
@@ -180,69 +220,92 @@ export default function AccountSettings() {
                         <CardDescription>{t("settings.account.password.description")}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Form {...passwordForm}>
-                            <form onSubmit={passwordForm.handleSubmit(handlePasswordUpdate)} className="space-y-4">
-                                <FormField
-                                    control={passwordForm.control}
-                                    name="currentPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("settings.account.form.currentPassword.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder={t("settings.account.form.currentPassword.placeholder")}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                        {hasCredentialAccount === null ? (
+                            <div className="text-center text-muted-foreground py-4">
+                                {t("settings.account.password.loading")}
+                            </div>
+                        ) : (
+                            <>
+                                {!hasCredentialAccount && (
+                                    <div className="mb-4 p-3 bg-muted rounded-md">
+                                        <p className="text-sm text-muted-foreground">
+                                            {t("settings.account.password.noPasswordSet")}
+                                        </p>
+                                    </div>
+                                )}
+                                <Form {...passwordForm}>
+                                    <form onSubmit={passwordForm.handleSubmit(handlePasswordUpdate)} className="space-y-4">
+                                        {hasCredentialAccount && (
+                                            <FormField
+                                                control={passwordForm.control}
+                                                name="currentPassword"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>{t("settings.account.form.currentPassword.label")}</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="password"
+                                                                placeholder={t("settings.account.form.currentPassword.placeholder")}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        )}
 
-                                <FormField
-                                    control={passwordForm.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("settings.account.form.password.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder={t("settings.account.form.password.placeholder")}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                        <FormField
+                                            control={passwordForm.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {hasCredentialAccount
+                                                            ? t("settings.account.form.password.label")
+                                                            : t("settings.account.form.password.labelNew")}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="password"
+                                                            placeholder={t("settings.account.form.password.placeholder")}
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                <FormField
-                                    control={passwordForm.control}
-                                    name="confirmPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t("settings.account.form.confirmPassword.label")}</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder={t("settings.account.form.confirmPassword.placeholder")}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                        <FormField
+                                            control={passwordForm.control}
+                                            name="confirmPassword"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("settings.account.form.confirmPassword.label")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="password"
+                                                            placeholder={t("settings.account.form.confirmPassword.placeholder")}
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                <Button type="submit" disabled={updatePasswordLoading}>
-                                    {updatePasswordLoading
-                                        ? t("settings.account.form.updatingPassword")
-                                        : t("settings.account.form.updatePassword")}
-                                </Button>
-                            </form>
-                        </Form>
+                                        <Button type="submit" disabled={updatePasswordLoading}>
+                                            {updatePasswordLoading
+                                                ? t("settings.account.form.updatingPassword")
+                                                : hasCredentialAccount
+                                                    ? t("settings.account.form.updatePassword")
+                                                    : t("settings.account.form.setPassword")}
+                                        </Button>
+                                    </form>
+                                </Form>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>

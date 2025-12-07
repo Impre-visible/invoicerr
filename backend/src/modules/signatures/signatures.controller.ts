@@ -1,10 +1,10 @@
-import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
 import { SignaturesService } from '@/modules/signatures/signatures.service';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 
 @Controller('signatures')
 export class SignaturesController {
-  constructor(private readonly signaturesService: SignaturesService) {}
+  constructor(private readonly signaturesService: SignaturesService) { }
 
   @Get('/:id')
   @AllowAnonymous()

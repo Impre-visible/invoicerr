@@ -5,17 +5,17 @@ import { components, hooks, utils } from '@generouted/react-router/client'
 
 export type Path =
   | `/`
+  | `/auth/sign-in`
+  | `/auth/sign-out`
+  | `/auth/sign-up`
   | `/clients`
   | `/dashboard`
   | `/invoices`
-  | `/login`
-  | `/logout`
   | `/payment-methods`
   | `/quotes`
   | `/receipts`
   | `/settings/:tab?`
   | `/signature/:id`
-  | `/signup`
   | `/stats`
 
 export type Params = {

@@ -1,10 +1,10 @@
 import { Check, ChevronDown, X } from "lucide-react"
+import { cn, dataCy } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 
 interface Option {
     label: string
@@ -24,6 +24,7 @@ interface SearchSelectProps {
     disabled?: boolean
     multiple?: boolean
     noResultsComponent?: React.ReactNode // Ajout d'une propriété pour un composant personnalisé
+    'data-cy'?: string
 }
 
 export default function SearchSelect({
@@ -39,6 +40,7 @@ export default function SearchSelect({
     disabled = false,
     multiple = false,
     noResultsComponent,
+    'data-cy': dataCyValue,
 }: SearchSelectProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [searchValue, setSearchValue] = useState("")
@@ -107,7 +109,7 @@ export default function SearchSelect({
     }
 
     return (
-        <div ref={containerRef} className={cn("relative w-full", className)}>
+        <div ref={containerRef} className={cn("relative w-full", className)} {...(dataCyValue ? dataCy(dataCyValue) : {})}>
             <Button
                 type="button"
                 variant="outline"
@@ -158,7 +160,7 @@ export default function SearchSelect({
                         />
                     </div>
 
-                    <div className="max-h-60 overflow-auto p-1 flex flex-col gap-1">
+                    <div className="max-h-60 overflow-auto p-1 flex flex-col gap-1" {...(dataCyValue ? dataCy(`${dataCyValue}-options`) : {})}>
                         {options.length === 0 && renderNoResults()}
                         {options.map((option) => (
                             <button
@@ -169,6 +171,7 @@ export default function SearchSelect({
                                     "w-full flex items-center justify-between px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground",
                                     isSelected(option.value) && "bg-accent",
                                 )}
+                                {...(dataCyValue ? dataCy(`${dataCyValue}-option-${option.label.toLowerCase().replace(/\s+/g, '-')}`) : {})}
                             >
                                 <span>{option.label}</span>
                                 {isSelected(option.value) && <Check className="h-4 w-4" />}

@@ -245,15 +245,6 @@ enum PaymentMethodType {
   OTHER
 }
 
-// User model
-model User {
-  id        String  @id @default(cuid())
-  firstname String
-  lastname  String
-  email     String  @unique
-  password  String? // If null, user is authenticated via OIDC
-}
-
 // PDF Configuration
 model PDFConfig {
   id      String   @id @default(cuid())
@@ -796,4 +787,93 @@ model Webhook {
   companyId String
 
   @@index([companyId])
+}
+
+// ======= INVITATION SYSTEM ======= //
+
+model InvitationCode {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  usedAt      DateTime?
+  createdById String
+  createdBy   User      @relation("CreatedInvitations", fields: [createdById], references: [id], onDelete: Cascade)
+  usedById    String?   @unique
+  usedBy      User?     @relation("UsedInvitation", fields: [usedById], references: [id], onDelete: SetNull)
+
+  @@index([code])
+  @@index([createdById])
+  @@map("invitation_code")
+}
+
+// ======= BETTER AUTH INTEGRATION ======= //
+
+model User {
+  id            String    @id
+  name          String?
+  firstname     String
+  lastname      String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  // Invitation relations
+  createdInvitations InvitationCode[] @relation("CreatedInvitations")
+  usedInvitation     InvitationCode?  @relation("UsedInvitation")
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }

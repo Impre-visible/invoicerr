@@ -24,7 +24,7 @@ const frontendEnv = loadEnv(path.resolve(__dirname, "../frontend/.env.test"));
 const frontend = spawn("npm", ["run", "dev"], {
     cwd: path.resolve(__dirname, "../frontend"),
     stdio: "inherit",
-    env: { ...frontendEnv, NODE_ENV: "test" },
+    env: { ...frontendEnv, NODE_ENV: "test", VITE_E2E_TESTING: "true" },
 });
 
 // Attendre que le frontend soit prêt

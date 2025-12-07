@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type React from "react"
 import { toast } from "sonner"
-import { useAuth } from "@/contexts/auth"
 import { useNavigate } from "react-router"
 import { usePost } from "@/hooks/use-fetch"
 import { useState } from "react"
@@ -27,7 +26,7 @@ export default function DangerZoneSettings() {
     const { trigger: sendOTP, loading: isLoadingOtp } = usePost("/api/danger/otp")
     const { trigger: sendAction } = usePost(`/api/danger/reset/${currentAction}?otp=${otp}`)
     const [otpModalOpen, setOtpModalOpen] = useState(false)
-    const { logout } = useAuth()
+
     const navigate = useNavigate()
 
     const requestOtp = (action: "app" | "all") => {
@@ -58,7 +57,7 @@ export default function DangerZoneSettings() {
                 setOtp("")
                 setCurrentAction(null)
                 if (currentAction === "all") {
-                    logout()
+                    navigate("/auth/log-out")
                 } else {
                     navigate("/dashboard")
                 }

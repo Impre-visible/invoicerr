@@ -4,7 +4,13 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-export default function CurrencySelect({ value, onChange }: { value: string | null | undefined; onChange: (value: string | string[]) => void }) {
+interface CurrencySelectProps {
+    value: string | null | undefined
+    onChange: (value: string | string[]) => void
+    'data-cy'?: string
+}
+
+export default function CurrencySelect({ value, onChange, 'data-cy': dataCyValue }: CurrencySelectProps) {
     const [currencySearch, setCurrencySearch] = useState("")
     const [searchedCurrencies, setSearchedCurrencies] = useState<
         {
@@ -73,6 +79,7 @@ export default function CurrencySelect({ value, onChange }: { value: string | nu
             searchPlaceholder={t("component.currency-select.searchPlaceholder")}
             noResultsText={t("component.currency-select.noResults")}
             className="w-full"
+            data-cy={dataCyValue}
         />
     );
 }

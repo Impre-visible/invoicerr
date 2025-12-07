@@ -1,4 +1,3 @@
-import { AllowAnonymous } from '@/decorators/allow-anonymous.decorator';
 import { ClientsService } from '@/modules/clients/clients.service';
 import { EditClientsDto } from '@/modules/clients/dto/clients.dto';
 import {
