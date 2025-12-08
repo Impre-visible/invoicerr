@@ -13,7 +13,6 @@ import { ClientUpsert } from "../../clients/_components/client-upsert"
 import { PaymentMethodType } from "@/types"
 import SearchSelect from "@/components/search-input"
 import { Trash2 } from "lucide-react"
-import { dataCy } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -140,12 +139,12 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
     return (
         <>
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit max-h-[90vh] overflow-y-auto overflow-visible" {...dataCy('receipt-dialog')}>
+                <DialogContent className="max-w-sm lg:max-w-4xl min-w-fit max-h-[90vh] overflow-y-auto overflow-visible" dataCy="receipt-dialog">
                     <DialogHeader className="h-fit">
                         <DialogTitle>{t(`receipts.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} {...dataCy('receipt-form')}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} data-cy="receipt-form">
                             <FormField
                                 control={form.control}
                                 name="invoiceId"
@@ -269,7 +268,7 @@ export function ReceiptUpsert({ receipt, open, onOpenChange }: ReceiptUpsertDial
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             {t("receipts.upsert.actions.cancel")}
                         </Button>
-                        <Button type="button" onClick={form.handleSubmit(onSubmit)} loading={createLoading || updateLoading} {...dataCy('receipt-submit')}>
+                        <Button type="button" onClick={form.handleSubmit(onSubmit)} loading={createLoading || updateLoading} dataCy="receipt-submit">
                             {t(`receipts.upsert.actions.${isEdit ? "save" : "create"}`)}
                         </Button>
                     </DialogFooter>

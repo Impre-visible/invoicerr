@@ -20,7 +20,6 @@ import { PaymentMethodType } from "@/types"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
-import { dataCy } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -197,12 +196,12 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="max-w-sm lg:max-w-4xl" {...dataCy('invoice-dialog')}>
+                <DialogContent className="max-w-sm lg:max-w-4xl" dataCy="invoice-dialog">
                     <DialogHeader>
                         <DialogTitle>{t(`invoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" {...dataCy('invoice-form')}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" data-cy="invoice-form">
                             <FormField
                                 control={control}
                                 name="quoteId"
@@ -516,7 +515,7 @@ export function InvoiceUpsert({ invoice, open, onOpenChange }: InvoiceUpsertDial
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                     {t("invoices.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit" {...dataCy('invoice-submit')}>
+                                <Button type="submit" dataCy="invoice-submit">
                                     {t(`invoices.upsert.actions.${isEdit ? "save" : "create"}`)}
                                 </Button>
                             </div>
