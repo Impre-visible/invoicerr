@@ -8,10 +8,8 @@ describe('Recurring Invoices E2E', () => {
             cy.visit('/invoices');
             cy.wait(2000);
 
-            cy.contains(/recurring|récurrent/i, { timeout: 10000 }).click();
-            cy.wait(1000);
-
-            cy.contains('button', /add|new|créer|ajouter/i, { timeout: 10000 }).click();
+            // Find the Recurring Invoices section and click Add
+            cy.contains(/recurring|récurrent/i).closest('.rounded-xl').find('button').contains(/add|new|créer|ajouter/i).click({ force: true });
             cy.wait(500);
 
             cy.get('[data-cy="recurring-invoice-dialog"]', { timeout: 5000 }).should('be.visible');
@@ -21,8 +19,8 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[data-cy="recurring-invoice-client-select-options"]').should('be.visible');
             cy.get('[data-cy="recurring-invoice-client-select-options"] button').first().click();
 
-            cy.get('button[role="combobox"][aria-label*="requency"], select[name="frequency"]').first().click({ force: true });
-            cy.get('[role="option"]').contains(/monthly|mensuel/i).click();
+            cy.contains('label', /frequency|fréquence/i).parent().find('button').click({ force: true });
+            cy.get('[role="option"]').eq(2).click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Monthly Retainer', { force: true });
@@ -40,10 +38,7 @@ describe('Recurring Invoices E2E', () => {
             cy.visit('/invoices');
             cy.wait(2000);
 
-            cy.contains(/recurring|récurrent/i, { timeout: 10000 }).click();
-            cy.wait(1000);
-
-            cy.contains('button', /add|new|créer|ajouter/i, { timeout: 10000 }).click();
+            cy.contains(/recurring|récurrent/i).closest('.rounded-xl').find('button').contains(/add|new|créer|ajouter/i).click({ force: true });
             cy.wait(500);
 
             cy.get('[data-cy="recurring-invoice-dialog"]', { timeout: 5000 }).should('be.visible');
@@ -53,8 +48,8 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[data-cy="recurring-invoice-client-select-options"]').should('be.visible');
             cy.get('[data-cy="recurring-invoice-client-select-options"] button').first().click();
 
-            cy.get('button[role="combobox"][aria-label*="requency"], select[name="frequency"]').first().click({ force: true });
-            cy.get('[role="option"]').contains(/weekly|hebdo/i).click();
+            cy.contains('label', /frequency|fréquence/i).parent().find('button').click({ force: true });
+            cy.get('[role="option"]').eq(0).click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Weekly Maintenance', { force: true });
@@ -74,16 +69,13 @@ describe('Recurring Invoices E2E', () => {
             cy.visit('/invoices');
             cy.wait(2000);
 
-            cy.contains(/recurring|récurrent/i, { timeout: 10000 }).click();
-            cy.wait(1000);
-
-            cy.contains('button', /add|new|créer|ajouter/i, { timeout: 10000 }).click();
+            cy.contains(/recurring|récurrent/i).closest('.rounded-xl').find('button').contains(/add|new|créer|ajouter/i).click({ force: true });
             cy.wait(500);
 
             cy.get('[data-cy="recurring-invoice-dialog"]', { timeout: 5000 }).should('be.visible');
 
-            cy.get('button[role="combobox"][aria-label*="requency"], select[name="frequency"]').first().click({ force: true });
-            cy.get('[role="option"]').first().click();
+            cy.contains('label', /frequency|fréquence/i).parent().find('button').click({ force: true });
+            cy.get('[role="option"]').eq(0).click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Test Item', { force: true });
@@ -100,10 +92,7 @@ describe('Recurring Invoices E2E', () => {
             cy.visit('/invoices');
             cy.wait(2000);
 
-            cy.contains(/recurring|récurrent/i, { timeout: 10000 }).click();
-            cy.wait(1000);
-
-            cy.contains('button', /add|new|créer|ajouter/i, { timeout: 10000 }).click();
+            cy.contains(/recurring|récurrent/i).closest('.rounded-xl').find('button').contains(/add|new|créer|ajouter/i).click({ force: true });
             cy.wait(500);
 
             cy.get('[data-cy="recurring-invoice-dialog"]', { timeout: 5000 }).should('be.visible');

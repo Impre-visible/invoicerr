@@ -69,8 +69,10 @@ describe('Receipts E2E', () => {
             cy.wait(2000);
 
             cy.get('body').then($body => {
-                if ($body.find('button').length > 3) {
-                    cy.get('button[tooltip*="View"], button[tooltip*="Voir"]').first().click({ force: true });
+                // Look for View PDF button (Receipt icon)
+                const buttons = $body.find('button:has(svg.lucide-receipt)');
+                if (buttons.length > 0) {
+                    cy.wrap(buttons).first().click({ force: true });
                     cy.get('[role="dialog"]').should('be.visible');
                 }
             });
