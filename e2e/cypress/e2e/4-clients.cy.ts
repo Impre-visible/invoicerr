@@ -324,8 +324,10 @@ describe('Clients E2E', () => {
             cy.get('[data-cy="client-submit"]').click();
 
             cy.get('[data-cy="client-dialog"]').should('not.exist');
+            cy.wait(2000);
 
             cy.get('[data-cy="edit-client-button-jane.doe@freelance.org"]').click();
+            cy.wait(2000);
             cy.get('[data-cy="client-dialog"]', { timeout: 5000 }).should('be.visible');
             cy.get('[name="description"]').should('have.value', 'A global technology leader');
 
