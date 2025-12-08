@@ -22,7 +22,6 @@ import SearchSelect from "@/components/search-input"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { dataCy } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -206,12 +205,12 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
     return (
         <>
             <Dialog open={open} onOpenChange={handleClose}>
-                <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden" {...dataCy('recurring-invoice-dialog')}>
+                <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden" dataCy="recurring-invoice-dialog">
                     <DialogHeader>
                         <DialogTitle>{t(`recurringInvoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1" {...dataCy('recurring-invoice-form')}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1" data-cy="recurring-invoice-form">
                             <FormField
                                 control={control}
                                 name="quoteId"
@@ -616,7 +615,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                 <Button variant="outline" onClick={() => handleClose(false)}>
                                     {t("recurringInvoices.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit" {...dataCy('recurring-invoice-submit')}>
+                                <Button type="submit" dataCy="recurring-invoice-submit">
                                     {t(`recurringInvoices.upsert.actions.${isEdit ? "save" : "create"}`)}
                                 </Button>
                             </DialogFooter>
