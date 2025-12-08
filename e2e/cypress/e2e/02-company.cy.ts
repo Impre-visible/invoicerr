@@ -12,19 +12,31 @@ describe('Company Settings E2E', () => {
 
             cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
             cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
+
             cy.get('[data-cy="company-legalid-input"]').clear().type('LEGAL123456');
             cy.get('[data-cy="company-vat-input"]').clear().type('FR12345678901');
+
+            cy.get('[data-cy="company-address-input"]').clear().type('123 Main Street');
+            cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
+            cy.get('[data-cy="company-city-input"]').clear().type('Paris');
+            cy.get('[data-cy="company-country-input"]').clear().type('France');
+
             cy.get('[data-cy="company-phone-input"]').clear().type('+33123456789');
             cy.get('[data-cy="company-email-input"]').clear().type('contact@acme.org');
-            cy.get('[data-cy="company-address-input"]').clear().type('123 Main Street');
-            cy.get('[data-cy="company-city-input"]').clear().type('Paris');
-            cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
-            cy.get('[data-cy="company-country-input"]').clear().type('France');
+
+            cy.get('[data-cy="company-currency-select"]').click();
+            cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
+
+            cy.get('[data-cy="company-pdfformat-select"]').click();
+            cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
+
+            cy.get('[data-cy="company-dateformat-select"]').click();
+            cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
 
             cy.get('[data-cy="company-submit-btn"]').click();
             // Attendre que la sauvegarde soit effectuée
             cy.wait(5000);
-            
+
             // Vérifier que la company a bien été créée
             cy.visit('/settings/company');
             cy.wait(3000);
@@ -123,7 +135,7 @@ describe('Company Settings E2E', () => {
             // Attendre que la page soit complètement chargée
             cy.wait(3000);
             cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
-            
+
             cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
             cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
             cy.get('[data-cy="company-legalid-input"]').clear().type('LEGAL123456');
@@ -135,10 +147,22 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
             cy.get('[data-cy="company-country-input"]').clear().type('France');
 
+            // Sélectionner la devise
+            cy.get('[data-cy="company-currency-select"]').click();
+            cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
+
+            // Sélectionner le format PDF
+            cy.get('[data-cy="company-pdfformat-select"]').click();
+            cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
+
+            // Sélectionner le format de date
+            cy.get('[data-cy="company-dateformat-select"]').click();
+            cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').click();
+
             cy.get('[data-cy="company-submit-btn"]').click();
             // Attendre que la sauvegarde soit effectuée
             cy.wait(5000);
-            
+
             // Vérifier que la company a bien été restaurée
             cy.visit('/settings/company');
             cy.wait(3000);

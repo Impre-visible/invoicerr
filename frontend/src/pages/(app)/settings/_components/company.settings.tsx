@@ -122,8 +122,6 @@ export default function CompanySettings() {
             }, t("settings.company.form.receiptNumberFormat.errors.format")),
         invoicePDFFormat: z
             .string()
-            .min(3, t("settings.company.form.invoicePDFFormat.errors.minLength"))
-            .max(10, t("settings.company.form.invoicePDFFormat.errors.maxLength"))
             .refine((val) => {
                 const validFormats = ['pdf', 'facturx', 'zugferd', 'xrechnung', 'ubl', 'cii']
                 return validFormats.includes(val.toLowerCase())
@@ -255,6 +253,7 @@ export default function CompanySettings() {
                                                     value={field.value || null}
                                                     onChange={field.onChange}
                                                     placeholder={t("settings.company.form.foundedAt.placeholder")}
+                                                    data-cy="company-foundedat-input"
                                                 />
                                             </FormControl>
                                             <FormDescription>{t("settings.company.form.foundedAt.description")}</FormDescription>
@@ -442,6 +441,7 @@ export default function CompanySettings() {
                                                         placeholder={t("settings.company.form.quoteStartingNumber.placeholder")}
                                                         {...field}
                                                         onChange={(e) => field.onChange(Number(e.target.value))}
+                                                        data-cy="company-quote-starting-number-input"
                                                     />
                                                 </FormControl>
                                                 <FormDescription>{t("settings.company.form.quoteStartingNumber.description")}</FormDescription>
@@ -456,7 +456,7 @@ export default function CompanySettings() {
                                             <FormItem>
                                                 <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} />
+                                                    <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} data-cy="company-quote-number-format-input" />
                                                 </FormControl>
                                                 <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
                                                 <FormMessage />
@@ -477,6 +477,7 @@ export default function CompanySettings() {
                                                         placeholder={t("settings.company.form.invoiceStartingNumber.placeholder")}
                                                         {...field}
                                                         onChange={(e) => field.onChange(Number(e.target.value))}
+                                                        data-cy="company-invoice-starting-number-input"
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
@@ -493,7 +494,7 @@ export default function CompanySettings() {
                                             <FormItem>
                                                 <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} />
+                                                    <Input placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")} {...field} data-cy="company-invoice-number-format-input" />
                                                 </FormControl>
                                                 <FormDescription>{t("settings.company.form.invoiceNumberFormat.description")}</FormDescription>
                                                 <FormMessage />
@@ -514,6 +515,7 @@ export default function CompanySettings() {
                                                         placeholder={t("settings.company.form.receiptStartingNumber.placeholder")}
                                                         {...field}
                                                         onChange={(e) => field.onChange(Number(e.target.value))}
+                                                        data-cy="company-receipt-starting-number-input"
                                                     />
                                                 </FormControl>
                                                 <FormDescription>
@@ -530,7 +532,7 @@ export default function CompanySettings() {
                                             <FormItem>
                                                 <FormLabel required>{t("settings.company.form.receiptNumberFormat.label")}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder={t("settings.company.form.receiptNumberFormat.placeholder")} {...field} />
+                                                    <Input placeholder={t("settings.company.form.receiptNumberFormat.placeholder")} {...field} data-cy="company-receipt-number-format-input" />
                                                 </FormControl>
                                                 <FormDescription>{t("settings.company.form.receiptNumberFormat.description")}</FormDescription>
                                                 <FormMessage />
@@ -556,16 +558,16 @@ export default function CompanySettings() {
                                         <FormLabel required>{t("settings.company.form.invoicePDFFormat.label")}</FormLabel>
                                         <FormControl>
                                             <Select onValueChange={field.onChange} value={field.value}>
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger className="w-full" data-cy="company-pdfformat-select">
                                                     <SelectValue placeholder={t("settings.company.form.invoicePDFFormat.placeholder")} />
                                                 </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="pdf">{t("settings.company.form.invoicePDFFormat.options.pdf")}</SelectItem>
-                                                    <SelectItem value="facturx">{t("settings.company.form.invoicePDFFormat.options.facturx")}</SelectItem>
-                                                    <SelectItem value="zugferd">{t("settings.company.form.invoicePDFFormat.options.zugferd")}</SelectItem>
-                                                    <SelectItem value="xrechnung">{t("settings.company.form.invoicePDFFormat.options.xrechnung")}</SelectItem>
-                                                    <SelectItem value="ubl">{t("settings.company.form.invoicePDFFormat.options.ubl")}</SelectItem>
-                                                    <SelectItem value="cii">{t("settings.company.form.invoicePDFFormat.options.cii")}</SelectItem>
+                                                <SelectContent data-cy="company-pdfformat-options">
+                                                    <SelectItem value="pdf" data-cy="company-pdfformat-option-pdf">{t("settings.company.form.invoicePDFFormat.options.pdf")}</SelectItem>
+                                                    <SelectItem value="facturx" data-cy="company-pdfformat-option-facturx">{t("settings.company.form.invoicePDFFormat.options.facturx")}</SelectItem>
+                                                    <SelectItem value="zugferd" data-cy="company-pdfformat-option-zugferd">{t("settings.company.form.invoicePDFFormat.options.zugferd")}</SelectItem>
+                                                    <SelectItem value="xrechnung" data-cy="company-pdfformat-option-xrechnung">{t("settings.company.form.invoicePDFFormat.options.xrechnung")}</SelectItem>
+                                                    <SelectItem value="ubl" data-cy="company-pdfformat-option-ubl">{t("settings.company.form.invoicePDFFormat.options.ubl")}</SelectItem>
+                                                    <SelectItem value="cii" data-cy="company-pdfformat-option-cii">{t("settings.company.form.invoicePDFFormat.options.cii")}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
@@ -583,12 +585,12 @@ export default function CompanySettings() {
                                         <FormLabel required>{t("settings.company.form.dateFormat.label")}</FormLabel>
                                         <FormControl>
                                             <Select onValueChange={field.onChange} value={field.value}>
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger className="w-full" data-cy="company-dateformat-select">
                                                     <SelectValue placeholder={t("settings.company.form.dateFormat.placeholder")} />
                                                 </SelectTrigger>
-                                                <SelectContent>
+                                                <SelectContent data-cy="company-dateformat-options">
                                                     {ALLOWED_DATE_FORMATS.map((format) => (
-                                                        <SelectItem key={format} value={format}>
+                                                        <SelectItem key={format} value={format} data-cy={`company-dateformat-option-${format.replace(/\//g, '-')}`}>
                                                             {getDateFormatOption(format)}
                                                         </SelectItem>
                                                     ))}
@@ -608,7 +610,7 @@ export default function CompanySettings() {
                                     <FormItem className="flex flex-col space-y-3">
                                         <FormLabel>{t("settings.company.form.exemptVat.label")}</FormLabel>
                                         <FormControl>
-                                            <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
+                                            <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} data-cy="company-exemptvat-switch" />
                                         </FormControl>
                                         <FormDescription>{t("settings.company.form.exemptVat.description")}</FormDescription>
                                         <FormMessage />
@@ -625,6 +627,6 @@ export default function CompanySettings() {
                     </div>
                 </form>
             </Form>
-        </div>
+        </div >
     )
 }

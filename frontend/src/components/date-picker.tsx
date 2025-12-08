@@ -16,6 +16,7 @@ interface DatePickerProps {
   placeholder?: string;
   className?: string;
   showOutsideDays?: boolean;
+  'data-cy'?: string;
 }
 
 const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
@@ -32,6 +33,7 @@ const DatePicker: React.FC<DatePickerProps> = (field: DatePickerProps) => {
               !field.value && "text-muted-foreground",
               field.className
             )}
+            data-cy={field['data-cy']}
           >
             {field.value ? (
               format(field.value, "PPP", {
