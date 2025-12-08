@@ -25,10 +25,10 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[role="option"]').contains(/monthly|mensuel/i).click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
-            cy.get('[name="items.0.description"]').type('Monthly Retainer');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('1500');
-            cy.get('[name="items.0.vatRate"]').clear().type('20');
+            cy.get('[name="items.0.description"]').type('Monthly Retainer', { force: true });
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('1500', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.get('[data-cy="recurring-invoice-submit"]').click();
 
@@ -57,10 +57,10 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[role="option"]').contains(/weekly|hebdo/i).click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
-            cy.get('[name="items.0.description"]').type('Weekly Maintenance');
-            cy.get('[name="items.0.quantity"]').clear().type('4');
-            cy.get('[name="items.0.unitPrice"]').clear().type('250');
-            cy.get('[name="items.0.vatRate"]').clear().type('20');
+            cy.get('[name="items.0.description"]').type('Weekly Maintenance', { force: true });
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('4', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('250', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.get('[data-cy="recurring-invoice-submit"]').click();
 
@@ -86,10 +86,10 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[role="option"]').first().click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
-            cy.get('[name="items.0.description"]').type('Test Item');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('0');
+            cy.get('[name="items.0.description"]').type('Test Item', { force: true });
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('0', { force: true });
 
             cy.get('[data-cy="recurring-invoice-submit"]').click();
             cy.get('[data-cy="recurring-invoice-dialog"]').should('be.visible');
@@ -114,10 +114,10 @@ describe('Recurring Invoices E2E', () => {
             cy.get('[data-cy="recurring-invoice-client-select-options"] button').first().click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
-            cy.get('[name="items.0.description"]').type('Test Item');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('0');
+            cy.get('[name="items.0.description"]').type('Test Item', { force: true });
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('0', { force: true });
 
             cy.get('[data-cy="recurring-invoice-submit"]').click();
             cy.get('[data-cy="recurring-invoice-dialog"]').should('be.visible');
