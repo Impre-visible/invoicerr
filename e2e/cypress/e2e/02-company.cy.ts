@@ -3,10 +3,12 @@ beforeEach(() => {
 });
 
 describe('Company Settings E2E', () => {
-    describe('Basic Company Information', () => {
-        it('fills in all company settings correctly', () => {
+    describe('1 - Initial Company Setup (Required for other tests)', () => {
+        it('creates the company with all required settings', () => {
             cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).should('be.visible');
+            // Attendre que la page soit complètement chargée
+            cy.wait(3000);
+            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
 
             cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
             cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
@@ -20,11 +22,18 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-country-input"]').clear().type('France');
 
             cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
+            // Attendre que la sauvegarde soit effectuée
+            cy.wait(5000);
+            
+            // Vérifier que la company a bien été créée
+            cy.visit('/settings/company');
+            cy.wait(3000);
+            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+            cy.get('[data-cy="company-name-input"]').should('have.value', 'Acme Corp');
         });
     });
 
-    describe('Validation Errors', () => {
+    describe('2 - Validation Errors', () => {
         it('shows error for empty company name', () => {
             cy.visit('/settings/company');
             cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear();
@@ -75,7 +84,7 @@ describe('Company Settings E2E', () => {
         });
     });
 
-    describe('Edge Cases', () => {
+    describe('3 - Edge Cases', () => {
         it('handles special characters in company name', () => {
             cy.visit('/settings/company');
             cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear().type("O'Reilly & Associates");
@@ -108,10 +117,14 @@ describe('Company Settings E2E', () => {
         });
     });
 
-    describe('Restore Valid State', () => {
+    describe('4 - Restore Valid State (Must run last)', () => {
         it('restores valid company settings for other tests', () => {
             cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear().type('Acme Corp');
+            // Attendre que la page soit complètement chargée
+            cy.wait(3000);
+            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+            
+            cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
             cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
             cy.get('[data-cy="company-legalid-input"]').clear().type('LEGAL123456');
             cy.get('[data-cy="company-vat-input"]').clear().type('FR12345678901');
@@ -123,7 +136,14 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-country-input"]').clear().type('France');
 
             cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
+            // Attendre que la sauvegarde soit effectuée
+            cy.wait(5000);
+            
+            // Vérifier que la company a bien été restaurée
+            cy.visit('/settings/company');
+            cy.wait(3000);
+            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+            cy.get('[data-cy="company-name-input"]').should('have.value', 'Acme Corp');
         });
     });
 });
