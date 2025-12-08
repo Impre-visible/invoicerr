@@ -43,7 +43,7 @@ describe('Settings E2E', () => {
             cy.visit('/settings/company');
             cy.wait(1000);
 
-            cy.get('[data-cy="company-name"], input[name="name"]').should('exist');
+            cy.get('[data-cy="company-name-input"], input[name="name"]').should('exist');
         });
     });
 
