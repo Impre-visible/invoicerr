@@ -6,7 +6,7 @@ describe('Company Settings E2E', () => {
     describe('1 - Initial Company Setup (Required for other tests)', () => {
         it('creates the company with all required settings', () => {
             cy.visit('/settings/company');
-            // Attendre que la page soit complètement chargée
+
             cy.wait(3000);
             cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
 
@@ -34,10 +34,8 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
 
             cy.get('[data-cy="company-submit-btn"]').click();
-            // Attendre que la sauvegarde soit effectuée
             cy.wait(5000);
 
-            // Vérifier que la company a bien été créée
             cy.visit('/settings/company');
             cy.wait(3000);
             cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
@@ -132,7 +130,6 @@ describe('Company Settings E2E', () => {
     describe('4 - Restore Valid State (Must run last)', () => {
         it('restores valid company settings for other tests', () => {
             cy.visit('/settings/company');
-            // Attendre que la page soit complètement chargée
             cy.wait(3000);
             cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
 
@@ -147,23 +144,18 @@ describe('Company Settings E2E', () => {
             cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
             cy.get('[data-cy="company-country-input"]').clear().type('France');
 
-            // Sélectionner la devise
             cy.get('[data-cy="company-currency-select"]').click();
             cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
 
-            // Sélectionner le format PDF
             cy.get('[data-cy="company-pdfformat-select"]').click();
             cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
 
-            // Sélectionner le format de date
             cy.get('[data-cy="company-dateformat-select"]').click();
-            cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').click();
+            cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
 
             cy.get('[data-cy="company-submit-btn"]').click();
-            // Attendre que la sauvegarde soit effectuée
             cy.wait(5000);
 
-            // Vérifier que la company a bien été restaurée
             cy.visit('/settings/company');
             cy.wait(3000);
             cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
