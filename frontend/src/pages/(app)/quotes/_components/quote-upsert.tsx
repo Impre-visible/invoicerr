@@ -443,7 +443,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                             )}
                                                         />
 
-                                                        <Button variant={"outline"} onClick={() => onRemove(index)}>
+                                                        <Button variant={"outline"} onClick={() => onRemove(index)} dataCy={`remove-item-${index}`}>
                                                             <Trash2 className="h-4 w-4 text-red-700" />
                                                         </Button>
                                                     </div>

@@ -28,9 +28,9 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Full website development');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('5000');
-            cy.get('[name="items.0.vatRate"]').clear().type('20');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('5000', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
 
@@ -60,15 +60,15 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Backend Development');
-            cy.get('[name="items.0.quantity"]').clear().type('40');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('20');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('40', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.1.description"]').type('Frontend Development');
-            cy.get('[name="items.1.quantity"]').clear().type('30');
-            cy.get('[name="items.1.unitPrice"]').clear().type('90');
-            cy.get('[name="items.1.vatRate"]').clear().type('20');
+            cy.get('[name="items.1.quantity"]').clear({ force: true }).type('30', { force: true });
+            cy.get('[name="items.1.unitPrice"]').clear({ force: true }).type('90', { force: true });
+            cy.get('[name="items.1.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
 
@@ -89,9 +89,9 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Test Item');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('0');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('0', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
             cy.get('[data-cy="quote-dialog"]').should('be.visible');
@@ -111,9 +111,9 @@ describe('Quotes E2E', () => {
             cy.get('[data-cy="quote-client-select-options"] button').first().click();
 
             cy.contains('button', /Add Item|Ajouter/i).click();
-            cy.get('[name="items.0.description"]').clear();
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
+            cy.get('[name="items.0.description"]').clear({ force: true });
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
             cy.get('[data-cy="quote-dialog"]').should('be.visible');
@@ -134,8 +134,8 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Test Item');
-            cy.get('[name="items.0.quantity"]').clear().type('0');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('0', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
             cy.get('[data-cy="quote-dialog"]').should('be.visible');
@@ -156,8 +156,8 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Test Item');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('-50');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('-50', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
             cy.get('[data-cy="quote-dialog"]').should('be.visible');
@@ -182,9 +182,9 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Enterprise Solution');
-            cy.get('[name="items.0.quantity"]').clear().type('1000');
-            cy.get('[name="items.0.unitPrice"]').clear().type('999.99');
-            cy.get('[name="items.0.vatRate"]').clear().type('20');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1000', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('999.99', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('20', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
 
@@ -208,9 +208,9 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Consulting per minute');
-            cy.get('[name="items.0.quantity"]').clear().type('120');
-            cy.get('[name="items.0.unitPrice"]').clear().type('1.50');
-            cy.get('[name="items.0.vatRate"]').clear().type('5.5');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('120', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('1.50', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('5.5', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
 
@@ -234,9 +234,9 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Item with "quotes" & symbols €£¥');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('0');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('0', { force: true });
 
             cy.get('[data-cy="quote-submit"]').click();
 
@@ -250,10 +250,7 @@ describe('Quotes E2E', () => {
             cy.visit('/quotes');
             cy.wait(2000);
 
-            cy.contains('Website Development Quote', { timeout: 5000 }).should('be.visible');
-            cy.contains('Website Development Quote').parent().parent().within(() => {
-                cy.get('button[tooltip*="View"], button[tooltip*="Voir"]').first().click();
-            });
+            cy.get('[data-cy="view-quote-website-development-quote"]', { timeout: 5000 }).first().click();
 
             cy.get('[role="dialog"]').should('be.visible');
             cy.contains('Website Development Quote');
@@ -265,13 +262,10 @@ describe('Quotes E2E', () => {
             cy.visit('/quotes');
             cy.wait(2000);
 
-            cy.contains('Decimal Price Quote', { timeout: 5000 }).should('be.visible');
-            cy.contains('Decimal Price Quote').parent().parent().within(() => {
-                cy.get('button').eq(3).click();
-            });
+            cy.get('[data-cy="edit-quote-decimal-price-quote"]', { timeout: 5000 }).first().click();
 
             cy.get('[data-cy="quote-dialog"]', { timeout: 5000 }).should('be.visible');
-            cy.get('[name="title"]').clear().type('Updated Decimal Price Quote');
+            cy.get('[name="title"]').clear({ force: true }).type('Updated Decimal Price Quote', { force: true });
             cy.get('[data-cy="quote-submit"]').click();
 
             cy.get('[data-cy="quote-dialog"]').should('not.exist');
@@ -284,10 +278,7 @@ describe('Quotes E2E', () => {
             cy.visit('/quotes');
             cy.wait(2000);
 
-            cy.contains("O'Reilly", { timeout: 5000 }).should('be.visible');
-            cy.contains("O'Reilly").parent().parent().within(() => {
-                cy.get('button').last().click();
-            });
+            cy.get('[data-cy="delete-quote-o\'reilly\'s-special-<project>-&-more"]', { timeout: 5000 }).first().click();
 
             cy.get('[role="alertdialog"], [role="dialog"]').within(() => {
                 cy.contains('button', /delete|confirm|supprimer|confirmer/i).click();
@@ -315,22 +306,22 @@ describe('Quotes E2E', () => {
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.0.description"]').type('Item to keep');
-            cy.get('[name="items.0.quantity"]').clear().type('1');
-            cy.get('[name="items.0.unitPrice"]').clear().type('100');
-            cy.get('[name="items.0.vatRate"]').clear().type('0');
+            cy.get('[name="items.0.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.0.unitPrice"]').clear({ force: true }).type('100', { force: true });
+            cy.get('[name="items.0.vatRate"]').clear({ force: true }).type('0', { force: true });
 
             cy.contains('button', /Add Item|Ajouter/i).click();
             cy.get('[name="items.1.description"]').type('Item to remove');
-            cy.get('[name="items.1.quantity"]').clear().type('1');
-            cy.get('[name="items.1.unitPrice"]').clear().type('50');
-            cy.get('[name="items.1.vatRate"]').clear().type('0');
+            cy.get('[name="items.1.quantity"]').clear({ force: true }).type('1', { force: true });
+            cy.get('[name="items.1.unitPrice"]').clear({ force: true }).type('50', { force: true });
+            cy.get('[name="items.1.vatRate"]').clear({ force: true }).type('0', { force: true });
 
-            cy.get('button[aria-label*="Remove"], button[aria-label*="Supprimer"]').last().click();
+            cy.get('[data-cy="remove-item-1"]').click();
 
             cy.get('[name="items.1.description"]').should('not.exist');
 
             cy.get('[data-cy="quote-submit"]').click();
-            
+
             cy.get('[data-cy="quote-dialog"]').should('not.exist');
             cy.contains('Quote with removable item', { timeout: 10000 });
         });
