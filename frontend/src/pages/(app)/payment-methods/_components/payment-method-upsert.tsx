@@ -7,7 +7,6 @@ import { authenticatedFetch, usePatch, usePost } from "@/hooks/use-fetch";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { dataCy } from "@/lib/utils";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -96,12 +95,12 @@ export function PaymentMethodUpsert({ paymentMethod, open, onOpenChange }: Payme
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl min-w-fit" {...dataCy('payment-method-dialog')}>
+      <DialogContent className="max-w-7xl min-w-fit" dataCy="payment-method-dialog">
         <DialogHeader>
           <DialogTitle>{t(`paymentMethods.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" {...dataCy('payment-method-form')}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" data-cy="payment-method-form">
             <FormField
               name="name"
               control={form.control}
@@ -141,15 +140,15 @@ export function PaymentMethodUpsert({ paymentMethod, open, onOpenChange }: Payme
                       value={field.value}
                       onValueChange={(val) => field.onChange(val as any)}
                     >
-                      <SelectTrigger className="w-full" size="sm" aria-label={t("paymentMethods.fields.type.label") as string} {...dataCy('payment-method-type-trigger')}>
+                      <SelectTrigger className="w-full" size="sm" aria-label={t("paymentMethods.fields.type.label") as string} dataCy="payment-method-type-trigger">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent {...dataCy('payment-method-type-content')}>
-                        <SelectItem value="BANK_TRANSFER" {...dataCy('payment-method-type-bank-transfer')}>{t("paymentMethods.fields.type.bank_transfer")}</SelectItem>
-                        <SelectItem value="PAYPAL" {...dataCy('payment-method-type-paypal')}>{t("paymentMethods.fields.type.paypal")}</SelectItem>
-                        <SelectItem value="CHECK" {...dataCy('payment-method-type-check')}>{t("paymentMethods.fields.type.check")}</SelectItem>
-                        <SelectItem value="CASH" {...dataCy('payment-method-type-cash')}>{t("paymentMethods.fields.type.cash")}</SelectItem>
-                        <SelectItem value="OTHER" {...dataCy('payment-method-type-other')}>{t("paymentMethods.fields.type.other")}</SelectItem>
+                      <SelectContent dataCy="payment-method-type-content">
+                        <SelectItem value="BANK_TRANSFER" dataCy="payment-method-type-bank-transfer">{t("paymentMethods.fields.type.bank_transfer")}</SelectItem>
+                        <SelectItem value="PAYPAL" dataCy="payment-method-type-paypal">{t("paymentMethods.fields.type.paypal")}</SelectItem>
+                        <SelectItem value="CHECK" dataCy="payment-method-type-check">{t("paymentMethods.fields.type.check")}</SelectItem>
+                        <SelectItem value="CASH" dataCy="payment-method-type-cash">{t("paymentMethods.fields.type.cash")}</SelectItem>
+                        <SelectItem value="OTHER" dataCy="payment-method-type-other">{t("paymentMethods.fields.type.other")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -162,7 +161,7 @@ export function PaymentMethodUpsert({ paymentMethod, open, onOpenChange }: Payme
               <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
                 {t("paymentMethods.actions.cancel") || "Cancel"}
               </Button>
-              <Button type="submit" disabled={creating || updating} {...dataCy('payment-method-submit')}>
+              <Button type="submit" disabled={creating || updating} dataCy="payment-method-submit">
                 {isEdit ? t("paymentMethods.actions.save") || "Save" : t("paymentMethods.actions.add") || "Add"}
               </Button>
             </div>

@@ -205,12 +205,12 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
     return (
         <>
             <Dialog open={open} onOpenChange={handleClose}>
-                <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden">
+                <DialogContent className="max-w-[95vw] lg:max-w-3xl max-h-[90dvh] flex flex-col overflow-hidden" dataCy="recurring-invoice-dialog">
                     <DialogHeader>
                         <DialogTitle>{t(`recurringInvoices.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-auto mt-2 flex-1" data-cy="recurring-invoice-form">
                             <FormField
                                 control={control}
                                 name="quoteId"
@@ -265,6 +265,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setClientsSearchTerm}
                                                 placeholder={t("recurringInvoices.upsert.form.client.placeholder")}
+                                                data-cy="recurring-invoice-client-select"
                                                 noResultsComponent={
                                                     <Button
                                                         variant="link"
@@ -287,7 +288,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                     <FormItem>
                                         <FormLabel>{t("recurringInvoices.upsert.form.currency.label")}</FormLabel>
                                         <FormControl>
-                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
+                                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} data-cy="recurring-invoice-currency-select" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -614,7 +615,7 @@ export function RecurringInvoiceUpsert({ recurringInvoice, open, onOpenChange }:
                                 <Button variant="outline" onClick={() => handleClose(false)}>
                                     {t("recurringInvoices.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit">
+                                <Button type="submit" dataCy="recurring-invoice-submit">
                                     {t(`recurringInvoices.upsert.actions.${isEdit ? "save" : "create"}`)}
                                 </Button>
                             </DialogFooter>

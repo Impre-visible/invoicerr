@@ -191,7 +191,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                         ) : (
                             <div className="divide-y">
                                 {invoices.map((invoice, index) => (
-                                    <div key={index} className="p-4 sm:p-6">
+                                    <div key={index} className="p-4 sm:p-6" data-cy="invoice-row">
                                         <div className="flex flex-row sm:items-center sm:justify-between gap-4">
                                             <div className="flex flex-row items-center gap-4 w-full">
                                                 <div className="p-2 bg-blue-100 rounded-lg mb-4 md:mb-0 w-fit h-fit">
@@ -206,6 +206,7 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
                                                             })}
                                                         </h3>
                                                         <span
+                                                            data-cy="invoice-status"
                                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}
                                                         >
                                                             {getStatusLabel(invoice.status)}
@@ -334,11 +335,12 @@ export const InvoiceList = forwardRef<InvoiceListHandle, InvoiceListProps>(
 
                                                 {invoice.status !== "PAID" && (
                                                     <Button
+                                                        data-cy="invoice-edit-button"
                                                         tooltip={t("invoices.list.tooltips.edit")}
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleEdit(invoice)}
-                                                        className="text-gray-600 hover:text-green-600"
+                                                        className="text-gray-600 hover:text-blue-600"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                     </Button>

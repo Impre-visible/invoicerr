@@ -46,7 +46,7 @@ export function ClientDeleteDialog({ client, onOpenChange }: ClientDeleteDialogP
                     <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>
                         {t('clients.delete.actions.cancel')}
                     </Button>
-                    <Button variant="destructive" className="w-full" onClick={handleDelete}>
+                    <Button variant="destructive" className="w-full" onClick={handleDelete} dataCy="confirm-delete-client-button">
                         {t('clients.delete.actions.delete')}
                     </Button>
                 </DialogFooter>

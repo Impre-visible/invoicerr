@@ -38,8 +38,6 @@ const createOidcConfig = (): GenericOAuthConfig[] => {
         }
     }
 
-    console.log("OIDC Config:", config);
-
     return [config];
 };
 
@@ -70,13 +68,17 @@ const validateInvitationForSignup = async (email: string): Promise<{ valid: bool
 const markInvitationAsUsed = async (email: string, userId: string) => {
     const invitationCode = pendingInvitationCodes.get(email);
     if (invitationCode) {
-        await prisma.invitationCode.update({
-            where: { code: invitationCode },
-            data: {
-                usedAt: new Date(),
-                usedById: userId,
-            },
-        });
+        try {
+            await prisma.invitationCode.update({
+                where: { code: invitationCode },
+                data: {
+                    usedAt: new Date(),
+                    usedById: userId,
+                },
+            });
+        } catch (error) {
+            console.warn(`Could not mark invitation code as used: ${error}`);
+        }
         pendingInvitationCodes.delete(email);
     }
 };

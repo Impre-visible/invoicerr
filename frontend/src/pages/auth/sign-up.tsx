@@ -182,6 +182,7 @@ export default function SignupPage() {
                                     name="firstname"
                                     placeholder={t("auth.signup.form.firstname.placeholder")}
                                     disabled={loading}
+                                    data-cy="auth-firstname-input"
                                 />
                                 {errors.firstname && (
                                     <p className="text-sm text-red-600">{errors.firstname[0]}</p>
@@ -196,6 +197,7 @@ export default function SignupPage() {
                                     name="lastname"
                                     placeholder={t("auth.signup.form.lastname.placeholder")}
                                     disabled={loading}
+                                    data-cy="auth-lastname-input"
                                 />
                                 {errors.lastname && (
                                     <p className="text-sm text-red-600">{errors.lastname[0]}</p>
@@ -210,6 +212,7 @@ export default function SignupPage() {
                                 type="email"
                                 placeholder={t("auth.signup.form.email.placeholder")}
                                 disabled={loading}
+                                data-cy="auth-email-input"
                             />
                             {errors.email && (
                                 <p className="text-sm text-red-600">{errors.email[0]}</p>
@@ -227,6 +230,7 @@ export default function SignupPage() {
                                     type={showPassword ? "text" : "password"}
                                     placeholder={t("auth.signup.form.password.placeholder")}
                                     disabled={loading}
+                                    data-cy="auth-password-input"
                                 />
                                 <Button
                                     type="button"
@@ -268,6 +272,7 @@ export default function SignupPage() {
                                         placeholder={t("auth.signup.form.invitationCode.placeholder")}
                                         disabled={loading}
                                         className="font-mono uppercase"
+                                        data-cy="auth-invitation-code-input"
                                     />
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -279,7 +284,7 @@ export default function SignupPage() {
                             </div>
                         )}
 
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="w-full" disabled={loading} data-cy="auth-submit-btn">
                             {loading
                                 ? t("auth.signup.form.creatingAccount")
                                 : t("auth.signup.form.createButton")}
@@ -291,6 +296,7 @@ export default function SignupPage() {
                             <a
                                 href="/auth/sign-in"
                                 className="underline hover:text-primary cursor-pointer"
+                                data-cy="auth-signin-link"
                             >
                                 {t("auth.signup.signInLink")}
                             </a>

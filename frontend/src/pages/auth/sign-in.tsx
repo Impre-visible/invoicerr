@@ -69,8 +69,8 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email">{t("auth.login.form.email.label")}</Label>
-                            <Input id="email" name="email" type="email" disabled={loading} />
-                            {errors.email && <p className="text-sm text-red-600">{errors.email[0]}</p>}
+                            <Input id="email" name="email" type="email" disabled={loading} data-cy="auth-email-input" />
+                            {errors.email && <p className="text-sm text-red-600" data-cy="auth-email-error">{errors.email[0]}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="password">{t("auth.login.form.password.label")}</Label>
@@ -80,6 +80,7 @@ export default function LoginPage() {
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     disabled={loading}
+                                    data-cy="auth-password-input"
                                 />
                                 <Button
                                     type="button"
@@ -95,14 +96,14 @@ export default function LoginPage() {
                             </div>
                             {errors.password && <p className="text-sm text-red-600">{errors.password[0]}</p>}
                         </div>
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="w-full" disabled={loading} data-cy="auth-submit-btn">
                             {loading ? t("auth.login.form.loggingIn") : t("auth.login.form.loginButton")}
                         </Button>
                     </form>
                     <section className="flex flex-col mt-4 gap-1">
                         <div className="text-center text-sm">
                             {t("auth.login.noAccount")}{" "}
-                            <a href="/auth/sign-up" className="underline hover:text-primary">
+                            <a href="/auth/sign-up" className="underline hover:text-primary" data-cy="auth-signup-link">
                                 {t("auth.login.signUpLink")}
                             </a>
                         </div>

@@ -22,7 +22,6 @@ import { PaymentMethodType } from "@/types"
 import type React from "react"
 import SearchSelect from "@/components/search-input"
 import { Textarea } from "@/components/ui/textarea"
-import { dataCy } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -188,12 +187,12 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="max-w-sm lg:max-w-4xl" {...dataCy('quote-dialog')}>
+                <DialogContent className="max-w-sm lg:max-w-4xl" dataCy="quote-dialog">
                     <DialogHeader>
                         <DialogTitle>{t(`quotes.upsert.title.${isEdit ? "edit" : "create"}`)}</DialogTitle>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" {...dataCy('quote-form')}>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" data-cy="quote-form">
                             <FormField
                                 control={control}
                                 name="title"
@@ -221,7 +220,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                 onValueChange={(val) => field.onChange(val || null)}
                                                 onSearchChange={setSearchTerm}
                                                 placeholder={t("quotes.upsert.form.client.placeholder")}
-                                                {...dataCy('quote-client-select')}
+                                                data-cy="quote-client-select"
                                                 noResultsComponent={
                                                     <Button
                                                         variant="link"
@@ -443,7 +442,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                                             )}
                                                         />
 
-                                                        <Button variant={"outline"} onClick={() => onRemove(index)}>
+                                                        <Button variant={"outline"} onClick={() => onRemove(index)} dataCy={`remove-item-${index}`}>
                                                             <Trash2 className="h-4 w-4 text-red-700" />
                                                         </Button>
                                                     </div>
@@ -476,7 +475,7 @@ export function QuoteUpsert({ quote, open, onOpenChange }: QuoteUpsertDialogProp
                                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                     {t("quotes.upsert.actions.cancel")}
                                 </Button>
-                                <Button type="submit" {...dataCy('quote-submit')}>
+                                <Button type="submit" dataCy="quote-submit">
                                     {t(`quotes.upsert.actions.${isEdit ? "save" : "create"}`)}
                                 </Button>
                             </div>

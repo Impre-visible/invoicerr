@@ -64,12 +64,14 @@ function Button({
   variant,
   size,
   asChild = false,
+  dataCy,
   ...props
 }: React.ComponentProps<"button"> & {
   loading?: boolean
 } & VariantProps<typeof buttonVariants> & {
   asChild?: boolean
   tooltip?: string
+  dataCy?: string
 }) {
   if (!tooltip) {
     return (
@@ -79,6 +81,7 @@ function Button({
         variant={variant}
         size={size}
         asChild={asChild}
+        data-cy={dataCy}
         disabled={disabled || loading}
         {...props}
       />
@@ -95,6 +98,7 @@ function Button({
           size={size}
           asChild={asChild}
           disabled={disabled || loading}
+          data-cy={dataCy}
           {...props}
         />
       </TooltipTrigger>

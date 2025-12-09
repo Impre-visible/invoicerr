@@ -8,29 +8,15 @@ const ALLOWED_PATHS = [
     '/signature/[^/]+',
 ];
 
-const Layout = () => {
-    const location = useLocation();
-    const {
-        data: session,
-        isPending,
-    } = authClient.useSession();
-
-    // Rediriger vers sign-in si pas de session et pas sur un chemin autorisé
-    if (!isPending && !session) {
-        const isAllowedPath = ALLOWED_PATHS.some(path => location.pathname.match(new RegExp(path)));
-        if (!isAllowedPath) {
-            return <Navigate to="/auth/sign-in" />;
-        }
-    }
-
+const AuthenticatedLayout = () => {
     return (
         <SidebarProvider>
             <section className="flex flex-col min-h-screen h-screen max-h-screen w-full max-w-screen overflow-y-auto overflow-x-hidden">
                 <main className="flex flex-1 h-full w-full max-w-screen overflow-y-auto overflow-x-hidden">
-                    {session && !isPending && <Sidebar />}
+                    <Sidebar />
                     <section className="flex flex-col flex-1 h-full w-full max-w-screen overflow-hidden">
                         <header className="p-4 bg-header border-b">
-                            {session && !isPending && <SidebarTrigger />}
+                            <SidebarTrigger />
                         </header>
                         <section className="h-full overflow-y-auto overflow-x-hidden">
                             <Outlet />
@@ -40,6 +26,43 @@ const Layout = () => {
             </section>
         </SidebarProvider>
     );
+};
+
+const UnauthenticatedLayout = () => {
+    return (
+        <section className="flex flex-col min-h-screen h-screen max-h-screen w-full max-w-screen overflow-y-auto overflow-x-hidden">
+            <main className="flex flex-1 h-full w-full max-w-screen overflow-y-auto overflow-x-hidden">
+                <section className="flex flex-col flex-1 h-full w-full max-w-screen overflow-hidden">
+                    <header className="p-4 bg-header border-b" />
+                    <section className="h-full overflow-y-auto overflow-x-hidden">
+                        <Outlet />
+                    </section>
+                </section>
+            </main>
+        </section>
+    );
+};
+
+const Layout = () => {
+    const location = useLocation();
+    const {
+        data: session,
+        isPending,
+    } = authClient.useSession();
+
+    if (isPending) {
+        return null;
+    }
+
+    if (!session) {
+        const isAllowedPath = ALLOWED_PATHS.some(path => location.pathname.match(new RegExp(path)));
+        if (!isAllowedPath) {
+            return <Navigate to="/auth/sign-in" />;
+        }
+        return <UnauthenticatedLayout />;
+    }
+
+    return <AuthenticatedLayout />;
 };
 
 export default Layout;

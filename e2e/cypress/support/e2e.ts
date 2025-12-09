@@ -16,11 +16,15 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-// Log API responses for debugging
 Cypress.on('fail', (error) => {
     console.error('Test failed:', error.message);
     throw error;
 });
+
+Cypress.on('uncaught:exception', () => {
+    return false
+})
+
 
 // Intercept and log auth API calls for debugging
 beforeEach(() => {

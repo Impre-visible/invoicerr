@@ -239,6 +239,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                     size="icon"
                                                     onClick={() => handleView(quote)}
                                                     className="text-gray-600 hover:text-blue-600"
+                                                    dataCy={`view-quote-${quote.title?.replace(/\s+/g, '-').toLowerCase()}`}
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </Button>
@@ -270,6 +271,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         size="icon"
                                                         onClick={() => handleEdit(quote)}
                                                         className="text-gray-600 hover:text-green-600"
+                                                        dataCy={`edit-quote-${quote.title?.replace(/\s+/g, '-').toLowerCase()}`}
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
@@ -313,6 +315,7 @@ export const QuoteList = forwardRef<QuoteListHandle, QuoteListProps>(
                                                         size="icon"
                                                         onClick={() => handleDelete(quote)}
                                                         className="text-gray-600 hover:text-red-600"
+                                                        dataCy={`delete-quote-${quote.title?.replace(/\s+/g, '-').toLowerCase()}`}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
