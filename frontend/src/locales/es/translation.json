@@ -1480,6 +1480,10 @@
         }
     },
     "common": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "loading": "Cargando...",
+        "finish": "Terminar",
         "units": {
             "day": "Día",
             "week": "Semana",
