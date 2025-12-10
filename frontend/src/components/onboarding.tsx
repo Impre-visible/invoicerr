@@ -50,18 +50,18 @@ export interface OnBoardingData {
   exemptVat?: boolean
 }
 
-const STEPS = [
-  { id: "basic", label: "Infos" },
-  { id: "address", label: "Adresse" },
-  { id: "contact", label: "Contact" },
-  { id: "settings", label: "Numérotation" },
-]
 
 export default function OnBoarding({
   isLoading: externalLoading,
   isOpen = true,
 }: OnBoardingProps) {
   const { t } = useTranslation()
+  const STEPS = [
+    { id: "basic", label: t("onboarding.steps.basic") },
+    { id: "address", label: t("onboarding.steps.address") },
+    { id: "contact", label: t("onboarding.steps.contact") },
+    { id: "settings", label: t("onboarding.steps.settings") },
+  ]
   const [isLoading, setIsLoading] = useState(false)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
