@@ -5,10 +5,9 @@ beforeEach(() => {
 describe('Company Settings E2E', () => {
     describe('1 - Initial Company Setup (Required for other tests)', () => {
         it('creates the company via onboarding', () => {
-            // Visit home page where onboarding should appear
             cy.visit('/');
 
-            cy.get('[role="dialog"]', { timeout: 10000 }).should('be.visible');
+            cy.get('[data-cy="onboarding-dialog"]', { timeout: 10000 }).should('be.visible');
 
             cy.get('[data-cy="onboarding-company-name-input"]').clear().type('Acme Corp');
             cy.get('[data-cy="onboarding-company-description-input"]').clear().type('A fictional company');
@@ -40,7 +39,7 @@ describe('Company Settings E2E', () => {
 
             cy.get('[data-cy="onboarding-submit-btn"]').click();
 
-            cy.get('[role="dialog"]').should('not.exist');
+            cy.get('[data-cy="onboarding-dialog"]').should('not.exist');
 
             cy.visit('/settings/company');
             cy.wait(3000);

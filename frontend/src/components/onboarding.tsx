@@ -61,13 +61,11 @@ export default function OnBoarding({
   onComplete,
   isLoading: externalLoading,
   isOpen = true,
-  onOpenChange,
 }: OnBoardingProps) {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [activeTab, setActiveTab] = useState("basic")
 
   const ALLOWED_DATE_FORMATS = [
     "dd/MM/yyyy",
@@ -269,7 +267,7 @@ export default function OnBoarding({
 
   return (
     <Dialog open={isOpen}>
-      <DialogContent className="!max-w-[50vw] max-h-[90vh] overflow-y-auto p-8" showCloseButton={false}>
+      <DialogContent className="!max-w-[50vw] max-h-[90vh] overflow-y-auto p-8" showCloseButton={false} data-cy="onboarding-dialog">
         <DialogHeader>
           <DialogTitle>{t("settings.company.title")}</DialogTitle>
           <DialogDescription>{t("settings.company.description")}</DialogDescription>
