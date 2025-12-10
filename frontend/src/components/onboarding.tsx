@@ -753,7 +753,7 @@ export default function OnBoarding({
                 </Button>
               ) : (
                 <Button type="submit" disabled={loading} data-cy="onboarding-submit-btn">
-                  {loading ? "Chargement..." : "Terminer"}
+                  {loading ? t("common.loading") : t("common.finish")}
                 </Button>
               )}
             </div>
