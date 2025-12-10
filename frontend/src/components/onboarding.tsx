@@ -6,6 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { Button } from "@/components/ui/button"
+import type { Company } from "@/types"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
@@ -14,16 +15,15 @@ import { Switch } from "@/components/ui/switch"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
+import { usePost } from "@/hooks/use-fetch"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 interface OnBoardingProps {
-  onComplete?: (data: OnBoardingData) => void | Promise<void>
   isLoading?: boolean
   isOpen?: boolean
-  onOpenChange?: (open: boolean) => void
 }
 
 export interface OnBoardingData {
@@ -58,7 +58,6 @@ const STEPS = [
 ]
 
 export default function OnBoarding({
-  onComplete,
   isLoading: externalLoading,
   isOpen = true,
 }: OnBoardingProps) {
@@ -66,6 +65,8 @@ export default function OnBoarding({
   const [isLoading, setIsLoading] = useState(false)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
+
+  const { trigger } = usePost<Company>("/api/company/info")
 
   const ALLOWED_DATE_FORMATS = [
     "dd/MM/yyyy",
@@ -223,9 +224,7 @@ export default function OnBoarding({
   async function onSubmit(values: z.infer<typeof companySchema>) {
     setIsLoading(true)
     try {
-      if (onComplete) {
-        await onComplete(values)
-      }
+      trigger(values)
       toast.success(t("settings.company.messages.updateSuccess"))
     } catch (error) {
       console.error("Error during onboarding:", error)
