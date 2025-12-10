@@ -40,6 +40,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useSse } from "@/hooks/use-fetch"
 import { useTheme } from "./theme-provider"
 import { useTranslation } from "react-i18next"
+import OnBoarding from "./onboarding"
 
 export function Sidebar() {
     const { t } = useTranslation()
@@ -111,17 +112,7 @@ export function Sidebar() {
 
     return (
         <RootSidebar collapsible="icon">
-            <Dialog open={!companyLoading && (!company || !company.name) && location.pathname !== "/settings/company"}>
-                <DialogContent className="[&>button]:hidden">
-                    <DialogHeader>
-                        <DialogTitle>{t("sidebar.companyDialog.title")}</DialogTitle>
-                    </DialogHeader>
-                    <p className="text-sm text-muted-foreground">{t("sidebar.companyDialog.description")}</p>
-                    <DialogFooter>
-                        <Button onClick={() => navigate("/settings/company")}>{t("sidebar.companyDialog.goButton")}</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <OnBoarding isOpen={!companyLoading && (!company || !company.name) && location.pathname !== "/settings/company"} />
 
             <SidebarHeader className="px-2">
                 <SidebarMenu>
