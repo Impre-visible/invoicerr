@@ -14,7 +14,6 @@ import {
     User,
     Users,
 } from "lucide-react"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
 import { Link, useLocation, useNavigate } from "react-router"
@@ -33,6 +32,7 @@ import {
 
 import { Button } from "./ui/button"
 import type { Company } from "@/types"
+import OnBoarding from "./onboarding"
 import type React from "react"
 import { Skeleton } from "./ui/skeleton"
 import { authClient } from "@/lib/auth"
@@ -40,7 +40,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useSse } from "@/hooks/use-fetch"
 import { useTheme } from "./theme-provider"
 import { useTranslation } from "react-i18next"
-import OnBoarding from "./onboarding"
 
 export function Sidebar() {
     const { t } = useTranslation()
