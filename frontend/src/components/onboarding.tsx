@@ -224,7 +224,7 @@ export default function OnBoarding({
   async function onSubmit(values: z.infer<typeof companySchema>) {
     setIsLoading(true)
     try {
-      trigger(values)
+      await trigger(values)
       toast.success(t("settings.company.messages.updateSuccess"))
     } catch (error) {
       console.error("Error during onboarding:", error)
