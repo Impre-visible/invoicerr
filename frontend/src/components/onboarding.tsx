@@ -1,22 +1,23 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import CurrencySelect from "@/components/currency-select"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
+import { StepIndicator } from "./step-indicator"
 import { Switch } from "@/components/ui/switch"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { StepIndicator } from "./step-indicator"
 
 interface OnBoardingProps {
   onComplete?: (data: OnBoardingData) => void | Promise<void>
@@ -278,348 +279,106 @@ export default function OnBoarding({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <StepIndicator steps={STEPS} currentStep={currentStepIndex} completedSteps={completedSteps} />
 
-          {/* Basic Info Step */}
-          {currentStepIndex === 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{STEPS[0].label}</CardTitle>
-                <CardDescription>{t("settings.company.basicInfoDescription")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.company.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.company.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.company.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.company.form.description.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.description.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.description.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="foundedAt"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.foundedAt.label")}</FormLabel>
-                        <FormControl>
-                          <DatePicker
-                            className="w-full bg-opacity-100"
-                            value={field.value || null}
-                            onChange={field.onChange}
-                            placeholder={t("settings.company.form.foundedAt.placeholder")}
-                          />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.foundedAt.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="currency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.currency.label")}</FormLabel>
-                        <FormControl>
-                          <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.currency.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="legalId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.company.form.legalId.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.legalId.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="VAT"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("settings.company.form.vat.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.vat.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Address Step */}
-          {currentStepIndex === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{STEPS[1].label}</CardTitle>
-                <CardDescription>{t("settings.company.address.description")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required>{t("settings.company.form.address.label")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("settings.company.form.address.placeholder")} {...field} />
-                      </FormControl>
-                      <FormDescription>{t("settings.company.form.address.description")}</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.postalCode.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.postalCode.placeholder")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.city.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.city.placeholder")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.country.label")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("settings.company.form.country.placeholder")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Contact Step */}
-          {currentStepIndex === 2 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>{STEPS[2].label}</CardTitle>
-                <CardDescription>{t("settings.company.contact.description")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.phone.label")}</FormLabel>
-                        <FormControl>
-                          <Input type="tel" placeholder={t("settings.company.form.phone.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.phone.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.email.label")}</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.email.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Settings Step */}
-          {currentStepIndex === 3 && (
-            <>
+            {/* Basic Info Step */}
+            {currentStepIndex === 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>{STEPS[3].label}</CardTitle>
-                  <CardDescription>{t("settings.company.numbering.description")}</CardDescription>
+                  <CardTitle>{STEPS[0].label}</CardTitle>
+                  <CardDescription>{t("settings.company.basicInfoDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
-                      name="quoteStartingNumber"
+                      name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.quoteStartingNumber.label")}</FormLabel>
+                          <FormLabel required>{t("settings.company.form.company.label")}</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              placeholder={t("settings.company.form.quoteStartingNumber.placeholder")}
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
-                            />
+                            <Input placeholder={t("settings.company.form.company.placeholder")} {...field} data-cy="onboarding-company-name-input" />
                           </FormControl>
-                          <FormDescription>
-                            {t("settings.company.form.quoteStartingNumber.description")}
-                          </FormDescription>
+                          <FormDescription>{t("settings.company.form.company.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
-                      name="quoteNumberFormat"
+                      name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
+                          <FormLabel>{t("settings.company.form.description.label")}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} />
+                            <Input placeholder={t("settings.company.form.description.placeholder")} {...field} data-cy="onboarding-company-description-input" />
                           </FormControl>
-                          <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
+                          <FormDescription>{t("settings.company.form.description.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
-                      name="invoiceStartingNumber"
+                      name="foundedAt"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.invoiceStartingNumber.label")}</FormLabel>
+                          <FormLabel required>{t("settings.company.form.foundedAt.label")}</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              placeholder={t("settings.company.form.invoiceStartingNumber.placeholder")}
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
+                            <DatePicker
+                              className="w-full bg-opacity-100"
+                              value={field.value || null}
+                              onChange={field.onChange}
+                              placeholder={t("settings.company.form.foundedAt.placeholder")}
+                              data-cy="onboarding-company-foundedat-input"
                             />
                           </FormControl>
-                          <FormDescription>
-                            {t("settings.company.form.invoiceStartingNumber.description")}
-                          </FormDescription>
+                          <FormDescription>{t("settings.company.form.foundedAt.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
-                      name="invoiceNumberFormat"
+                      name="currency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
+                          <FormLabel required>{t("settings.company.form.currency.label")}</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")}
-                              {...field}
-                            />
+                            <CurrencySelect value={field.value} onChange={(value) => field.onChange(value)} data-cy="onboarding-company-currency-select" />
                           </FormControl>
-                          <FormDescription>
-                            {t("settings.company.form.invoiceNumberFormat.description")}
-                          </FormDescription>
+                          <FormDescription>{t("settings.company.form.currency.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
-                      name="receiptStartingNumber"
+                      name="legalId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.receiptStartingNumber.label")}</FormLabel>
+                          <FormLabel>{t("settings.company.form.legalId.label")}</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              placeholder={t("settings.company.form.receiptStartingNumber.placeholder")}
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
-                            />
+                            <Input placeholder={t("settings.company.form.legalId.placeholder")} {...field} data-cy="onboarding-company-legalid-input" />
                           </FormControl>
-                          <FormDescription>
-                            {t("settings.company.form.receiptStartingNumber.description")}
-                          </FormDescription>
+                          <FormDescription>{t("settings.company.form.legalId.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
-                      name="receiptNumberFormat"
+                      name="VAT"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel required>{t("settings.company.form.receiptNumberFormat.label")}</FormLabel>
+                          <FormLabel>{t("settings.company.form.vat.label")}</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder={t("settings.company.form.receiptNumberFormat.placeholder")}
-                              {...field}
-                            />
+                            <Input placeholder={t("settings.company.form.vat.placeholder")} {...field} data-cy="onboarding-company-vat-input" />
                           </FormControl>
-                          <FormDescription>
-                            {t("settings.company.form.receiptNumberFormat.description")}
-                          </FormDescription>
+                          <FormDescription>{t("settings.company.form.vat.description")}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -627,131 +386,381 @@ export default function OnBoarding({
                   </div>
                 </CardContent>
               </Card>
+            )}
 
+            {/* Address Step */}
+            {currentStepIndex === 1 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("settings.company.other.title")}</CardTitle>
-                  <CardDescription>{t("settings.company.other.description")}</CardDescription>
+                  <CardTitle>{STEPS[1].label}</CardTitle>
+                  <CardDescription>{t("settings.company.address.description")}</CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CardContent className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="invoicePDFFormat"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel required>{t("settings.company.form.invoicePDFFormat.label")}</FormLabel>
+                        <FormLabel required>{t("settings.company.form.address.label")}</FormLabel>
                         <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder={t("settings.company.form.invoicePDFFormat.placeholder")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pdf">
-                                {t("settings.company.form.invoicePDFFormat.options.pdf")}
-                              </SelectItem>
-                              <SelectItem value="facturx">
-                                {t("settings.company.form.invoicePDFFormat.options.facturx")}
-                              </SelectItem>
-                              <SelectItem value="zugferd">
-                                {t("settings.company.form.invoicePDFFormat.options.zugferd")}
-                              </SelectItem>
-                              <SelectItem value="xrechnung">
-                                {t("settings.company.form.invoicePDFFormat.options.xrechnung")}
-                              </SelectItem>
-                              <SelectItem value="ubl">
-                                {t("settings.company.form.invoicePDFFormat.options.ubl")}
-                              </SelectItem>
-                              <SelectItem value="cii">
-                                {t("settings.company.form.invoicePDFFormat.options.cii")}
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Input placeholder={t("settings.company.form.address.placeholder")} {...field} data-cy="onboarding-company-address-input" />
                         </FormControl>
-                        <FormDescription>{t("settings.company.form.invoicePDFFormat.description")}</FormDescription>
+                        <FormDescription>{t("settings.company.form.address.description")}</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="dateFormat"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel required>{t("settings.company.form.dateFormat.label")}</FormLabel>
-                        <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder={t("settings.company.form.dateFormat.placeholder")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ALLOWED_DATE_FORMATS.map((format) => (
-                                <SelectItem key={format} value={format}>
-                                  {getDateFormatOption(format)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.dateFormat.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.postalCode.label")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("settings.company.form.postalCode.placeholder")} {...field} data-cy="onboarding-company-postalcode-input" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="exemptVat"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col space-y-3">
-                        <FormLabel>{t("settings.company.form.exemptVat.label")}</FormLabel>
-                        <FormControl>
-                          <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
-                        </FormControl>
-                        <FormDescription>{t("settings.company.form.exemptVat.description")}</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.city.label")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("settings.company.form.city.placeholder")} {...field} data-cy="onboarding-company-city-input" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.country.label")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("settings.company.form.country.placeholder")} {...field} data-cy="onboarding-company-country-input" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </CardContent>
               </Card>
-            </>
-          )}
+            )}
 
-          <div className="flex justify-between gap-4 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={currentStepIndex === 0 || loading}
-              onClick={() => {
-                setCurrentStepIndex(currentStepIndex - 1)
-              }}
-            >
-                {t("common.previous")}
-            </Button>
+            {/* Contact Step */}
+            {currentStepIndex === 2 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{STEPS[2].label}</CardTitle>
+                  <CardDescription>{t("settings.company.contact.description")}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.phone.label")}</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder={t("settings.company.form.phone.placeholder")} {...field} data-cy="onboarding-company-phone-input" />
+                          </FormControl>
+                          <FormDescription>{t("settings.company.form.phone.description")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-            {currentStepIndex < STEPS.length - 1 ? (
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.email.label")}</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder={t("settings.company.form.email.placeholder")} {...field} data-cy="onboarding-company-email-input" />
+                          </FormControl>
+                          <FormDescription>{t("settings.company.form.email.description")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Settings Step */}
+            {currentStepIndex === 3 && (
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{STEPS[3].label}</CardTitle>
+                    <CardDescription>{t("settings.company.numbering.description")}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="quoteStartingNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.quoteStartingNumber.label")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder={t("settings.company.form.quoteStartingNumber.placeholder")}
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                data-cy="onboarding-company-quote-starting-number-input"
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {t("settings.company.form.quoteStartingNumber.description")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="quoteNumberFormat"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.quoteNumberFormat.label")}</FormLabel>
+                            <FormControl>
+                              <Input placeholder={t("settings.company.form.quoteNumberFormat.placeholder")} {...field} data-cy="onboarding-company-quote-number-format-input" />
+                            </FormControl>
+                            <FormDescription>{t("settings.company.form.quoteNumberFormat.description")}</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="invoiceStartingNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.invoiceStartingNumber.label")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder={t("settings.company.form.invoiceStartingNumber.placeholder")}
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                data-cy="onboarding-company-invoice-starting-number-input"
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {t("settings.company.form.invoiceStartingNumber.description")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="invoiceNumberFormat"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.invoiceNumberFormat.label")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("settings.company.form.invoiceNumberFormat.placeholder")}
+                                {...field}
+                                data-cy="onboarding-company-invoice-number-format-input"
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {t("settings.company.form.invoiceNumberFormat.description")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="receiptStartingNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.receiptStartingNumber.label")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder={t("settings.company.form.receiptStartingNumber.placeholder")}
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                data-cy="onboarding-company-receipt-starting-number-input"
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {t("settings.company.form.receiptStartingNumber.description")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="receiptNumberFormat"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required>{t("settings.company.form.receiptNumberFormat.label")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("settings.company.form.receiptNumberFormat.placeholder")}
+                                {...field}
+                                data-cy="onboarding-company-receipt-number-format-input"
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {t("settings.company.form.receiptNumberFormat.description")}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{t("settings.company.other.title")}</CardTitle>
+                    <CardDescription>{t("settings.company.other.description")}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="invoicePDFFormat"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.invoicePDFFormat.label")}</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger className="w-full" data-cy="onboarding-company-pdfformat-select">
+                                <SelectValue placeholder={t("settings.company.form.invoicePDFFormat.placeholder")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pdf" data-cy="onboarding-company-pdfformat-option-pdf">
+                                  {t("settings.company.form.invoicePDFFormat.options.pdf")}
+                                </SelectItem>
+                                <SelectItem value="facturx" data-cy="onboarding-company-pdfformat-option-facturx">
+                                  {t("settings.company.form.invoicePDFFormat.options.facturx")}
+                                </SelectItem>
+                                <SelectItem value="zugferd" data-cy="onboarding-company-pdfformat-option-zugferd">
+                                  {t("settings.company.form.invoicePDFFormat.options.zugferd")}
+                                </SelectItem>
+                                <SelectItem value="xrechnung" data-cy="onboarding-company-pdfformat-option-xrechnung">
+                                  {t("settings.company.form.invoicePDFFormat.options.xrechnung")}
+                                </SelectItem>
+                                <SelectItem value="ubl" data-cy="onboarding-company-pdfformat-option-ubl">
+                                  {t("settings.company.form.invoicePDFFormat.options.ubl")}
+                                </SelectItem>
+                                <SelectItem value="cii" data-cy="onboarding-company-pdfformat-option-cii">
+                                  {t("settings.company.form.invoicePDFFormat.options.cii")}
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormDescription>{t("settings.company.form.invoicePDFFormat.description")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="dateFormat"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{t("settings.company.form.dateFormat.label")}</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger className="w-full" data-cy="onboarding-company-dateformat-select">
+                                <SelectValue placeholder={t("settings.company.form.dateFormat.placeholder")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ALLOWED_DATE_FORMATS.map((format) => (
+                                  <SelectItem key={format} value={format} data-cy={`onboarding-company-dateformat-option-${format}`}>
+                                    {getDateFormatOption(format)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormDescription>{t("settings.company.form.dateFormat.description")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="exemptVat"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col space-y-3">
+                          <FormLabel>{t("settings.company.form.exemptVat.label")}</FormLabel>
+                          <FormControl>
+                            <Switch checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} data-cy="onboarding-company-exemptvat-switch" />
+                          </FormControl>
+                          <FormDescription>{t("settings.company.form.exemptVat.description")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            <div className="flex justify-between gap-4 pt-4">
               <Button
                 type="button"
-                onClick={async () => {
-                  const stepFields = getStepFields(currentStepIndex)
-                  const isValid = await form.trigger(stepFields)
-                  if (isValid) {
-                    setCompletedSteps([...completedSteps, currentStepIndex])
-                    setCurrentStepIndex(currentStepIndex + 1)
-                  }
+                variant="outline"
+                disabled={currentStepIndex === 0 || loading}
+                onClick={() => {
+                  setCurrentStepIndex(currentStepIndex - 1)
                 }}
-                disabled={loading}
+                data-cy="onboarding-prev-btn"
               >
-                {t("common.next")}
+                {t("common.previous")}
               </Button>
-            ) : (
-              <Button type="submit" disabled={loading}>
-                {loading ? "Chargement..." : "Terminer"}
-              </Button>
-            )}
-          </div>
-        </form>
+
+              {currentStepIndex < STEPS.length - 1 ? (
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const stepFields = getStepFields(currentStepIndex)
+                    const isValid = await form.trigger(stepFields)
+                    if (isValid) {
+                      setCompletedSteps([...completedSteps, currentStepIndex])
+                      setCurrentStepIndex(currentStepIndex + 1)
+                    }
+                  }}
+                  disabled={loading}
+                  data-cy="onboarding-next-btn"
+                >
+                  {t("common.next")}
+                </Button>
+              ) : (
+                <Button type="submit" disabled={loading} data-cy="onboarding-submit-btn">
+                  {loading ? "Chargement..." : "Terminer"}
+                </Button>
+              )}
+            </div>
+          </form>
         </Form>
       </DialogContent>
     </Dialog>
