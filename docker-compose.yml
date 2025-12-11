@@ -1,6 +1,6 @@
 services:
   invoicerr:
-    image: ghcr.io/impre-visible/invoicerr:latest
+    image: ghcr.io/invoicerr-app/invoicerr:latest
     ports:
       - "80:80"
     environment:
@@ -37,7 +37,7 @@ services:
       - invoicerr_db
 
   invoicerr_db:
-    image: postgres:17
+    image: postgres:15
     environment:
       POSTGRES_USER: invoicerr
       POSTGRES_PASSWORD: invoicerr
