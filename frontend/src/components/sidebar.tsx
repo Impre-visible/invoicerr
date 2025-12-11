@@ -14,7 +14,6 @@ import {
     User,
     Users,
 } from "lucide-react"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
 import { Link, useLocation, useNavigate } from "react-router"
@@ -33,6 +32,7 @@ import {
 
 import { Button } from "./ui/button"
 import type { Company } from "@/types"
+import OnBoarding from "./onboarding"
 import type React from "react"
 import { Skeleton } from "./ui/skeleton"
 import { authClient } from "@/lib/auth"
@@ -111,17 +111,7 @@ export function Sidebar() {
 
     return (
         <RootSidebar collapsible="icon">
-            <Dialog open={!companyLoading && (!company || !company.name) && location.pathname !== "/settings/company"}>
-                <DialogContent className="[&>button]:hidden">
-                    <DialogHeader>
-                        <DialogTitle>{t("sidebar.companyDialog.title")}</DialogTitle>
-                    </DialogHeader>
-                    <p className="text-sm text-muted-foreground">{t("sidebar.companyDialog.description")}</p>
-                    <DialogFooter>
-                        <Button onClick={() => navigate("/settings/company")}>{t("sidebar.companyDialog.goButton")}</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <OnBoarding isOpen={!companyLoading && (!company || !company.name) && location.pathname !== "/settings/company"} />
 
             <SidebarHeader className="px-2">
                 <SidebarMenu>

@@ -4,37 +4,42 @@ beforeEach(() => {
 
 describe('Company Settings E2E', () => {
     describe('1 - Initial Company Setup (Required for other tests)', () => {
-        it('creates the company with all required settings', () => {
-            cy.visit('/settings/company');
+        it('creates the company via onboarding', () => {
+            cy.visit('/');
 
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+            cy.get('[data-cy="onboarding-dialog"]', { timeout: 10000 }).should('be.visible');
 
-            cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
-            cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
+            cy.get('[data-cy="onboarding-company-name-input"]').clear().type('Acme Corp');
+            cy.get('[data-cy="onboarding-company-description-input"]').clear().type('A fictional company');
+            cy.get('[data-cy="onboarding-company-legalid-input"]').clear().type('LEGAL123456');
+            cy.get('[data-cy="onboarding-company-vat-input"]').clear().type('FR12345678901');
 
-            cy.get('[data-cy="company-legalid-input"]').clear().type('LEGAL123456');
-            cy.get('[data-cy="company-vat-input"]').clear().type('FR12345678901');
+            cy.get('[data-cy="onboarding-company-currency-select"]').click();
+            cy.get('[data-cy="onboarding-company-currency-select-option-euro-(€)"]').click();
 
-            cy.get('[data-cy="company-address-input"]').clear().type('123 Main Street');
-            cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
-            cy.get('[data-cy="company-city-input"]').clear().type('Paris');
-            cy.get('[data-cy="company-country-input"]').clear().type('France');
+            cy.get('[data-cy="onboarding-next-btn"]').click();
 
-            cy.get('[data-cy="company-phone-input"]').clear().type('+33123456789');
-            cy.get('[data-cy="company-email-input"]').clear().type('contact@acme.org');
+            cy.get('[data-cy="onboarding-company-address-input"]').clear().type('123 Main Street');
+            cy.get('[data-cy="onboarding-company-postalcode-input"]').clear().type('75001');
+            cy.get('[data-cy="onboarding-company-city-input"]').clear().type('Paris');
+            cy.get('[data-cy="onboarding-company-country-input"]').clear().type('France');
 
-            cy.get('[data-cy="company-currency-select"]').click();
-            cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
+            cy.get('[data-cy="onboarding-next-btn"]').click();
 
-            cy.get('[data-cy="company-pdfformat-select"]').click();
-            cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
+            cy.get('[data-cy="onboarding-company-phone-input"]').clear().type('+33123456789');
+            cy.get('[data-cy="onboarding-company-email-input"]').clear().type('contact@acme.org');
 
-            cy.get('[data-cy="company-dateformat-select"]').click();
-            cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
+            cy.get('[data-cy="onboarding-next-btn"]').click();
 
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(5000);
+            cy.get('[data-cy="onboarding-company-pdfformat-select"]').click();
+            cy.get('[data-cy="onboarding-company-pdfformat-option-pdf"]').click();
+
+            cy.get('[data-cy="onboarding-company-dateformat-select"]').click();
+            cy.get('[data-cy="onboarding-company-dateformat-option-dd/MM/yyyy"]').click();
+
+            cy.get('[data-cy="onboarding-submit-btn"]').click();
+
+            cy.get('[data-cy="onboarding-dialog"]').should('not.exist');
 
             cy.visit('/settings/company');
             cy.wait(3000);

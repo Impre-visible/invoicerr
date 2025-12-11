@@ -1536,6 +1536,10 @@
         }
     },
     "common": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "loading": "Chargement...",
+        "finish": "Terminer",
         "units": {
             "day": "Jour",
             "week": "Semaine",

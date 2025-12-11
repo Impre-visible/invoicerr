@@ -151,6 +151,7 @@ export function useSse<T = any>(url: string, options?: EventSourceInit): useSseR
         };
 
         es.onmessage = (event) => {
+            setLoading(false);
             try {
                 const parsed = JSON.parse(event.data);
                 setData(parsed);

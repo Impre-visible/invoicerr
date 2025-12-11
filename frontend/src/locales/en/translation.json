@@ -1535,6 +1535,10 @@
         }
     },
     "common": {
+        "previous": "Previous",
+        "next": "Next",
+        "loading": "Loading...",
+        "finish": "Finish",
         "units": {
             "day": "Day",
             "week": "Week",
