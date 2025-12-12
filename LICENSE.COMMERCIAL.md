@@ -1,8 +1,8 @@
 # **Invoicerr Commercial License Agreement**
 
-*Last updated: 14 Oct. 2025*
+*Last updated: 12 Dec. 2025*
 
-This **Commercial License Agreement** (“Agreement”) governs the commercial use of the software project **Invoicerr** (the “Software”), available at [https://github.com/Impre-visible/invoicerr](https://github.com/invoicerr-app/invoicerr), created and maintained by **Roméo Chevrier** (known as **“Impre-visible”** on GitHub).
+This **Commercial License Agreement** (“Agreement”) governs the commercial use of the software project **Invoicerr** (the “Software”), available at [https://github.com/invoicerr-app/invoicerr](https://github.com/invoicerr-app/invoicerr), created and maintained by **Roméo Chevrier** (known as **“Impre-visible”** on GitHub).
 
 By using, modifying, distributing, or offering the Software for **commercial purposes**, you (“the Licensee”) agree to the following terms and conditions.
 If you do not agree, you may only use the Software under the terms of the **GNU Affero General Public License version 3 (AGPLv3)**.
