@@ -596,8 +596,11 @@
   `u:checkPIVA`/`u:addPIVA` exercés transitivement via `u:checkCF`/`u:checkPIVAseIT`, jamais
   référencés directement par une règle du `.sch`). Voir `B2G_COVERAGE.md` §2/§6 pour le détail.
 
-- **Écran client — le sélecteur de schéma Peppol n'offre pas les EAS des pays nouvellement couverts,
-  et une option préexistante est mal étiquetée** (2026-09-02, découvert par l'audit B2G) : les EAS
+- ~~**Écran client — le sélecteur de schéma Peppol n'offre pas les EAS des pays nouvellement couverts,
+  et une option préexistante est mal étiquetée**~~ — **RÉSOLU à T4-b** (vérifié 2026-09-06 :
+  client-upsert.tsx offre 17 options dont 0191/0200/0218/0240/9928/9933/9943, « 0106 — NL KVK »
+  corrigé et « 0184 — DK CVR » ajouté, le commentaire du fichier porte la correction).
+  Entrée d'origine (2026-09-02, découvert par l'audit B2G) : les EAS
   documentés par les nouvelles règles (0191 EE, 0200 LT, 0218 LV, 0240 LU, 9928 CY, 9933 GR, 9943
   MT) ne figurent pas dans les options de `client-upsert.tsx` (`peppolSchemeId`) — 0208 BE et 0007
   SE y sont déjà. L'utilisateur peut toujours saisir la valeur : le champ `PEPPOL_ENDPOINT` reste
@@ -688,13 +691,17 @@
     tu. La composition des deux N'EST PAS écrite — resterait à faire si une correction
     transfrontalière devait un jour distinguer "quel document" de "la base taxable réductible
     comment et jusqu'à quand".
-  - **Pays non-pivots sans fichier correction-routes/** — seuls les 7 pivots (FR/IT/PL/DE/ES/MX/US)
-    ont un fichier `correction-routes/data/*.json` ; tout autre pays (ex. BE, testé dans
+  - ~~**Pays non-pivots sans fichier correction-routes/**~~ — **RÉSOLU par la vague B de
+    TODO_DOCUMENTS** (2026-09-05) : 28 pays dans `correction-routes/data/` (UE-27 + US/MX),
+    chacun sourcé ou unverified honnête. Entrée d'origine : seuls les 7 pivots (FR/IT/PL/DE/ES/MX/US)
+    avaient un fichier `correction-routes/data/*.json` ; tout autre pays (ex. BE, testé dans
     43-correction-routes.cy.ts) reçoit le refus honnête 404 nommé, jamais une voie inventée. Étendre
     la couverture est un travail de RECHERCHE JURIDIQUE pays par pays (le patron `docs/compliance/
     CORRECTION-ROUTES.yaml`), pas un mécanisme à construire.
-  - **`country-policy/` ne couvre QUE FR/US/HU aujourd'hui — DE/IT/PL/ES/MX sont TOTALEMENT
-    bloqués sur TOUTE action document, pas seulement l'annulation** (découvert et vérifié
+  - ~~**`country-policy/` ne couvre QUE FR/US/HU aujourd'hui — DE/IT/PL/ES/MX sont TOTALEMENT
+    bloqués sur TOUTE action document**~~ — **RÉSOLU en deux temps** : TODO_SUITE P (les 5 fichiers
+    sourcés DE/IT/PL/ES/MX, 2026-09-03) puis la vague B de TODO_DOCUMENTS (UE-27 complète,
+    29 pays en country-policy, 2026-09-05). Entrée d'origine (découverte et vérifiée
     empiriquement pendant C3 : `POST .../invoice/actions/save-draft` sous une société PL répond
     403 "No document action policy is declared for PL", AVANT même d'atteindre le statut ou le
     contenu — voir `country-policy/country-policy.ts#evaluateCountryPolicy`, "aucun fichier =
