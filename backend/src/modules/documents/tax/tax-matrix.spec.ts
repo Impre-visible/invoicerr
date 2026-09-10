@@ -5,14 +5,46 @@
  * changent (types/`../tax-systems/registry` de ce module plutôt que les profils pays complets
  * supprimés) — chaque assertion est CHIFFRÉE (root TODO item 16's own test brief), pas seulement
  * qualitative, là où le repère ne l'était pas déjà.
+ *
+ * Re-anchored by the 5-country prune (2026-09-10, see this task's own report): SA/AE/IN/QA/HU's own
+ * `tax-systems/data/xx.json` files were removed along with every country outside FR/PL/IT/PT/DE. The
+ * GCC-union, GST-domestic and NONE-tax-system cases below test GENERIC, data-driven dispatch in
+ * `tax-engine.ts`/`classification.ts` (never a per-country branch — `EU_MEMBERS`/`GCC_VAT` in
+ * classification.ts stay complete, untouched tables) that remains fully reachable by any directly
+ * -constructed `CountryTaxSystemProfile`, so these cases are re-anchored on HAND-BUILT synthetic
+ * profiles (`saProfile`/`aeProfile`/`inProfile`/`qaProfile` below) instead of the removed registry
+ * entries — this is a stronger test than before (independent of which countries happen to be
+ * shipped), not a weaker one. The OSS "highest EU rate" case (was FR→HU, 27%) is re-anchored on
+ * FR→PL (23%, tied for the highest among the KEPT countries — see tax-systems/data/all.spec.ts's own
+ * matching claim).
  */
-import { DocumentLine, PartyTaxProfile, SupplyType, TaxScheme } from './types';
+import { CountryTaxSystemProfile, DocumentLine, PartyTaxProfile, SupplyType, TaxScheme } from './types';
 import { defaultTaxSystemRegistry } from './tax-systems/registry';
 import { selectorMatches, taxUnionOf, TrustFlagVatValidator } from './classification';
 import { determineLineTax } from './tax-engine';
 
 const vat = new TrustFlagVatValidator();
 const prof = (cc: string) => defaultTaxSystemRegistry.resolve(cc)!;
+
+// Synthetic profiles for the GCC/GST/NONE mechanics — SA/AE/IN/QA's own shipped data files were
+// removed by the 5-country prune, but the engine branches they exercise are generic (dispatch on
+// `taxSystem.kind`, never a per-country special case), so these hand-built fixtures keep the same
+// mechanical coverage without depending on any shipped country file. Values are plain test fixtures,
+// not a legal claim about SA/AE/IN/QA's real tax law (unlike the sourced `tax-systems/data/*.json`
+// catalog, which is never re-created here).
+const saProfile: CountryTaxSystemProfile = {
+  countryCode: 'SA',
+  taxSystem: { kind: 'VAT', standardRate: 15, reducedRates: [], schemes: ['STANDARD'] },
+};
+const aeProfile: CountryTaxSystemProfile = {
+  countryCode: 'AE',
+  taxSystem: { kind: 'VAT', standardRate: 5, reducedRates: [], schemes: ['STANDARD'] },
+};
+const inProfile: CountryTaxSystemProfile = {
+  countryCode: 'IN',
+  taxSystem: { kind: 'GST', standardRate: 18, reducedRates: [], schemes: ['STANDARD'] },
+};
+const qaProfile: CountryTaxSystemProfile = { countryCode: 'QA', taxSystem: { kind: 'NONE' } };
 
 function party(
   country: string,
@@ -44,9 +76,9 @@ describe('LA MATRICE — TaxEngine — GCC union', () => {
       party('SA', 'B2B'),
       party('AE', 'B2B'),
       line('SERVICES'),
-      prof('SA'),
+      saProfile,
       vat,
-      prof('AE'),
+      aeProfile,
     );
     expect(t.components[0].category).toBe('AE');
     expect(t.components[0].rate).toBe(0);
@@ -57,9 +89,9 @@ describe('LA MATRICE — TaxEngine — GCC union', () => {
       party('SA', 'B2B'),
       party('AE', 'B2B'),
       line('GOODS'),
-      prof('SA'),
+      saProfile,
       vat,
-      prof('AE'),
+      aeProfile,
     );
     expect(t.components[0].category).toBe('K');
     expect(t.components[0].rate).toBe(0);
@@ -72,9 +104,9 @@ describe('LA MATRICE — TaxEngine — GST & NONE systems', () => {
       party('IN', 'B2B'),
       party('IN', 'B2B'),
       line('GOODS'),
-      prof('IN'),
+      inProfile,
       vat,
-      prof('IN'),
+      inProfile,
     );
     expect(t.components[0].taxSystem).toBe('GST');
     expect(t.components[0].rate).toBe(18);
@@ -85,9 +117,9 @@ describe('LA MATRICE — TaxEngine — GST & NONE systems', () => {
       party('QA', 'B2B'),
       party('QA', 'B2C'),
       line('GOODS'),
-      prof('QA'),
+      qaProfile,
       vat,
-      prof('QA'),
+      qaProfile,
     );
     expect(t.components[0].taxSystem).toBe('NONE');
     expect(t.components[0].category).toBe('O');
@@ -110,20 +142,21 @@ describe('LA MATRICE — TaxEngine — OSS destination rate from a real buyer pr
     expect(t.reportingFlags).toContain('OSS');
   });
 
-  // Root TODO item 16 follow-up (2026-09-01): the 26 other EU member states' standard rate, read
-  // from the European Commission's TEDB — HU is the highest in the EU (27%), DE is the destination
-  // the OSS gate's own error message used to name verbatim as missing.
-  it('11. FR→HU B2C goods: OSS charges the real HU standard rate (27%, the highest in the EU)', () => {
+  // Root TODO item 16 follow-up (2026-09-01): the EU member states' standard rate, read from the
+  // European Commission's TEDB. HU (27%, the highest in the full EU) was removed by the 5-country
+  // prune (2026-09-10) — re-anchored on PL, tied for the highest standard rate among the KEPT
+  // countries (23%, same as PT — see tax-systems/data/all.spec.ts's own matching claim).
+  it('11. FR→PL B2C goods: OSS charges the real PL standard rate (23%, tied for the highest among the kept countries)', () => {
     const t = determineLineTax(
       party('FR', 'B2C'),
-      party('HU', 'B2C'),
+      party('PL', 'B2C'),
       line('GOODS'),
       prof('FR'),
       vat,
-      prof('HU'),
+      prof('PL'),
     );
-    expect(t.components[0].jurisdiction).toBe('HU');
-    expect(t.components[0].rate).toBe(27);
+    expect(t.components[0].jurisdiction).toBe('PL');
+    expect(t.components[0].rate).toBe(23);
     expect(t.components[0].category).toBe('S');
     expect(t.reportingFlags).toContain('OSS');
   });

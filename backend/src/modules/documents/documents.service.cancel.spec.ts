@@ -115,8 +115,12 @@ describe('DocumentsService.runAction("invoice", "cancel") — TODO_CORRECTION.md
       );
     });
 
-    it('DE and US: also an unrestricted local cancel (no restrictedToStatuses), same as FR', async () => {
-      for (const countryCode of ['DE', 'US']) {
+    // US used to pair with DE here — data/us.json (correction-routes) was removed by the 5-country
+    // prune (2026-09-10, see this task's own report), and with it US's own entry in cancel-policy.ts's
+    // whitelist (now dead code, removed too — see that file's own header). DE alone still proves the
+    // point: FR is not the only country with an unrestricted local cancel.
+    it('DE: also an unrestricted local cancel (no restrictedToStatuses), same as FR', async () => {
+      for (const countryCode of ['DE']) {
         (countryPolicy.resolveCompanyCountryCode as jest.Mock).mockResolvedValue(countryCode);
         mockDocument({ status: 'sent' });
         (persistence.updateDocumentStatus as jest.Mock).mockResolvedValue({
@@ -152,7 +156,12 @@ describe('DocumentsService.runAction("invoice", "cancel") — TODO_CORRECTION.md
       expect(persistence.updateDocumentStatus).not.toHaveBeenCalled();
     });
 
-    it('ES and MX: also refused with 403 — forbidden (ES) and authority-bound (MX), neither locally implementable', async () => {
+    // ES's own "forbidden" and MX's own "authority-bound, required" nuances (each pinned in detail by
+    // correction-routes/cancel-policy.spec.ts, before their data/xx.json were removed by the
+    // 5-country prune, 2026-09-10) no longer apply here: both countries now have NO correction-routes
+    // file at all, so they fall into the same generic "no file" refusal Belgium exercises just below
+    // — kept as their own test (rather than folded into Belgium's) to document that fact honestly.
+    it('ES and MX: also refused with 403 — both correction-routes files were removed by the prune, so this is now the generic "no file" refusal', async () => {
       for (const countryCode of ['ES', 'MX']) {
         (countryPolicy.resolveCompanyCountryCode as jest.Mock).mockResolvedValue(countryCode);
         mockDocument({ status: 'sent' });

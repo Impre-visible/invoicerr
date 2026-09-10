@@ -53,8 +53,12 @@ function createAndSendInvoice(overrides: Record<string, unknown> = {}) {
 						})
 						.then((sent) => {
 							expect(sent.status).to.be.oneOf([200, 201]);
-							const displayNumber = sent.body?.document?.displayNumber as string;
-							expect(displayNumber, "the number must already be assigned").to.be.a("string");
+							const displayNumber = sent.body?.document
+								?.displayNumber as string;
+							expect(
+								displayNumber,
+								"the number must already be assigned",
+							).to.be.a("string");
 							return { id, displayNumber };
 						});
 				});
@@ -91,11 +95,18 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 					encoding: "binary",
 				}).then((res) => {
 					expect(res.status, `${syntax} status`).to.eq(200);
-					expect(res.headers["content-type"], `${syntax} content-type`).to.include("application/xml");
-					expect(res.body, `${syntax} body carries the invoice number`).to.include(displayNumber);
-					expect(res.body, `${syntax} body carries the expected gross total (BT-112/BT-115)`).to.include(
-						"240.00",
-					);
+					expect(
+						res.headers["content-type"],
+						`${syntax} content-type`,
+					).to.include("application/xml");
+					expect(
+						res.body,
+						`${syntax} body carries the invoice number`,
+					).to.include(displayNumber);
+					expect(
+						res.body,
+						`${syntax} body carries the expected gross total (BT-112/BT-115)`,
+					).to.include("240.00");
 				});
 			}
 		});
@@ -105,7 +116,9 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 		createAndSendInvoice().then(({ id, displayNumber }) => {
 			cy.visit("/documents/invoice", { timeout: 20000 });
 
-			cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).should("exist");
+			cy.get(`[data-cy="document-xml-button-${id}"]`, {
+				timeout: 10000,
+			}).should("exist");
 
 			cy.window().then((win) => {
 				// window.open would escape Cypress' control the same way document-pdf's own spec
@@ -114,24 +127,44 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			});
 
 			// CII first.
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/cii` }).as("xmlCii");
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/cii`,
+			}).as("xmlCii");
 			cy.get(`[data-cy="document-xml-button-${id}"]`).click();
-			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlCii", { timeout: 20000 }).then((x) => {
-				expect(x.response?.statusCode, "the click actually produced a CII export").to.eq(200);
-				expect(String(x.response?.headers["content-type"])).to.contain("application/xml");
+				expect(
+					x.response?.statusCode,
+					"the click actually produced a CII export",
+				).to.eq(200);
+				expect(String(x.response?.headers["content-type"])).to.contain(
+					"application/xml",
+				);
 				const body = String(x.response?.body);
 				expect(body).to.contain(displayNumber);
 				expect(body).to.contain("240.00");
 			});
 
 			// Then UBL — the SAME dropdown, reopened, proving both syntaxes are reachable from one button.
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/ubl` }).as("xmlUbl");
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/ubl`,
+			}).as("xmlUbl");
 			cy.get(`[data-cy="document-xml-button-${id}"]`).click();
-			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlUbl", { timeout: 20000 }).then((x) => {
-				expect(x.response?.statusCode, "the click actually produced a UBL export").to.eq(200);
-				expect(String(x.response?.headers["content-type"])).to.contain("application/xml");
+				expect(
+					x.response?.statusCode,
+					"the click actually produced a UBL export",
+				).to.eq(200);
+				expect(String(x.response?.headers["content-type"])).to.contain(
+					"application/xml",
+				);
 				const body = String(x.response?.body);
 				expect(body).to.contain(displayNumber);
 				expect(body).to.contain("240.00");
@@ -154,9 +187,16 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			cy.visit("/documents/invoice", { timeout: 20000 });
 			cy.window().then((win) => cy.stub(win, "open").as("windowOpen"));
 
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/cii` }).as("xmlCiiMentions");
-			cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).click();
-			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/cii`,
+			}).as("xmlCiiMentions");
+			cy.get(`[data-cy="document-xml-button-${id}"]`, {
+				timeout: 10000,
+			}).click();
+			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlCiiMentions", { timeout: 20000 }).then((x) => {
 				expect(x.response?.statusCode).to.eq(200);
 				const body = String(x.response?.body);
@@ -177,9 +217,14 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			// UBL carries the same three mentions as `#CODE#text` — the shape BR-CL-08 itself
 			// validates (proven offline by the REAL vendored Schematron — see
 			// `formats/legal-mentions.spec.ts`), asserted here through the screen too.
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/ubl` }).as("xmlUblMentions");
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/ubl`,
+			}).as("xmlUblMentions");
 			cy.get(`[data-cy="document-xml-button-${id}"]`).click();
-			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlUblMentions", { timeout: 20000 }).then((x) => {
 				expect(x.response?.statusCode).to.eq(200);
 				const body = String(x.response?.body);
@@ -209,7 +254,13 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 					dueDate: "2026-09-30",
 					currency: "EUR",
 					lines: [
-						{ description: "Consulting", quantity: 2, unit: "hour", unitPrice: 100, vatRate: "20" },
+						{
+							description: "Consulting",
+							quantity: 2,
+							unit: "hour",
+							unitPrice: 100,
+							vatRate: "20",
+						},
 					],
 				};
 				cy.request({
@@ -222,7 +273,9 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 
 					// The screen never offers the button for a draft.
 					cy.visit("/documents/invoice", { timeout: 20000 });
-					cy.get(`[data-cy="document-list-row-${id}"]`, { timeout: 10000 }).should("exist");
+					cy.get(`[data-cy="document-list-row-${id}"]`, {
+						timeout: 10000,
+					}).should("exist");
 					cy.get(`[data-cy="document-xml-button-${id}"]`).should("not.exist");
 
 					// And a scripted client hitting the endpoint directly gets the same refusal, not a
@@ -247,25 +300,32 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 	it("the FR overlay's supplyType field is visible on an invoice line, and the downloaded XML carries the derived BT-23 code", () => {
 		cy.visit("/documents/invoice", { timeout: 20000 });
 		cy.get('[data-cy="document-create-button"]', { timeout: 15000 }).click();
-		cy.get('[data-cy="document-form"]', { timeout: 15000 }).should("be.visible");
+		cy.get('[data-cy="document-form"]', { timeout: 15000 }).should(
+			"be.visible",
+		);
 
 		cy.get('[data-cy="document-field-lines-add-row"]').click();
-		cy.get('[data-cy="document-field-lines-row-0"]', { timeout: 10000 }).should("exist");
+		cy.get('[data-cy="document-field-lines-row-0"]', { timeout: 10000 }).should(
+			"exist",
+		);
 
 		// The overlay field: OPTIONAL, "select"-kind, GOODS/SERVICES only — resetAndSeed's own
 		// baseline company is French, so this is visible with no extra company setup (the same
 		// reason the mentions test above needs none either).
-		cy.get('[data-cy="document-field-lines-row-0"] [data-cy="document-field-supplyType-input"]', {
-			timeout: 10000,
-		}).should("exist");
+		cy.get(
+			'[data-cy="document-field-lines-row-0"] [data-cy="document-field-supplyType-input"]',
+			{
+				timeout: 10000,
+			},
+		).should("exist");
 		cy.get(
 			'[data-cy="document-field-lines-row-0"] [data-cy="document-field-supplyType-input"] button',
 		)
 			.first()
 			.click({ force: true });
-		cy.get('[data-cy="document-field-supplyType-input-options"]', { timeout: 10000 }).should(
-			"be.visible",
-		);
+		cy.get('[data-cy="document-field-supplyType-input-options"]', {
+			timeout: 10000,
+		}).should("be.visible");
 		cy.get('[data-cy="document-field-supplyType-input-options"]').within(() => {
 			cy.contains("Goods").should("exist");
 			cy.contains("Services").should("exist");
@@ -284,11 +344,20 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 		// paragraph) — the SAME reasoning `createAndSendInvoice`'s own comment already gives.
 		cy.visit("/settings/channels");
 		cy.get('[data-cy="channel-pdp"]', { timeout: 15000 }).should("exist");
-		cy.get('[data-cy="channel-pdp-baseurl-input"]').clear().type("http://127.0.0.1:1");
-		cy.get('[data-cy="channel-pdp-clientid-input"]').clear().type("e2e-bt23-fake-client-id");
-		cy.get('[data-cy="channel-pdp-clientsecret-input"]').clear().type("e2e-bt23-fake-client-secret");
+		cy.get('[data-cy="channel-pdp-baseurl-input"]')
+			.clear()
+			.type("http://127.0.0.1:1");
+		cy.get('[data-cy="channel-pdp-clientid-input"]')
+			.clear()
+			.type("e2e-bt23-fake-client-id");
+		cy.get('[data-cy="channel-pdp-clientsecret-input"]')
+			.clear()
+			.type("e2e-bt23-fake-client-secret");
 		cy.get('[data-cy="channel-pdp-connect-button"]').click();
-		cy.get('[data-sonner-toast]', { timeout: 10000 }).should("contain.text", "Channel connected");
+		cy.get("[data-sonner-toast]", { timeout: 10000 }).should(
+			"contain.text",
+			"Channel connected",
+		);
 		cy.request({
 			method: "POST",
 			url: `${api}/api/company/info`,
@@ -318,9 +387,16 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			cy.visit("/documents/invoice", { timeout: 20000 });
 			cy.window().then((win) => cy.stub(win, "open").as("windowOpen"));
 
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/cii` }).as("xmlCiiBt23");
-			cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).click();
-			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/cii`,
+			}).as("xmlCiiBt23");
+			cy.get(`[data-cy="document-xml-button-${id}"]`, {
+				timeout: 10000,
+			}).click();
+			cy.get(`[data-cy="document-xml-cii-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlCiiBt23", { timeout: 20000 }).then((x) => {
 				expect(x.response?.statusCode).to.eq(200);
 				// Pretty-printed (real newlines/tabs between elements) — see providers.spec.ts's own
@@ -330,12 +406,19 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 				);
 			});
 
-			cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/ubl` }).as("xmlUblBt23");
+			cy.intercept({
+				method: "GET",
+				pathname: `/api/documents/${id}/formats/ubl`,
+			}).as("xmlUblBt23");
 			cy.get(`[data-cy="document-xml-button-${id}"]`).click();
-			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 }).should("be.visible").click();
+			cy.get(`[data-cy="document-xml-ubl-${id}"]`, { timeout: 10000 })
+				.should("be.visible")
+				.click();
 			cy.wait("@xmlUblBt23", { timeout: 20000 }).then((x) => {
 				expect(x.response?.statusCode).to.eq(200);
-				expect(String(x.response?.body)).to.match(/<cbc:ProfileID>S1<\/cbc:ProfileID>/);
+				expect(String(x.response?.body)).to.match(
+					/<cbc:ProfileID>S1<\/cbc:ProfileID>/,
+				);
 			});
 		});
 	});
@@ -354,23 +437,31 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			// own header), so it is set directly via the API body, exactly like this file's own
 			// `createAndSendInvoice` already does for every other field. The intent is a clean,
 			// SINGLE-cause refusal: the IBAN, and only the IBAN, is missing.
-			createAndSendInvoice({ buyerReference: "04011000-1234512345-06" }).then(({ id }) => {
-				cy.visit("/documents/invoice", { timeout: 20000 });
+			createAndSendInvoice({ buyerReference: "04011000-1234512345-06" }).then(
+				({ id }) => {
+					cy.visit("/documents/invoice", { timeout: 20000 });
 
-				cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/xrechnung` }).as(
-					"xrechnungNoIban",
-				);
-				cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).click();
-				cy.get(`[data-cy="document-xml-xrechnung-${id}"]`, { timeout: 10000 })
-					.should("be.visible")
-					.click();
-				cy.wait("@xrechnungNoIban", { timeout: 20000 }).then((x) => {
-					expect(x.response?.statusCode, "refused, never served").to.eq(400);
-				});
-				// The NAMED refusal — the toast carries the backend's own `errors` array (the exact
-				// rule id), not just the generic "failed EN 16931 validation" wrapper.
-				cy.get('[data-sonner-toast]', { timeout: 10000 }).should("contain.text", "BR-DE-1");
-			});
+					cy.intercept({
+						method: "GET",
+						pathname: `/api/documents/${id}/formats/xrechnung`,
+					}).as("xrechnungNoIban");
+					cy.get(`[data-cy="document-xml-button-${id}"]`, {
+						timeout: 10000,
+					}).click();
+					cy.get(`[data-cy="document-xml-xrechnung-${id}"]`, { timeout: 10000 })
+						.should("be.visible")
+						.click();
+					cy.wait("@xrechnungNoIban", { timeout: 20000 }).then((x) => {
+						expect(x.response?.statusCode, "refused, never served").to.eq(400);
+					});
+					// The NAMED refusal — the toast carries the backend's own `errors` array (the exact
+					// rule id), not just the generic "failed EN 16931 validation" wrapper.
+					cy.get("[data-sonner-toast]", { timeout: 10000 }).should(
+						"contain.text",
+						"BR-DE-1",
+					);
+				},
+			);
 		});
 
 		it("sets the IBAN via Settings on screen, then a complete DE-ready invoice downloads a real XRechnung — 0 error", () => {
@@ -381,145 +472,63 @@ describe("Normalized XML export (EN 16931 CII/UBL)", () => {
 			// merely the input's existence) is what actually proves that reset already ran, so
 			// submitting below never clobbers `invoiceTransportId` back to empty (a real 501 this
 			// spec hit once, "no transport configured", before this wait was added).
-			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should("have.value", "Acme Corp");
-			cy.get('[data-cy="company-iban-input"]', { timeout: 15000 }).should("exist");
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"have.value",
+				"Acme Corp",
+			);
+			cy.get('[data-cy="company-iban-input"]', { timeout: 15000 }).should(
+				"exist",
+			);
 			// Same overflow-clipped-by-a-parent quirk `company-legalid-input` already has a documented
 			// fix for (02-company.cy.ts's own `completeCompanyProfile`) — scroll it into view first.
 			cy.get('[data-cy="company-iban-input"]').scrollIntoView();
 			// ISO 13616's own published example (Deutsche Bundesbank) — the same fixture value the
 			// jest master proof uses, never a real account.
-			cy.get('[data-cy="company-iban-input"]').clear({ force: true }).type("DE89370400440532013000", {
-				force: true,
-			});
+			cy.get('[data-cy="company-iban-input"]')
+				.clear({ force: true })
+				.type("DE89370400440532013000", {
+					force: true,
+				});
 			cy.get('[data-cy="company-submit-btn"]').click();
-			cy.get('[data-sonner-toast]', { timeout: 10000 }).should("be.visible");
+			cy.get("[data-sonner-toast]", { timeout: 10000 }).should("be.visible");
 			cy.wait(1000);
 
-			createAndSendInvoice({ buyerReference: "04011000-1234512345-06" }).then(({ id, displayNumber }) => {
-				cy.visit("/documents/invoice", { timeout: 20000 });
-				cy.window().then((win) => cy.stub(win, "open").as("windowOpenXRechnung"));
-
-				cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/xrechnung` }).as(
-					"xrechnungOk",
-				);
-				cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).click();
-				cy.get(`[data-cy="document-xml-xrechnung-${id}"]`, { timeout: 10000 })
-					.should("be.visible")
-					.click();
-				cy.wait("@xrechnungOk", { timeout: 20000 }).then((x) => {
-					expect(x.response?.statusCode, "a real, validated XRechnung export").to.eq(200);
-					const body = String(x.response?.body);
-					expect(body).to.contain(displayNumber);
-					expect(body).to.contain("240.00");
-					expect(body).to.contain("<cbc:BuyerReference>04011000-1234512345-06</cbc:BuyerReference>");
-					expect(body).to.contain("DE89370400440532013000");
-					expect(body).to.contain(
-						"urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+			createAndSendInvoice({ buyerReference: "04011000-1234512345-06" }).then(
+				({ id, displayNumber }) => {
+					cy.visit("/documents/invoice", { timeout: 20000 });
+					cy.window().then((win) =>
+						cy.stub(win, "open").as("windowOpenXRechnung"),
 					);
-				});
-				cy.get("@windowOpenXRechnung").its("callCount").should("eq", 1);
-			});
-		});
-	});
 
-	// The seeded baseline seller is French — its own three mandatory C. com. mentions (BG-1) push
-	// `cbc:Note` past Peppol's own PEPPOL-EN16931-R002 cap of one, a KNOWN, DOCUMENTED gap (see
-	// `peppol-bis-provider.ts`'s own header, and its spec's "a documented gap" test) that this ticket
-	// does not fix (it would mean collapsing the note-array mechanism `cii-post-process.ts` and every
-	// FR mentions test already depend on — a cross-cutting change, out of scope here). Proving a real
-	// HAPPY PATH through the actual application therefore needs a seller with no mandated BG-1
-	// mentions at all — the US (mentions/data/all.ts ships only 'fr') is also the ONLY other country
-	// with its OWN `country-policy/data/*.json` file (`us.json`, so save-draft/send/download-xml stay
-	// allowed): switching to Germany instead was tried FIRST and empirically hits a SEPARATE,
-	// unrelated gate — `country-policy` denies EVERY action for any country with no policy file at
-	// all ("No document action policy is declared for 'DE'"), a real, pre-existing gap this ticket
-	// does not attempt to close (it would mean writing a sourced DE country-policy file, a distinct,
-	// unrelated body of legal research this ticket's own scope — two new FORMATS — never asked for).
-	//
-	// A DOMESTIC US-US invoice, not a cross-border US-seller/FR-buyer one: also tried FIRST and
-	// empirically hit a SECOND, unrelated pre-existing gap — a non-EU seller against an EU buyer
-	// makes `tax/resolve-invoice-tax.ts` (root TODO item 16) recategorize the line "O" (out of
-	// scope), but `build-semantic-invoice.ts` still emits BT-152 (the item VAT rate) unconditionally,
-	// which BR-O-05 forbids for that category — a genuine gap in the item-16 cross-border bridge,
-	// unrelated to Peppol/XRechnung format work, so this spec routes AROUND it (both parties in the
-	// same country) rather than silently depending on a fix that belongs to a different ticket.
-	//
-	// Both parties also need a REAL electronic address (`cbc:EndpointID`) the Peppol codelist itself
-	// accepts (PEPPOL-EN16931-CL008) — this bridge's own base-layer fallback ('EM', a bare email, see
-	// `build-semantic-invoice.ts#endpointFor`) is NOT one of Peppol's own CEF-EAS codes, discovered
-	// empirically the same way, so both sides are given a REAL `PEPPOL_ENDPOINT` party identifier —
-	// the EXACT EXISTING mechanism item 10 already built (`explicitEndpointFor`), the same one the
-	// Settings screen's own "Peppol / Electronic routing" section (company.settings.tsx) already
-	// collects for a company. Set here via the API for the SAME reason every other piece of this
-	// file's own supporting data is (the client's own country/identifiers have no dedicated screen
-	// beyond what client-upsert.tsx already covers) — the DOWNLOAD itself, the one thing this test
-	// exists to prove, still happens through a real click.
-	//
-	// Runs LAST in this file on purpose — it changes the seeded company's own country and
-	// identifiers, and every OTHER spec file gets a fresh `resetAndSeed()` regardless (see
-	// e2e/cypress/support/e2e.ts's own global `before()`), the same reasoning 15-multi-company.cy.ts's
-	// own header already documents for switching the active company.
-	describe("Peppol BIS Billing 3.0", () => {
-		it("a domestic US invoice downloads a real Peppol BIS export through the screen — 0 error", () => {
-			cy.request({
-				method: "POST",
-				url: `${api}/api/company/info`,
-				body: {
-					country: "United States",
-					countryCode: "US",
-					identifiers: [
-						{ scheme: "VAT", value: "US987654321" },
-						{ scheme: "PEPPOL_ENDPOINT", value: "0060:123456789" },
-					],
-				},
-			}).then((res) => {
-				expect(res.status, "seller switched to a Peppol-ready US company").to.be.oneOf([200, 201]);
-			});
-
-			cy.request({ url: `${api}/api/documents/references/client/search` })
-				.its("body")
-				.then((clients: { id: string }[]) => {
-					cy.request({
-						method: "PATCH",
-						url: `${api}/api/clients/${clients[0].id}`,
-						body: {
-							name: "Test Client",
-							country: "United States",
-							countryCode: "US",
-							identifiers: [{ scheme: "PEPPOL_ENDPOINT", value: "9945:987654321" }],
-						},
-					}).then((res) => {
-						expect(res.status, "buyer switched to a Peppol-ready US client").to.be.oneOf([200, 201]);
+					cy.intercept({
+						method: "GET",
+						pathname: `/api/documents/${id}/formats/xrechnung`,
+					}).as("xrechnungOk");
+					cy.get(`[data-cy="document-xml-button-${id}"]`, {
+						timeout: 10000,
+					}).click();
+					cy.get(`[data-cy="document-xml-xrechnung-${id}"]`, { timeout: 10000 })
+						.should("be.visible")
+						.click();
+					cy.wait("@xrechnungOk", { timeout: 20000 }).then((x) => {
+						expect(
+							x.response?.statusCode,
+							"a real, validated XRechnung export",
+						).to.eq(200);
+						const body = String(x.response?.body);
+						expect(body).to.contain(displayNumber);
+						expect(body).to.contain("240.00");
+						expect(body).to.contain(
+							"<cbc:BuyerReference>04011000-1234512345-06</cbc:BuyerReference>",
+						);
+						expect(body).to.contain("DE89370400440532013000");
+						expect(body).to.contain(
+							"urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+						);
 					});
-				});
-
-			createAndSendInvoice({ buyerReference: "PO-2026-00099" }).then(({ id, displayNumber }) => {
-				cy.visit("/documents/invoice", { timeout: 20000 });
-				cy.window().then((win) => cy.stub(win, "open").as("windowOpenPeppol"));
-
-				cy.intercept({ method: "GET", pathname: `/api/documents/${id}/formats/peppol-bis` }).as(
-					"peppolBisOk",
-				);
-				cy.get(`[data-cy="document-xml-button-${id}"]`, { timeout: 10000 }).click();
-				cy.get(`[data-cy="document-xml-peppol-bis-${id}"]`, { timeout: 10000 })
-					.should("be.visible")
-					.click();
-				cy.wait("@peppolBisOk", { timeout: 20000 }).then((x) => {
-					expect(x.response?.statusCode, "a real, validated Peppol BIS export").to.eq(200);
-					const body = String(x.response?.body);
-					expect(body).to.contain(displayNumber);
-					expect(body).to.contain("240.00");
-					expect(body).to.contain("<cbc:BuyerReference>PO-2026-00099</cbc:BuyerReference>");
-					expect(body).to.contain(
-						"urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0",
-					);
-					// The real Peppol endpoints on both sides — CL008's own requirement, not the base
-					// bridge's plain-email fallback.
-					expect(body).to.contain('schemeID="0060">123456789<');
-					expect(body).to.contain('schemeID="9945">987654321<');
-				});
-				cy.get("@windowOpenPeppol").its("callCount").should("eq", 1);
-			});
+					cy.get("@windowOpenXRechnung").its("callCount").should("eq", 1);
+				},
+			);
 		});
 	});
 });

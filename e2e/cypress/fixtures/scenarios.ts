@@ -44,18 +44,50 @@ export interface Scenario {
   };
 }
 
+// 5-COUNTRY PRUNE (2026-09-10) — SCENARIO MAPPING, see this task's own report for the full rationale.
+// The product now keeps FR/PL/IT/PT/DE only. Four of the six scenarios named a removed country (BE,
+// ES, MX, and the US on both sides of "mx-us"/"us-us") and are re-pointed onto kept-country pairs,
+// preserving each replaced scenario's own SHAPE and role in the matrix rather than redesigning it:
+//   fr-be → fr-pl : same role — intra-EU B2B SERVICE, reverse-charge (0%), seller's own EU VAT
+//                   required (EN16931 BR-S-02/BR-AE-02). Belgium → Poland.
+//   es-pt → pt-de : same role — cross-border B2B SERVICE at the SELLER's own domestic standard
+//                   rate (not reverse-charged — mirrors de-fr's own "standard-rated cross-border"
+//                   shape). Seller swaps from Spain to Portugal (23%, was Spain's 21%); buyer
+//                   swaps from Portugal to Germany.
+//   mx-us → it-pt : same role — cross-border B2B GOODS at the seller's own standard rate. Mexico's
+//                   own RFC identifier scheme, MXN currency and `expectsAuthorityNumbering` (CFDI's
+//                   authority-stamped folio) have NO equivalent among the kept countries — none of
+//                   FR/PL/IT/PT/DE's own channels (PDP/KSeF/SdI) overwrite the invoice's own display
+//                   number the way Mexico's SAT does, so `expectsAuthorityNumbering` is dropped
+//                   rather than asserted on a trait this task never verified. Italy → Portugal.
+//                   `noCiTransmission: true` carries over from it-it, same reason (SdI has no EMAIL
+//                   fallback and no CI credentials).
+//   us-us → pl-de : same role — a B2C scenario with an INDIVIDUAL client — but US's own domestic,
+//                   no-VAT sales-tax shape has no kept-country equivalent, so this becomes a
+//                   cross-border EU B2C distance sale instead (Poland → a German individual),
+//                   exercising the OSS destination-VAT path (tax-engine.ts#ossDestinationVat) that
+//                   none of the other five scenarios reaches: the line's `vatRate` (19%) is the
+//                   DESTINATION country's own standard rate, not the seller's.
+// de-fr and it-it are unaffected — both already resolve to kept countries.
+//
+// NOTE (2026-09-10): `e2e/cypress/e2e/scenarios/full-lifecycle.cy.ts`, the spec this fixture file
+// feeds, is NOT present in this branch's working tree — removed by an earlier, unrelated commit
+// ("refactor!: suppression des documents légaux et du moteur de conformité"), predating and
+// independent of the 5-country prune. This mapping is prepared and internally consistent, but
+// `.github/workflows/scenarios.yml`'s "Business Scenarios" job cannot actually run until that spec
+// exists again — flagged here and in this task's own report rather than silently left inconsistent.
 export const SCENARIOS: Record<string, Scenario> = {
-  'fr-be': {
-    id: 'fr-be',
-    // Intra-EU B2B service (Art. 44/196 Directive 2006/112/EC): FR seller → BE buyer, both
+  'fr-pl': {
+    id: 'fr-pl',
+    // Intra-EU B2B service (Art. 44/196 Directive 2006/112/EC): FR seller → PL buyer, both
     // VAT-registered. Correct treatment is reverse charge (0% VAT, buyer self-accounts in
-    // Belgium) — NOT French/Belgian standard-rated VAT, which the seller has no place charging
+    // Poland) — NOT French/Polish standard-rated VAT, which the seller has no place charging
     // for a supply whose place of supply is the buyer's country. The FR seller's own
     // intra-community VAT number (`vat`, distinct from the SIRET `legalId`/`identifierScheme`
     // used at onboarding) is required by EN16931 (BR-S-02/BR-AE-02) to identify the seller for
     // tax purposes on ANY cross-border invoice, standard-rated or reverse-charge alike.
     company: { name: 'Studio Lyon SARL', country: 'France', legalId: '73282932000074', vat: 'FR44732829320', currency: 'EUR', currencyLabel: 'Euro (€)', identifierScheme: 'LEGAL_ID' },
-    client: { name: 'Brussels Retail NV', email: 'client-fr-be@mailpit.test', country: 'Belgium', type: 'COMPANY', vat: 'BE0123456789', address: '10 Rue de la Loi', postalCode: '1000', city: 'Brussels', currency: 'EUR' },
+    client: { name: 'Warszawa Consulting Sp. z o.o.', email: 'client-fr-pl@mailpit.test', country: 'Poland', type: 'COMPANY', vat: 'PL5260001246', address: 'ul. Marszałkowska 1', postalCode: '00-624', city: 'Warsaw', currency: 'EUR' },
     item: { name: 'Consulting', quantity: 5, unitPrice: 200, vatRate: 0, type: 'SERVICE' },
   },
   'de-fr': {
@@ -84,23 +116,37 @@ export const SCENARIOS: Record<string, Scenario> = {
     client: { name: 'Comune di Roma', email: 'client-it-it@mailpit.test', country: 'Italy', type: 'COMPANY', vat: 'IT98765432109', address: 'Via del Corso', postalCode: '00186', city: 'Rome', currency: 'EUR' },
     item: { name: 'Servizi IT', quantity: 10, unitPrice: 90, vatRate: 22, type: 'SERVICE' },
   },
-  'es-pt': {
-    id: 'es-pt',
-    company: { name: 'Madrid Diseño SL', country: 'Spain', legalId: 'ESB12345678', currency: 'EUR', currencyLabel: 'Euro (€)', identifierScheme: 'VAT' },
-    client: { name: 'Lisboa Comércio Lda', email: 'client-es-pt@mailpit.test', country: 'Portugal', type: 'COMPANY', vat: 'PT123456789', address: 'Av. da Liberdade', postalCode: '1250-143', city: 'Lisbon', currency: 'EUR' },
-    item: { name: 'Diseño web', quantity: 3, unitPrice: 500, vatRate: 21, type: 'SERVICE' },
+  'pt-de': {
+    id: 'pt-de',
+    // Cross-border B2B service at the SELLER's own standard rate (23%, Portugal's own — was
+    // Spain's 21%) — mirrors de-fr's own "standard-rated cross-border" shape rather than fr-pl's
+    // reverse-charge one, same as the es-pt scenario this replaces.
+    company: { name: 'Porto Digital Lda', country: 'Portugal', legalId: '509442661', vat: 'PT509442661', currency: 'EUR', currencyLabel: 'Euro (€)', identifierScheme: 'VAT' },
+    client: { name: 'Hamburg Handel GmbH', email: 'client-pt-de@mailpit.test', country: 'Germany', type: 'COMPANY', vat: 'DE812000006', address: 'Mönckebergstraße 1', postalCode: '20095', city: 'Hamburg', currency: 'EUR' },
+    item: { name: 'Web design', quantity: 3, unitPrice: 500, vatRate: 23, type: 'SERVICE' },
   },
-  'mx-us': {
-    id: 'mx-us',
-    expectsAuthorityNumbering: true,
-    company: { name: 'CDMX Soluciones SA', country: 'Mexico', legalId: 'MEX010101AAA', currency: 'MXN', currencyLabel: 'Mexican Peso (MX$)', identifierScheme: 'RFC' },
-    client: { name: 'Austin Imports LLC', email: 'client-mx-us@mailpit.test', country: 'United States', type: 'COMPANY', address: '100 Congress Ave', postalCode: '78701', city: 'Austin', currency: 'USD' },
-    item: { name: 'Productos', quantity: 20, unitPrice: 35, vatRate: 16, type: 'PRODUCT' },
+  'it-pt': {
+    id: 'it-pt',
+    // SdI is Italy's ONLY transmission channel — same "no EMAIL fallback, no CI credentials"
+    // situation it-it already documents, so this ALSO legitimately lands on TRANSMISSION_FAILED.
+    // Mexico's own RFC identifier scheme, MXN currency, and `expectsAuthorityNumbering` (the CFDI's
+    // authority-stamped folio) have no equivalent among the kept countries and are dropped, not
+    // reassigned to Italy/Portugal on a guess — see this file's own header.
+    noCiTransmission: true,
+    company: { name: 'Torino Componenti SRL', country: 'Italy', legalId: '11223344554', currency: 'EUR', currencyLabel: 'Euro (€)', identifierScheme: 'VAT' },
+    client: { name: 'Porto Import Lda', email: 'client-it-pt@mailpit.test', country: 'Portugal', type: 'COMPANY', vat: 'PT501442600', address: 'Rua de Santa Catarina', postalCode: '4000-009', city: 'Porto', currency: 'EUR' },
+    item: { name: 'Componenti', quantity: 20, unitPrice: 35, vatRate: 22, type: 'PRODUCT' },
   },
-  'us-us': {
-    id: 'us-us',
-    company: { name: 'Denver Goods Inc', country: 'United States', legalId: '12-3456789', currency: 'USD', currencyLabel: 'United States Dollar ($)' },
-    client: { name: 'Jane Customer', email: 'client-us-us@mailpit.test', country: 'United States', type: 'INDIVIDUAL', contactFirstname: 'Jane', contactLastname: 'Customer', address: '123 Main St', postalCode: '80202', city: 'Denver', currency: 'USD' },
-    item: { name: 'Widget', quantity: 2, unitPrice: 150, vatRate: 0, type: 'PRODUCT' },
+  'pl-de': {
+    id: 'pl-de',
+    // B2C — a Polish seller and a German INDIVIDUAL buyer, preserving us-us's own "individual
+    // client" angle but as a genuine cross-border EU distance sale: the OSS destination-VAT path
+    // (tax-engine.ts#ossDestinationVat), which none of the other four scenarios reaches. `vatRate`
+    // is the DESTINATION country's own standard rate (Germany, 19%), not the seller's — the real
+    // tax resolution at issuance recomputes this from tax-systems/data/de.json regardless of what
+    // was typed here.
+    company: { name: 'Kraków Usługi Sp. z o.o.', country: 'Poland', legalId: 'PL7010018991', currency: 'EUR', currencyLabel: 'Euro (€)', identifierScheme: 'VAT' },
+    client: { name: 'Klaus Mueller', email: 'client-pl-de@mailpit.test', country: 'Germany', type: 'INDIVIDUAL', contactFirstname: 'Klaus', contactLastname: 'Mueller', address: 'Leopoldstraße 10', postalCode: '80802', city: 'Munich', currency: 'EUR' },
+    item: { name: 'Widget', quantity: 2, unitPrice: 150, vatRate: 19, type: 'PRODUCT' },
   },
 };

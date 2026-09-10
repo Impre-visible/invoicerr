@@ -273,28 +273,19 @@ describe('ChannelCredentialsService', () => {
   // above: never a transport hint, always "declare this invoice's data to this authority". Reads
   // `documents/reporting/data/*.json`, the real, shipped files, not a fixture.
   describe('reportingObligations() — reads the country file, never a hard-coded country check', () => {
-    it("a Hungarian company's reporting obligation is nav, with legal provenance", async () => {
-      mockedPrisma.company.findUnique.mockResolvedValue({ country: 'Hungary', countryCode: 'HU' });
-      const facts = await service.reportingObligations('company-1');
-      expect(facts).toEqual([
-        expect.objectContaining({
-          providerId: 'nav',
-          appliesTo: 'invoice',
-          provenance: expect.objectContaining({ kind: 'legal' }),
-        }),
-      ]);
-    });
-
-    it("a Greek company's reporting obligation is mydata, honestly unverified", async () => {
-      mockedPrisma.company.findUnique.mockResolvedValue({ country: 'Greece', countryCode: 'GR' });
-      const facts = await service.reportingObligations('company-1');
-      expect(facts).toEqual([
-        expect.objectContaining({
-          providerId: 'mydata',
-          appliesTo: 'invoice',
-          provenance: expect.objectContaining({ kind: 'unverified' }),
-        }),
-      ]);
+    // HU ("nav") and GR ("mydata") were the only two countries this mechanism ever shipped a
+    // reporting obligation for — both removed by the 5-country prune (2026-09-10, see this task's
+    // own report): the shipped catalog is now honestly EMPTY (reporting/data/all.spec.ts's own
+    // pin). Re-anchored here (not deleted) on that same fact, so this still proves the SERVICE reads
+    // the real (now-empty) catalog rather than a hard-coded guess.
+    it('a Hungarian or Greek company has no reporting obligation any more — the shipped catalog is now empty', async () => {
+      for (const [country, countryCode] of [
+        ['Hungary', 'HU'],
+        ['Greece', 'GR'],
+      ] as const) {
+        mockedPrisma.company.findUnique.mockResolvedValue({ country, countryCode });
+        await expect(service.reportingObligations('company-1')).resolves.toEqual([]);
+      }
     });
 
     it('a French company has no reporting obligation at all — not a guess', async () => {

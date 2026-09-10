@@ -45,10 +45,13 @@ function fileFor(countryCode: string) {
   return file;
 }
 
-describe('country-policy/data — the shipped FR and US files', () => {
-  it('loads exactly the two countries this task asked for, at minimum', () => {
+describe('country-policy/data — the shipped FR/DE/IT/PL/PT files', () => {
+  // Re-pinned by the 5-country prune (2026-09-10, see this task's own report): this mechanism now
+  // ships exactly the five kept countries. US, HU and every other country root TODO P1/vague B ever
+  // added were `git rm`'d along with their data/xx.json.
+  it('loads exactly the five kept countries', () => {
     const codes = ALL_COUNTRY_POLICY_FILES.map((f) => f.countryCode).sort();
-    expect(codes).toEqual(expect.arrayContaining(['FR', 'US']));
+    expect(codes).toEqual(['DE', 'FR', 'IT', 'PL', 'PT']);
   });
 
   it('FR — the reference jurisdiction every test fixture company uses — declares a rule for EVERY native action the core exposes today', () => {
@@ -67,12 +70,10 @@ describe('country-policy/data — the shipped FR and US files', () => {
     expect(forbidden).toEqual([]);
   });
 
-  it('US deliberately does NOT cover quote.duplicate — a real, documented gap, not an oversight', () => {
-    const us = fileFor('US');
-    const declared = new Set(us.rules.map((r) => `${r.typeId}::${r.actionId}`));
-    expect(declared).not.toContain('quote::duplicate');
-    expect(us.notes).toMatch(/duplicate/);
-  });
+  // US used to be the one shipped file with a real, documented gap here (no quote.duplicate rule) —
+  // data/us.json was removed by the 5-country prune (2026-09-10), and every one of the five kept
+  // files (DE/FR/IT/PL/PT) declares quote.duplicate, so there is no honest gap left to re-anchor
+  // this test on; deleted rather than weakened.
 
   it('every rule in every shipped file carries a real provenance (already enforced at load time by data/all.ts — this just makes the property explicit here)', () => {
     for (const file of ALL_COUNTRY_POLICY_FILES) {
@@ -91,8 +92,8 @@ describe('country-policy/data — the shipped FR and US files', () => {
   // The NEW "which types this country has" layer (schema.ts's `documentTypes`) — a separate
   // declaration from `rules` above, so it needs its own coverage guard the same way `rules` already
   // has one just above.
-  it('FR and US both declare every document type the core registers today', () => {
-    for (const code of ['FR', 'US']) {
+  it('every kept country declares every document type the core registers today', () => {
+    for (const code of ['FR', 'DE', 'IT', 'PL', 'PT']) {
       const file = fileFor(code);
       expect((file.documentTypes ?? []).slice().sort()).toEqual(ALL_DOCUMENT_TYPE_IDS.slice().sort());
     }
@@ -104,65 +105,28 @@ describe('country-policy/data — the shipped FR and US files', () => {
   // [approved/rejected] received invoice's fields are no longer editable", the same shape of fact
   // applied to a different type's own lifecycle). Root TODO item 21 (2026-09-01) promoted FR's
   // invoice.save-draft to `legal` (CGI art. 289 I.5, read directly — see its own `notes`); root TODO
-  // P1 (2026-09-03) did the SAME for DE/IT/PL/ES/MX, each on its own national text (see each file's
-  // own `notes` on invoice.save-draft). US is the one shipped file that declares NO narrowing here at
-  // all (see us.json's own resolutionNote: no US statutory prohibition on re-editing an issued
-  // invoice was found, but that absence was never positively confirmed either, so US's own
-  // invoice.save-draft stays `unverified` AND unrestricted — it is simply not one of the two examples
-  // this test pins). received-invoice.receive stays `unverified` in every file (no rule's own
-  // resolutionNote named a checkable text for the STATUS narrowing itself, as opposed to the
-  // separate, already-sourced reception-channel mandate FR's own rule documents).
-  it('invoice.save-draft (FR+DE+IT+PL+ES+MX) and received-invoice.receive (every shipped file) restrict to their own "still editable" status', () => {
-    for (const code of ['FR', 'DE', 'IT', 'PL', 'ES', 'MX']) {
-      expect(
-        fileFor(code).rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft')?.statuses,
-      ).toEqual(['draft']);
-    }
+  // P1 (2026-09-03) did the SAME for DE/IT/PL, and lot 7 (2026-09-04) for PT (see each file's own
+  // `notes` on invoice.save-draft). Every one of the five kept files sources this narrowing today —
+  // US used to be the one shipped file with NO narrowing here at all, but data/us.json was removed by
+  // the 5-country prune (2026-09-10). received-invoice.receive stays `unverified` in every file (no
+  // rule's own resolutionNote named a checkable text for the STATUS narrowing itself, as opposed to
+  // the separate, already-sourced reception-channel mandate FR's own rule documents).
+  it('invoice.save-draft and received-invoice.receive restrict to their own "still editable" status, in every shipped file', () => {
     for (const file of ALL_COUNTRY_POLICY_FILES) {
-      // HU is the one shipped file that doesn't declare 'received-invoice' at all (hu.json's own
-      // notes: deliberately partial, only invoice.save-draft/send are declared) — skip it here
-      // rather than assert on a rule that was never meant to exist.
-      const rule = file.rules.find((r) => r.typeId === 'received-invoice' && r.actionId === 'receive');
-      if (!rule) {
-        expect(file.countryCode).toBe('HU');
-        continue;
-      }
-      expect(rule.statuses).toEqual(['received']);
+      expect(file.rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft')?.statuses).toEqual(
+        ['draft'],
+      );
+      expect(
+        file.rules.find((r) => r.typeId === 'received-invoice' && r.actionId === 'receive')?.statuses,
+      ).toEqual(['received']);
     }
   });
 
   it('no OTHER shipped rule declares a per-status narrowing — these two stay the only deliberate examples', () => {
-    // BE (AR n°1 art. 12 §1), NL (art. 35a lid 1.b composition — the file says so itself) and AT
-    // (UStG §16 Abs. 1) joined with lot 1 (TODO_DOCUMENTS vague B) — each narrowing SOURCED in its file.
-    const COUNTRIES_WITH_SOURCED_SAVE_DRAFT_NARROWING = [
-      'FR',
-      'DE',
-      'IT',
-      'PL',
-      'ES',
-      'MX',
-      'BE',
-      'NL',
-      'AT',
-      'EE',
-      'GR',
-      'CY',
-      'LT',
-      'LV',
-      'LU',
-      'MT',
-      'SE',
-      'DK',
-      'FI',
-      'IE',
-      'BG',
-      'CZ',
-      'HR',
-      'PT',
-      'RO',
-      'SI',
-      'SK',
-    ];
+    // Every one of the five kept countries (FR/DE/IT/PL/PT) sources this narrowing today — the
+    // longer, lot-1/vague-B list this test used to carry (BE/NL/AT/EE/GR/CY/…) was removed by the
+    // 5-country prune (2026-09-10) along with those countries' own data/xx.json files.
+    const COUNTRIES_WITH_SOURCED_SAVE_DRAFT_NARROWING = ['FR', 'DE', 'IT', 'PL', 'PT'];
     const isKnownNarrowing = (countryCode: string, typeId: string, actionId: string) =>
       (typeId === 'invoice' &&
         actionId === 'save-draft' &&
@@ -223,18 +187,9 @@ describe('country-policy/data — FR rules promoted to "legal" by root TODO item
     expect(rule.statuses).toEqual(['draft']); // the underlying restriction this citation now grounds
   });
 
-  it("US quote.send/invoice.send E-SIGN citation was re-verified 2026-09-01 against the official govinfo.gov text, not just Cornell's mirror", () => {
-    const us = fileFor('US');
-    for (const actionId of ['send'] as const) {
-      const quoteRule = us.rules.find((r) => r.typeId === 'quote' && r.actionId === actionId)!;
-      const invoiceRule = us.rules.find((r) => r.typeId === 'invoice' && r.actionId === actionId)!;
-      for (const rule of [quoteRule, invoiceRule]) {
-        expect(rule.provenance.kind).toBe('legal');
-        if (rule.provenance.kind === 'legal') expect(rule.provenance.sourceCheckedAt).toBe('2026-09-01');
-        expect(rule.notes).toMatch(/govinfo\.gov/);
-      }
-    }
-  });
+  // US's own quote.send/invoice.send E-SIGN (govinfo.gov) citation was re-verified 2026-09-01, but
+  // data/us.json was removed by the 5-country prune (2026-09-10) — no kept country cites the US
+  // federal E-SIGN act, so this case has no honest re-anchor and is deleted rather than weakened.
 });
 
 // Root TODO P1 (2026-09-03) — "les 5 fichiers country-policy sourcés (DE, IT, PL, ES, MX)". Before
@@ -245,40 +200,13 @@ describe('country-policy/data — FR rules promoted to "legal" by root TODO item
 // the two immutability citations this task called out BY NAME (PL/IT), the five `send` unblocks, and
 // one honest `unverified` per country, so a future edit that quietly waters one of these down goes
 // red here first.
-describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-03)', () => {
-  it('the catalog now covers exactly 29 countries — the FULL EU-27 plus US and MX: lot 7 (PT/RO/SI/SK) closed vague B', () => {
+// Re-scoped by the 5-country prune (2026-09-10): ES and MX (root TODO P1's other two additions) were
+// removed along with their data/xx.json — this block now pins DE/IT/PL only, the three P1 additions
+// that survived the prune. See this task's own report for the mapping.
+describe('country-policy/data — DE/IT/PL added by root TODO P1 (2026-09-03)', () => {
+  it('the catalog now covers exactly the five kept countries (DE/FR/IT/PL/PT)', () => {
     const codes = ALL_COUNTRY_POLICY_FILES.map((f) => f.countryCode).sort();
-    expect(codes).toEqual([
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'FR',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'IT',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'MX',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-      'US',
-    ]);
+    expect(codes).toEqual(['DE', 'FR', 'IT', 'PL', 'PT']);
   });
 
   it('PL invoice.save-draft cites the Podręcznik KSeF verbatim: a file sent to KSeF cannot be edited, only corrected by a new faktura korygująca', () => {
@@ -305,42 +233,32 @@ describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-
     expect(rule.statuses).toEqual(['draft']);
   });
 
-  it('DE and ES invoice.save-draft are ALSO sourced "legal" with the same draft-only restriction (the immutability fact generalizes, not just PL/IT)', () => {
-    for (const code of ['DE', 'ES']) {
-      const rule = fileFor(code).rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft')!;
-      expect(rule.provenance.kind).toBe('legal');
-      expect(rule.statuses).toEqual(['draft']);
-    }
-  });
-
-  it('MX invoice.save-draft cites CFF art. 29-A: a stamped CFDI is immutable, with no amendment-by-reference route', () => {
-    const mx = fileFor('MX');
-    const rule = mx.rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft')!;
+  it('DE invoice.save-draft is ALSO sourced "legal" with the same draft-only restriction (the immutability fact generalizes, not just PL/IT)', () => {
+    // ES used to pair with DE here — data/es.json was removed by the 5-country prune (2026-09-10).
+    const rule = fileFor('DE').rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft')!;
     expect(rule.provenance.kind).toBe('legal');
-    if (rule.provenance.kind === 'legal') expect(rule.provenance.sourceText).toMatch(/immuable/);
     expect(rule.statuses).toEqual(['draft']);
   });
 
-  it('invoice.send is allowed for all five new countries — the actual unblock this task exists for', () => {
-    for (const code of ['DE', 'IT', 'PL', 'ES', 'MX']) {
+  it('invoice.send is allowed for all three surviving P1 countries — the actual unblock this task exists for', () => {
+    for (const code of ['DE', 'IT', 'PL']) {
       const rule = fileFor(code).rules.find((r) => r.typeId === 'invoice' && r.actionId === 'send')!;
       expect(rule.allowed).toBe(true);
     }
   });
 
-  it('invoice.send is grounded "legal" for DE/IT/PL/ES (a national electronic-invoicing text read live on 2026-09-03) — MX stays honestly unverified', () => {
-    for (const code of ['DE', 'IT', 'PL', 'ES']) {
+  it('invoice.send is grounded "legal" for DE/IT/PL — a national electronic-invoicing text read live on 2026-09-03', () => {
+    // MX used to be the honestly-unverified counterexample here — data/mx.json was removed by the
+    // 5-country prune (2026-09-10).
+    for (const code of ['DE', 'IT', 'PL']) {
       const rule = fileFor(code).rules.find((r) => r.typeId === 'invoice' && r.actionId === 'send')!;
       expect(rule.provenance.kind).toBe('legal');
       if (rule.provenance.kind === 'legal') expect(rule.provenance.sourceCheckedAt).toBe('2026-09-03');
     }
-    const mxSend = fileFor('MX').rules.find((r) => r.typeId === 'invoice' && r.actionId === 'send')!;
-    expect(mxSend.provenance.kind).toBe('unverified'); // diputados.gob.mx/sat.gob.mx unreachable — see its own resolutionNote
-    expect(mxSend.allowed).toBe(true); // still unblocked — 'unverified' is not a lesser citizen (schema.ts's own header)
   });
 
-  it('quote.send cites the SAME eIDAS art. 25 §1 text for DE/IT/PL/ES — a Regulation, not a directive, needs no per-country transposition', () => {
-    for (const code of ['DE', 'IT', 'PL', 'ES']) {
+  it('quote.send cites the SAME eIDAS art. 25 §1 text for DE/IT/PL — a Regulation, not a directive, needs no per-country transposition', () => {
+    for (const code of ['DE', 'IT', 'PL']) {
       const rule = fileFor(code).rules.find((r) => r.typeId === 'quote' && r.actionId === 'send')!;
       expect(rule.provenance.kind).toBe('legal');
       if (rule.provenance.kind === 'legal') {
@@ -351,7 +269,7 @@ describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-
   });
 
   it('credit-note.send is sourced per country from the correction-routes CREDIT_NOTE fact already read for C1/C3 — never re-invented here', () => {
-    for (const code of ['DE', 'IT', 'PL', 'ES', 'MX']) {
+    for (const code of ['DE', 'IT', 'PL']) {
       const rule = fileFor(code).rules.find((r) => r.typeId === 'credit-note' && r.actionId === 'send')!;
       expect(rule.provenance.kind).toBe('legal');
       expect(rule.allowed).toBe(true);
@@ -363,8 +281,8 @@ describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-
     ).toMatch(/faktura korygująca/);
   });
 
-  it('each of the five new files carries at least one honest, resolvable `unverified` entry — not a wall-to-wall "legal" claim', () => {
-    for (const code of ['DE', 'IT', 'PL', 'ES', 'MX']) {
+  it('each of the three surviving P1 files carries at least one honest, resolvable `unverified` entry — not a wall-to-wall "legal" claim', () => {
+    for (const code of ['DE', 'IT', 'PL']) {
       const file = fileFor(code);
       const unverified = file.rules.filter((r) => r.provenance.kind === 'unverified');
       expect(unverified.length).toBeGreaterThan(0);
@@ -375,11 +293,13 @@ describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-
     }
   });
 
-  it('all five new files declare the SAME 22 (typeId, actionId) pairs as fr.json — no silent gap versus the reference jurisdiction', () => {
+  it('every kept file declares the SAME 22 (typeId, actionId) pairs as fr.json — no silent gap versus the reference jurisdiction', () => {
+    // Widened from the original DE/IT/PL/ES/MX list to every kept country (also PT) — strictly more
+    // coverage than before the prune, not less.
     const frKeys = fileFor('FR')
       .rules.map((r) => `${r.typeId}::${r.actionId}`)
       .sort();
-    for (const code of ['DE', 'IT', 'PL', 'ES', 'MX']) {
+    for (const code of ['DE', 'IT', 'PL', 'PT']) {
       const keys = fileFor(code)
         .rules.map((r) => `${r.typeId}::${r.actionId}`)
         .sort();
@@ -388,89 +308,9 @@ describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-
   });
 });
 
-// BE — agent pays Belgique, lot 1 TODO_DOCUMENTS.md (vague B, 2026-09-04). country-policy/data/be.json
-// is NOT YET registered in this file's own data/all.ts (COUNTRY_FILES) — registration is the
-// mandataire's job at lot validation, done together with the NL/AT files this same lot also adds. This
-// block therefore loads be.json DIRECTLY (readFileSync + assertValidProvenance, the exact gate
-// data/all.ts's own loadCountryFile calls) rather than through ALL_COUNTRY_POLICY_FILES, so it is
-// green independently of that registration, using inline `require()` (not a top-level `import`)
-// specifically so this addition can never collide with the NL/AT agents' own additions to this same
-// file editing the same import block in parallel.
-describe('BE — country-policy/data/be.json (agent pays Belgique, not yet registered in all.ts)', () => {
-  const { readFileSync } = require('node:fs');
-  const { join } = require('node:path');
-  const { assertValidProvenance } = require('../schema');
-
-  function loadBe() {
-    return JSON.parse(readFileSync(join(__dirname, 'be.json'), 'utf-8'));
-  }
-
-  it('parses, declares countryCode BE, and every rule passes the load-time provenance gate', () => {
-    const be = loadBe();
-    expect(be.countryCode).toBe('BE');
-    expect(be.rules.length).toBeGreaterThan(0);
-    for (const rule of be.rules) {
-      expect(() => assertValidProvenance(rule, 'test')).not.toThrow();
-    }
-  });
-
-  it('declares the same 22 (typeId, actionId) pairs as fr.json — no silent gap versus the reference jurisdiction', () => {
-    const be = loadBe();
-    const fr = JSON.parse(readFileSync(join(__dirname, 'fr.json'), 'utf-8'));
-    const frKeys = fr.rules.map((r) => `${r.typeId}::${r.actionId}`).sort();
-    const beKeys = be.rules.map((r) => `${r.typeId}::${r.actionId}`).sort();
-    expect(beKeys).toEqual(frKeys);
-  });
-
-  it('declares the same five document types as fr.json', () => {
-    const be = loadBe();
-    expect((be.documentTypes ?? []).slice().sort()).toEqual(
-      ['credit-note', 'expense', 'invoice', 'quote', 'received-invoice'].sort(),
-    );
-  });
-
-  it('invoice.save-draft is "legal", restricted to draft — the AR n°1 art. 12 §1 immutability fact (efacture.belgium.be, read 2026-09-04)', () => {
-    const be = loadBe();
-    const rule = be.rules.find((r) => r.typeId === 'invoice' && r.actionId === 'save-draft');
-    expect(rule.provenance.kind).toBe('legal');
-    expect(rule.provenance.sourceText).toMatch(/document rectificatif/);
-    expect(rule.provenance.sourceCheckedAt).toBe('2026-09-04');
-    expect(rule.statuses).toEqual(['draft']);
-  });
-
-  it('invoice.send is "legal", citing the loi du 6 février 2024 (CTVA art. 53 §2bis, read directly on ejustice.just.fgov.be)', () => {
-    const be = loadBe();
-    const rule = be.rules.find((r) => r.typeId === 'invoice' && r.actionId === 'send');
-    expect(rule.allowed).toBe(true);
-    expect(rule.provenance.kind).toBe('legal');
-    expect(rule.provenance.sourceText).toMatch(/facture électronique structurée/);
-    expect(rule.notes).toMatch(/2024001635/);
-  });
-
-  it('quote.send reuses the eIDAS art. 25 §1 citation already verified by other files of this same lot (pl/de/it/es) — dated, not re-verified', () => {
-    const be = loadBe();
-    const rule = be.rules.find((r) => r.typeId === 'quote' && r.actionId === 'send');
-    expect(rule.provenance.kind).toBe('legal');
-    expect(rule.provenance.sourceText).toMatch(/shall not be denied legal effect/);
-    expect(rule.notes).toMatch(/RÉUTILISE/);
-  });
-
-  it('credit-note.send is "legal" — Belgium names BOTH "notes de crédit" and "notes de débit" explicitly, unlike Poland\'s single-instrument regime', () => {
-    const be = loadBe();
-    const rule = be.rules.find((r) => r.typeId === 'credit-note' && r.actionId === 'send');
-    expect(rule.provenance.kind).toBe('legal');
-    expect(rule.provenance.sourceText).toMatch(/notes de crédit et notes de débit/);
-  });
-
-  it('carries at least one honest, resolvable "unverified" entry — not a wall-to-wall "legal" claim', () => {
-    const be = loadBe();
-    const unverified = be.rules.filter((r) => r.provenance.kind === 'unverified');
-    expect(unverified.length).toBeGreaterThan(0);
-    for (const rule of unverified) {
-      expect(rule.provenance.resolutionNote.trim().length).toBeGreaterThan(0);
-    }
-  });
-});
+// BE's country-policy/data/be.json (agent pays Belgique) was removed by the 5-country prune
+// (2026-09-10, see this task's own report) along with every other country outside FR/PL/IT/PT/DE —
+// it was never registered in data/all.ts to begin with, so nothing here re-anchors it.
 
 // Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
 // really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory

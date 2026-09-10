@@ -13,21 +13,15 @@ describe('TaxSystemRegistry', () => {
     }
   });
 
-  it('US is a SALES_TAX system with the repère-ported state rates', () => {
-    const us = registry.resolve('US');
-    expect(us?.taxSystem.kind).toBe('SALES_TAX');
-    if (us?.taxSystem.kind === 'SALES_TAX') {
-      expect(us.taxSystem.stateRates.CA).toBe(7.25);
-      expect(us.taxSystem.nexusSubdivisions).toContain('CA');
-    }
-  });
-
-  it('IT/SA/AE/IN/QA are resolvable with their own explicit rates', () => {
+  // US (SALES_TAX) and SA/AE/IN/QA (VAT/GST/NONE, non-EU) were removed by the 5-country prune
+  // (2026-09-10) along with their data/xx.json — no kept country (DE/FR/IT/PL/PT) uses the
+  // SALES_TAX/GST/NONE `kind`s, so these two cases have no honest re-anchor and are deleted rather
+  // than weakened. `toTaxSystemSpec`'s own SALES_TAX/GST/NONE branches in registry.ts stay: they are
+  // generic, data-driven dispatch on `fact.kind`, not a US/MX-specific branch, and remain reachable
+  // by constructing a `TaxSystemRegistry` with a synthetic fact directly (see this file's own
+  // constructor parameter) — see this task's own report.
+  it('IT is resolvable with its own explicit rate', () => {
     expect(registry.resolve('IT')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 22 });
-    expect(registry.resolve('SA')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 15 });
-    expect(registry.resolve('AE')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 5 });
-    expect(registry.resolve('IN')?.taxSystem).toMatchObject({ kind: 'GST', standardRate: 18 });
-    expect(registry.resolve('QA')?.taxSystem).toEqual({ kind: 'NONE' });
   });
 
   it('an uncatalogued country (the United Kingdom, GB — left the EU, no tax-system file shipped) has no known profile at all — the fact the OSS gate relies on', () => {
@@ -50,8 +44,12 @@ describe('TaxSystemRegistry', () => {
     }
   });
 
-  it('HU (27%, the highest in the EU) and LU (17%, the lowest) both resolve — the two extremes this task’s own report cites', () => {
-    expect(registry.resolve('HU')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 27 });
-    expect(registry.resolve('LU')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 17 });
+  // HU (27%, the highest in the EU) and LU (17%, the lowest) were removed by the 5-country prune
+  // (2026-09-10) — re-anchored on the two extremes among the KEPT countries instead (see
+  // tax-systems/data/all.spec.ts's own matching test).
+  it('PL/PT (23%, the highest among the kept countries) and DE (19%, the lowest) both resolve', () => {
+    expect(registry.resolve('PL')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 23 });
+    expect(registry.resolve('PT')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 23 });
+    expect(registry.resolve('DE')?.taxSystem).toMatchObject({ kind: 'VAT', standardRate: 19 });
   });
 });

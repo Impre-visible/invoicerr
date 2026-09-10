@@ -31,22 +31,19 @@
  *    correctives, jamais par une annulation — la voie existe, le mécanisme d'annulation non." The
  *    ROUTE is mandatory, but its own REALIZATION is a corrective invoice (CORRECTIVE_INVOICE, a
  *    different mechanism this task does not build), never a status flip on the original record.
- *  - Mexico (`required`): data/mx.json's own sourceText NAMES an authority operation as step 2 of the
- *    mandated order — "Al registrar la solicitud de cancelación..." (a request submitted THROUGH the
- *    SAT/PAC channel) — exactly as un-implementable as AUTHORITY_ANNULMENT itself (data/mx.json's own
- *    AUTHORITY_ANNULMENT entry, also `required`, for the identical missing-channel reason: this repo
- *    wires no SAT/PAC transport at all today — `grep -rn mx transports/` finds nothing), even though
- *    the ROUTE ID differs. AUTHORITY_ANNULMENT itself stays out of scope for every pivot for the same
- *    reason (KSeF/SdI/PDP wire no cancellation OPERATION today either) — see documents.service.ts's
- *    own `resolveActionPolicy` header.
  *
- * Spain's own CANCEL_AND_REPLACE is simply `forbidden` — the generic refusal already covers it, no
- * exception needed. So this stays a per-country WHITELIST (`CANCEL_LOCAL_AVAILABILITY` below), each
- * entry justified inline and cross-checked against the ACTUAL loaded route status
- * (`resolveCancelPolicyForCountry` throws if a country's own JSON status no longer matches what this
- * whitelist assumes — cancel-policy.spec.ts proves it) so a future edit to a country's own correction-
- * routes file that invalidates one of these assumptions fails LOUDLY at the moment it is READ, never
- * silently drifts into a wrong answer.
+ * Portugal's own CANCEL_AND_REPLACE stays honestly `unverified` (no clearance/refusal-then-reissue
+ * mechanism was found in the Decreto-Lei n.º 28/2019 read in primary text) — the generic
+ * not-whitelisted refusal already covers it, no exception needed. So this stays a per-country
+ * WHITELIST (`CANCEL_LOCAL_AVAILABILITY` below), each entry justified inline and cross-checked
+ * against the ACTUAL loaded route status (`resolveCancelPolicyForCountry` throws if a country's own
+ * JSON status no longer matches what this whitelist assumes — cancel-policy.spec.ts proves it) so a
+ * future edit to a country's own correction-routes file that invalidates one of these assumptions
+ * fails LOUDLY at the moment it is READ, never silently drifts into a wrong answer.
+ *
+ * (Mexico and Spain used to illustrate the same two shapes — MX's own authority-side "required" trap
+ * and ES's plain "forbidden" — but both data/mx.json and data/es.json were removed by the 5-country
+ * prune, 2026-09-10; PL and PT alone now carry the two documented "not implementable" shapes above.)
  *
  * Italy is the one exception with a REAL local mechanism but a NARROWER scope than the other three:
  * its own data says CANCEL_AND_REPLACE exists "Après scarto UNIQUEMENT (inexistant après livraison au
@@ -59,14 +56,17 @@
  * itself draws (composed by `documents.service.ts#runAction`'s existing `restrictedToStatuses` 409,
  * the same mechanism `country-policy/`'s own per-status narrowing already uses for other actions).
  *
- * FR, DE and US ground an UNRESTRICTED local cancel: none of their own CANCEL_AND_REPLACE sourceText
+ * FR and DE ground an UNRESTRICTED local cancel: neither of their own CANCEL_AND_REPLACE sourceText
  * names an authority step, a transmission-outcome precondition, or any other narrowing — FR ("Doit
  * porter référence exacte à la facture initiale et la mention expresse de l'annulation de celle-ci"),
  * DE ("Auch der Stornierung einer Rechnung nebst Neuausstellung einer sie ersetzenden Rechnung kann
  * eine Rückwirkung [...] zukommen" — DE additionally grounds the SAME conclusion a second, independent
  * way through NO_DOCUMENT_BY_LAW, `allowed`, Germany's own DEFAULT correction route, "aucune correction
- * de facture n'est requise" — not read by this module since CANCEL_AND_REPLACE alone already suffices),
- * US ("Rien à annuler auprès de personne [...] Réémettre est un acte purement privé").
+ * de facture n'est requise" — not read by this module since CANCEL_AND_REPLACE alone already suffices).
+ * (US used to ground the same conclusion a third way — "Rien à annuler auprès de personne [...]
+ * Réémettre est un acte purement privé" — but data/us.json was removed by the 5-country prune,
+ * 2026-09-10, and the "US" entry below with it: `findCancelAndReplaceRoute` can never resolve a file
+ * for "US" any more, so keeping it in the whitelist would have been dead, unreachable code.)
  */
 import { CountryPolicyDecision } from '../country-policy/country-policy';
 import { defaultCorrectionRoutesCatalog } from './registry';
@@ -90,7 +90,6 @@ interface CancelWhitelistEntry {
 const CANCEL_LOCAL_AVAILABILITY: Record<string, CancelWhitelistEntry> = {
   FR: { expectedStatus: 'allowed' },
   DE: { expectedStatus: 'allowed' },
-  US: { expectedStatus: 'allowed' },
   IT: { expectedStatus: 'allowed', restrictedToStatuses: ['send_failed'] },
 };
 
@@ -141,7 +140,7 @@ export function resolveCancelPolicyForCountry(countryCode: string | undefined | 
 
   const whitelisted = CANCEL_LOCAL_AVAILABILITY[resolved];
   if (!whitelisted) {
-    // Poland, Mexico, Spain, and any 8th country whose file exists but was never reviewed for this
+    // Poland, Portugal, and any other country whose file exists but was never reviewed for this
     // specific question — every one of them refused by NAME, quoting the route's own words, never a
     // silent fallback.
     return { allowed: false, reason: describeCancelRefusal(resolved, route) };
@@ -163,7 +162,8 @@ export function resolveCancelPolicyForCountry(countryCode: string | undefined | 
     : { allowed: true };
 }
 
-/** Every seller country this module currently founds a LOCAL cancel for — `correction-routes.ts` calls
+/** Every seller country this module currently founds a LOCAL cancel for (three today: FR/DE/IT) —
+ *  `correction-routes.ts` calls
  *  `resolveCancelPolicyForCountry` directly instead of this list (see that file's own `isImplemented`
  *  header for why: the direct call also gets the whitelist's own data-drift cross-check on every
  *  read, not just when someone actually tries to cancel). This export exists for

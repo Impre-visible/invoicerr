@@ -8,8 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # 5-country prune (2026-09-10) — fr-be/es-pt/mx-us/us-us re-pointed onto kept-country pairs
+      # (fr-pl/pt-de/it-pt/pl-de); de-fr and it-it are unchanged. See
+      # e2e/cypress/fixtures/scenarios.ts's own header for the full mapping and rationale.
       matrix:
-        scenario: [fr-be, de-fr, it-it, es-pt, mx-us, us-us]
+        scenario: [fr-pl, de-fr, it-it, pt-de, it-pt, pl-de]
     services:
       postgres-test:
         image: postgres:16

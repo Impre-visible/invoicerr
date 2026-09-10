@@ -45,14 +45,16 @@ npm run i18n:check             # fails if a used t() key is missing from locales
 cd e2e && npm ci
 npm run e2e:run                # the numbered suites (cypress/e2e/*.cy.ts)
 npx cypress run --spec "cypress/e2e/07-invoices.cy.ts"
-CYPRESS_scenario=fr-be npx cypress run --spec "cypress/e2e/scenarios/full-lifecycle.cy.ts"
+CYPRESS_scenario=fr-pl npx cypress run --spec "cypress/e2e/scenarios/full-lifecycle.cy.ts"
 ```
 
 ### CI (`.github/workflows/`)
 - `cypress.yml` ("Tests", on PR) — biome lint, i18n check, backend jest, a **queue-integration** job
   (real Redis + Postgres, runs `compliance/nest/queue/__tests__`), and the Cypress run.
-- `scenarios.yml` ("Business Scenarios", on PR) — matrix `fr-be de-fr it-it es-pt mx-us us-us`, each
-  driving `scenarios/full-lifecycle.cy.ts` against a real stack.
+- `scenarios.yml` ("Business Scenarios", on PR) — matrix `fr-pl de-fr it-it pt-de it-pt pl-de` (the
+  5-country prune, 2026-09-10, re-pointed fr-be/es-pt/mx-us/us-us onto kept-country pairs — see
+  `e2e/cypress/fixtures/scenarios.ts`'s own header for the mapping), each driving
+  `scenarios/full-lifecycle.cy.ts` against a real stack.
 - `compliance-live.yml` — real-API round-trips, `workflow_dispatch` only. See `LIVE_TESTING.md`.
 
 ## Architecture

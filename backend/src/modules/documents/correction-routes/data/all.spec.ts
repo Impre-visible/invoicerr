@@ -36,39 +36,13 @@ describe('correction-routes/data/all.ts', () => {
     expect(ALL_CORRECTION_ROUTES_FILES.length).toBeGreaterThan(0);
   });
 
-  it('ships the seven YAML pivots PLUS the lot-1/lot-2 direct readings (BE/NL/AT/EE/GR/CY — TODO_DOCUMENTS vague B, first readings OUTSIDE docs/compliance/CORRECTION-ROUTES.yaml, each file saying so itself)', () => {
+  // Re-pinned by the 5-country prune (2026-09-10, see this task's own report): this mechanism ships
+  // correction-routes rules for DE/FR/IT/PL/PT only — every other country the YAML or a later
+  // direct-reading lot ever covered (AT/BE/BG/CY/CZ/DK/EE/ES/FI/GR/HR/HU/IE/LT/LU/LV/MT/MX/NL/RO/
+  // SE/SI/SK/US) was `git rm`'d along with its data/xx.json.
+  it('ships exactly the five kept-country files (DE/FR/IT/PL/PT)', () => {
     const countries = ALL_CORRECTION_ROUTES_FILES.map((f) => f.countryCode).sort();
-    expect(countries).toEqual([
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'FR',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'IT',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'MX',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-      'US',
-    ]);
+    expect(countries).toEqual(['DE', 'FR', 'IT', 'PL', 'PT']);
   });
 
   it('every shipped route carries either legal or unverified provenance, never anything else', () => {
@@ -119,9 +93,8 @@ describe('correction-routes/data/all.ts', () => {
     expect(statusOf('IT', 'INTERNAL_CREDIT_NOTE')).toBe('required');
   });
 
-  it('ES and MX also forbid INTERNAL_CREDIT_NOTE, same side as Poland', () => {
-    expect(statusOf('ES', 'INTERNAL_CREDIT_NOTE')).toBe('forbidden');
-    expect(statusOf('MX', 'INTERNAL_CREDIT_NOTE')).toBe('forbidden');
+  it('DE also forbids INTERNAL_CREDIT_NOTE, same side as Poland', () => {
+    expect(statusOf('DE', 'INTERNAL_CREDIT_NOTE')).toBe('forbidden');
   });
 
   // One further pinned sample per country — each a headline finding from CORRECTION-ROUTES.yaml, so a
@@ -141,25 +114,16 @@ describe('correction-routes/data/all.ts', () => {
     expect(statusOf('DE', 'AUTHORITY_ANNULMENT')).toBe('required');
   });
 
-  it('DE and MX both declare COUNTERPARTY_OBJECTION as allowed — two different legal shapes, same route', () => {
+  // DE genuinely declares COUNTERPARTY_OBJECTION "allowed" — none of the other four kept countries
+  // do (FR/IT/PL/PT all stay honestly "unverified" for the same route), which is itself the point:
+  // this is real per-country data, not a shared default silently applied to everyone. (MX, which
+  // used to pair with DE here on the same "allowed" value, was removed by the 5-country prune,
+  // 2026-09-10 — no other kept country shares DE's value for this route.)
+  it('DE declares COUNTERPARTY_OBJECTION as "allowed" while every other kept country stays honestly "unverified" for the same route', () => {
     expect(statusOf('DE', 'COUNTERPARTY_OBJECTION')).toBe('allowed');
-    expect(statusOf('MX', 'COUNTERPARTY_OBJECTION')).toBe('allowed');
-  });
-
-  it('ES: CREDIT_NOTE is required (conditioned on remission) and CANCEL_AND_REPLACE is forbidden by absence of mechanism', () => {
-    expect(statusOf('ES', 'CREDIT_NOTE')).toBe('required');
-    expect(statusOf('ES', 'CANCEL_AND_REPLACE')).toBe('forbidden');
-  });
-
-  it('MX: AUTHORITY_ANNULMENT and CANCEL_AND_REPLACE are both required — the only pivot where NOT correcting is itself an infraction', () => {
-    expect(statusOf('MX', 'AUTHORITY_ANNULMENT')).toBe('required');
-    expect(statusOf('MX', 'CANCEL_AND_REPLACE')).toBe('required');
-  });
-
-  it('US: every negative-established route is "allowed" (no federal instrument at all) and AUTHORITY_ANNULMENT is structurally forbidden (no receiving authority)', () => {
-    expect(statusOf('US', 'CREDIT_NOTE')).toBe('allowed');
-    expect(statusOf('US', 'INTERNAL_CREDIT_NOTE')).toBe('allowed');
-    expect(statusOf('US', 'AUTHORITY_ANNULMENT')).toBe('forbidden');
+    for (const countryCode of ['FR', 'IT', 'PL', 'PT']) {
+      expect(statusOf(countryCode, 'COUNTERPARTY_OBJECTION')).toBe('unverified');
+    }
   });
 
   it('FR: ANNOTATED_DUPLICATE is required for unpaid invoices (the counterpart of a forbidden credit note there)', () => {
@@ -170,7 +134,7 @@ describe('correction-routes/data/all.ts', () => {
   // transcribes to "unverified" — never silently promoted, never silently absent.
   it('a route the YAML never mentions for a country transcribes to "unverified", never a guess', () => {
     expect(statusOf('FR', 'NO_DOCUMENT_BY_LAW')).toBe('unverified');
-    expect(statusOf('US', 'LEDGER_ANNOTATION')).toBe('unverified');
+    expect(statusOf('DE', 'LEDGER_ANNOTATION')).toBe('unverified');
   });
 
   // THE LOAD-TIME GATE, proven against an INVENTED eighth country — TODO_CORRECTION.md C1's own
@@ -181,80 +145,9 @@ describe('correction-routes/data/all.ts', () => {
   });
 });
 
-// BE — agent pays Belgique, lot 1 TODO_DOCUMENTS.md (vague B, 2026-09-04). No pivot in
-// docs/compliance/CORRECTION-ROUTES.yaml (only FR/IT/PL/DE/ES/MX/US are covered) — this is a first C1
-// reading, done entirely by this task. correction-routes/data/be.json is NOT YET registered in this
-// file's own data/all.ts (COUNTRY_FILES) — registration is the mandataire's job at lot validation. This
-// block therefore loads be.json DIRECTLY (readFileSync + assertValidCorrectionRouteFact, the exact
-// gate loadCountryFile calls) rather than through ALL_CORRECTION_ROUTES_FILES — via inline `require()`
-// (not a top-level `import`) so this addition can never collide with the NL/AT agents' own additions to
-// this same file. Note: the file-level `jest.mock('node:fs', ...)` above passes any path other than
-// "zz.json" straight through to the real `readFileSync`, so `require('node:fs')` here still reads the
-// real be.json.
-describe('BE — correction-routes/data/be.json (agent pays Belgique, not yet registered in all.ts)', () => {
-  const { readFileSync } = require('node:fs');
-  const { join } = require('node:path');
-  const { assertValidCorrectionRouteFact } = require('../schema');
-
-  function loadBe() {
-    return JSON.parse(readFileSync(join(__dirname, 'be.json'), 'utf-8'));
-  }
-
-  it('parses, declares countryCode BE, and declares exactly the eleven canonical routes, each passing the load-time gate', () => {
-    const be = loadBe();
-    expect(be.countryCode).toBe('BE');
-    const EXPECTED = [
-      'CREDIT_NOTE',
-      'DEBIT_NOTE',
-      'CORRECTIVE_INVOICE',
-      'CANCEL_AND_REPLACE',
-      'INTERNAL_CREDIT_NOTE',
-      'AUTHORITY_ANNULMENT',
-      'RESUBMIT_SAME_IDENTITY',
-      'ANNOTATED_DUPLICATE',
-      'LEDGER_ANNOTATION',
-      'NO_DOCUMENT_BY_LAW',
-      'COUNTERPARTY_OBJECTION',
-    ].sort();
-    expect(be.routes.map((r) => r.routeId).sort()).toEqual(EXPECTED);
-    for (const route of be.routes) {
-      expect(() => assertValidCorrectionRouteFact(route, 'test')).not.toThrow();
-    }
-  });
-
-  it('CREDIT_NOTE, DEBIT_NOTE, CORRECTIVE_INVOICE, and COUNTERPARTY_OBJECTION are the four routes sourced "legal" — all four read the same day on efacture.belgium.be', () => {
-    const be = loadBe();
-    for (const routeId of ['CREDIT_NOTE', 'DEBIT_NOTE', 'CORRECTIVE_INVOICE', 'COUNTERPARTY_OBJECTION']) {
-      const route = be.routes.find((r) => r.routeId === routeId);
-      expect(route.status).toBe('allowed');
-      expect(route.provenance.kind).toBe('legal');
-      expect(route.provenance.sourceCheckedAt).toBe('2026-09-04');
-    }
-  });
-
-  it('DEBIT_NOTE is explicitly named by the Belgian text — "notes de crédit ET notes de débit" in the same sentence, unlike Poland\'s single-instrument regime', () => {
-    const be = loadBe();
-    const route = be.routes.find((r) => r.routeId === 'DEBIT_NOTE');
-    expect(route.provenance.sourceText).toMatch(/notes de crédit et notes de débit/);
-  });
-
-  it('the seven remaining routes stay honestly "unverified", each with a real resolutionNote — this is a first C1 reading, not a finished one', () => {
-    const be = loadBe();
-    const sourced = new Set(['CREDIT_NOTE', 'DEBIT_NOTE', 'CORRECTIVE_INVOICE', 'COUNTERPARTY_OBJECTION']);
-    for (const route of be.routes) {
-      if (sourced.has(route.routeId)) continue;
-      expect(route.status).toBe('unverified');
-      expect(route.provenance.kind).toBe('unverified');
-      expect(route.provenance.resolutionNote.trim().length).toBeGreaterThan(0);
-    }
-  });
-
-  it('AUTHORITY_ANNULMENT is NOT promoted to "forbidden" by analogy with the US entry, despite a similarly decentralized Peppol architecture — stays unverified', () => {
-    const be = loadBe();
-    const route = be.routes.find((r) => r.routeId === 'AUTHORITY_ANNULMENT');
-    expect(route.status).toBe('unverified');
-  });
-});
+// BE's correction-routes/data/be.json (agent pays Belgique) was removed by the 5-country prune
+// (2026-09-10, see this task's own report) along with every other country outside FR/PL/IT/PT/DE —
+// it was never registered in data/all.ts to begin with, so nothing here re-anchors it.
 
 // Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
 // really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory

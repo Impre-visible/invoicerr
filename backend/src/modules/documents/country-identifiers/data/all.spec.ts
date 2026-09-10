@@ -10,10 +10,14 @@ function fileFor(countryCode: string) {
   return file;
 }
 
-describe('country-identifiers/data — the shipped FR and US files', () => {
-  it('loads exactly the two countries this task asked for, at minimum', () => {
+describe('country-identifiers/data — the shipped FR, DE and PT files', () => {
+  // Re-pinned by the 5-country prune (2026-09-10): this mechanism ships identifier requirements
+  // for DE, FR and PT only — PL and IT never had a country-identifiers file (see this task's own
+  // report). US, GB and BE (below) were removed by the prune along with every other country
+  // outside FR/PL/IT/PT/DE.
+  it('loads exactly the three countries this mechanism ships', () => {
     const codes = ALL_COUNTRY_IDENTIFIER_FILES.map((f) => f.countryCode).sort();
-    expect(codes).toEqual(expect.arrayContaining(['FR', 'US']));
+    expect(codes).toEqual(['DE', 'FR', 'PT']);
   });
 
   it('every fact in every shipped file carries a real provenance (already enforced at load time by data/all.ts — this just makes the property explicit here)', () => {
@@ -50,27 +54,31 @@ describe('country-identifiers/data — the shipped FR and US files', () => {
     }
   });
 
-  it('FR requires a LEGAL_ID for BOTH party types and also declares a VAT scheme — US does not', () => {
+  it("FR requires a LEGAL_ID for BOTH party types, required — DE's LEGAL_ID (Handelsregisternummer) applies to COMPANY only and is not required", () => {
     const fr = fileFor('FR');
     const frLegalId = fr.schemes.find((s) => s.scheme === 'LEGAL_ID');
     expect(frLegalId?.appliesTo).toBe('BOTH');
     expect(frLegalId?.required).toBe(true);
     expect(fr.schemes.some((s) => s.scheme === 'VAT')).toBe(true);
 
-    const us = fileFor('US');
-    expect(us.schemes.some((s) => s.scheme === 'VAT')).toBe(false);
+    const de = fileFor('DE');
+    const deLegalId = de.schemes.find((s) => s.scheme === 'LEGAL_ID');
+    expect(deLegalId?.appliesTo).toBe('COMPANY');
+    expect(deLegalId?.required).toBe(false);
   });
 
-  it('FR and US genuinely differ — not a copy of one another with only the label swapped', () => {
+  it('FR and DE genuinely differ — not a copy of one another with only the label swapped', () => {
     const fr = fileFor('FR');
-    const us = fileFor('US');
+    const de = fileFor('DE');
     const frLegalId = fr.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
-    const usLegalId = us.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
+    const deLegalId = de.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
 
-    expect(frLegalId.label).not.toBe(usLegalId.label);
-    expect(frLegalId.appliesTo).not.toBe(usLegalId.appliesTo);
-    expect(frLegalId.required).not.toBe(usLegalId.required);
-    expect(fr.schemes.length).not.toBe(us.schemes.length);
+    expect(frLegalId.label).not.toBe(deLegalId.label);
+    expect(frLegalId.appliesTo).not.toBe(deLegalId.appliesTo);
+    expect(frLegalId.required).not.toBe(deLegalId.required);
+    // Both files ship the same two schemes (LEGAL_ID + VAT) today, so a length comparison would
+    // prove nothing — assert the files aren't a literal copy of one another directly instead.
+    expect(fr).not.toEqual(de);
   });
 
   it('every `scheme` used by a shipped file is one of the two the frontend actually special-cases ("LEGAL_ID", "VAT") — a third scheme would silently render with no dedicated data-cy', () => {
@@ -83,13 +91,12 @@ describe('country-identifiers/data — the shipped FR and US files', () => {
   });
 });
 
-// Root TODO item 19 — DE and GB, added so a German or British CLIENT has a country-specific
-// identifiers section on the client screen at all (05-clients.cy.ts's Germany/United Kingdom
-// scenarios had no `client-identifier-LEGAL_ID` field to type into before this task: gb.json did
-// not exist, and de.json had only a VAT scheme). Sourced this time at the primary text —
-// gesetze-im-internet.de for Germany, legislation.gov.uk for the UK — see each fact's own
-// provenance for exactly what was read and what it does and doesn't settle.
-describe('country-identifiers/data — the shipped DE and GB files', () => {
+// Root TODO item 19 — DE, added so a German CLIENT has a country-specific identifiers section on
+// the client screen at all (de.json had only a VAT scheme before). Sourced at the primary text —
+// gesetze-im-internet.de for Germany — see each fact's own provenance for exactly what was read
+// and what it does and doesn't settle. GB was removed by the 5-country prune (2026-09-10, see this
+// task's own report) — re-anchored here on PT, which this mechanism keeps.
+describe('country-identifiers/data — the shipped DE and PT files', () => {
   it('DE declares a VAT scheme applying to BOTH party types and a LEGAL_ID (Handelsregisternummer) scheme applying to COMPANY only', () => {
     const de = fileFor('DE');
     const vat = de.schemes.find((s) => s.scheme === 'VAT');
@@ -104,33 +111,35 @@ describe('country-identifiers/data — the shipped DE and GB files', () => {
     expect(legalId?.pattern).toBeUndefined(); // no fixed shape sourced — see resolutionNote
   });
 
-  it('GB declares a VAT scheme applying to BOTH party types and a LEGAL_ID (Companies House number) scheme applying to COMPANY only', () => {
-    const gb = fileFor('GB');
-    const vat = gb.schemes.find((s) => s.scheme === 'VAT');
-    expect(vat?.appliesTo).toBe('BOTH'); // reg. 14(1) VAT Regulations 1995 binds "a registered
-    // person", not companies specifically — a VAT-registered sole trader is bound the same way.
-    expect(vat?.required).toBe(false);
+  it('PT declares a VAT scheme applying to BOTH party types (not required, below the isenção threshold) and a LEGAL_ID (NIF/NIPC) scheme also applying to BOTH, required', () => {
+    const pt = fileFor('PT');
+    const vat = pt.schemes.find((s) => s.scheme === 'VAT');
+    expect(vat?.appliesTo).toBe('BOTH');
+    expect(vat?.required).toBe(false); // CIVA art. 53.º isenção below the 15 000 €/year threshold
 
-    const legalId = gb.schemes.find((s) => s.scheme === 'LEGAL_ID');
-    expect(legalId?.appliesTo).toBe('COMPANY');
-    expect(legalId?.label).toBe('Companies House registered number');
-    expect(legalId?.required).toBe(false);
+    const legalId = pt.schemes.find((s) => s.scheme === 'LEGAL_ID');
+    expect(legalId?.appliesTo).toBe('BOTH'); // the NIF/NIPC is a single, universal id for both
+    // individuals and companies in Portugal — unlike DE's company-only Handelsregisternummer.
+    expect(legalId?.label).toBe(
+      'NIF / NIPC (Número de Identificação Fiscal / Número de Identificação de Pessoa Coletiva)',
+    );
+    expect(legalId?.required).toBe(true); // CIVA art. 36.º n.º 5 a) — a frontal, unconditional clause for the supplier
   });
 
-  it("neither GB scheme declares a `pattern` — the read texts require the identifiers without ever specifying their shape, and no other primary/official text describing the shape was found (see each fact's resolutionNote for the URLs tried) — permissive, not invented", () => {
-    const gb = fileFor('GB');
-    for (const fact of gb.schemes) {
+  it("neither PT scheme declares a `pattern` — the read texts require the identifiers without ever settling their exact shape (see each fact's own notes for the primary texts that were and weren't reachable) — permissive, not invented", () => {
+    const pt = fileFor('PT');
+    for (const fact of pt.schemes) {
       expect(fact.pattern).toBeUndefined();
     }
   });
 
-  it('GB VAT is the one shipped fact graded "legal" — reg. 14(1)(d) of the VAT Regulations 1995 was read directly and names the supplier\'s registration number as a mandatory VAT-invoice particular', () => {
-    const gb = fileFor('GB');
-    const vat = gb.schemes.find((s) => s.scheme === 'VAT')!;
-    expect(vat.provenance.kind).toBe('legal');
-    if (vat.provenance.kind === 'legal') {
-      expect(vat.provenance.sourceText).toMatch(/registration number of the supplier/);
-      expect(vat.provenance.sourceCheckedAt).toBe('2026-09-01');
+  it('PT\'s LEGAL_ID (NIF/NIPC) is graded "legal" — CIVA art. 36.º n.º 5 a) was read directly and names "os correspondentes números de identificação fiscal" as a mandatory invoice particular', () => {
+    const pt = fileFor('PT');
+    const legalId = pt.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
+    expect(legalId.provenance.kind).toBe('legal');
+    if (legalId.provenance.kind === 'legal') {
+      expect(legalId.provenance.sourceText).toMatch(/números de identificação fiscal/);
+      expect(legalId.provenance.sourceCheckedAt).toBe('2026-09-04');
     }
   });
 
@@ -155,15 +164,16 @@ describe('country-identifiers/data — the shipped DE and GB files', () => {
     expect(legalId.required).toBe(true);
   });
 
-  it('DE and GB genuinely differ from each other — not one copied onto the other with only labels swapped', () => {
+  it('DE and PT genuinely differ from each other — not one copied onto the other with only labels swapped', () => {
     const de = fileFor('DE');
-    const gb = fileFor('GB');
+    const pt = fileFor('PT');
     const deLegalId = de.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
-    const gbLegalId = gb.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
-    expect(deLegalId.label).not.toBe(gbLegalId.label);
+    const ptLegalId = pt.schemes.find((s) => s.scheme === 'LEGAL_ID')!;
+    expect(deLegalId.label).not.toBe(ptLegalId.label);
+    expect(deLegalId.appliesTo).not.toBe(ptLegalId.appliesTo); // DE: COMPANY, PT: BOTH
     expect(de.schemes.find((s) => s.scheme === 'VAT')!.provenance.kind).not.toBe(
-      gb.schemes.find((s) => s.scheme === 'VAT')!.provenance.kind,
-    );
+      pt.schemes.find((s) => s.scheme === 'VAT')!.provenance.kind,
+    ); // DE VAT is "unverified", PT VAT is "legal"
   });
 });
 
@@ -227,65 +237,9 @@ describe('country-identifiers/data — FR LEGAL_ID resolved to accept SIREN or S
   });
 });
 
-// BE — agent pays Belgique, lot 1 TODO_DOCUMENTS.md (vague B, 2026-09-04).
-// country-identifiers/data/be.json is NOT YET registered in this file's own data/all.ts
-// (COUNTRY_FILES) — registration is the mandataire's job at lot validation. This block therefore
-// loads be.json DIRECTLY (readFileSync + assertValidProvenance, the exact gate data/all.ts's own
-// loadCountryFile calls) rather than through ALL_COUNTRY_IDENTIFIER_FILES — via inline `require()`
-// (not a top-level `import`) so this addition can never collide with the NL/AT agents' own additions
-// to this same file editing the same import block in parallel.
-describe('BE — country-identifiers/data/be.json (agent pays Belgique, not yet registered in all.ts)', () => {
-  const { readFileSync } = require('node:fs');
-  const { join } = require('node:path');
-  const { assertValidProvenance } = require('../schema');
-
-  function loadBe() {
-    return JSON.parse(readFileSync(join(__dirname, 'be.json'), 'utf-8'));
-  }
-
-  it('parses, declares countryCode BE, declares LEGAL_ID and VAT, and every fact passes the load-time gate', () => {
-    const be = loadBe();
-    expect(be.countryCode).toBe('BE');
-    const schemes = be.schemes.map((s) => s.scheme).sort();
-    expect(schemes).toEqual(['LEGAL_ID', 'VAT']);
-    for (const fact of be.schemes) {
-      expect(() => assertValidProvenance(fact, 'test')).not.toThrow();
-    }
-  });
-
-  it('LEGAL_ID (numéro d\'entreprise BCE/KBO) applies to COMPANY only and stays honestly "unverified" — the mandatory-mention text (CSA art. 2:20) could not be reached in full', () => {
-    const be = loadBe();
-    const legalId = be.schemes.find((s) => s.scheme === 'LEGAL_ID');
-    expect(legalId.appliesTo).toBe('COMPANY');
-    expect(legalId.required).toBe(false);
-    expect(legalId.provenance.kind).toBe('unverified');
-    expect(legalId.provenance.resolutionNote).toMatch(/2:20/);
-  });
-
-  it('VAT applies to BOTH party types and stays honestly "unverified" — the mandatory-mention text (AR n°1 art. 5 §1) could not be reached in full', () => {
-    const be = loadBe();
-    const vat = be.schemes.find((s) => s.scheme === 'VAT');
-    expect(vat.appliesTo).toBe('BOTH');
-    expect(vat.required).toBe(false);
-    expect(vat.provenance.kind).toBe('unverified');
-    expect(vat.provenance.resolutionNote).toMatch(/art\. 5/);
-  });
-
-  it('every scheme used is one of the two the frontend special-cases ("LEGAL_ID", "VAT") — no stale or invented scheme', () => {
-    const be = loadBe();
-    const known = new Set(['LEGAL_ID', 'VAT']);
-    for (const fact of be.schemes) {
-      expect(known.has(fact.scheme)).toBe(true);
-    }
-  });
-
-  it("neither BE scheme declares a `pattern` — no primary text reached settled either identifier's exact shape (see each fact's own resolutionNote), permissive rather than invented", () => {
-    const be = loadBe();
-    for (const fact of be.schemes) {
-      expect(fact.pattern).toBeUndefined();
-    }
-  });
-});
+// BE's country-identifiers/data/be.json (agent pays Belgique) was removed by the 5-country prune
+// (2026-09-10, see this task's own report) along with every other country outside FR/PL/IT/PT/DE —
+// it was never registered in data/all.ts to begin with, so nothing here re-anchors it.
 
 // Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
 // really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory

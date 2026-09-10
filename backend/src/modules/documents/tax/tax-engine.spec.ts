@@ -8,14 +8,30 @@
  * (la couche de câblage, testée séparément) empêche délibérément d'atteindre en production — voir ce
  * fichier's own header pour pourquoi ce fallback reste correct à tester ici, sans jamais être exécuté
  * par le vrai flux d'envoi.
+ *
+ * Re-anchored by the 5-country prune (2026-09-10, see this task's own report): `tax-systems/data/
+ * us.json` was removed along with every country outside FR/PL/IT/PT/DE, so `defaultTaxSystemRegistry.
+ * resolve('US')` no longer resolves. The "United States sales tax" describe block below tests
+ * GENERIC, data-driven SALES_TAX dispatch in `tax-engine.ts#salesTax` (never a US-specific branch),
+ * so it is re-anchored on a hand-built synthetic profile (`usSalesTaxProfile`) instead of the removed
+ * registry entry — this keeps the exact same mechanical coverage (nexus/no-nexus, cross-border
+ * export) without depending on any shipped country file. The two FR→US export tests above it don't
+ * read `buyerProfile` at all on this code path (`determineLineTax`'s own "buyer outside the union"
+ * branch only reads the buyer's `countryCode`) — their now-stale `prof('US')` sixth argument is
+ * simply dropped rather than replaced.
  */
-import { DocumentLine, PartyTaxProfile, SupplyType, TaxScheme } from './types';
+import { CountryTaxSystemProfile, DocumentLine, PartyTaxProfile, SupplyType, TaxScheme } from './types';
 import { defaultTaxSystemRegistry } from './tax-systems/registry';
 import { TrustFlagVatValidator } from './classification';
 import { determineLineTax, determineTax } from './tax-engine';
 
 const vat = new TrustFlagVatValidator();
 const prof = (cc: string) => defaultTaxSystemRegistry.resolve(cc);
+
+const usSalesTaxProfile: CountryTaxSystemProfile = {
+  countryCode: 'US',
+  taxSystem: { kind: 'SALES_TAX', stateRates: { CA: 7.25 }, nexusSubdivisions: ['CA'] },
+};
 
 type VatMode = 'valid' | 'invalid' | 'unchecked' | 'none';
 
@@ -148,14 +164,7 @@ describe('TaxEngine — cross-border within the EU', () => {
 
 describe('TaxEngine — export out of the EU (FR→US)', () => {
   it('FR→US B2B services: outside scope (0%, category O), buyer self-assesses, art. hors-champ', () => {
-    const t = determineLineTax(
-      party('FR', 'B2B'),
-      party('US', 'B2B'),
-      line('SERVICES'),
-      prof('FR')!,
-      vat,
-      prof('US'),
-    );
+    const t = determineLineTax(party('FR', 'B2B'), party('US', 'B2B'), line('SERVICES'), prof('FR')!, vat);
     expect(t.components[0].category).toBe('O');
     expect(t.components[0].rate).toBe(0);
     expect(t.buyerSelfAssess).toBe(true);
@@ -165,14 +174,7 @@ describe('TaxEngine — export out of the EU (FR→US)', () => {
   });
 
   it('FR→US goods: export, zero-rated (0%, category G), customs export, art. 146', () => {
-    const t = determineLineTax(
-      party('FR', 'B2B'),
-      party('US', 'B2B'),
-      line('GOODS'),
-      prof('FR')!,
-      vat,
-      prof('US'),
-    );
+    const t = determineLineTax(party('FR', 'B2B'), party('US', 'B2B'), line('GOODS'), prof('FR')!, vat);
     expect(t.components[0].category).toBe('G');
     expect(t.components[0].rate).toBe(0);
     expect(t.reportingFlags).toContain('CUSTOMS_EXPORT');
@@ -186,7 +188,7 @@ describe('TaxEngine — United States sales tax (no VAT)', () => {
       party('US', 'B2B', { state: 'CA' }),
       party('FR', 'B2B'),
       line('SERVICES'),
-      prof('US')!,
+      usSalesTaxProfile,
       vat,
       prof('FR'),
     );
@@ -202,9 +204,9 @@ describe('TaxEngine — United States sales tax (no VAT)', () => {
       party('US', 'B2B'),
       party('US', 'B2B', { state: 'CA' }),
       line('GOODS'),
-      prof('US')!,
+      usSalesTaxProfile,
       vat,
-      prof('US'),
+      usSalesTaxProfile,
     );
     expect(t.components[0].taxSystem).toBe('SALES_TAX');
     expect(t.components[0].category).toBe('S');
@@ -217,9 +219,9 @@ describe('TaxEngine — United States sales tax (no VAT)', () => {
       party('US', 'B2B'),
       party('US', 'B2B', { state: 'OR' }),
       line('GOODS'),
-      prof('US')!,
+      usSalesTaxProfile,
       vat,
-      prof('US'),
+      usSalesTaxProfile,
     );
     expect(t.components[0].category).toBe('O');
     expect(t.components[0].rate).toBe(0);

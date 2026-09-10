@@ -1,279 +1,370 @@
 beforeEach(() => {
-    cy.login();
+	cy.login();
 });
 
 // The simplified onboarding only collects name + country. The rest of the profile
 // (address, contact, currency, numbering/PDF/date formats) is filled in afterwards via
 // Settings > Company, which several tests below assume is already valid.
 function completeCompanyProfile() {
-    cy.visit('/settings/company');
-    cy.wait(3000);
-    cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+	cy.visit("/settings/company");
+	cy.wait(3000);
+	cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+		"be.visible",
+	);
 
-    cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
-    cy.get('[data-cy="company-description-input"]').clear().type('A fictional company');
-    cy.get('[data-cy="company-phone-input"]').clear().type('+33123456789');
-    cy.get('[data-cy="company-email-input"]').clear().type('contact@acme.org');
-    cy.get('[data-cy="company-address-input"]').clear().type('123 Main St');
-    cy.get('[data-cy="company-address-line2-input"]').clear();
-    cy.get('[data-cy="company-city-input"]').clear().type('Paris');
-    cy.get('[data-cy="company-state-input"]').clear();
-    cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
-    cy.selectCountry('company-country-input', 'France');
+	cy.get('[data-cy="company-name-input"]').clear().type("Acme Corp");
+	cy.get('[data-cy="company-description-input"]')
+		.clear()
+		.type("A fictional company");
+	cy.get('[data-cy="company-phone-input"]').clear().type("+33123456789");
+	cy.get('[data-cy="company-email-input"]').clear().type("contact@acme.org");
+	cy.get('[data-cy="company-address-input"]').clear().type("123 Main St");
+	cy.get('[data-cy="company-address-line2-input"]').clear();
+	cy.get('[data-cy="company-city-input"]').clear().type("Paris");
+	cy.get('[data-cy="company-state-input"]').clear();
+	cy.get('[data-cy="company-postalcode-input"]').clear().type("75001");
+	cy.selectCountry("company-country-input", "France");
 
-    // Fill SIRET (required by FR compliance — may be clipped by overflow:hidden)
-    cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should('exist');
-    cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
-    cy.get('[data-cy="company-legalid-input"]').clear({ force: true }).type('73282932000074', { force: true });
+	// Fill SIRET (required by FR compliance — may be clipped by overflow:hidden)
+	cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should(
+		"exist",
+	);
+	cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
+	cy.get('[data-cy="company-legalid-input"]')
+		.clear({ force: true })
+		.type("73282932000074", { force: true });
 
-    cy.get('[data-cy="company-currency-select"] button').first().click();
-    cy.wait(300);
-    cy.get('[data-cy="company-currency-select-options"]').should('be.visible');
-    cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
+	cy.get('[data-cy="company-currency-select"] button').first().click();
+	cy.wait(300);
+	cy.get('[data-cy="company-currency-select-options"]').should("be.visible");
+	cy.get('[data-cy="company-currency-select-option-euro-(€)"]').click();
 
-    cy.get('[data-cy="company-pdfformat-select"]').click();
-    cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
+	cy.get('[data-cy="company-pdfformat-select"]').click();
+	cy.get('[data-cy="company-pdfformat-option-pdf"]').click();
 
-    cy.get('[data-cy="company-dateformat-select"]').click();
-    cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
+	cy.get('[data-cy="company-dateformat-select"]').click();
+	cy.get('[data-cy="company-dateformat-option-dd-MM-yyyy"]').first().click();
 
-    cy.get('[data-cy="company-submit-btn"]').click();
-    cy.wait(5000);
+	cy.get('[data-cy="company-submit-btn"]').click();
+	cy.wait(5000);
 }
 
-describe('Company Settings E2E', () => {
-    describe('1 - Initial Company Setup (Required for other tests)', () => {
-        it('creates the company via onboarding', () => {
-            // Visit root and wait for either onboarding dialog OR dashboard to load
-            cy.visit('/');
-            cy.wait(5000);
+describe("Company Settings E2E", () => {
+	describe("1 - Initial Company Setup (Required for other tests)", () => {
+		it("creates the company via onboarding", () => {
+			// Visit root and wait for either onboarding dialog OR dashboard to load
+			cy.visit("/");
+			cy.wait(5000);
 
-            // Check if onboarding dialog appeared; if not, company already exists.
-            // Note: don't gate on offsetParent — DialogContent is `position: fixed`,
-            // which makes offsetParent null in every browser regardless of visibility.
-            // Radix unmounts the dialog from the DOM when closed, so presence alone
-            // is a reliable signal here (same check as scenarios/full-lifecycle.cy.ts).
-            cy.document().then((doc) => {
-                const dialog = doc.querySelector('[data-cy="onboarding-dialog"]');
-                if (dialog) {
-                    // Step 1 — country only.
-                    cy.selectCountry('onboarding-company-country-input', 'France');
-                    cy.get('[data-cy="onboarding-country-next-btn"]').click();
-                    // Step 2 — the national identifier, labeled by the backend. France
-                    // requires a LEGAL_ID (SIRET) — the wizard refuses to advance without
-                    // it. "Next" also fires the backend company-lookup search before
-                    // moving on; it always advances regardless of what that finds.
-                    cy.get('[data-cy="onboarding-legalid-input"]', { timeout: 10000 })
-                        .clear({ force: true })
-                        .type('73282932000074', { force: true });
-                    cy.get('[data-cy="onboarding-identifier-next-btn"]').click();
-                    // Step 3 — the company form, pre-filled by whatever the search found.
-                    cy.get('[data-cy="onboarding-company-name-input"]', { timeout: 10000 }).clear().type('Acme Corp');
-                    cy.get('[data-cy="onboarding-submit-btn"]').click();
-                    // Company creation now advances the wizard to the channels step
-                    // instead of closing the dialog — finish onboarding from there.
-                    cy.get('[data-cy="onboarding-finish-btn"]', { timeout: 10000 }).should('be.visible').click();
-                    // Company creation switches to the new company and reloads the page —
-                    // wait for the dialog to be gone and the reloaded app to settle before
-                    // moving on, otherwise later steps race the reload.
-                    cy.get('[data-cy="onboarding-dialog"]', { timeout: 20000 }).should('not.exist');
-                    cy.wait(3000);
-                } else {
-                    cy.log('Onboarding dialog not visible — company already exists');
-                }
-            });
+			// Check if onboarding dialog appeared; if not, company already exists.
+			// Note: don't gate on offsetParent — DialogContent is `position: fixed`,
+			// which makes offsetParent null in every browser regardless of visibility.
+			// Radix unmounts the dialog from the DOM when closed, so presence alone
+			// is a reliable signal here (same check as scenarios/full-lifecycle.cy.ts).
+			cy.document().then((doc) => {
+				const dialog = doc.querySelector('[data-cy="onboarding-dialog"]');
+				if (dialog) {
+					// Step 1 — country only.
+					cy.selectCountry("onboarding-company-country-input", "France");
+					cy.get('[data-cy="onboarding-country-next-btn"]').click();
+					// Step 2 — the national identifier, labeled by the backend. France
+					// requires a LEGAL_ID (SIRET) — the wizard refuses to advance without
+					// it. "Next" also fires the backend company-lookup search before
+					// moving on; it always advances regardless of what that finds.
+					cy.get('[data-cy="onboarding-legalid-input"]', { timeout: 10000 })
+						.clear({ force: true })
+						.type("73282932000074", { force: true });
+					cy.get('[data-cy="onboarding-identifier-next-btn"]').click();
+					// Step 3 — the company form, pre-filled by whatever the search found.
+					cy.get('[data-cy="onboarding-company-name-input"]', {
+						timeout: 10000,
+					})
+						.clear()
+						.type("Acme Corp");
+					cy.get('[data-cy="onboarding-submit-btn"]').click();
+					// Company creation now advances the wizard to the channels step
+					// instead of closing the dialog — finish onboarding from there.
+					cy.get('[data-cy="onboarding-finish-btn"]', { timeout: 10000 })
+						.should("be.visible")
+						.click();
+					// Company creation switches to the new company and reloads the page —
+					// wait for the dialog to be gone and the reloaded app to settle before
+					// moving on, otherwise later steps race the reload.
+					cy.get('[data-cy="onboarding-dialog"]', { timeout: 20000 }).should(
+						"not.exist",
+					);
+					cy.wait(3000);
+				} else {
+					cy.log("Onboarding dialog not visible — company already exists");
+				}
+			});
 
-            // Ensure company exists before continuing to other tests
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
-            cy.get('[data-cy="company-name-input"]').invoke('val').then((val) => {
-                if (!val) {
-                    cy.get('[data-cy="company-name-input"]').clear().type('Acme Corp');
-                    cy.selectCountry('company-country-input', 'France');
-                    cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).scrollIntoView().clear({ force: true }).type('73282932000074', { force: true });
-                    cy.get('[data-cy="company-address-input"]').clear().type('123 Rue de Rivoli');
-                    cy.get('[data-cy="company-city-input"]').clear().type('Paris');
-                    cy.get('[data-cy="company-postalcode-input"]').clear().type('75001');
-                    cy.get('[data-cy="company-submit-btn"]').click();
-                    cy.wait(5000);
-                    // Re-fetch from the server rather than trusting the still-typed
-                    // local form state, so this assertion can't false-positive on a
-                    // submit that actually failed server-side.
-                    cy.visit('/settings/company');
-                    cy.wait(3000);
-                }
-            });
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('have.value', 'Acme Corp');
-        });
-    });
+			// Ensure company exists before continuing to other tests
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
+			cy.get('[data-cy="company-name-input"]')
+				.invoke("val")
+				.then((val) => {
+					if (!val) {
+						cy.get('[data-cy="company-name-input"]').clear().type("Acme Corp");
+						cy.selectCountry("company-country-input", "France");
+						cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 })
+							.scrollIntoView()
+							.clear({ force: true })
+							.type("73282932000074", { force: true });
+						cy.get('[data-cy="company-address-input"]')
+							.clear()
+							.type("123 Rue de Rivoli");
+						cy.get('[data-cy="company-city-input"]').clear().type("Paris");
+						cy.get('[data-cy="company-postalcode-input"]')
+							.clear()
+							.type("75001");
+						cy.get('[data-cy="company-submit-btn"]').click();
+						cy.wait(5000);
+						// Re-fetch from the server rather than trusting the still-typed
+						// local form state, so this assertion can't false-positive on a
+						// submit that actually failed server-side.
+						cy.visit("/settings/company");
+						cy.wait(3000);
+					}
+				});
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"have.value",
+				"Acme Corp",
+			);
+		});
+	});
 
-    describe('2 - Complete Company Profile (Required for other tests)', () => {
-        it('fills in the rest of the company profile via Settings', () => {
-            completeCompanyProfile();
+	describe("2 - Complete Company Profile (Required for other tests)", () => {
+		it("fills in the rest of the company profile via Settings", () => {
+			completeCompanyProfile();
 
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
-            cy.get('[data-cy="company-address-input"]').should('have.value', '123 Main St');
-        });
-    });
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
+			cy.get('[data-cy="company-address-input"]').should(
+				"have.value",
+				"123 Main St",
+			);
+		});
+	});
 
-    describe('3 - Validation Errors', () => {
-        it('shows error for empty company name', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear();
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/required|empty|name/i);
-        });
+	describe("3 - Validation Errors", () => {
+		it("shows error for empty company name", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear();
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/required|empty|name/i);
+		});
 
-        it('shows error for empty address', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-address-input"]', { timeout: 10000 }).clear();
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/required|empty|address/i);
-        });
+		it("shows error for empty address", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-address-input"]', { timeout: 10000 }).clear();
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/required|empty|address/i);
+		});
 
-        it('shows error for empty city', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-city-input"]', { timeout: 10000 }).clear();
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/required|empty|city/i);
-        });
+		it("shows error for empty city", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-city-input"]', { timeout: 10000 }).clear();
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/required|empty|city/i);
+		});
 
-        it('shows error for invalid postal code format', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-postalcode-input"]', { timeout: 10000 }).clear().type('AB');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/format|invalid|postal/i);
-        });
+		it("shows error for invalid postal code format", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-postalcode-input"]', { timeout: 10000 })
+				.clear()
+				.type("AB");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/format|invalid|postal/i);
+		});
 
-        it('shows error for invalid phone format', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-phone-input"]', { timeout: 10000 }).clear().type('123');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/format|invalid|phone|characters/i);
-        });
+		it("shows error for invalid phone format", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-phone-input"]', { timeout: 10000 })
+				.clear()
+				.type("123");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/format|invalid|phone|characters/i);
+		});
 
-        it('shows error for invalid email format', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-email-input"]', { timeout: 10000 }).clear().type('not-an-email');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/format|invalid|email/i);
-        });
-    });
+		it("shows error for invalid email format", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-email-input"]', { timeout: 10000 })
+				.clear()
+				.type("not-an-email");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/format|invalid|email/i);
+		});
+	});
 
-    describe('Extended Address Fields', () => {
-        it('updates company with addressLine2 and state', () => {
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+	describe("Extended Address Fields", () => {
+		it("updates company with addressLine2 and state", () => {
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
 
-            cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should('exist');
-            cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
-            cy.get('[data-cy="company-legalid-input"]').clear({ force: true }).type('73282932000074', { force: true });
+			cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should(
+				"exist",
+			);
+			cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
+			cy.get('[data-cy="company-legalid-input"]')
+				.clear({ force: true })
+				.type("73282932000074", { force: true });
 
-            cy.get('[data-cy="company-address-line2-input"]').clear().type('Building A, Floor 5');
-            cy.get('[data-cy="company-state-input"]').clear().type('Île-de-France');
+			cy.get('[data-cy="company-address-line2-input"]')
+				.clear()
+				.type("Building A, Floor 5");
+			cy.get('[data-cy="company-state-input"]').clear().type("Île-de-France");
 
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.wait(2000);
 
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-address-line2-input"]', { timeout: 10000 }).should('have.value', 'Building A, Floor 5');
-            cy.get('[data-cy="company-state-input"]').should('have.value', 'Île-de-France');
-        });
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-address-line2-input"]', {
+				timeout: 10000,
+			}).should("have.value", "Building A, Floor 5");
+			cy.get('[data-cy="company-state-input"]').should(
+				"have.value",
+				"Île-de-France",
+			);
+		});
 
-        it('updates company with US state abbreviation', () => {
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+		it("updates company with US state abbreviation", () => {
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
 
-            // Fill SIRET while country is still FR (before switching to US)
-            cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should('exist');
-            cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
-            cy.get('[data-cy="company-legalid-input"]').clear({ force: true }).type('73282932000074', { force: true });
+			// Fill SIRET while country is still FR (before switching to US)
+			cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should(
+				"exist",
+			);
+			cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
+			cy.get('[data-cy="company-legalid-input"]')
+				.clear({ force: true })
+				.type("73282932000074", { force: true });
 
-            cy.get('[data-cy="company-address-input"]').clear().type('1234 Tech Boulevard');
-            cy.get('[data-cy="company-address-line2-input"]').clear().type('Suite 100');
-            cy.get('[data-cy="company-city-input"]').clear().type('Austin');
-            cy.get('[data-cy="company-state-input"]').clear().type('TX');
-            cy.get('[data-cy="company-postalcode-input"]').clear().type('78701');
-            cy.selectCountry('company-country-input', 'United States');
+			cy.get('[data-cy="company-address-input"]')
+				.clear()
+				.type("1234 Tech Boulevard");
+			cy.get('[data-cy="company-address-line2-input"]')
+				.clear()
+				.type("Suite 100");
+			cy.get('[data-cy="company-city-input"]').clear().type("Austin");
+			cy.get('[data-cy="company-state-input"]').clear().type("TX");
+			cy.get('[data-cy="company-postalcode-input"]').clear().type("78701");
+			cy.selectCountry("company-country-input", "France");
 
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.wait(2000);
 
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-address-line2-input"]', { timeout: 10000 }).should('have.value', 'Suite 100');
-            cy.get('[data-cy="company-state-input"]').should('have.value', 'TX');
-        });
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-address-line2-input"]', {
+				timeout: 10000,
+			}).should("have.value", "Suite 100");
+			cy.get('[data-cy="company-state-input"]').should("have.value", "TX");
+		});
 
-        it('clears addressLine2 and state fields', () => {
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
+		it("clears addressLine2 and state fields", () => {
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
 
-            cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should('exist');
-            cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
-            cy.get('[data-cy="company-legalid-input"]').clear({ force: true }).type('73282932000074', { force: true });
+			cy.get('[data-cy="company-legalid-input"]', { timeout: 10000 }).should(
+				"exist",
+			);
+			cy.get('[data-cy="company-legalid-input"]').scrollIntoView();
+			cy.get('[data-cy="company-legalid-input"]')
+				.clear({ force: true })
+				.type("73282932000074", { force: true });
 
-            cy.get('[data-cy="company-address-line2-input"]').clear();
-            cy.get('[data-cy="company-state-input"]').clear();
+			cy.get('[data-cy="company-address-line2-input"]').clear();
+			cy.get('[data-cy="company-state-input"]').clear();
 
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(2000);
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.wait(2000);
 
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-address-line2-input"]', { timeout: 10000 }).should('have.value', '');
-            cy.get('[data-cy="company-state-input"]').should('have.value', '');
-        });
-    });
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-address-line2-input"]', {
+				timeout: 10000,
+			}).should("have.value", "");
+			cy.get('[data-cy="company-state-input"]').should("have.value", "");
+		});
+	});
 
-    describe('4 - Edge Cases', () => {
-        it('handles special characters in company name', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear().type("O'Reilly & Associates");
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(1000);
-            cy.get('[data-cy="company-name-input"]').invoke('val').should('contain', "O'Reilly");
-        });
+	describe("4 - Edge Cases", () => {
+		it("handles special characters in company name", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-name-input"]', { timeout: 10000 })
+				.clear()
+				.type("O'Reilly & Associates");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.wait(1000);
+			cy.get('[data-cy="company-name-input"]')
+				.invoke("val")
+				.should("contain", "O'Reilly");
+		});
 
-        it('handles unicode characters in company name', () => {
-            cy.visit('/settings/company');
-            cy.get('[data-cy="company-name-input"]', { timeout: 10000 }).clear().type('Société Générale');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.wait(1000);
-            cy.get('[data-cy="company-name-input"]').invoke('val').should('contain', 'Société');
-        });
+		it("handles unicode characters in company name", () => {
+			cy.visit("/settings/company");
+			cy.get('[data-cy="company-name-input"]', { timeout: 10000 })
+				.clear()
+				.type("Société Générale");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.wait(1000);
+			cy.get('[data-cy="company-name-input"]')
+				.invoke("val")
+				.should("contain", "Société");
+		});
 
-        it('shows error for description exceeding max length', () => {
-            cy.visit('/settings/company');
-            const tooLongDescription = 'A'.repeat(501);
-            cy.get('[data-cy="company-description-input"]', { timeout: 10000 }).clear().type(tooLongDescription, { delay: 0 });
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/max|length|500|characters|caractères/i);
-        });
+		it("shows error for description exceeding max length", () => {
+			cy.visit("/settings/company");
+			const tooLongDescription = "A".repeat(501);
+			cy.get('[data-cy="company-description-input"]', { timeout: 10000 })
+				.clear()
+				.type(tooLongDescription, { delay: 0 });
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/max|length|500|characters|caractères/i);
+		});
 
-        it('validates starting numbers are positive', () => {
-            cy.visit('/settings/company');
-            cy.get('input[name="quoteStartingNumber"]', { timeout: 10000 }).clear().type('0');
-            cy.get('[data-cy="company-submit-btn"]').click();
-            cy.contains(/min|at least|1/i);
-        });
-    });
+		it("validates starting numbers are positive", () => {
+			cy.visit("/settings/company");
+			cy.get('input[name="quoteStartingNumber"]', { timeout: 10000 })
+				.clear()
+				.type("0");
+			cy.get('[data-cy="company-submit-btn"]').click();
+			cy.contains(/min|at least|1/i);
+		});
+	});
 
-    describe('5 - Restore Valid State (Must run last)', () => {
-        it('restores valid company settings for other tests', () => {
-            completeCompanyProfile();
+	describe("5 - Restore Valid State (Must run last)", () => {
+		it("restores valid company settings for other tests", () => {
+			completeCompanyProfile();
 
-            cy.visit('/settings/company');
-            cy.wait(3000);
-            cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should('be.visible');
-            cy.get('[data-cy="company-name-input"]').should('have.value', 'Acme Corp');
-        });
-    });
+			cy.visit("/settings/company");
+			cy.wait(3000);
+			cy.get('[data-cy="company-name-input"]', { timeout: 15000 }).should(
+				"be.visible",
+			);
+			cy.get('[data-cy="company-name-input"]').should(
+				"have.value",
+				"Acme Corp",
+			);
+		});
+	});
 });

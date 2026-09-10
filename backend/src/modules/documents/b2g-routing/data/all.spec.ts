@@ -3,51 +3,25 @@
  * `data/all.ts`) — proves each one is well-formed AND that the countries this wave actually shipped
  * (fr, de, it — see this task's own explicit scope) are exactly what's there, no more, no less.
  *
- * A LATER audit task (2026-09-02) added TEN more countries after reading all 23 remaining EU member
- * states — see `data/all.ts`'s own header and `B2G_COVERAGE.md` at the repo root for the full audit.
- * Nine (be/cy/ee/gr/lt/lu/lv/mt/se) share the exact same shape — `transportId: "peppol"`,
- * `formatSyntax: "peppol-bis"`, no country-specific required identifiers/fields — so they get ONE
- * pinned, looped test rather than nine near-duplicate ones; pl is structurally different (its own
- * national channel/format) and gets its own dedicated test, same treatment as fr/de/it/es above.
- *
- * `nl` is added by a LATER task still (root TODO, "NLCIUS vendorable" — mandant "Go", 2026-09-05) —
- * structurally closer to DE (its own vendored national CIUS, `formatOverride`-carried over the SAME
- * `"peppol"` transport) than to the nine generic `"peppol-bis"` countries above, so it gets its own
- * dedicated test too, same treatment as DE's below.
+ * Re-pinned by the 5-country prune (2026-09-10, see this task's own report): this mechanism now ships
+ * DE/FR/IT/PL only. ES (its own "face"/facturae/DIR3 triad), NL (NLCIUS), and the nine countries the
+ * 2026-09-02 B2G audit added as "generic Peppol BIS, no national CIUS"
+ * (BE/CY/EE/GR/LT/LU/LV/MT/SE) were all `git rm`'d along with their data/xx.json — none of the four
+ * kept countries shares that generic peppol-bis shape (DE overrides to "xrechnung", FR routes to
+ * "chorus-pro", IT to "fatturapa" via "sdi", PL to its own "fa3" via "ksef"), so the peppol-bis-only
+ * cases below have no honest re-anchor and are deleted rather than weakened.
  */
-import { peppolBisFormatProvider } from '../../formats/peppol-bis-provider';
 import { fa3FormatProvider } from '../../formats/national/fa3-provider';
-import { nlciusFormatProvider } from '../../formats/nlcius-provider';
 import { ALL_B2G_ROUTING_FILES } from './all';
-
-/** The nine countries read as "generic Peppol BIS, no national CIUS" — see each file's own header
- *  for its own citation (EC eInvoicing Country Factsheet, checked 2026-09-02). */
-const PEPPOL_BIS_COUNTRIES = ['BE', 'CY', 'EE', 'GR', 'LT', 'LU', 'LV', 'MT', 'SE'];
 
 describe('b2g-routing/data/all.ts', () => {
   it('loads every shipped file without throwing', () => {
     expect(ALL_B2G_ROUTING_FILES.length).toBeGreaterThan(0);
   });
 
-  it("ships exactly 15 countries: the original FR/DE/IT/ES wave, the 2026-09-02 B2G audit's ten, plus NL (NLCIUS)", () => {
+  it('ships exactly the four kept countries (DE/FR/IT/PL)', () => {
     const countries = ALL_B2G_ROUTING_FILES.map((f) => f.countryCode).sort();
-    expect(countries).toEqual([
-      'BE',
-      'CY',
-      'DE',
-      'EE',
-      'ES',
-      'FR',
-      'GR',
-      'IT',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'NL',
-      'PL',
-      'SE',
-    ]);
+    expect(countries).toEqual(['DE', 'FR', 'IT', 'PL']);
   });
 
   it('every shipped rule carries LEGAL provenance with a real citation', () => {
@@ -79,25 +53,8 @@ describe('b2g-routing/data/all.ts', () => {
     expect(buyerRef?.required).toBe(true);
   });
 
-  // NL (NLCIUS) — root TODO, "NLCIUS vendorable" (mandant "Go", 2026-09-05). Structurally closer to
-  // DE (its own vendored national CIUS, format-overridden over the SAME "peppol" transport) than to
-  // the nine generic peppol-bis countries above — see `data/nl.json`'s own header for the full
-  // citation and for why NO `requiredClientIdentifiers`/mandatory `requiredDocumentFields` are added
-  // (every NLCIUS BR-NL-* rule is scoped to a DUTCH supplier, unlike BR-DE-*'s own unconditional
-  // Leitweg-ID requirement).
-  it('NL routes through the IMPLEMENTED "peppol" channel, carrying "nlcius" CONTENT (never Peppol BIS), matching the registered nlciusFormatProvider id, and adds NO unconditional required identifier/field (every BR-NL-* rule is scoped to a Dutch supplier)', () => {
-    const nl = ALL_B2G_ROUTING_FILES.find((f) => f.countryCode === 'NL')!;
-    expect(nl.transportId).toBe('peppol');
-    expect(nl.formatSyntax).toBe('nlcius');
-    expect(nl.formatSyntax).toBe(nlciusFormatProvider.id);
-    expect(nl.requiredClientIdentifiers ?? []).toEqual([]);
-    // The one document field this rule names (buyerReference/BR-NL-2) is informational only —
-    // `required: false` — precisely because it is NOT unconditional (see `data/nl.json`'s own note).
-    const buyerRef = nl.requiredDocumentFields?.find((f) => f.field === 'buyerReference');
-    expect(buyerRef?.required).toBe(false);
-    expect(nl.notes).toContain('0106');
-    expect(nl.notes).toContain('0190');
-  });
+  // NL (NLCIUS) and ES (its own "face"/facturae/DIR3 triad) were removed by the 5-country prune
+  // (2026-09-10) along with their data/xx.json — neither case has a re-anchor among DE/FR/IT/PL.
 
   it('IT routes to the ALREADY IMPLEMENTED "sdi" channel with "fatturapa" and requires the IPA code', () => {
     const it = ALL_B2G_ROUTING_FILES.find((f) => f.countryCode === 'IT')!;
@@ -106,51 +63,14 @@ describe('b2g-routing/data/all.ts', () => {
     expect(it.requiredClientIdentifiers?.some((i) => i.scheme === 'IT_PA_CODE')).toBe(true);
   });
 
-  it('ES routes to the ALREADY IMPLEMENTED "face" channel with "facturae", requires the NIF, and the FULL DIR3 triad', () => {
-    const es = ALL_B2G_ROUTING_FILES.find((f) => f.countryCode === 'ES')!;
-    expect(es.transportId).toBe('face');
-    expect(es.formatSyntax).toBe('facturae');
-    expect(es.requiredClientIdentifiers?.some((i) => i.scheme === 'VAT')).toBe(true);
-    const dir3Fields = ['dir3OrganoGestor', 'dir3UnidadTramitadora', 'dir3OficinaContable'];
-    for (const field of dir3Fields) {
-      const entry = es.requiredDocumentFields?.find((f) => f.field === field);
-      expect(entry).toBeDefined();
-      expect(entry?.required).toBe(true);
-    }
-  });
-
-  // The 2026-09-02 B2G audit wave — see this file's own header. All nine read as "generic Peppol
-  // BIS, no national CIUS" (EC eInvoicing Country Factsheets) — pinned together, plus each one's own
-  // EAS (Peppol codelist v9.7) named in its own `notes`, so a citation drifting silently to the wrong
-  // scheme would still show up as a content change here.
-  it.each([
-    ['BE', '0208'],
-    ['CY', '9928'],
-    ['EE', '0191'],
-    ['GR', '9933'],
-    ['LT', '0200'],
-    ['LU', '0240'],
-    ['LV', '0218'],
-    ['MT', '9943'],
-    ['SE', '0007'],
-  ])('%s routes to the ALREADY IMPLEMENTED "peppol" channel with generic "peppol-bis" (no CIUS), EAS %s named in its own notes, and adds NO country-specific required identifier/field', (countryCode, eas) => {
-    const rule = ALL_B2G_ROUTING_FILES.find((f) => f.countryCode === countryCode)!;
-    expect(rule).toBeDefined();
-    expect(rule.transportId).toBe('peppol');
-    expect(rule.formatSyntax).toBe('peppol-bis');
-    // `formatSyntax` really is the registered Peppol BIS provider's own id — never a typo that
-    // would only surface later as a runtime `UnknownFormatError` at send time.
-    expect(rule.formatSyntax).toBe(peppolBisFormatProvider.id);
-    expect(rule.requiredClientIdentifiers ?? []).toEqual([]);
-    expect(rule.requiredDocumentFields ?? []).toEqual([]);
-    expect(rule.notes).toContain(eas);
-  });
-
-  it('every peppol-bis rule in this wave is covered by PEPPOL_BIS_COUNTRIES — the loop above is exhaustive, never a silent extra', () => {
-    const actualPeppolBis = ALL_B2G_ROUTING_FILES.filter((f) => f.formatSyntax === 'peppol-bis')
-      .map((f) => f.countryCode)
-      .sort();
-    expect(actualPeppolBis).toEqual([...PEPPOL_BIS_COUNTRIES].sort());
+  // The 2026-09-02 B2G audit's nine "generic Peppol BIS, no national CIUS" countries
+  // (BE/CY/EE/GR/LT/LU/LV/MT/SE) were all removed by the 5-country prune (2026-09-10) — none of the
+  // four kept countries shares that shape (see this file's own header), so no rule in the kept set
+  // has `formatSyntax === 'peppol-bis'` any more; this is asserted directly rather than deleted
+  // outright, so a future rule silently reintroducing an untested peppol-bis shape would be caught.
+  it('no kept country uses the generic "peppol-bis" format any more — DE/FR/IT/PL each have their own channel/format', () => {
+    const peppolBisRules = ALL_B2G_ROUTING_FILES.filter((f) => f.formatSyntax === 'peppol-bis');
+    expect(peppolBisRules).toEqual([]);
   });
 
   it('PL routes to the ALREADY IMPLEMENTED "ksef" channel with its OWN national "fa3" format (never a generic Peppol BIS substitute for PEF), and requires the NIP', () => {

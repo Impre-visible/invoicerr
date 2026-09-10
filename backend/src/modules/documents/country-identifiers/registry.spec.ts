@@ -33,9 +33,11 @@ describe('CountryIdentifierRequirementsCatalog', () => {
     expect(catalog.schemesFor('DE')).toEqual([]);
   });
 
-  it('defaults to the real shipped catalog (FR and US — see data/all.ts)', () => {
+  // US was removed by the 5-country prune (2026-09-10) — this mechanism now ships DE/FR/PT
+  // (see data/all.ts and data/all.spec.ts's own exact-list pin).
+  it('defaults to the real shipped catalog (FR and DE — see data/all.ts)', () => {
     const catalog = new CountryIdentifierRequirementsCatalog();
-    expect(catalog.countries()).toEqual(expect.arrayContaining(['FR', 'US']));
+    expect(catalog.countries()).toEqual(expect.arrayContaining(['FR', 'DE']));
     expect(catalog.schemesFor('FR').length).toBeGreaterThan(0);
   });
 });

@@ -39,35 +39,12 @@ describe('channel policy files — loaded, not hard-coded', () => {
     ]);
   });
 
-  // Root TODO item 10 remainder ("Peppol") — BE's own mandate is real but READ AS CONDITIONAL ("in
-  // principe... tenzij" — see `data/be.json`'s own note): this catalog's `mandate.ts` has no room for
-  // a conditional block, so promoting this to `mandated` would hard-refuse a legitimate case the law
-  // itself allows. `suggested` with `legal` provenance (never `unverified`) is the honest middle
-  // ground — a SOURCED fact, not enforced as an unconditional block.
-  it('BE suggests (never mandates) the "peppol" provider, with a REAL legal citation — a fact read from data/be.json', () => {
-    expect(defaultChannelPolicyCatalog.factsFor('BE')).toEqual([
-      expect.objectContaining({
-        providerId: 'peppol',
-        requirement: 'suggested',
-        provenance: expect.objectContaining({ kind: 'legal', sourceCheckedAt: '2026-09-02' }),
-      }),
-    ]);
-  });
-
-  // Root TODO item 10, ANAF/RO wave — the EU mandate wave RO opens: unlike BE's own conditional
-  // ("tenzij") mandate above, the primary source actually read here (a Council Implementing Decision,
-  // not a phased/conditional national scheme) authorizes an UNCONDITIONAL domestic-B2B rule, the same
-  // shape FR's own mandate already has — see `data/ro.json`'s own citation and note.
-  it('RO mandates the "anaf" provider from 2024-01-01 — a fact read from data/ro.json, not a branch in code', () => {
-    expect(defaultChannelPolicyCatalog.factsFor('RO')).toEqual([
-      expect.objectContaining({
-        providerId: 'anaf',
-        requirement: 'mandated',
-        mandatedFrom: '2024-01-01',
-        provenance: expect.objectContaining({ kind: 'legal', sourceCheckedAt: '2026-09-02' }),
-      }),
-    ]);
-  });
+  // BE (suggested "peppol", REAL legal citation) and RO (mandated "anaf", the same unconditional
+  // shape as FR's own mandate) were removed by the 5-country prune (2026-09-10, see this task's own
+  // report) along with their data/xx.json. Neither case has an honest re-anchor among the kept three
+  // files: FR alone is "mandated" + "legal" (already pinned above), IT/PL are both "suggested" +
+  // "unverified" (also already pinned above) — no kept file exhibits BE's own "suggested" + "legal"
+  // combination, so this case is deleted rather than weakened.
 
   it('lower-cased or absent country codes never crash — no fact, not a throw', () => {
     expect(defaultChannelPolicyCatalog.factsFor('fr')).toEqual(defaultChannelPolicyCatalog.factsFor('FR'));

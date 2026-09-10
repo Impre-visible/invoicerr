@@ -9,7 +9,8 @@ describe('resolveCorrectionRoutesForCountry', () => {
   });
 
   it('returns undefined for a country with no shipped file — the honest-refusal case a caller turns into a NAMED 404', () => {
-    // BE gained a correction-routes file in lot 1 — JP is the uncovered stand-in now.
+    // JP has never had a correction-routes file — a clean "not covered" stand-in (BE's own file,
+    // added in lot 1, was later removed by the 5-country prune, 2026-09-10, so it would work too).
     expect(resolveCorrectionRoutesForCountry('JP')).toBeUndefined();
   });
 
@@ -45,12 +46,13 @@ describe('resolveCorrectionRoutesForCountry', () => {
     expect(route.label).toMatch(/^unverified — /);
   });
 
-  it('every route across all seven shipped countries is implemented=false EXCEPT INTERNAL_CREDIT_NOTE (always) and CANCEL_AND_REPLACE (TODO_CORRECTION.md C3, country-aware) — the hard, honest mapping', () => {
-    // FR/DE/US ground an unrestricted local cancel, IT a narrower one (see cancel-policy.ts's own
-    // header) — PL/ES/MX do NOT, despite two of them declaring CANCEL_AND_REPLACE `required` (the
-    // exact nuance cancel-policy.ts's whitelist exists to hold).
-    const localCancelCountries = new Set(['FR', 'DE', 'US', 'IT']);
-    for (const countryCode of ['FR', 'IT', 'PL', 'DE', 'ES', 'MX', 'US']) {
+  it('every route across all five shipped countries is implemented=false EXCEPT INTERNAL_CREDIT_NOTE (always) and CANCEL_AND_REPLACE (TODO_CORRECTION.md C3, country-aware) — the hard, honest mapping', () => {
+    // FR/DE ground an unrestricted local cancel, IT a narrower one (see cancel-policy.ts's own
+    // header) — PL/PT do NOT, despite PL declaring CANCEL_AND_REPLACE `required` (the exact nuance
+    // cancel-policy.ts's whitelist exists to hold). (ES/MX/US used to widen this same set — all three
+    // removed by the 5-country prune, 2026-09-10.)
+    const localCancelCountries = new Set(['FR', 'DE', 'IT']);
+    for (const countryCode of ['FR', 'IT', 'PL', 'DE', 'PT']) {
       const decision = resolveCorrectionRoutesForCountry(countryCode)!;
       for (const route of decision.routes) {
         if (route.routeId === 'INTERNAL_CREDIT_NOTE') {
@@ -64,13 +66,13 @@ describe('resolveCorrectionRoutesForCountry', () => {
     }
   });
 
-  it('TODO_CORRECTION.md C3 — CANCEL_AND_REPLACE is implemented for FR/DE/US/IT (a real local cancel), never for PL/ES/MX (declared, but no real mechanism founds it)', () => {
-    for (const countryCode of ['FR', 'DE', 'US', 'IT']) {
+  it('TODO_CORRECTION.md C3 — CANCEL_AND_REPLACE is implemented for FR/DE/IT (a real local cancel), never for PL/PT (declared, but no real mechanism founds it)', () => {
+    for (const countryCode of ['FR', 'DE', 'IT']) {
       const decision = resolveCorrectionRoutesForCountry(countryCode)!;
       const route = decision.routes.find((r) => r.routeId === 'CANCEL_AND_REPLACE')!;
       expect(route.implemented).toBe(true);
     }
-    for (const countryCode of ['PL', 'ES', 'MX']) {
+    for (const countryCode of ['PL', 'PT']) {
       const decision = resolveCorrectionRoutesForCountry(countryCode)!;
       const route = decision.routes.find((r) => r.routeId === 'CANCEL_AND_REPLACE')!;
       expect(route.implemented).toBe(false);

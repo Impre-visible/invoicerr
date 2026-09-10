@@ -7,46 +7,22 @@
  * that a handful of notorious rates actually LOADED with the value this task's own TEDB reading
  * produced (mutation target: a copy/paste error swapping two countries' rates, or the seller's own
  * rate leaking into a destination file, would slip past a purely structural "does it load" check).
+ *
+ * Re-pinned by the 5-country prune (2026-09-10, see this task's own report): this mechanism now
+ * ships DE/FR/IT/PL/PT only — the other 25 EU member states plus AE/IN/QA/SA/US read for root TODO
+ * item 16's own OSS follow-up were all `git rm`'d along with their data/xx.json. The superlative
+ * "highest/lowest in the EU" claims this file used to pin (HU 27%, LU 17%) no longer have an honest
+ * basis — this catalog can no longer see the full EU-27 to make that claim — so they were re-scoped
+ * to "highest/lowest AMONG THE KEPT COUNTRIES" instead of deleted outright, since PL/PT/DE's own real
+ * rates still support a narrower, still-true version of the same observation.
  */
 import { assertValidTaxSystemProvenance, InvalidTaxSystemProvenanceError } from '../schema';
 import { ALL_TAX_SYSTEM_FILES } from './all';
 
 describe('tax-systems/data — coverage', () => {
-  it('loads exactly the 7 non-EU jurisdictions plus all 27 EU member states (FR + the 26 read for item 16)', () => {
+  it('loads exactly the five kept countries (DE/FR/IT/PL/PT)', () => {
     const codes = ALL_TAX_SYSTEM_FILES.map((f) => f.countryCode).sort();
-    const nonEu = ['AE', 'IN', 'IT', 'QA', 'SA', 'US']; // IT is EU but was already shipped pre-item-16
-    const eu27 = [
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'FR',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'IT',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-    ];
-    expect(eu27.length).toBe(27); // sanity on the fixture itself
-    const expected = [...new Set([...nonEu, ...eu27])].sort();
-    expect(codes).toEqual(expected);
+    expect(codes).toEqual(['DE', 'FR', 'IT', 'PL', 'PT']);
   });
 
   it('every shipped file carries a real provenance (already enforced at load time by data/all.ts — this just makes the property explicit)', () => {
@@ -56,7 +32,7 @@ describe('tax-systems/data — coverage', () => {
   });
 });
 
-describe('tax-systems/data — the 26 EU standard rates read from TEDB (item 16 follow-up), content-pinned', () => {
+describe('tax-systems/data — the kept standard rates read from TEDB (item 16 follow-up), content-pinned', () => {
   const byCode = (cc: string) => ALL_TAX_SYSTEM_FILES.find((f) => f.countryCode === cc);
 
   it('DE (Germany): 19% — the rate the OSS gate used to name as missing', () => {
@@ -66,86 +42,32 @@ describe('tax-systems/data — the 26 EU standard rates read from TEDB (item 16 
     expect(de?.provenance.kind).toBe('legal');
   });
 
-  it('HU (Hungary): 27% — the highest standard VAT rate in the EU', () => {
-    const hu = byCode('HU');
-    expect(hu?.standardRate).toBe(27);
-    const allRates = ALL_TAX_SYSTEM_FILES.filter(
+  // PL and PT tie for the highest standard rate AMONG THE KEPT COUNTRIES (23%), DE the lowest (19%)
+  // — a narrower, still-true replacement for the "highest/lowest in the EU" claim this test used to
+  // pin on HU (27%) and LU (17%), both removed by the 5-country prune (2026-09-10).
+  it('PL and PT share the highest standard rate among the kept countries (23%); DE has the lowest (19%)', () => {
+    const rates = ALL_TAX_SYSTEM_FILES.filter(
       (f) => f.kind === 'VAT' && typeof f.standardRate === 'number',
-    );
-    const max = Math.max(...allRates.map((f) => f.standardRate as number));
-    expect(max).toBe(27);
+    ).map((f) => f.standardRate as number);
+    expect(Math.max(...rates)).toBe(23);
+    expect(byCode('PL')?.standardRate).toBe(23);
+    expect(byCode('PT')?.standardRate).toBe(23);
+    expect(Math.min(...rates)).toBe(19);
+    expect(byCode('DE')?.standardRate).toBe(19);
   });
 
-  it('LU (Luxembourg): 17% — the lowest standard VAT rate in the EU', () => {
-    const lu = byCode('LU');
-    expect(lu?.standardRate).toBe(17);
-    const eu27Codes = new Set([
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'FR',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'IT',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-    ]);
-    const euRates = ALL_TAX_SYSTEM_FILES.filter(
-      (f) => eu27Codes.has(f.countryCode) && typeof f.standardRate === 'number',
-    );
-    const min = Math.min(...euRates.map((f) => f.standardRate as number));
-    expect(min).toBe(17);
-  });
-
-  // Spot-checks across the rest of the 26 — each value is the one this task's own TEDB reading
-  // returned (see each file's own `provenance.sourceText`), not a value recalled from memory.
+  // Spot-checks across the kept set — each value is the one this task's own TEDB reading returned
+  // (see each file's own `provenance.sourceText`), not a value recalled from memory.
   it.each([
-    ['AT', 20],
-    ['BE', 21],
-    ['BG', 20],
-    ['CY', 19],
-    ['CZ', 21],
-    ['DK', 25],
-    ['EE', 24],
-    ['ES', 21], // mainland/general rate — NOT the Canary Islands' own 7% IGIC, see es.json's own notes
-    ['FI', 25.5],
-    ['GR', 24], // TEDB indexes this under isoCode "EL"; this catalog keeps "GR" — see gr.json's own notes
-    ['HR', 25],
-    ['IE', 23],
+    ['DE', 19],
     ['IT', 22],
-    ['LT', 21],
-    ['LV', 21],
-    ['MT', 18],
-    ['NL', 21],
     ['PL', 23],
     ['PT', 23],
-    ['RO', 21],
-    ['SE', 25],
-    ['SI', 22],
-    ['SK', 23],
   ])('%s standard rate is %s%%', (cc, rate) => {
     expect(byCode(cc)?.standardRate).toBe(rate);
   });
 
-  it('FR still derives its rate from vat-rates/, not one of the 26 hand-sourced TEDB files', () => {
+  it('FR still derives its rate from vat-rates/, not one of the TEDB-sourced files', () => {
     const fr = byCode('FR');
     expect(fr?.standardRate).toBeUndefined(); // FR derives its rate from vat-rates/registry.ts, see schema.ts's own header
   });
@@ -169,68 +91,14 @@ describe('tax-systems/data — the 26 EU standard rates read from TEDB (item 16 
     expect(fr?.notes).toContain('293 B');
   });
 
-  it('none of the 26 new files invent a reducedRates table — the OSS branch this work unblocks reads only standardRate, and DocumentLine has no per-line product category to select a reduced rate against', () => {
-    const newCodes = [
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-    ];
-    for (const cc of newCodes) {
+  it('none of the TEDB-sourced files (DE/IT/PL/PT) invent a reducedRates table — the OSS branch this work unblocks reads only standardRate, and DocumentLine has no per-line product category to select a reduced rate against', () => {
+    for (const cc of ['DE', 'IT', 'PL', 'PT']) {
       expect(byCode(cc)?.reducedRates).toBeUndefined();
     }
   });
 
-  it('every one of the 26 new files claims "legal" provenance citing the actual TEDB HTTP response, checked 2026-09-01', () => {
-    const newCodes = [
-      'AT',
-      'BE',
-      'BG',
-      'CY',
-      'CZ',
-      'DE',
-      'DK',
-      'EE',
-      'ES',
-      'FI',
-      'GR',
-      'HR',
-      'HU',
-      'IE',
-      'LT',
-      'LU',
-      'LV',
-      'MT',
-      'NL',
-      'PL',
-      'PT',
-      'RO',
-      'SE',
-      'SI',
-      'SK',
-    ];
-    for (const cc of newCodes) {
+  it('every one of the TEDB-sourced files (DE/IT/PL/PT) claims "legal" provenance citing the actual TEDB HTTP response, checked 2026-09-01', () => {
+    for (const cc of ['DE', 'IT', 'PL', 'PT']) {
       const file = byCode(cc);
       expect(file?.provenance.kind).toBe('legal');
       if (file?.provenance.kind === 'legal') {

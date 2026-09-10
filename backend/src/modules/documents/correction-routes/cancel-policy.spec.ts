@@ -8,8 +8,10 @@ import { defaultCorrectionRoutesCatalog } from './registry';
  * "required" mais AUCUN mécanisme réel derrière).
  */
 describe('resolveCancelPolicyForCountry — the per-country map', () => {
-  it('FR, DE, US: unrestricted local cancel — allowed, no status narrowing', () => {
-    for (const countryCode of ['FR', 'DE', 'US']) {
+  // US used to ground this same conclusion a third way, but data/us.json was removed by the
+  // 5-country prune (2026-09-10) — see cancel-policy.ts's own header.
+  it('FR, DE: unrestricted local cancel — allowed, no status narrowing', () => {
+    for (const countryCode of ['FR', 'DE']) {
       expect(resolveCancelPolicyForCountry(countryCode)).toEqual({ allowed: true });
     }
   });
@@ -29,32 +31,28 @@ describe('resolveCancelPolicyForCountry — the per-country map', () => {
     expect(decision.reason).toMatch(/faktur/i);
   });
 
-  it('MX: refused — CANCEL_AND_REPLACE is "required" too, but its own order names an authority-side cancellation step (SAT) this repo wires no channel for', () => {
-    const decision = resolveCancelPolicyForCountry('MX');
+  // MX ('required', authority-side SAT step) and ES ('forbidden') both illustrated the same two
+  // "not implementable" shapes PL and PT alone now carry — but data/mx.json and data/es.json were
+  // both removed by the 5-country prune (2026-09-10). PT re-anchors the "not whitelisted" refusal
+  // below, sourced this time on a genuine structural absence rather than an authority step.
+  it('PT: refused — CANCEL_AND_REPLACE stays honestly "unverified", no clearance/refusal-then-reissue mechanism was found', () => {
+    const decision = resolveCancelPolicyForCountry('PT');
     expect(decision.allowed).toBe(false);
-    expect(decision.reason).toMatch(/MX/);
-    expect(decision.reason).toMatch(/cancelaci/i);
+    expect(decision.reason).toMatch(/PT/);
+    expect(decision.reason).toMatch(/clearance/i);
   });
 
-  it('ES: refused — CANCEL_AND_REPLACE is plainly "forbidden"', () => {
-    const decision = resolveCancelPolicyForCountry('ES');
-    expect(decision.allowed).toBe(false);
-    expect(decision.reason).toMatch(/ES/);
-  });
-
-  it('the INVERSION this task turns on: PL and MX both declare CANCEL_AND_REPLACE "required", yet neither founds a local cancel — required is not implementable', () => {
+  it('the INVERSION this task turns on: PL declares CANCEL_AND_REPLACE "required", yet does not found a local cancel — required is not implementable', () => {
     // The map's own most important, non-obvious fact: a route being LEGALLY REQUIRED never implies
     // it is LOCALLY IMPLEMENTABLE (see this file's own header). Read straight off the real catalog to
-    // prove the premise, not asserted blind.
-    for (const countryCode of ['PL', 'MX']) {
-      const file = defaultCorrectionRoutesCatalog.fileFor(countryCode);
-      expect(file).toBeDefined();
-      const route = file!.routes.find((r) => r.routeId === 'CANCEL_AND_REPLACE');
-      expect(route).toBeDefined();
-      expect(route!.status).toBe('required');
-    }
+    // prove the premise, not asserted blind. (MX used to illustrate the same inversion a second way —
+    // removed by the 5-country prune, 2026-09-10 — PL alone proves the point.)
+    const file = defaultCorrectionRoutesCatalog.fileFor('PL');
+    expect(file).toBeDefined();
+    const route = file!.routes.find((r) => r.routeId === 'CANCEL_AND_REPLACE');
+    expect(route).toBeDefined();
+    expect(route!.status).toBe('required');
     expect(resolveCancelPolicyForCountry('PL').allowed).toBe(false);
-    expect(resolveCancelPolicyForCountry('MX').allowed).toBe(false);
   });
 
   it('a country with no correction-routes file at all is refused, named, never a silent default', () => {
@@ -76,7 +74,7 @@ describe('resolveCancelPolicyForCountry — the per-country map', () => {
     expect(resolveCancelPolicyForCountry('Fr')).toEqual({ allowed: true });
   });
 
-  it('countriesWithLocalCancel() enumerates exactly the four whitelisted countries — the map, pinned', () => {
-    expect(new Set(countriesWithLocalCancel())).toEqual(new Set(['FR', 'DE', 'US', 'IT']));
+  it('countriesWithLocalCancel() enumerates exactly the three whitelisted countries — the map, pinned', () => {
+    expect(new Set(countriesWithLocalCancel())).toEqual(new Set(['FR', 'DE', 'IT']));
   });
 });
