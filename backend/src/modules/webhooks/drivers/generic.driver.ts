@@ -1,4 +1,4 @@
-import { WebhookDriver } from './webhook-driver.interface';
+import { WEBHOOK_FETCH_TIMEOUT_MS, WebhookDriver } from './webhook-driver.interface';
 import { WebhookType } from '../../../../prisma/generated/prisma/client';
 import crypto from 'node:crypto';
 
@@ -19,6 +19,8 @@ export class GenericDriver implements WebhookDriver {
         ...(signature ? { 'X-Webhook-Signature': signature } : {}),
       },
       body,
+      redirect: 'manual',
+      signal: AbortSignal.timeout(WEBHOOK_FETCH_TIMEOUT_MS),
     });
 
     return res.ok;

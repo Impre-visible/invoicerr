@@ -1,7 +1,7 @@
 import { EVENT_STYLES, formatPayloadForEvent } from './event-formatters';
 import { WebhookEvent, WebhookType } from '../../../../prisma/generated/prisma/client';
 
-import { WebhookDriver } from './webhook-driver.interface';
+import { WEBHOOK_FETCH_TIMEOUT_MS, WebhookDriver } from './webhook-driver.interface';
 
 export interface ChatField {
   title: string;
@@ -106,6 +106,8 @@ export class ChatWebhook {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      redirect: 'manual',
+      signal: AbortSignal.timeout(WEBHOOK_FETCH_TIMEOUT_MS),
     });
 
     this.text = '';

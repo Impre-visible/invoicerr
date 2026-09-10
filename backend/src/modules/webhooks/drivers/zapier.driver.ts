@@ -1,4 +1,4 @@
-import { WebhookDriver } from './webhook-driver.interface';
+import { WEBHOOK_FETCH_TIMEOUT_MS, WebhookDriver } from './webhook-driver.interface';
 import { WebhookType } from '../../../../prisma/generated/prisma/client';
 
 export class ZapierDriver implements WebhookDriver {
@@ -11,6 +11,8 @@ export class ZapierDriver implements WebhookDriver {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      redirect: 'manual',
+      signal: AbortSignal.timeout(WEBHOOK_FETCH_TIMEOUT_MS),
     });
 
     return res.ok;

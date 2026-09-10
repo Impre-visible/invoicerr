@@ -11,6 +11,7 @@ import { RocketChatDriver } from './drivers/rocketchat.driver';
 import { SlackDriver } from './drivers/slack.driver';
 import { TeamsDriver } from './drivers/teams.driver';
 import { WebhookDriver } from './drivers/webhook-driver.interface';
+import { WebhookUrlValidationError, assertPublicWebhookUrl } from './webhook-url-guard';
 import { ZapierDriver } from './drivers/zapier.driver';
 import prisma from '@/prisma/prisma.service';
 import { logger } from '@/logger/logger.service';
@@ -117,6 +118,26 @@ export class WebhooksService {
     return `${baseUrl}/api/webhooks/${pluginId}`;
   }
 
+  /**
+   * SECURITY_AUDIT.md finding #2 (SSRF) — reject a webhook URL that is not a public http(s)
+   * endpoint. Called from create/update below, before the row is ever persisted; `send()` re-runs
+   * `assertPublicWebhookUrl` itself right before each dispatch (DNS rebinding — see that function's
+   * own header). The client only ever sees the one generic message: neither the internal `reason`
+   * nor the rejected URL is echoed back or logged, since either would hand an attacker a live oracle
+   * to scan internal address ranges with ("is 10.0.3.4 open? what about 172.20.0.1?").
+   */
+  private async validateWebhookUrl(url: string): Promise<void> {
+    try {
+      await assertPublicWebhookUrl(url);
+    } catch (err) {
+      if (err instanceof WebhookUrlValidationError) {
+        this.logger.warn(`Rejected webhook URL at write time (${err.reason})`);
+        throw new HttpException('webhook URL must be a public http(s) endpoint', HttpStatus.BAD_REQUEST);
+      }
+      throw err;
+    }
+  }
+
   private getDriver(type: WebhookType): WebhookDriver {
     const driver = this.drivers.find((d) => d.supports(type));
     if (!driver) {
@@ -147,6 +168,8 @@ export class WebhooksService {
 
   /** Create a webhook for the active company. Returns the full row (incl. secret) + company for event dispatch. */
   async create(companyId: string, body: WebhookCreateInput) {
+    await this.validateWebhookUrl(body.url);
+
     const company = await prisma.company.findUniqueOrThrow({ where: { id: companyId } });
 
     const secret = body.secret ?? '';
@@ -168,6 +191,8 @@ export class WebhooksService {
   async update(companyId: string, id: string, body: WebhookUpdateInput) {
     const existing = await prisma.webhook.findFirst({ where: { id, companyId } });
     if (!existing) throw new HttpException('Webhook not found', HttpStatus.NOT_FOUND);
+
+    if (body.url) await this.validateWebhookUrl(body.url);
 
     const company = await prisma.company.findUniqueOrThrow({ where: { id: companyId } });
 
@@ -202,6 +227,19 @@ export class WebhooksService {
   async send(webhooks: Webhook[], event: WebhookEvent, payload: any) {
     const results = await Promise.all(
       webhooks.map(async (webhook) => {
+        // Re-validate right before dispatch, not just at create/update time: a hostname that
+        // resolved to a public IP when the webhook was saved can be repointed at an internal one by
+        // the time the event actually fires ("DNS rebinding" — see webhook-url-guard.ts). A webhook
+        // failing this check is skipped (reported as a failed send), never allowed to abort the
+        // batch for every other webhook of the same event.
+        try {
+          await assertPublicWebhookUrl(webhook.url);
+        } catch (err) {
+          const reason = err instanceof WebhookUrlValidationError ? err.reason : 'validation error';
+          this.logger.warn(`Skipped webhook dispatch: URL failed the SSRF guard at send time (${reason})`);
+          return false;
+        }
+
         const driver = this.getDriver(webhook.type);
         return await driver.send(
           webhook.url,
