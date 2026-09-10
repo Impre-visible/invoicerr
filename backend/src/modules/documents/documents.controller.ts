@@ -554,7 +554,9 @@ export class DocumentsController {
     summary: 'List the legal archives of a document instance',
     description:
       'Root TODO item 14 ("archivage légal ⚖") — every archive written for this document, most ' +
-      'recent first: one row per successful delivery that produced at least one artifact.',
+      'recent first: DELIVERY rows (one per successful send that produced at least one artifact) ' +
+      "and, since 2026-09-06, VERDICT rows (the authority's own terminal verdict on a deposit — " +
+      'see `DocumentArchive`’s own schema comment). Distinguish them via `kind`.',
   })
   @ApiParam({ name: 'id', type: String })
   @ApiQuery({ name: 'typeId', required: true, type: String })

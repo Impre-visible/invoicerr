@@ -1,11 +1,13 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import prisma from '@/prisma/prisma.service';
 
+import { DocumentArchiveKind } from '../../../../prisma/generated/prisma/client';
 import { computeContentHash } from './hashing';
 import {
+  createAuthorityVerdictArchive,
   createDocumentArchive,
   findOwnedArchive,
   listDocumentArchives,
@@ -17,12 +19,18 @@ jest.mock('@/prisma/prisma.service', () => ({
   __esModule: true,
   default: {
     company: { findUnique: jest.fn() },
-    documentArchive: { create: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+    documentArchive: {
+      create: jest.fn(),
+      createMany: jest.fn(),
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+    },
   },
 }));
 
 const findCompany = prisma.company.findUnique as jest.Mock;
 const createArchive = prisma.documentArchive.create as jest.Mock;
+const createManyArchives = prisma.documentArchive.createMany as jest.Mock;
 const findManyArchives = prisma.documentArchive.findMany as jest.Mock;
 const findFirstArchive = prisma.documentArchive.findFirst as jest.Mock;
 
@@ -118,6 +126,115 @@ describe('archive/persistence', () => {
 
       expect(createArchive).toHaveBeenCalledTimes(2);
       expect(first.id).not.toBe(second.id);
+    });
+  });
+
+  // Root TODO item 14's own remainder (TODO_ISSUES.md, mandataire decision 2026-09-06) — the
+  // PROBATIVE archive for a TERMINAL authority verdict, under the same discipline as
+  // `createDocumentArchive` above, but linked to and inheriting the retention of the DELIVERY archive
+  // it attests to instead of resolving its own.
+  describe('createAuthorityVerdictArchive', () => {
+    const PARENT = {
+      id: 'delivery-archive-1',
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      kind: DocumentArchiveKind.DELIVERY,
+      parentArchiveId: null,
+      contentHash: 'parent-content-hash',
+      uri: 'file:///wherever',
+      artifacts: [],
+      archivedAt: new Date('2026-09-01T00:00:00Z'),
+      retentionUntil: new Date('2036-09-01T00:00:00Z'),
+      retentionBasis: 'commerciale 10y (C. com. art. L123-22).',
+    };
+
+    const EVENT = {
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      providerId: 'pdp',
+      statusCode: 'fr:202',
+      statusText: 'Reçue par la plateforme',
+      reason: null,
+      observedAt: new Date('2026-09-06T10:00:00Z'),
+      rawPayload: { events: [{ status_code: 'fr:202' }] },
+    };
+
+    it('links to the most recent DELIVERY archive and copies its retention VERBATIM — never recomputed', async () => {
+      findFirstArchive.mockResolvedValue(PARENT);
+      createManyArchives.mockResolvedValue({ count: 1 });
+
+      const outcome = await createAuthorityVerdictArchive(EVENT);
+
+      expect(outcome).toEqual({ archived: true });
+      expect(findFirstArchive).toHaveBeenCalledWith({
+        where: { companyId: 'company-1', documentId: 'doc-1', kind: DocumentArchiveKind.DELIVERY },
+        orderBy: { archivedAt: 'desc' },
+      });
+
+      const written = createManyArchives.mock.calls[0][0].data[0];
+      expect(written.kind).toBe(DocumentArchiveKind.VERDICT);
+      expect(written.parentArchiveId).toBe(PARENT.id);
+      expect(written.verdictKey).toBe('doc-1|pdp|fr:202');
+      // The whole point of this decision (2026-09-06): SAME retentionUntil/Basis as the parent, not a
+      // fresh one resolved for "now" — mutating either of these two lines must fail this test.
+      expect(written.retentionUntil).toBe(PARENT.retentionUntil);
+      expect(written.retentionBasis).toBe(PARENT.retentionBasis);
+      expect(written.artifacts).toEqual([
+        expect.objectContaining({ role: 'authority-verdict', mime: 'application/json' }),
+      ]);
+      expect(createManyArchives).toHaveBeenCalledWith(expect.objectContaining({ skipDuplicates: true }));
+    });
+
+    it('embeds the parent’s own contentHash in the archived bytes — self-contained even without the database', async () => {
+      findFirstArchive.mockResolvedValue(PARENT);
+      createManyArchives.mockResolvedValue({ count: 1 });
+
+      await createAuthorityVerdictArchive(EVENT);
+
+      const written = createManyArchives.mock.calls[0][0].data[0];
+      const filePath = join(written.uri.replace('file://', ''), 'authority-verdict.json');
+      const parsed = JSON.parse(readFileSync(filePath, 'utf-8'));
+      expect(parsed.deposit).toEqual({
+        documentId: 'doc-1',
+        archiveId: PARENT.id,
+        contentHash: PARENT.contentHash,
+      });
+      expect(parsed.rawPayload).toEqual(EVENT.rawPayload);
+    });
+
+    it('never archives (never even hashes/writes) a verdict for a document with no deposit archive at all', async () => {
+      findFirstArchive.mockResolvedValue(null);
+
+      const outcome = await createAuthorityVerdictArchive(EVENT);
+
+      expect(outcome).toEqual({ archived: false, reason: 'no-deposit-archive' });
+      expect(createManyArchives).not.toHaveBeenCalled();
+    });
+
+    it('is idempotent — a re-poll of the same terminal status archives nothing a second time', async () => {
+      findFirstArchive.mockResolvedValue(PARENT);
+      createManyArchives.mockResolvedValue({ count: 0 }); // the unique verdictKey already exists
+
+      const outcome = await createAuthorityVerdictArchive(EVENT);
+
+      expect(outcome).toEqual({ archived: false, reason: 'duplicate' });
+    });
+
+    it('mutating the payload changes the archived contentHash — content-sensitive, not merely a label', async () => {
+      findFirstArchive.mockResolvedValue(PARENT);
+      createManyArchives.mockResolvedValue({ count: 1 });
+
+      await createAuthorityVerdictArchive(EVENT);
+      const firstHash = createManyArchives.mock.calls[0][0].data[0].contentHash;
+
+      createManyArchives.mockClear();
+      await createAuthorityVerdictArchive({
+        ...EVENT,
+        rawPayload: { events: [{ status_code: 'fr:202-mutated' }] },
+      });
+      const secondHash = createManyArchives.mock.calls[0][0].data[0].contentHash;
+
+      expect(secondHash).not.toBe(firstHash);
     });
   });
 

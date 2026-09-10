@@ -29,6 +29,7 @@ import {
   readConformitySweepIntervalMs,
   readMaxPollAgeMs,
 } from './conformity-sweep';
+import { archiveTerminalAuthorityVerdictIfAny } from '../archive/archive-verdict-on-terminal';
 import { dispatchDocumentAuthorityEventWebhook } from '../queue/document-authority-webhook';
 import { DOCUMENT_WEBHOOK_EMITTER, DocumentWebhookEmitter } from '../queue/document-webhooks';
 import { DocumentEventsPublisher } from '../queue/document-events-publisher';
@@ -177,14 +178,18 @@ export class ConformitySweepRunner {
   /**
    * Runs ONE poll — resolves the poller fresh (never a value cached at enqueue time, the identical
    * discipline `schedule-sweep-runner.ts#runOccurrence` already holds for its own re-read source
-   * document), calls it, and journals whatever comes back.
+   * document), calls it, and journals whatever comes back. Also the single entry point (mandataire
+   * decision, 2026-09-06) that WORM-archives any TERMINAL event among them — see
+   * `archive/archive-verdict-on-terminal.ts`'s own header.
    *
    * NEVER throws — see `authority-status-poller.ts`'s own header ("un handler d'événement ne tue
    * jamais le processus", this task's own explicit rule): a missing/invalid credential
    * (`ChannelNotConnectedError`) OR any other unexpected failure (a network error, a malformed
    * response) both end up journaling `BLOCKED_STATUS_CODE` with the failure's own message as
    * `reason` — loud (logged, and visible on the document as a "blocked" badge), never a crashed
-   * worker process and never a silently-swallowed poll.
+   * worker process and never a silently-swallowed poll. Verdict archiving carries the identical
+   * guarantee on its own (`archiveTerminalAuthorityVerdictIfAny` never throws either) — a failure
+   * there logs loud but never turns an otherwise-successful poll into a failed one.
    */
   async runPoll(data: ConformityPollJobData): Promise<{ journaled: number }> {
     const poller = this.pollerRegistry.resolve(data.providerId);
@@ -200,6 +205,45 @@ export class ConformitySweepRunner {
         `Conformity poll for document ${data.documentId} ("${data.providerId}"): ` +
           `${events.length} event(s) observed, ${journaled} newly journaled.`,
       );
+
+      // Root TODO item 14's own remainder (TODO_ISSUES.md, mandataire decision 2026-09-06) — the
+      // WORM-probative twin of the journal write just above. Every TERMINAL event this poll observed
+      // (never an intermediate one — `poller.isTerminal` is this provider's own vocabulary, never
+      // guessed at here), regardless of `journaled`: `archiveTerminalAuthorityVerdictIfAny` is
+      // idempotent on its own (`verdictKey`), so re-archiving an already-archived verdict on a
+      // re-poll or a redelivered job is a safe, cheap no-op rather than something this loop needs to
+      // filter for itself.
+      //
+      // Wrapped in its OWN try/catch, deliberately separate from the outer one below: that outer
+      // catch exists for POLL failures (a broken channel, a network error) and reports them as
+      // `BLOCKED_STATUS_CODE` — an archiving problem is neither of those, and must never be
+      // misreported as "channel not connected", nor allowed to override the `journaled` count this
+      // method already has in hand. `archiveTerminalAuthorityVerdictIfAny` itself never throws (see
+      // its own header) — this is belt-and-suspenders against a contract violation, the identical
+      // posture the compensating `poll:blocked` write below already holds for ITS OWN failure mode.
+      try {
+        for (const event of events) {
+          if (poller.isTerminal(event.statusCode)) {
+            await archiveTerminalAuthorityVerdictIfAny({
+              companyId: data.companyId,
+              documentId: data.documentId,
+              providerId: data.providerId,
+              statusCode: event.statusCode,
+              statusText: event.statusText,
+              reason: event.reason,
+              observedAt: event.observedAt,
+              rawPayload: event.rawPayload,
+            });
+          }
+        }
+      } catch (archiveError) {
+        this.logger.error(
+          `Verdict archiving unexpectedly threw for document ${data.documentId} ("${data.providerId}") — ` +
+            `the conformity journal itself is unaffected: ` +
+            `${archiveError instanceof Error ? archiveError.message : String(archiveError)}`,
+        );
+      }
+
       // TODO_PRODUIT.md T1 / PLAN-V2 R8 — only when something was GENUINELY new (journaled > 0, never
       // for a re-poll that only rediscovered events already known) and only when this job data
       // actually carries a typeId (see `ConformityPollJobData.typeId`'s own header — several EXISTING

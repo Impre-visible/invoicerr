@@ -1129,10 +1129,13 @@ export class DocumentsService implements OnModuleInit {
 
   /**
    * "GET .../archives" — root TODO item 14 ("archivage légal ⚖"). Every archive written for this
-   * document (`archive/archive-on-send.ts`, one row per successful delivery that produced at least
-   * one artifact — see `DocumentArchive`'s own schema comment), most recent first. `findOwnedDocument`
-   * first, the same tenant/existence check every other per-document read in this class already runs
-   * — an archive is never listed for a document belonging to another company, or that doesn't exist.
+   * document, most recent first — DELIVERY rows (`archive/archive-on-send.ts`, one per successful
+   * delivery that produced at least one artifact) AND, since 2026-09-06, VERDICT rows (the
+   * authority's own terminal verdict on one of those deposits, `archive/persistence.ts#
+   * createAuthorityVerdictArchive`) — see `DocumentArchive`'s own schema comment for both.
+   * `findOwnedDocument` first, the same tenant/existence check every other per-document read in this
+   * class already runs — an archive is never listed for a document belonging to another company, or
+   * that doesn't exist.
    */
   async listDocumentArchives(
     companyId: string,

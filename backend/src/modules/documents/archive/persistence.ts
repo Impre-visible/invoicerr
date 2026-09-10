@@ -11,13 +11,14 @@
 import { NotFoundException } from '@nestjs/common';
 
 import prisma from '@/prisma/prisma.service';
-import { Prisma } from '../../../../prisma/generated/prisma/client';
+import { DocumentArchiveKind, Prisma } from '../../../../prisma/generated/prisma/client';
 
 import { resolveCompanyCountryCode } from '../country-policy/country-policy';
 import { ArchivedArtifactInput, computeArtifactHash, computeContentHash } from './hashing';
 import { persistArtifacts, readArchivedArtifact } from './storage';
 import { computeRetention } from './retention/compute-retention';
 import { defaultRetentionCatalog, RetentionCatalog } from './retention/registry';
+import { AttestedDeposit, buildVerdictArtifact, TerminalAuthorityVerdict } from './verdict-artifact';
 
 /** Ce que `artifacts` (colonne Json) contient réellement — le hachage PLAIN par artefact (jamais les
  *  octets eux-mêmes, qui vivent sous `uri` — voir storage.ts) sert à nommer LEQUEL des artefacts a été
@@ -33,6 +34,12 @@ export interface DocumentArchiveResult {
   id: string;
   companyId: string;
   documentId: string;
+  /** See `DocumentArchive`'s own schema comment — `'DELIVERY'` for every archive written before this
+   *  field existed, and for every ordinary "artifact actually sent" archive since; `'VERDICT'` only
+   *  for the authority's own later verdict on one of those (mandataire decision, 2026-09-06). */
+  kind: DocumentArchiveKind;
+  /** Set only for `kind: 'VERDICT'` — the DELIVERY archive this verdict attests to. */
+  parentArchiveId: string | null;
   contentHash: string;
   uri: string;
   artifacts: StoredArtifactMeta[];
@@ -54,6 +61,8 @@ function toResult(row: {
   id: string;
   companyId: string;
   documentId: string;
+  kind?: DocumentArchiveKind;
+  parentArchiveId?: string | null;
   contentHash: string;
   uri: string;
   artifacts: Prisma.JsonValue;
@@ -65,6 +74,10 @@ function toResult(row: {
     id: row.id,
     companyId: row.companyId,
     documentId: row.documentId,
+    // `?? 'DELIVERY'` covers only offline test mocks that construct a row by hand without the
+    // column (real Prisma rows always carry it, `@default(DELIVERY)` — see the schema comment).
+    kind: row.kind ?? DocumentArchiveKind.DELIVERY,
+    parentArchiveId: row.parentArchiveId ?? null,
     contentHash: row.contentHash,
     uri: row.uri,
     artifacts: (row.artifacts ?? []) as unknown as StoredArtifactMeta[],
@@ -122,6 +135,104 @@ export async function createDocumentArchive(
   });
 
   return toResult(created);
+}
+
+/** What archiving a terminal authority verdict actually did — read by `archiveTerminalAuthorityVerdict`
+ *  (this task's own "never throws" wrapper, see that file's header) to decide whether the "no deposit
+ *  archive" case deserves a loud log. `'duplicate'` is the EXPECTED steady state for every poll after
+ *  the first that observes the same terminal status (see `verdictKey`'s own schema comment) — never
+ *  logged as an error by the caller. */
+export type VerdictArchiveOutcome =
+  | { archived: true }
+  | { archived: false; reason: 'duplicate' | 'no-deposit-archive' };
+
+export interface TerminalVerdictInput extends TerminalAuthorityVerdict {
+  companyId: string;
+  documentId: string;
+}
+
+/**
+ * Archives ONE terminal authority verdict (mandataire decision, 2026-09-06 — see `DocumentArchive`'s
+ * own schema comment and `verdict-artifact.ts`'s header for the full reasoning) under the exact same
+ * discipline `createDocumentArchive` above already holds for a deposit: content-hashed
+ * (`hashing.ts`), persisted WORM-style (`storage.ts`), and — unlike a deposit — linked to, and given
+ * the SAME retention as, the DELIVERY archive it attests to, rather than a freshly resolved one.
+ *
+ * Idempotent by construction: `verdictKey` (`${documentId}|${providerId}|${statusCode}`) is written
+ * via `createMany`+`skipDuplicates`, the identical dedup idiom `authority-events.persistence.ts#
+ * createAuthorityEvents` already uses for the very same event — a re-poll rediscovering an
+ * already-archived terminal status (or a redelivered queue job) archives nothing a second time and
+ * reports `{ archived: false, reason: 'duplicate' }`, never a second row nor an error.
+ *
+ * Never called for a document with no DELIVERY archive at all (a prior archiving failure —
+ * `archive-on-send.ts`'s own `lastArchiveError`): there would be nothing honest to link this verdict
+ * to, and no retention to copy — see this function's own "no-deposit-archive" branch. This is a REAL,
+ * if rare, failure mode, surfaced to the caller rather than silently inventing a parent.
+ */
+export async function createAuthorityVerdictArchive(
+  input: TerminalVerdictInput,
+): Promise<VerdictArchiveOutcome> {
+  const { companyId, documentId, providerId, statusCode } = input;
+
+  // The most recent DELIVERY archive for this document — see this function's own header on why a
+  // verdict is never archived without one. `kind` is filtered explicitly rather than relying on
+  // "the first row" ordering alone: a document could, in principle, already carry an earlier VERDICT
+  // row (from a previous terminal status this same provider reported first, e.g. a rejection
+  // followed by a corrected re-submission under the same transportRef) that must never be mistaken
+  // for the deposit itself.
+  const parent = await prisma.documentArchive.findFirst({
+    where: { companyId, documentId, kind: DocumentArchiveKind.DELIVERY },
+    orderBy: { archivedAt: 'desc' },
+  });
+  if (!parent) {
+    return { archived: false, reason: 'no-deposit-archive' };
+  }
+
+  const receivedAt = new Date();
+  const deposit: AttestedDeposit = { documentId, archiveId: parent.id, contentHash: parent.contentHash };
+  const artifact = buildVerdictArtifact(
+    {
+      providerId,
+      statusCode,
+      statusText: input.statusText,
+      reason: input.reason,
+      observedAt: input.observedAt,
+      rawPayload: input.rawPayload,
+    },
+    deposit,
+    receivedAt,
+  );
+
+  // Writing the bytes BEFORE the database row — same order `createDocumentArchive` above already
+  // uses, and the same reason: `persistArtifacts` is idempotent (content-hash-addressed), so a
+  // `createMany` that turns out to be a duplicate below has already, harmlessly, re-written the exact
+  // same bytes to the exact same path rather than left a DB row pointing at nothing.
+  const { uri, contentHash } = persistArtifacts(documentId, [artifact]);
+  const verdictKey = `${documentId}|${providerId}|${statusCode}`;
+
+  const { count } = await prisma.documentArchive.createMany({
+    data: [
+      {
+        companyId,
+        documentId,
+        kind: DocumentArchiveKind.VERDICT,
+        parentArchiveId: parent.id,
+        verdictKey,
+        contentHash,
+        uri,
+        artifacts: toArtifactMetas([artifact]) as unknown as Prisma.InputJsonValue,
+        archivedAt: receivedAt,
+        // Copied VERBATIM from the parent DELIVERY archive — never recomputed. See this model's own
+        // schema comment: a verdict proves the fate of its deposit, it has no retention life of its
+        // own.
+        retentionUntil: parent.retentionUntil,
+        retentionBasis: parent.retentionBasis,
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  return count > 0 ? { archived: true } : { archived: false, reason: 'duplicate' };
 }
 
 /** Toutes les archives d'un document, les plus récentes d'abord — un re-send en produit plusieurs

@@ -440,9 +440,23 @@
   sélectionné par région, sans toucher au hachage encadré ni au schéma `DocumentArchive` (le champ
   `uri` porte déjà `file://` OU pourrait porter `s3://` sans migration).
 
-- **Item 14 — le poller de conformité PDP/KSeF (item 10) n'archive PAS le VERDICT, seulement le DÉPÔT**
+- ~~**Item 14 — le poller de conformité PDP/KSeF (item 10) n'archive PAS le VERDICT, seulement le DÉPÔT**~~
+  — **RÉSOLU** (mandataire, 2026-09-06) : un verdict TERMINAL (jamais un état intermédiaire —
+  `poller.isTerminal`) devient un SECOND artefact archivé selon la MÊME discipline que le dépôt.
+  `archive/verdict-artifact.ts` construit une représentation canonique et datée du verdict (payload
+  BRUT tel que reçu, jamais reformulé, + horodatage de réception + référence au dépôt), hashée
+  (`hashing.ts`) et conservée WORM (`storage.ts`) comme une ligne DELIVERY ; `DocumentArchive` gagne
+  `kind` (DELIVERY|VERDICT), `parentArchiveId`, `verdictKey` (unique → idempotent, migration
+  20260906153634). `archive-verdict-on-terminal.ts` (point d'entrée unique depuis le sweep de
+  conformité, NE JETTE jamais — un échec d'archive ne perd pas le verdict, patron d'archive-on-send)
+  écrit l'artefact ; `DocumentAuthorityEvent` (journal opérationnel) reste, le verdict archivé S'AJOUTE
+  pour le besoin PROBATOIRE. Rétention = celle du parent. Validation : mutations — archivage de TOUT
+  event (pas seulement terminal) mord (2 tests), payload retiré de la forme canonique mord (2 tests) ;
+  fresh-schema tripwire vert (l'enum DocumentArchiveKind rejoue sur base fraîche, pg ↔ client cohérents) ;
+  full jest 2953, batterie 38/38. L'entrée d'origine ci-dessous conservée comme trace.
+- **Item 14 (trace d'origine) — le poller n'archivait que le DÉPÔT**
   (2026-08-31 ; le poller lui-même existe depuis le 2026-09-01, voir l'entrée résolue de l'item 10 —
-  cette entrée-ci reste PARTIELLEMENT ouverte, précisée ci-dessous) : l'artefact archivé
+  cette entrée-ci ÉTAIT partiellement ouverte) : l'artefact archivé
   (`DocumentArchive`, WORM/content-hash) pour "pdp"/"ksef" reste le Factur-X/FA(3) au moment où le
   transport l'a DÉPOSÉ — ça n'a PAS changé. Ce qui A changé : le verdict (fr:201/202/213, ou le
   ksefNumber CLEARED) est désormais SUIVI et CONSULTABLE (`DocumentAuthorityEvent`, append-only,

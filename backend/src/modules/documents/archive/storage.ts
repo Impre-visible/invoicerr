@@ -24,6 +24,9 @@ export function archiveRoot(): string {
 export function extFor(mime: string): string {
   if (mime === 'application/pdf') return 'pdf';
   if (mime === 'application/xml') return 'xml';
+  // `verdict-artifact.ts`'s own canonical VERDICT representation — legible on disk (`.json`, not the
+  // `.bin` fallback below) for a human auditor opening a WORM archive directory directly.
+  if (mime === 'application/json') return 'json';
   return 'bin';
 }
 

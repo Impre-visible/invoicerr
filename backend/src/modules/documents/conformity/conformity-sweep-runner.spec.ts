@@ -11,6 +11,12 @@
  * block below: `dispatchDocumentAuthorityEventWebhook` (`queue/document-authority-webhook.ts`) fetches
  * the row via `findOwnedDocument` before dispatching `DOCUMENT_AUTHORITY_EVENT` — every test ABOVE
  * that block never configures a `webhookDispatcher` at all, so that fetch never runs for them.
+ *
+ * `../archive/archive-verdict-on-terminal` (root TODO item 14's own remainder, mandataire decision
+ * 2026-09-06) is mocked wholesale too, for the exact same isolation reason: it is Prisma/disk-touching
+ * (`archive/persistence.ts#createAuthorityVerdictArchive`), and this file's whole point is a
+ * `ConformitySweepRunner` that never reaches a real database — dedicated coverage for THAT function's
+ * own dedup/retention/parent-linking logic lives in `archive/persistence.spec.ts`.
  */
 import {
   createAuthorityEvents,
@@ -24,16 +30,19 @@ import {
 } from './authority-status-poller';
 import { BLOCKED_STATUS_CODE, GAVE_UP_STATUS_CODE } from './conformity-sweep';
 import { ConformitySweepRunner } from './conformity-sweep-runner';
+import { archiveTerminalAuthorityVerdictIfAny } from '../archive/archive-verdict-on-terminal';
 import * as persistence from '../persistence';
 import { DocumentEventsPublisher } from '../queue/document-events-publisher';
 import { DocumentQueueDispatcher } from '../queue/document-queue.dispatcher';
 
 jest.mock('./authority-events.persistence');
 jest.mock('../persistence');
+jest.mock('../archive/archive-verdict-on-terminal');
 
 const mockedFindCandidates = findConformitySweepCandidates as jest.Mock;
 const mockedCreateEvents = createAuthorityEvents as jest.Mock;
 const mockedJournalSynthetic = journalSyntheticEvent as jest.Mock;
+const mockedArchiveVerdict = archiveTerminalAuthorityVerdictIfAny as jest.Mock;
 
 function buildPdpPoller(overrides: Partial<AuthorityStatusPoller> = {}): AuthorityStatusPoller {
   return {
@@ -176,6 +185,7 @@ describe('ConformitySweepRunner.runPoll', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     registry = new AuthorityStatusPollerRegistry();
+    mockedArchiveVerdict.mockResolvedValue(undefined);
   });
 
   it('journals every event the poller returns', async () => {
@@ -257,6 +267,110 @@ describe('ConformitySweepRunner.runPoll', () => {
     await expect(
       runner.runPoll({ companyId: 'company-1', documentId: 'doc-1', providerId: 'pdp', transportRef: 'x' }),
     ).resolves.toEqual({ journaled: 0 });
+  });
+});
+
+// Root TODO item 14's own remainder (TODO_ISSUES.md, mandataire decision 2026-09-06) — `runPoll` is
+// the ONE entry point that WORM-archives a terminal authority verdict. Dedicated coverage for
+// `createAuthorityVerdictArchive` itself (dedup, retention copied from the parent, the
+// "no-deposit-archive" outcome) lives in `archive/persistence.spec.ts` — these tests only prove
+// `runPoll` calls the (mocked) wrapper for the RIGHT events, and never lets it affect its own result.
+describe('ConformitySweepRunner.runPoll — verdict archiving (root TODO item 14, 2026-09-06)', () => {
+  const dispatcher = {} as DocumentQueueDispatcher;
+  let registry: AuthorityStatusPollerRegistry;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    registry = new AuthorityStatusPollerRegistry();
+    mockedArchiveVerdict.mockResolvedValue(undefined);
+  });
+
+  it('archives ONLY the terminal event among several observed — never a PENDING one', async () => {
+    const events = [
+      { statusCode: 'fr:200', statusText: 'Déposée', observedAt: new Date('2026-09-06T10:00:00Z') },
+      { statusCode: 'fr:201', statusText: 'Émise', observedAt: new Date('2026-09-06T10:00:01Z') },
+      {
+        statusCode: 'fr:202',
+        statusText: 'Reçue',
+        observedAt: new Date('2026-09-06T10:00:02Z'),
+        rawPayload: { raw: true },
+      },
+    ];
+    registry.register(buildPdpPoller({ poll: jest.fn().mockResolvedValue(events) }));
+    mockedCreateEvents.mockResolvedValue(3);
+
+    const runner = new ConformitySweepRunner(registry, dispatcher);
+    await runner.runPoll({
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      providerId: 'pdp',
+      transportRef: 'x',
+    });
+
+    expect(mockedArchiveVerdict).toHaveBeenCalledTimes(1);
+    expect(mockedArchiveVerdict).toHaveBeenCalledWith({
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      providerId: 'pdp',
+      statusCode: 'fr:202',
+      statusText: 'Reçue',
+      reason: undefined,
+      observedAt: events[2].observedAt,
+      rawPayload: { raw: true },
+    });
+  });
+
+  it('archives nothing at all when every observed event is non-terminal', async () => {
+    const events = [{ statusCode: 'fr:200', statusText: 'Déposée', observedAt: new Date() }];
+    registry.register(buildPdpPoller({ poll: jest.fn().mockResolvedValue(events) }));
+    mockedCreateEvents.mockResolvedValue(1);
+
+    const runner = new ConformitySweepRunner(registry, dispatcher);
+    await runner.runPoll({
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      providerId: 'pdp',
+      transportRef: 'x',
+    });
+
+    expect(mockedArchiveVerdict).not.toHaveBeenCalled();
+  });
+
+  it('archives a terminal REJECTION (fr:213) exactly like a terminal acceptance', async () => {
+    const events = [
+      { statusCode: 'fr:213', statusText: 'Rejetée', reason: 'BR-01 missing', observedAt: new Date() },
+    ];
+    registry.register(buildPdpPoller({ poll: jest.fn().mockResolvedValue(events) }));
+    mockedCreateEvents.mockResolvedValue(1);
+
+    const runner = new ConformitySweepRunner(registry, dispatcher);
+    await runner.runPoll({
+      companyId: 'company-1',
+      documentId: 'doc-1',
+      providerId: 'pdp',
+      transportRef: 'x',
+    });
+
+    expect(mockedArchiveVerdict).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 'fr:213', reason: 'BR-01 missing' }),
+    );
+  });
+
+  // The whole point of `archiveTerminalAuthorityVerdictIfAny`'s own "never throws" guarantee — proven
+  // for real in `archive/archive-verdict-on-terminal.spec.ts`. Here, even a mock that VIOLATES that
+  // guarantee must not turn a successful poll into a failed one from `runPoll`'s own point of view.
+  it('never lets an archiving failure affect the poll’s own result', async () => {
+    const events = [{ statusCode: 'fr:202', observedAt: new Date() }];
+    registry.register(buildPdpPoller({ poll: jest.fn().mockResolvedValue(events) }));
+    mockedCreateEvents.mockResolvedValue(1);
+    mockedArchiveVerdict.mockRejectedValue(new Error('disk full'));
+
+    const runner = new ConformitySweepRunner(registry, dispatcher);
+    // A throwing runPoll would reject this promise — the `resolves` matcher below IS the proof, the
+    // same discipline this file's own "NEVER THROWS" tests already use for the channel-blocked path.
+    await expect(
+      runner.runPoll({ companyId: 'company-1', documentId: 'doc-1', providerId: 'pdp', transportRef: 'x' }),
+    ).resolves.toEqual({ journaled: 1 });
   });
 });
 

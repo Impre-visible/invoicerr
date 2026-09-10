@@ -1090,12 +1090,63 @@ model DocumentPayment {
 // a row (and the bytes it points at — see `uri`) is never revised. `documents.service.ts`'s own
 // "verify" endpoint RE-HASHES the stored bytes and compares against `contentHash` on every call; it
 // never writes the result back here, so even a corruption-discovery run cannot mutate this table.
+//
+// ## `kind` — mandataire decision, 2026-09-06 (TODO_ISSUES.md, "le poller ... n'archive PAS le
+// VERDICT, seulement le DÉPÔT")
+//
+// A DELIVERY row (the default, and the only kind that ever existed before this decision) archives
+// the artifact actually SENT (Factur-X/FA(3)/PDF). A VERDICT row archives the AUTHORITY'S OWN later
+// verdict on that same deposit (PDP fr:201/202/213, KSeF's CLEARED/rejection) — written by
+// `conformity/`'s own poller/sweep the moment it observes a TERMINAL status code (never an
+// intermediate one — see `AuthorityStatusPoller.isTerminal`), under the exact SAME discipline as a
+// DELIVERY row: content-hashed (`archive/hashing.ts`), stored WORM-style (`archive/storage.ts`),
+// listed and re-hash-verified by the exact same endpoints. `DocumentAuthorityEvent` (below) remains
+// the operational journal (every event, terminal or not, queried live by the conformity panel) — a
+// VERDICT archive does not replace it, it ADDS the probative guarantee that journal alone never gave:
+// an inaltered, re-hashable record of exactly what the authority said and when it was received.
+//
+// Chosen over a dedicated table: `DocumentArchive` already owns every column a verdict artifact
+// needs (contentHash/uri/artifacts/archivedAt/retentionUntil/retentionBasis) — a second table would
+// duplicate all of them for no real gain, and would need its own list/verify endpoints where this one
+// already has both. A `kind` discriminator is the sober addition; the two kind-specific extra columns
+// below are both nullable so existing (DELIVERY) rows and the migration that adds this column need no
+// backfill beyond the enum's own default.
+enum DocumentArchiveKind {
+  DELIVERY
+  VERDICT
+}
+
 model DocumentArchive {
   id         String           @id @default(cuid())
   company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId  String
   document   DocumentInstance @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId String
+
+  // See this model's own header. Every row written before this field existed is DELIVERY (the
+  // default) — the only kind that existed at the time.
+  kind DocumentArchiveKind @default(DELIVERY)
+
+  // VERDICT rows only: the DELIVERY archive of the SAME document this verdict attests to — resolved
+  // once, at write time, to the most recent DELIVERY row for the document (`archive/persistence.ts#
+  // createAuthorityVerdictArchive`). NULL for a DELIVERY row (nothing to point at). This is a
+  // convenience for querying "the verdict(s) for this deposit" from SQL — the archived VERDICT
+  // artifact's own bytes ALSO carry this same reference (documentId + the parent's own contentHash),
+  // verbatim, so the probative value never depends on this foreign key surviving: even the JSON bytes
+  // alone, read off disk with no database at all, name which deposit they attest to.
+  parentArchive   DocumentArchive?  @relation("DocumentArchiveVerdictOf", fields: [parentArchiveId], references: [id], onDelete: SetNull)
+  parentArchiveId String?
+  verdictArchives DocumentArchive[] @relation("DocumentArchiveVerdictOf")
+
+  // VERDICT rows only: `${documentId}|${providerId}|${statusCode}` — the dedup key that makes
+  // archiving a terminal verdict idempotent under a re-poll or a redelivered queue job (the identical
+  // `@@unique([documentId, providerId, statusCode])` discipline `DocumentAuthorityEvent` already
+  // holds below, reused here as a single unique column since this table's own `documentId` already
+  // scopes the row). NULL for a DELIVERY row: a re-send legitimately archives more than once (see
+  // this model's own header), so DELIVERY rows must never collide with each other on this account —
+  // a unique index over a nullable column allows any number of NULLs in Postgres, which is exactly
+  // what lets that keep happening unaffected by this column's existence.
+  verdictKey String? @unique
 
   // SHA-256 (hex) over EVERY artifact in this archive, each one framed by a stable
   // `role|mime|byteLength\n` header before its own bytes — see archive/hashing.ts's own header for
@@ -1115,7 +1166,9 @@ model DocumentArchive {
   // CORRUPTED), never the bytes themselves (those live at `uri`, see storage.ts). E.g., for an
   // invoice sent by email: `[{ role: "pdf", mime: "application/pdf", byteLength, sha256 }]`; for one
   // deposited to the PDP: `[{ role: "facturx", mime: "application/pdf", ... }]` — never both invented
-  // for a transport that only ever delivered one (see transports/*-transport.ts's own headers).
+  // for a transport that only ever delivered one (see transports/*-transport.ts's own headers). For a
+  // VERDICT row: always exactly one artifact, `{ role: "authority-verdict", mime: "application/json",
+  // ... }` — see `archive/verdict-artifact.ts`.
   artifacts Json
 
   archivedAt DateTime @default(now())
@@ -1126,6 +1179,11 @@ model DocumentArchive {
   // — see retention/compute-retention.ts's own header: archiving still happens (integrity is owed to
   // every company), but no duration is ever invented. `retentionBasis` is ALWAYS set (even when
   // `retentionUntil` is null) — it names either the rule(s) applied or says plainly that none exist.
+  //
+  // VERDICT rows are the ONE exception to "resolved at THIS row's own archivedAt": a verdict proves
+  // the fate of its deposit, it has no retention life of its own (mandataire decision, 2026-09-06,
+  // this model's own header) — both fields are copied VERBATIM from `parentArchive` instead of being
+  // recomputed, so a verdict is never kept a day less (or more) than the deposit it attests to.
   retentionUntil DateTime?
   retentionBasis String?
 

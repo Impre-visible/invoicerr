@@ -31,6 +31,7 @@ describe('archive/storage — local, content-hash-addressed persistence', () => 
   it('extFor maps known mimes to extensions and falls back to .bin', () => {
     expect(extFor('application/pdf')).toBe('pdf');
     expect(extFor('application/xml')).toBe('xml');
+    expect(extFor('application/json')).toBe('json');
     expect(extFor('application/octet-stream')).toBe('bin');
   });
 
