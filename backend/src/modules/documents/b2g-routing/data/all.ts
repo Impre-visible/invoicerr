@@ -1,6 +1,6 @@
 /**
- * The only aggregator — adding a country's B2G routing rule means adding `data/xx.json` plus one line
- * here, mirroring `channel-policy/data/all.ts`'s own header verbatim on why this reads the file with
+ * The only aggregator — adding a country's B2G routing rule means adding `data/xx.json` and NOTHING
+ * else, mirroring `channel-policy/data/all.ts`'s own header verbatim on why this reads the file with
  * `fs.readFileSync` rather than `import`ing it as a TS module: editing a rule is then a plain data
  * change, never a TypeScript one.
  *
@@ -39,29 +39,31 @@
  * genuine structural difference from XRechnung (every NLCIUS BR-NL-* rule is scoped to a Dutch
  * SUPPLIER, never unconditional the way BR-DE-* is). AT/HR/DK/FI/IE/PT/RO/SI/SK (nine, NL now removed
  * from this list) and BG/CZ/HU remain NOT shipped, for the exact same reasons as before.
+ *
+ * The country list above used to be a hand-maintained array; it is now DISCOVERED, not maintained —
+ * `discoverCountryCodes()` reads this directory with `readdirSync` and keeps only names matching
+ * `/^[a-z]{2}\.json$/` — a lowercase two-letter code plus `.json`, which is a country file and
+ * nothing else (it excludes this `all.ts` and `all.spec.ts`, neither of which is `.json`).
+ * `readdirSync` makes no ordering promise, so the codes are sorted before loading — deterministic,
+ * reproducible, independent of the OS or filesystem. A future addition to the list above (the twelve
+ * still-not-shipped countries) needs only its own `data/xx.json` — the prose above stays the
+ * historical record of WHY each wave shipped when it did, not a registration step to repeat.
  */
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { assertValidB2gRoutingFact, B2gRoutingRuleFact } from '../schema';
 
-const COUNTRY_FILES = [
-  'fr',
-  'de',
-  'it',
-  'es',
-  'be',
-  'cy',
-  'ee',
-  'gr',
-  'lt',
-  'lu',
-  'lv',
-  'mt',
-  'nl',
-  'pl',
-  'se',
-] as const;
+const COUNTRY_FILE_PATTERN = /^[a-z]{2}\.json$/;
+
+/** Every country code with a `data/xx.json` file next to this loader, sorted for a deterministic
+ *  load order — see the module docstring for why this reads the directory instead of a fixed list. */
+function discoverCountryCodes(): string[] {
+  return readdirSync(__dirname)
+    .filter((name) => COUNTRY_FILE_PATTERN.test(name))
+    .map((name) => name.slice(0, -'.json'.length))
+    .sort();
+}
 
 interface RawB2gRoutingFile {
   countryCode: string;
@@ -89,4 +91,4 @@ function loadCountryFile(code: string): B2gRoutingRuleFact {
 }
 
 /** Every wired jurisdiction's B2G routing rule, one file per country — see the module docstring. */
-export const ALL_B2G_ROUTING_FILES: B2gRoutingRuleFact[] = COUNTRY_FILES.map(loadCountryFile);
+export const ALL_B2G_ROUTING_FILES: B2gRoutingRuleFact[] = discoverCountryCodes().map(loadCountryFile);

@@ -134,7 +134,35 @@ describe('country-policy/data — the shipped FR and US files', () => {
   it('no OTHER shipped rule declares a per-status narrowing — these two stay the only deliberate examples', () => {
     // BE (AR n°1 art. 12 §1), NL (art. 35a lid 1.b composition — the file says so itself) and AT
     // (UStG §16 Abs. 1) joined with lot 1 (TODO_DOCUMENTS vague B) — each narrowing SOURCED in its file.
-    const COUNTRIES_WITH_SOURCED_SAVE_DRAFT_NARROWING = ['FR', 'DE', 'IT', 'PL', 'ES', 'MX', 'BE', 'NL', 'AT', 'EE', 'GR', 'CY', 'LT', 'LV', 'LU', 'MT', 'SE', 'DK', 'FI', 'IE', 'BG', 'CZ', 'HR', 'PT', 'RO', 'SI', 'SK'];
+    const COUNTRIES_WITH_SOURCED_SAVE_DRAFT_NARROWING = [
+      'FR',
+      'DE',
+      'IT',
+      'PL',
+      'ES',
+      'MX',
+      'BE',
+      'NL',
+      'AT',
+      'EE',
+      'GR',
+      'CY',
+      'LT',
+      'LV',
+      'LU',
+      'MT',
+      'SE',
+      'DK',
+      'FI',
+      'IE',
+      'BG',
+      'CZ',
+      'HR',
+      'PT',
+      'RO',
+      'SI',
+      'SK',
+    ];
     const isKnownNarrowing = (countryCode: string, typeId: string, actionId: string) =>
       (typeId === 'invoice' &&
         actionId === 'save-draft' &&
@@ -220,7 +248,37 @@ describe('country-policy/data — FR rules promoted to "legal" by root TODO item
 describe('country-policy/data — DE/IT/PL/ES/MX added by root TODO P1 (2026-09-03)', () => {
   it('the catalog now covers exactly 29 countries — the FULL EU-27 plus US and MX: lot 7 (PT/RO/SI/SK) closed vague B', () => {
     const codes = ALL_COUNTRY_POLICY_FILES.map((f) => f.countryCode).sort();
-    expect(codes).toEqual(['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'MX', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'US']);
+    expect(codes).toEqual([
+      'AT',
+      'BE',
+      'BG',
+      'CY',
+      'CZ',
+      'DE',
+      'DK',
+      'EE',
+      'ES',
+      'FI',
+      'FR',
+      'GR',
+      'HR',
+      'HU',
+      'IE',
+      'IT',
+      'LT',
+      'LU',
+      'LV',
+      'MT',
+      'MX',
+      'NL',
+      'PL',
+      'PT',
+      'RO',
+      'SE',
+      'SI',
+      'SK',
+      'US',
+    ]);
   });
 
   it('PL invoice.save-draft cites the Podręcznik KSeF verbatim: a file sent to KSeF cannot be edited, only corrected by a new faktura korygująca', () => {
@@ -411,5 +469,22 @@ describe('BE — country-policy/data/be.json (agent pays Belgique, not yet regis
     for (const rule of unverified) {
       expect(rule.provenance.resolutionNote.trim().length).toBeGreaterThan(0);
     }
+  });
+});
+
+// Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
+// really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory
+// with the IDENTICAL pattern, independently of all.ts's own implementation, so a regression that
+// silently drops a file from discovery (a typo'd pattern, a change that stops sorting, anything) goes
+// red here — the whole point of "adding a country = dropping a file" is only true if this holds.
+describe('country-policy/data — every *.json on disk is actually loaded (drop-in invariant)', () => {
+  it('ALL_COUNTRY_POLICY_FILES covers exactly the country files present in this directory, no more, no fewer', () => {
+    const { readdirSync } = require('node:fs');
+    const onDisk = readdirSync(__dirname)
+      .filter((name: string) => /^[a-z]{2}\.json$/.test(name))
+      .map((name: string) => name.replace(/\.json$/, '').toUpperCase())
+      .sort();
+    const loaded = ALL_COUNTRY_POLICY_FILES.map((f) => f.countryCode).sort();
+    expect(loaded).toEqual(onDisk);
   });
 });

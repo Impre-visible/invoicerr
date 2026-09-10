@@ -38,7 +38,37 @@ describe('correction-routes/data/all.ts', () => {
 
   it('ships the seven YAML pivots PLUS the lot-1/lot-2 direct readings (BE/NL/AT/EE/GR/CY — TODO_DOCUMENTS vague B, first readings OUTSIDE docs/compliance/CORRECTION-ROUTES.yaml, each file saying so itself)', () => {
     const countries = ALL_CORRECTION_ROUTES_FILES.map((f) => f.countryCode).sort();
-    expect(countries).toEqual(['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'MX', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'US']);
+    expect(countries).toEqual([
+      'AT',
+      'BE',
+      'BG',
+      'CY',
+      'CZ',
+      'DE',
+      'DK',
+      'EE',
+      'ES',
+      'FI',
+      'FR',
+      'GR',
+      'HR',
+      'HU',
+      'IE',
+      'IT',
+      'LT',
+      'LU',
+      'LV',
+      'MT',
+      'MX',
+      'NL',
+      'PL',
+      'PT',
+      'RO',
+      'SE',
+      'SI',
+      'SK',
+      'US',
+    ]);
   });
 
   it('every shipped route carries either legal or unverified provenance, never anything else', () => {
@@ -223,5 +253,24 @@ describe('BE — correction-routes/data/be.json (agent pays Belgique, not yet re
     const be = loadBe();
     const route = be.routes.find((r) => r.routeId === 'AUTHORITY_ANNULMENT');
     expect(route.status).toBe('unverified');
+  });
+});
+
+// Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
+// really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory
+// with the IDENTICAL pattern, independently of all.ts's own implementation, so a regression that
+// silently drops a file from discovery (a typo'd pattern, a change that stops sorting, anything) goes
+// red here — the whole point of "adding a country = dropping a file" is only true if this holds. Uses
+// `require('node:fs')` (real, unmocked — the file-level `jest.mock` above only overrides
+// `readFileSync`) rather than the module's own mocked `readFileSync`.
+describe('correction-routes/data — every *.json on disk is actually loaded (drop-in invariant)', () => {
+  it('ALL_CORRECTION_ROUTES_FILES covers exactly the country files present in this directory, no more, no fewer', () => {
+    const { readdirSync } = require('node:fs');
+    const onDisk = readdirSync(__dirname)
+      .filter((name: string) => /^[a-z]{2}\.json$/.test(name))
+      .map((name: string) => name.replace(/\.json$/, '').toUpperCase())
+      .sort();
+    const loaded = ALL_CORRECTION_ROUTES_FILES.map((f) => f.countryCode).sort();
+    expect(loaded).toEqual(onDisk);
   });
 });

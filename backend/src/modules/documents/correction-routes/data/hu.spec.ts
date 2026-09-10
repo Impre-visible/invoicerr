@@ -127,7 +127,7 @@ describe('HU — correction-routes/data/hu.json', () => {
    *  suite verte — le spec épinglait statut et référence, jamais le verbatim. Or la classe de risque
    *  « mots fabriqués/omis » (mémoire feedback-legal-raw-text) vit précisément là : le fragment
    *  distinctif de la clause d'assimilation hongroise est épinglé mot pour mot. */
-  it("the §170 assimilation clause is pinned VERBATIM — « A számlával egy tekintet alá esik... okirat » (168. § (2)), one altered word trips this", () => {
+  it('the §170 assimilation clause is pinned VERBATIM — « A számlával egy tekintet alá esik... okirat » (168. § (2)), one altered word trips this', () => {
     const route = hu.routes.find((r) => r.routeId === 'CORRECTIVE_INVOICE');
     expect(route?.provenance.kind).toBe('legal');
     expect(route?.provenance.kind === 'legal' ? route.provenance.sourceText : '').toContain(

@@ -157,7 +157,7 @@ describe('tax-systems/data — the 26 EU standard rates read from TEDB (item 16 
       // The exact CGI art. 293 B, I sentence, already cited as `legal` on vat-rates/data/fr.json's
       // own 'fr-exempt-293b' entry — reused here verbatim, not a new, unverified citation.
       expect(fr.provenance.sourceText).toContain(
-        "franchise qui les dispense du paiement de la taxe sur la valeur ajoutée",
+        'franchise qui les dispense du paiement de la taxe sur la valeur ajoutée',
       );
       expect(fr.provenance.sourceCheckedAt).toBe('2026-09-01');
     }
@@ -263,5 +263,22 @@ describe('tax-systems/data — mutation target #2: a file with no provenance mus
     expect(() => assertValidTaxSystemProvenance(broken, 'documents/tax/tax-systems/data/de.json')).toThrow(
       /missing sourceText/,
     );
+  });
+});
+
+// Drop-in invariant (readdir-discovery conversion) — proves all.ts's own `discoverCountryCodes()`
+// really does pick up every `<cc>.json` sitting in this directory: this test re-reads the directory
+// with the IDENTICAL pattern, independently of all.ts's own implementation, so a regression that
+// silently drops a file from discovery (a typo'd pattern, a change that stops sorting, anything) goes
+// red here — the whole point of "adding a country = dropping a file" is only true if this holds.
+describe('tax-systems/data — every *.json on disk is actually loaded (drop-in invariant)', () => {
+  it('ALL_TAX_SYSTEM_FILES covers exactly the country files present in this directory, no more, no fewer', () => {
+    const { readdirSync } = require('node:fs');
+    const onDisk = readdirSync(__dirname)
+      .filter((name: string) => /^[a-z]{2}\.json$/.test(name))
+      .map((name: string) => name.replace(/\.json$/, '').toUpperCase())
+      .sort();
+    const loaded = ALL_TAX_SYSTEM_FILES.map((f) => f.countryCode).sort();
+    expect(loaded).toEqual(onDisk);
   });
 });
