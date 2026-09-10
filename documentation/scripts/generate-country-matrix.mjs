@@ -423,6 +423,92 @@ const STRINGS = {
         "_Generated from the compliance engine's own data files — do not edit by hand. Sources: " +
         `${sources}._`,
       seeGlossaryLink: 'See the glossary on the [compliance matrix](./index.md) for the technical terms used on this page.',
+      part1Heading: 'Part 1 — In plain words',
+      part2Heading: 'Part 2 — The details',
+      part1Intro: (name) =>
+        `What running a business in ${name} means for your documents, explained simply — no unexplained ` +
+        'jargon (hover, or tap, any underlined term for a plain definition).',
+      part2Intro:
+        "Every fact below is read straight from this app's own data files, at build time — never typed " +
+        "by hand — with its exact legal source when one has been checked against the law itself.",
+      notConfiguredTitle: 'Not yet configured',
+      notConfiguredBody: (name, mechanismPlain) =>
+        `This app does not have an answer yet for ${name} on this: **${mechanismPlain}**. That is an ` +
+        'open, honest gap — not a hidden default and not "probably fine": this app would rather say ' +
+        '"not yet configured" than guess. See [Adding a country](../adding-a-country.md) for how to close it.',
+      mechanismPlainPolicy: 'which documents you can create, and what you can do with them',
+      mechanismPlainB2g: 'selling to a government client',
+      mechanismPlainCorrection: 'fixing a mistake on an invoice you already sent',
+      mechanismPlainCancel: "cancelling an invoice you've already sent",
+      mechanismPlainTax: 'sales tax (VAT)',
+      mechanismPlainIdentifiers: 'the ID numbers a business here must show on an invoice',
+      mechanismPlainMentions: 'extra legal text and fields every invoice must carry',
+      mechanismPlainChannel: 'whether the law forces you to use one particular delivery channel',
+      plainPolicyIntro: (name, types) =>
+        `As a business based in ${name}, this app lets you create and manage: ${types}.`,
+      plainPolicyRestriction: (actionLabel, typeArticled, statusLabel) =>
+        `One nuance: you can only ${actionLabel} ${typeArticled} while its status is still "${statusLabel}".`,
+      plainPolicyForbidden: (actionLabel, typeArticled) =>
+        `One restriction: the law here does not let you ${actionLabel} ${typeArticled}.`,
+      plainB2gIntro: (name, transportLabel, formatLabel) =>
+        `If you sell to a government body in ${name}, the invoice cannot just be emailed — it must travel ` +
+        `through ${transportLabel}, built in the ${formatLabel} format. This app handles that for you once ` +
+        'the channel is connected; you just need to have the right information about your government client on file first.',
+      plainB2gIdentifierNeeded: (label) => `their **${label}**`,
+      plainB2gFieldNeeded: (label) => `**${label}** filled in on the invoice`,
+      plainB2gNeedsIntro: 'Before you can send, you will need:',
+      plainCorrectionLegend:
+        'Four honest answers a country\'s law can give for each way of fixing a mistake: **required** ' +
+        '(the law says you must use this one for this kind of situation), **allowed** (you may use it), ' +
+        '**forbidden** (the law does not let you use it here), and **unverified** (nobody has checked the ' +
+        'actual law for this one yet — not "no", just "not researched").',
+      plainCorrectionIntro: (name, sourced, total) =>
+        `${name}'s law has been checked, so far, for ${sourced} of the ${total} ways this app knows to fix ` +
+        'a mistake on an invoice. The ones actually confirmed:',
+      plainCorrectionNoneSourced: 'None of them have been checked against the actual law yet.',
+      plainCancelYes:
+        'Yes. If you need to, you can cancel an invoice you already sent and issue a corrected one in its ' +
+        'place, with no extra restriction from this country\'s own law.',
+      plainCancelRestricted: (statusLabel) =>
+        'Only in one situation: cancelling and re-issuing an invoice is possible while it is still ' +
+        `"${statusLabel}" — not once it has gone further than that.`,
+      plainCancelNo:
+        'Not through this app yet. The law here may allow it in principle, but no channel or mechanism in ' +
+        'this app actually carries it out for this country yet — a known gap, not a silent "no".',
+      plainCancelNone: 'Nothing is declared yet for this country — see the details below for what would settle it.',
+      plainCancelDrift:
+        "This app's own records disagree with each other about this — see the details below rather than " +
+        'trusting a plain answer until that is sorted out.',
+      plainTaxIntro: (name, kindLabel, rate) =>
+        `If you're registered for ${kindLabel} in ${name}, the standard rate is ${rate} — the percentage ` +
+        'added on top of most sales.',
+      plainTaxIntroNoRate: (name, kindLabel) =>
+        `${name} uses ${kindLabel}, but this app does not yet have its standard rate on file.`,
+      plainTaxReduced: (list) => `Some categories of goods or services get a lower rate instead: ${list}.`,
+      plainTaxOtherKind: (name, kindLabel) =>
+        `${name} uses ${kindLabel} rather than VAT — see Part 2 below for what this app has on file about it.`,
+      plainTaxNone: (name) => `${name} is on file as charging no general sales tax at all on an invoice.`,
+      plainIdentifiersIntro: (name) =>
+        `When you invoice someone in ${name}, or when someone in ${name} invoices through this app, these ` +
+        'ID numbers matter:',
+      plainIdentifierRequired: (label, partyType) => `**${label}** — required, for a ${partyType}.`,
+      plainIdentifierOptional: (label, partyType) => `${label} — optional, for a ${partyType}.`,
+      plainMentionsIntro: (name, count) =>
+        `Every invoice issued in ${name} must legally carry ${count} standard sentence${count === 1 ? '' : 's'} ` +
+        'printed on it (about late-payment penalties, for example). This app adds them for you automatically — ' +
+        'see Part 2 below for the exact, word-for-word legal text.',
+      plainContentRequirementsIntro: (name, count) =>
+        `On top of that, ${name} law requires ${count} extra field${count === 1 ? '' : 's'} to carry a ` +
+        `${name}-specific value on certain invoices, from a set date — see Part 2 for exactly which field(s).`,
+      plainChannelMandated: (name, channelLabel, date) =>
+        `Yes — if your business is established in ${name}, the law requires you, from ${date}, to send ` +
+        `invoices through ${channelLabel}. This app blocks sending through any other channel from that date, ` +
+        'on purpose: sending the right invoice through the wrong channel is treated as a real block, not a warning.',
+      plainChannelSuggested: (name, channelLabel) =>
+        `Not required by law, but ${channelLabel} is the channel businesses in ${name} normally use.`,
+      plainChannelNone: (name) =>
+        `${name} does not, as far as this app's data goes, force a particular delivery channel on a ` +
+        'business established there (selling to a *government* client can be a different story — see above).',
     },
   },
   fr: {
@@ -655,6 +741,105 @@ const STRINGS = {
         `modifier à la main. Sources : ${sources}._`,
       seeGlossaryLink:
         'Voir le glossaire sur la [matrice de conformité](./index.md) pour les termes techniques utilisés sur cette page.',
+      part1Heading: 'Partie 1 — En mots simples',
+      part2Heading: 'Partie 2 — Les détails',
+      part1Intro: (name) =>
+        `Ce que gérer une entreprise en ${name} implique pour vos documents, expliqué simplement — sans ` +
+        'jargon non expliqué (survolez, ou touchez, tout terme souligné pour une définition simple).',
+      part2Intro:
+        "Chaque fait ci-dessous est lu directement dans les propres fichiers de données de cette " +
+        "application, au moment de la génération — jamais tapé à la main — avec sa source légale exacte " +
+        'quand elle a été vérifiée contre le texte de loi lui-même.',
+      notConfiguredTitle: 'Pas encore configuré',
+      notConfiguredBody: (name, mechanismPlain) =>
+        `Cette application n'a pas encore de réponse pour ${name} sur ce point : **${mechanismPlain}**. ` +
+        "C'est un manque ouvert et honnête — pas une valeur par défaut cachée, et pas « probablement bon » : " +
+        'cette application préfère dire « pas encore configuré » que de deviner. Voir ' +
+        '[Ajouter un pays](../adding-a-country.md) pour savoir comment combler ce manque.',
+      mechanismPlainPolicy: 'quels documents vous pouvez créer, et ce que vous pouvez en faire',
+      mechanismPlainB2g: 'vendre à un client gouvernemental',
+      mechanismPlainCorrection: 'corriger une erreur sur une facture déjà envoyée',
+      mechanismPlainCancel: 'annuler une facture déjà envoyée',
+      mechanismPlainTax: 'la taxe sur les ventes (TVA)',
+      mechanismPlainIdentifiers: "les numéros d'identifiant qu'une entreprise d'ici doit indiquer sur une facture",
+      mechanismPlainMentions: 'les mentions légales et champs supplémentaires que doit porter chaque facture',
+      mechanismPlainChannel: "si la loi impose l'usage d'un canal de transmission précis",
+      plainPolicyIntro: (name, types) =>
+        `En tant qu'entreprise basée en ${name}, cette application vous permet de créer et gérer : ${types}.`,
+      plainPolicyRestriction: (actionLabel, typeArticled, statusLabel) =>
+        `Une nuance : vous ne pouvez ${actionLabel} ${typeArticled} que tant que son statut est encore « ${statusLabel} ».`,
+      plainPolicyForbidden: (actionLabel, typeArticled) =>
+        `Une restriction : la loi ici ne vous permet pas de ${actionLabel} ${typeArticled}.`,
+      plainB2gIntro: (name, transportLabel, formatLabel) =>
+        `Si vous vendez à une administration en ${name}, la facture ne peut pas être simplement envoyée par ` +
+        `e-mail — elle doit passer par ${transportLabel}, construite au format ${formatLabel}. Cette ` +
+        "application s'en charge une fois le canal connecté ; il vous faut seulement avoir les bonnes " +
+        "informations sur votre client gouvernemental au préalable.",
+      plainB2gIdentifierNeeded: (label) => `son **${label}**`,
+      plainB2gFieldNeeded: (label) => `**${label}** rempli sur la facture`,
+      plainB2gNeedsIntro: "Avant de pouvoir envoyer, il vous faudra :",
+      plainCorrectionLegend:
+        "Quatre réponses honnêtes que la loi d'un pays peut donner pour chaque façon de corriger une " +
+        'erreur : **obligatoire** (la loi dit que vous devez utiliser celle-ci pour ce genre de situation), ' +
+        '**permise** (vous pouvez l\'utiliser), **interdite** (la loi ne vous permet pas de l\'utiliser ici), ' +
+        'et **non vérifiée** (personne n\'a encore vérifié le texte de loi pour celle-ci — pas « non », ' +
+        'juste « pas encore recherché »).',
+      plainCorrectionIntro: (name, sourced, total) =>
+        `La loi applicable en ${name} a été vérifiée, à ce jour, pour ${sourced} des ${total} façons que ` +
+        'cette application connaît pour corriger une erreur sur une facture. Celles réellement confirmées :',
+      plainCorrectionNoneSourced: "Aucune d'entre elles n'a encore été vérifiée contre le texte de loi.",
+      plainCancelYes:
+        'Oui. Si besoin, vous pouvez annuler une facture déjà envoyée et en émettre une corrigée à la ' +
+        'place, sans restriction supplémentaire de la loi propre à ce pays.',
+      plainCancelRestricted: (statusLabel) =>
+        'Seulement dans un cas : annuler et réémettre une facture est possible tant qu\'elle est encore ' +
+        `au statut « ${statusLabel} » — plus une fois allée au-delà.`,
+      plainCancelNo:
+        "Pas encore via cette application. La loi ici peut le permettre en principe, mais aucun canal ou " +
+        "mécanisme de cette application ne le réalise encore pour ce pays — un manque connu, jamais un " +
+        '« non » silencieux.',
+      plainCancelNone: 'Rien n\'est encore déclaré pour ce pays — voir les détails ci-dessous pour ce qui trancherait.',
+      plainCancelDrift:
+        "Les propres données de cette application se contredisent sur ce point — voir les détails " +
+        "ci-dessous plutôt qu'une réponse simple, tant que ce n'est pas réglé.",
+      plainTaxIntro: (name, kindLabel, rate) =>
+        `Si vous êtes assujetti à la ${kindLabel} en ${name}, le taux normal est de ${rate} — le ` +
+        'pourcentage ajouté au-dessus de la plupart des ventes.',
+      plainTaxIntroNoRate: (name, kindLabel) =>
+        `${name} applique la ${kindLabel}, mais cette application n'a pas encore son taux normal en donnée.`,
+      plainTaxReduced: (list) => `Certaines catégories de biens ou services bénéficient d'un taux réduit à la place : ${list}.`,
+      plainTaxOtherKind: (name, kindLabel) =>
+        `${name} applique une ${kindLabel} plutôt qu'une TVA — voir la Partie 2 ci-dessous pour ce que ` +
+        'cette application a en donnée à ce sujet.',
+      plainTaxNone: (name) => `${name} est renseigné comme ne prélevant aucune taxe générale sur les ventes sur une facture.`,
+      plainIdentifiersIntro: (name) =>
+        `Quand vous facturez quelqu'un en ${name}, ou que quelqu'un en ${name} facture via cette ` +
+        'application, ces numéros d\'identifiant comptent :',
+      plainIdentifierRequired: (label, partyType) => `**${label}** — obligatoire (${partyType}).`,
+      plainIdentifierOptional: (label, partyType) => `${label} — facultatif (${partyType}).`,
+      plainMentionsIntro: (name, count) =>
+        `Chaque facture émise en ${name} doit légalement porter ${count} mention${count === 1 ? '' : 's'} ` +
+        'obligatoire' +
+        (count === 1 ? '' : 's') +
+        ' (sur les pénalités de retard de paiement, par exemple). Cette application les ajoute ' +
+        'automatiquement pour vous — voir la Partie 2 ci-dessous pour le texte légal exact, mot pour mot.',
+      plainContentRequirementsIntro: (name, count) =>
+        `En plus de cela, la loi ${frLawAdjective(name)} exige ${count} champ` +
+        (count === 1 ? '' : 's') +
+        ` supplémentaire${count === 1 ? '' : 's'} portant une valeur spécifique à ${name} sur certaines ` +
+        'factures, à partir d\'une date donnée — voir la Partie 2 pour savoir exactement lequel/lesquels.',
+      plainChannelMandated: (name, channelLabel, date) =>
+        `Oui — si votre entreprise est établie en ${name}, la loi vous impose, depuis le ${date}, d'envoyer ` +
+        `vos factures via ${channelLabel}. Cette application bloque l'envoi par tout autre canal à partir ` +
+        "de cette date, volontairement : envoyer la bonne facture par le mauvais canal est traité comme " +
+        'un vrai blocage, pas un simple avertissement.',
+      plainChannelSuggested: (name, channelLabel) =>
+        `Pas obligatoire légalement, mais ${channelLabel} est le canal qu'utilisent normalement les ` +
+        `entreprises en ${name}.`,
+      plainChannelNone: (name) =>
+        `${name} n'impose, d'après les données de cette application, aucun canal de transmission ` +
+        "particulier à une entreprise qui y est établie (vendre à un client *gouvernemental* peut être " +
+        'un cas différent — voir ci-dessus).',
     },
   },
 };
@@ -749,6 +934,48 @@ const GLOSSARY = {
       fr: 'Sistema di Interscambio — la plateforme nationale italienne de clearance pour les factures électroniques.',
     },
   },
+  VAT: {
+    term: { en: 'VAT', fr: 'TVA' },
+    def: {
+      en: 'Value Added Tax — a percentage of the price, added on top, that the seller collects from the buyer and hands over to the tax authority. Most of Europe uses it; the exact percentage and the rules for who charges it depend on the country and the kind of sale.',
+      fr: "Taxe sur la Valeur Ajoutée — un pourcentage du prix, ajouté par-dessus, que le vendeur collecte auprès de l'acheteur et reverse à l'administration fiscale. La plupart des pays européens l'utilisent ; le pourcentage exact et les règles sur qui la facture dépendent du pays et du type de vente.",
+    },
+  },
+  E_INVOICING_MANDATE: {
+    term: { en: 'e-invoicing mandate', fr: 'obligation de facturation électronique' },
+    def: {
+      en: "A law that doesn't just ALLOW sending invoices electronically (almost every country does) but REQUIRES it, in a specific structured format, through a specific channel, from a specific date — as opposed to simply emailing a PDF, which most countries still permit unless a mandate like this applies.",
+      fr: "Une loi qui n'AUTORISE pas seulement l'envoi de factures par voie électronique (presque tous les pays le permettent) mais l'EXIGE, dans un format structuré précis, par un canal précis, à partir d'une date précise — par opposition au simple envoi d'un PDF par e-mail, que la plupart des pays autorisent encore tant qu'une telle obligation ne s'applique pas.",
+    },
+  },
+  SCHEME_ID: {
+    term: { en: 'schemeID', fr: 'schemeID' },
+    def: {
+      en: 'A short code, attached to an identifier inside an e-invoice\'s own XML, that says WHICH REGISTRY that identifier belongs to — e.g. Peppol\'s own code "0204" in front of a German public body\'s Leitweg-ID means "this number is a German Leitweg-ID", not a VAT number or anything else. The same idea as an EAS, spelled out as an XML attribute rather than a Peppol network concept.',
+      fr: "Un court code, attaché à un identifiant à l'intérieur du XML d'une facture électronique, qui indique DE QUEL REGISTRE cet identifiant relève — par exemple le code Peppol « 0204 » devant le Leitweg-ID d'une entité publique allemande signifie « ce numéro est un Leitweg-ID allemand », pas un numéro de TVA ou autre chose. La même idée qu'un EAS, exprimée comme attribut XML plutôt que comme concept du réseau Peppol.",
+    },
+  },
+  XADES: {
+    term: { en: 'XAdES', fr: 'XAdES' },
+    def: {
+      en: 'XML Advanced Electronic Signature — a standard way to attach a legally-recognized digital signature to an XML document (like an e-invoice), so the receiver can verify who signed it and that nobody altered it afterward.',
+      fr: "XML Advanced Electronic Signature — une manière standardisée d'attacher une signature électronique juridiquement reconnue à un document XML (comme une facture électronique), pour que le destinataire puisse vérifier qui l'a signé et que personne ne l'a modifié depuis.",
+    },
+  },
+  POST_AUDIT: {
+    term: { en: 'post-audit model', fr: 'modèle post-audit' },
+    def: {
+      en: "A transmission model where the seller sends the invoice straight to the buyer and the tax authority only checks it later, if it checks at all — as opposed to a clearance model, where the authority validates the invoice before (or as) it reaches the buyer.",
+      fr: "Un modèle de transmission où le vendeur envoie la facture directement à l'acheteur et où l'administration fiscale ne la contrôle que plus tard, si elle la contrôle — par opposition à un modèle de clearance, où l'administration valide la facture avant, ou au moment, qu'elle atteigne l'acheteur.",
+    },
+  },
+  PROVENANCE: {
+    term: { en: 'provenance', fr: 'provenance' },
+    def: {
+      en: 'Where a fact on this page comes from: either "legal" — an exact quote from a law or an official source, dated — or "unverified" — an honest note saying nobody has confirmed this against the actual law yet, and what would settle it. There is no in-between and no guessing.',
+      fr: "D'où vient un fait affiché sur cette page : soit « légal » — une citation exacte d'une loi ou d'une source officielle, datée — soit « non vérifié » — une note honnête disant que personne n'a encore confirmé ce fait contre le texte de loi réel, et ce qui permettrait de le faire. Il n'y a pas d'entre-deux, et jamais de supposition.",
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -806,6 +1033,106 @@ const FORMAT_LABELS = {
 // clearance examples are tagged, so as never to overstate a still-debated model (e.g. the French
 // PDP's own decentralized-CTC design) as one or the other.
 const TRANSPORT_MODEL = { ksef: 'clearance', sdi: 'clearance', peppol: 'postAudit' };
+
+// ---------------------------------------------------------------------------------------------
+// PART-1 PLAIN-WORDS LABEL MAPS — presentation-only, exactly like TRANSPORT_LABELS/FORMAT_LABELS
+// above: generic domain vocabulary (which English/French verb describes "send", which noun
+// describes a "quote"), never a per-country legal claim. Every actionId/typeId/statusId spelled
+// out here comes from the SAME closed, shared vocabulary every country-policy/*.json file already
+// uses (`descriptors/types.ts`'s own document types and actions are identical for every country —
+// only which ones are ALLOWED differs, which is data, read from the file at render time). Adding a
+// sixth document type or a new action id to the product means adding one entry here too — the
+// build fails loudly (falls back to the raw id in brackets) rather than silently, see
+// `plainActionLabel`/`plainTypeArticled`/`plainStatusLabel` below.
+// ---------------------------------------------------------------------------------------------
+const ACTION_PLAIN_LABELS = {
+  en: {
+    'save-draft': 'save as a draft',
+    send: 'send',
+    'convert-to-invoice': 'convert to an invoice',
+    'request-deposit': 'request a deposit on',
+    duplicate: 'duplicate',
+    'share-link': 'create a shareable link for',
+    'record-payment': 'record a payment on',
+    'download-xml': 'download the structured XML for',
+    'export-accounting': 'export to accounting software',
+    delete: 'delete',
+    receive: 'log as received',
+    approve: 'approve',
+    reject: 'reject',
+  },
+  fr: {
+    'save-draft': 'enregistrer comme brouillon',
+    send: 'envoyer',
+    'convert-to-invoice': 'convertir en facture',
+    'request-deposit': 'demander un acompte sur',
+    duplicate: 'dupliquer',
+    'share-link': 'créer un lien de partage pour',
+    'record-payment': 'enregistrer un paiement sur',
+    'download-xml': 'télécharger le XML structuré de',
+    'export-accounting': 'exporter vers un logiciel comptable',
+    delete: 'supprimer',
+    receive: 'enregistrer comme reçue',
+    approve: 'approuver',
+    reject: 'rejeter',
+  },
+};
+/** Doc-type label ALREADY carrying its own article ("an invoice", "une facture") — baked in per
+ *  entry rather than derived from spelling, which sidesteps English a/an-before-vowel and French
+ *  un/une gender entirely (see this block's own header). */
+const DOC_TYPE_ARTICLED_PLAIN_LABELS = {
+  en: {
+    quote: 'a quote',
+    invoice: 'an invoice',
+    'credit-note': 'a credit note',
+    expense: 'an expense',
+    'received-invoice': 'a received invoice',
+  },
+  fr: {
+    quote: 'un devis',
+    invoice: 'une facture',
+    'credit-note': 'un avoir',
+    expense: 'une note de frais',
+    'received-invoice': 'une facture reçue',
+  },
+};
+const DOC_TYPE_PLURAL_PLAIN_LABELS = {
+  en: {
+    quote: 'quotes',
+    invoice: 'invoices',
+    'credit-note': 'credit notes',
+    expense: 'expenses',
+    'received-invoice': 'invoices you receive from suppliers',
+  },
+  fr: {
+    quote: 'devis',
+    invoice: 'factures',
+    'credit-note': 'avoirs',
+    expense: 'notes de frais',
+    'received-invoice': 'factures reçues de vos fournisseurs',
+  },
+};
+/** Every `DocumentInstance.status` value a country-policy `rules[].statuses` narrowing has ever
+ *  named, across all five shipped countries — see country-policy/data/*.json's own `invoice.save-
+ *  draft` (`["draft"]`) and `received-invoice.receive` (`["received"]"`), and correction-routes/
+ *  cancel-policy.ts's own Italian `restrictedToStatuses: ["send_failed"]`. */
+const STATUS_PLAIN_LABELS = {
+  en: { draft: 'draft', sent: 'sent', send_failed: 'failed to send', received: 'received' },
+  fr: { draft: 'brouillon', sent: 'envoyée', send_failed: "en échec d'envoi", received: 'reçue' },
+};
+
+function plainActionLabel(actionId, locale) {
+  return ACTION_PLAIN_LABELS[locale][actionId] ?? `[${actionId}]`;
+}
+function plainTypeArticled(typeId, locale) {
+  return DOC_TYPE_ARTICLED_PLAIN_LABELS[locale][typeId] ?? `[${typeId}]`;
+}
+function plainTypesList(typeIds, locale) {
+  return typeIds.map((t) => DOC_TYPE_PLURAL_PLAIN_LABELS[locale][t] ?? `[${t}]`).join(locale === 'fr' ? ', ' : ', ');
+}
+function plainStatusLabel(statusId, locale) {
+  return STATUS_PLAIN_LABELS[locale][statusId] ?? statusId;
+}
 
 const COUNTRY_NAMES = {
   en: {
@@ -886,6 +1213,21 @@ assertSameShape(COUNTRY_NAMES.en, COUNTRY_NAMES.fr, 'COUNTRY_NAMES');
 function countryName(cc, locale) {
   return COUNTRY_NAMES[locale][cc] ?? cc;
 }
+/** French adjectival form of "the law of <country>" ("la loi française", not "la loi de France") —
+ *  needed only by `plainContentRequirementsIntro` today, which is why this stays a small, closed
+ *  lookup by NAME (not `cc`, since that string function only ever receives the already-localized
+ *  name) rather than a general country->adjective mechanism. Falls back to the grammatically safe,
+ *  if less idiomatic, "de <name>" for any country this map does not yet cover. */
+const FR_LAW_ADJECTIVE_BY_NAME = {
+  France: 'française',
+  Allemagne: 'allemande',
+  Italie: 'italienne',
+  Pologne: 'polonaise',
+  Portugal: 'portugaise',
+};
+function frLawAdjective(name) {
+  return FR_LAW_ADJECTIVE_BY_NAME[name] ?? `de ${name}`;
+}
 function transportLabel(id) {
   return TRANSPORT_LABELS[id] ?? id;
 }
@@ -899,28 +1241,13 @@ function transportWithModel(id, locale) {
   return `${label} (${STRINGS[locale].transportModel[model]})`;
 }
 
-// The 17 countries that get a full narrative page: the 8 country-policy jurisdictions plus the 9
-// Peppol-BIS-only B2G countries from the 2026-09-02 audit (B2G_COVERAGE.md) — every other country
-// in the union below appears ONLY as a row in the matrix, honestly thin.
-const DETAIL_PAGES = [
-  'FR',
-  'DE',
-  'IT',
-  'PL',
-  'ES',
-  'MX',
-  'US',
-  'HU',
-  'BE',
-  'CY',
-  'EE',
-  'GR',
-  'LT',
-  'LU',
-  'LV',
-  'MT',
-  'SE',
-];
+// The 5 countries this product covers today (2026-09-10 prune — every other country's data files
+// were removed; see TODO_ISSUES.md and the root git log for that change). Every one of these gets
+// a full two-part narrative page (Part 1 "In plain words" + Part 2 "The details"); `unionCountries`
+// below is, as a direct consequence, ALSO exactly this set — there is no country left with data in
+// only some mechanisms and no page at all, unlike the pre-prune matrix, which had rows with no
+// detail page (a thin row for a country nobody had written a narrative for yet).
+const DETAIL_PAGES = ['DE', 'FR', 'IT', 'PL', 'PT'];
 
 // =================================================================================================
 // TEXT / MDX HELPERS
@@ -929,6 +1256,13 @@ function clean(text) {
   return String(text ?? '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+/** Heading-cases a lowercase, conversational phrase (`mechanismPlain*` above are written to read
+ *  naturally mid-sentence in a "not yet configured" callout, so they start lowercase) — applied only
+ *  where one of those doubles as a Part-1 `###` heading, never to a phrase already reused verbatim
+ *  inside a sentence. Multi-byte-safe (French accented capitals included) via `toLocaleUpperCase`. */
+function capitalize(text) {
+  return text ? text.charAt(0).toLocaleUpperCase() + text.slice(1) : text;
 }
 /**
  * These pages are MDX, not plain Markdown — Docusaurus parses `{...}` as a JS expression and a
@@ -981,15 +1315,38 @@ function createGlossaryMarker(locale) {
   const seen = new Set();
   return function mark(text) {
     let out = text;
+    // [start, end) byte ranges of `out` already occupied by a just-inserted `<abbr title="…">…
+    // </abbr>` — see this function's own header addendum below for why later entries must never
+    // match INSIDE one of these, even when a shorter term's exact display text happens to appear,
+    // verbatim, inside a LONGER (earlier-processed, since entries sort longest-first) term's own
+    // definition — e.g. this file's own GLOSSARY.POST_AUDIT mentioning "clearance model" in its
+    // definition, or GLOSSARY.SCHEME_ID mentioning "Peppol"/"EAS" in its. Without this guard, that
+    // definition text — once embedded as a `title` attribute — gets re-scanned by every SHORTER
+    // entry still left in the loop exactly like ordinary page prose would, corrupting the markup
+    // with a tag nested inside an attribute value AND wrongly marking that shorter term "seen" for
+    // the rest of the page (so its own, GENUINE first occurrence later on the page silently loses
+    // its tooltip) — a real regression this task's own litmus check (the country matrix's clearance-
+    // model column) caught.
+    const protectedRanges = [];
+    const isProtected = (idx, len) => protectedRanges.some(([s, e]) => idx < e && idx + len > s);
     for (const { term, title } of entries) {
       if (seen.has(term)) continue;
       const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp(`(?<![\\p{L}\\p{N}])(${escaped})(?![\\p{L}\\p{N}])`, 'u');
-      const m = re.exec(out);
-      if (!m) continue;
+      const re = new RegExp(`(?<![\\p{L}\\p{N}])(${escaped})(?![\\p{L}\\p{N}])`, 'gu');
+      let match = null;
+      let m;
+      while ((m = re.exec(out))) {
+        if (!isProtected(m.index, m[1].length)) {
+          match = m;
+          break;
+        }
+      }
+      if (!match) continue;
       seen.add(term);
-      const idx = m.index;
-      out = `${out.slice(0, idx)}<abbr title="${escapeAttr(title)}">${m[1]}</abbr>${out.slice(idx + m[1].length)}`;
+      const idx = match.index;
+      const inserted = `<abbr title="${escapeAttr(title)}">${match[1]}</abbr>`;
+      out = `${out.slice(0, idx)}${inserted}${out.slice(idx + match[1].length)}`;
+      protectedRanges.push([idx, idx + inserted.length]);
     }
     return out;
   };
@@ -1530,7 +1887,7 @@ function renderBonusSections(cc, locale) {
   const out = [];
   const fields = countryFields[cc];
   if (fields) {
-    out.push(`## ${S.sectionFieldOverlay}`);
+    out.push(`### ${S.sectionFieldOverlay}`);
     out.push('');
     out.push(S.fieldOverlayIntro);
     out.push('');
@@ -1546,7 +1903,7 @@ function renderBonusSections(cc, locale) {
   }
   const content = contentRequirements[cc];
   if (content) {
-    out.push(`## ${S.sectionContentRequirements}`);
+    out.push(`### ${S.sectionContentRequirements}`);
     out.push('');
     out.push(`| ${S.contentReqColField} | ${S.contentReqColMandatedFrom} | ${S.contentReqColProvenance} |`);
     out.push('|---|---|---|');
@@ -1561,6 +1918,212 @@ function renderBonusSections(cc, locale) {
   return out.join('\n');
 }
 
+// =================================================================================================
+// PART 1 — "IN PLAIN WORDS" RENDERERS.
+//
+// Every sentence below is assembled from the exact same STRUCTURED facts (booleans, enums, dates,
+// numbers, labels) Part 2's render*Section functions above already read — never from a data file's
+// own free-form `notes`/`resolutionNote` prose. That is rule #2 (this file's own header) applied to
+// a friendlier register: "clear enough for a 15-year-old" is a tone requirement, not a license to
+// paraphrase a legal citation nobody actually re-checked, or to invent a reason "why" beyond what
+// the structured fact itself says.
+//
+// A mechanism with NO file for this country returns `null` here — buildCountryPage's own
+// `notConfiguredCallout()` renders the honest "not yet configured" admonition in exactly the same
+// shape for every mechanism, so a reader never has to guess whether a missing paragraph is a bug in
+// this script or a real, named gap in the data (the brief's own "never a blank, always a reason").
+// =================================================================================================
+
+function notConfiguredCallout(name, mechanismPlain, locale) {
+  const S = STRINGS[locale].country;
+  return [`:::info ${S.notConfiguredTitle}`, '', S.notConfiguredBody(name, mechanismPlain), '', ':::', ''].join('\n');
+}
+
+/** country-policy, in plain words — see country-policy/data/*.json: every shipped country today
+ *  ALLOWS every action, so the only thing worth calling out in Part 1 is a per-status narrowing
+ *  (`invoice.save-draft` -> only while "draft", `received-invoice.receive` -> only while "received")
+ *  or an outright forbidden action (none exist today, but the code does not assume that stays true —
+ *  see `plainPolicyForbidden` above). */
+function renderPlainPolicy(cc, locale, name) {
+  const file = countryPolicy[cc];
+  if (!file) return null;
+  const S = STRINGS[locale].country;
+  const out = [S.plainPolicyIntro(name, plainTypesList(file.documentTypes, locale))];
+  const restricted = file.rules.filter((r) => r.allowed && r.statuses?.length);
+  const forbidden = file.rules.filter((r) => !r.allowed);
+  if (restricted.length || forbidden.length) {
+    out.push('');
+    for (const r of restricted) {
+      const statusLabel = r.statuses.map((s) => plainStatusLabel(s, locale)).join(', ');
+      out.push(`- ${S.plainPolicyRestriction(plainActionLabel(r.actionId, locale), plainTypeArticled(r.typeId, locale), statusLabel)}`);
+    }
+    for (const r of forbidden) {
+      out.push(`- ${S.plainPolicyForbidden(plainActionLabel(r.actionId, locale), plainTypeArticled(r.typeId, locale))}`);
+    }
+  }
+  return out.join('\n');
+}
+
+/** b2g-routing, in plain words — the transport/format a GOVERNMENT client in this country forces,
+ *  plus the concrete pieces of information the plain reader actually has to go get before sending
+ *  (a client identifier scheme, a required document field) — never the full technical rule shape
+ *  (that stays Part 2's job). */
+function renderPlainB2g(cc, locale, name, mark) {
+  const rule = b2gRouting[cc];
+  if (!rule) return null;
+  const S = STRINGS[locale].country;
+  const out = [mark(S.plainB2gIntro(name, transportWithModel(rule.transportId, locale), formatLabel(rule.formatSyntax)))];
+  const needs = [
+    ...(rule.requiredClientIdentifiers ?? []).map((r) => S.plainB2gIdentifierNeeded(r.label)),
+    ...(rule.requiredDocumentFields ?? []).filter((f) => f.required).map((f) => S.plainB2gFieldNeeded(f.label)),
+  ];
+  if (needs.length) {
+    out.push('', S.plainB2gNeedsIntro, '');
+    for (const n of needs) out.push(`- ${n}`);
+  }
+  return out.join('\n');
+}
+
+/** correction-routes, in plain words — states the four-way vocabulary ONCE (required/allowed/
+ *  forbidden/unverified), then lists only the routes actually checked against the law
+ *  (`provenance.kind === 'legal'`) — an `unverified` route is real information (see this file's own
+ *  header on why "unverified" is a first-class, honest state) but belongs in Part 2's full table,
+ *  not the plain summary, which would otherwise be dominated by "not researched yet" noise. */
+function renderPlainCorrection(cc, locale, name, mark) {
+  const file = correctionRoutes[cc];
+  if (!file) return null;
+  const S = STRINGS[locale].country;
+  const RS = STRINGS[locale].routes;
+  const STS = STRINGS[locale].routeStatuses;
+  const { sourced, total } = sourcedRouteCount(file);
+  const out = [mark(S.plainCorrectionLegend), '', S.plainCorrectionIntro(name, sourced, total)];
+  const known = file.routes.filter((r) => r.provenance.kind === 'legal');
+  if (known.length) {
+    out.push('');
+    for (const r of known) out.push(`- **${mark(RS[r.routeId] ?? r.routeId)}** — ${STS[r.status] ?? r.status}`);
+  } else {
+    out.push('', S.plainCorrectionNoneSourced);
+  }
+  return out.join('\n');
+}
+
+/** The local-cancel derived fact, in plain words — same YES/RESTRICTED/NO/DRIFT/NONE outcomes
+ *  `resolveCancelPolicy` already computes for the matrix and for Part 2's own `renderCancelSection`,
+ *  just without the internal `CANCEL_AND_REPLACE` identifier in the reader-facing sentence. */
+function renderPlainCancel(cc, locale) {
+  const S = STRINGS[locale].country;
+  const result = resolveCancelPolicy(cc);
+  switch (result.key) {
+    case 'NONE':
+      return S.plainCancelNone;
+    case 'NO':
+      return S.plainCancelNo;
+    case 'DRIFT':
+      return S.plainCancelDrift;
+    case 'RESTRICTED':
+      return S.plainCancelRestricted(result.statuses.map((s) => plainStatusLabel(s, locale)).join(', '));
+    default:
+      return S.plainCancelYes;
+  }
+}
+
+/** tax-systems + vat-rates, in plain words — the standard rate (declared, or derived from the VAT
+ *  rate catalog — same `resolveStandardRate` Part 2 uses) plus, when a fuller catalog exists, every
+ *  non-standard, non-exempt category as a short "reduced rate" list. */
+function renderPlainTax(cc, locale, name) {
+  const fact = taxSystems[cc];
+  if (!fact) return null;
+  const S = STRINGS[locale].country;
+  const CS = STRINGS[locale];
+  if (fact.kind === 'NONE') return S.plainTaxNone(name);
+  if (fact.kind === 'SALES_TAX') return S.plainTaxOtherKind(name, CS.kinds[fact.kind] ?? fact.kind);
+  const kindLabel = CS.kinds[fact.kind] ?? fact.kind;
+  const { rate } = resolveStandardRate(cc, fact);
+  const out = [rate === undefined ? S.plainTaxIntroNoRate(name, kindLabel) : S.plainTaxIntro(name, kindLabel, formatPercent(rate, locale))];
+  const vat = vatRates[cc];
+  if (vat) {
+    const reduced = vat.rates.filter((r) => r.category !== 'STANDARD' && r.category !== 'EXEMPT');
+    if (reduced.length) {
+      const list = reduced
+        .map((r) => `${formatPercent(r.rate, locale)} (${(CS.categories[r.category] ?? r.category).toLowerCase()})`)
+        .join(', ');
+      out.push(S.plainTaxReduced(list));
+    }
+  }
+  return out.join(' ');
+}
+
+/** country-identifiers, in plain words — every scheme this country's own catalog declares, split
+ *  only on required-vs-optional (the technical `appliesTo`/`pattern`/provenance stay Part 2's job). */
+function renderPlainIdentifiers(cc, locale, name) {
+  const file = countryIdentifiers[cc];
+  if (!file || !file.schemes?.length) return null;
+  const S = STRINGS[locale].country;
+  const CS = STRINGS[locale];
+  const out = [S.plainIdentifiersIntro(name), ''];
+  for (const s of file.schemes) {
+    const partyType = CS.partyTypes[s.appliesTo] ?? s.appliesTo;
+    out.push(`- ${s.required ? S.plainIdentifierRequired(s.label, partyType) : S.plainIdentifierOptional(s.label, partyType)}`);
+  }
+  return out.join('\n');
+}
+
+/** mentions, in plain words — deliberately just a COUNT and a pointer to Part 2: the mention TEXT
+ *  itself is the law's own words (a `legalRef`-backed quote, per-mention), so it belongs exactly
+ *  once, in the table that already carries its citation — repeating it here in a "simplified" form
+ *  would be exactly the kind of paraphrase-of-a-citation rule #2 forbids. */
+function renderPlainMentions(cc, locale, name) {
+  const file = mentions[cc];
+  if (!file || !file.invoiceNotes?.length) return null;
+  const S = STRINGS[locale].country;
+  return S.plainMentionsIntro(name, file.invoiceNotes.length);
+}
+
+/** channel-policy (the SELLER's own country), in plain words — the one binary a plain reader needs:
+ *  is this legally forced (mandated, with a date) or merely the going habit (suggested)? Multiple
+ *  facts (more than one channel) are listed one bullet each, same as B2G's own "needs" list above. */
+function renderPlainChannel(cc, locale, name, mark) {
+  const file = channelPolicy[cc];
+  if (!file || !file.facts?.length) return null;
+  const S = STRINGS[locale].country;
+  const lines = file.facts.map((f) => {
+    const label = mark(transportLabel(f.providerId));
+    return f.requirement === 'mandated' ? S.plainChannelMandated(name, label, f.mandatedFrom) : S.plainChannelSuggested(name, label);
+  });
+  return lines.length === 1 ? lines[0] : lines.map((l) => `- ${l}`).join('\n');
+}
+
+/** content-requirements, in plain words — grouped into the SAME Part-1 subsection as mentions (both
+ *  are "extra legal text/fields an invoice must carry"), but rendered separately since a country can
+ *  have one without the other (today, only France has either). Deliberately just a COUNT, same
+ *  restraint as `renderPlainMentions` above: the field id itself (e.g. "BT-23") is an EN 16931
+ *  business-term code, not plain English, so Part 2's own table is where it belongs. */
+function renderPlainContentRequirements(cc, locale, name) {
+  const file = contentRequirements[cc];
+  if (!file || !file.facts?.length) return null;
+  const S = STRINGS[locale].country;
+  return S.plainContentRequirementsIntro(name, file.facts.length);
+}
+
+/**
+ * A country page is now TWO passes over the exact same loaded data, at two different altitudes —
+ * the brief's own "an elève de seconde reads Part 1, a professional reads Part 2" split:
+ *
+ *  - PART 1 ("in plain words") is built ENTIRELY from `renderPlain*` functions above: short,
+ *    complete sentences, no internal identifier (`CANCEL_AND_REPLACE`, `BT-23`, a raw `routeId`)
+ *    ever appears unexplained, and every technical noun that DOES appear (VAT, B2G, Peppol, CIUS,
+ *    schemeID, XAdES, …) is glossary-marked so hovering it explains it inline. A mechanism absent
+ *    for this country renders the SAME `notConfiguredCallout` admonition here, every time — never a
+ *    blank paragraph a reader has to interpret as either "nothing to say" or "the page is broken".
+ *  - PART 2 ("the details") is the ORIGINAL, pre-this-task render*Section machinery, UNCHANGED in
+ *    substance (same tables, same citations, same `<details>` quote blocks) — only its own headings
+ *    are demoted from `##` to `###` so both parts nest cleanly under one `##` each in the sidebar's
+ *    table of contents.
+ *
+ * The SAME `mark()` glossary-marker instance is threaded through both parts (created once, right
+ * here), so a term explained once in Part 1 is not re-annotated (redundantly) the first time Part 2
+ * also happens to use it — see `createGlossaryMarker`'s own "first occurrence, per page" contract.
+ */
 function buildCountryPage(cc, locale, position) {
   const S = STRINGS[locale].country;
   const mark = createGlossaryMarker(locale);
@@ -1580,31 +2143,86 @@ function buildCountryPage(cc, locale, position) {
   lines.push('');
   lines.push(S.generatedNotice);
   lines.push('');
-  lines.push(`## ${mark(S.sectionPolicy)}`);
+
+  // ============================================================= PART 1 — IN PLAIN WORDS =========
+  lines.push(`## ${mark(S.part1Heading)}`);
+  lines.push('');
+  lines.push(S.part1Intro(name));
+  lines.push('');
+
+  /** Pushes one Part-1 subsection: its heading, then either the given (already-rendered) plain
+   *  content or the shared "not yet configured" admonition when that content is `null` — the one
+   *  place every `renderPlain*` function's "no file for this country" case actually surfaces. */
+  const pushPlain = (heading, mechanismPlain, content) => {
+    lines.push(`### ${mark(capitalize(heading))}`);
+    lines.push('');
+    lines.push(content ?? notConfiguredCallout(name, mechanismPlain, locale));
+    lines.push('');
+  };
+
+  pushPlain(S.mechanismPlainPolicy, S.mechanismPlainPolicy, renderPlainPolicy(cc, locale, name));
+  pushPlain(S.mechanismPlainTax, S.mechanismPlainTax, renderPlainTax(cc, locale, name));
+  pushPlain(S.mechanismPlainCorrection, S.mechanismPlainCorrection, renderPlainCorrection(cc, locale, name, mark));
+  // Local cancel has no "not configured" state of its own: `resolveCancelPolicy` always resolves to
+  // a real answer (down to "NONE" when correction-routes itself has no file), so this subsection
+  // never needs the shared callout — see renderPlainCancel's own header.
+  lines.push(`### ${capitalize(S.mechanismPlainCancel)}`);
+  lines.push('');
+  lines.push(renderPlainCancel(cc, locale));
+  lines.push('');
+  pushPlain(S.mechanismPlainIdentifiers, S.mechanismPlainIdentifiers, renderPlainIdentifiers(cc, locale, name));
+  pushPlain(S.mechanismPlainB2g, S.mechanismPlainB2g, renderPlainB2g(cc, locale, name, mark));
+  pushPlain(S.mechanismPlainChannel, S.mechanismPlainChannel, renderPlainChannel(cc, locale, name, mark));
+
+  // Mentions + content-requirements share ONE Part-1 subsection ("extra legal text and fields an
+  // invoice must carry") since both answer the same plain question, even though they are two
+  // independently-absent mechanisms (only France ships either today) — see
+  // renderPlainContentRequirements's own header.
+  {
+    const mentionsPlain = renderPlainMentions(cc, locale, name);
+    const contentReqPlain = renderPlainContentRequirements(cc, locale, name);
+    lines.push(`### ${mark(capitalize(S.mechanismPlainMentions))}`);
+    lines.push('');
+    if (mentionsPlain || contentReqPlain) {
+      if (mentionsPlain) lines.push(mentionsPlain);
+      if (mentionsPlain && contentReqPlain) lines.push('');
+      if (contentReqPlain) lines.push(contentReqPlain);
+    } else {
+      lines.push(notConfiguredCallout(name, S.mechanismPlainMentions, locale));
+    }
+    lines.push('');
+  }
+
+  // ============================================================= PART 2 — THE DETAILS ============
+  lines.push(`## ${mark(S.part2Heading)}`);
+  lines.push('');
+  lines.push(S.part2Intro);
+  lines.push('');
+  lines.push(`### ${mark(S.sectionPolicy)}`);
   lines.push('');
   lines.push(renderPolicySection(cc, locale, mark));
-  lines.push(`## ${mark(S.sectionB2g)}`);
+  lines.push(`### ${mark(S.sectionB2g)}`);
   lines.push('');
   lines.push(`_${S.b2gIntro}_`);
   lines.push('');
   lines.push(renderB2gSection(cc, locale, mark));
-  lines.push(`## ${S.sectionCorrection}`);
+  lines.push(`### ${S.sectionCorrection}`);
   lines.push('');
   lines.push(renderCorrectionRoutesSection(cc, locale, mark));
-  lines.push(`## ${S.sectionCancel}`);
+  lines.push(`### ${S.sectionCancel}`);
   lines.push('');
   lines.push(renderCancelSection(cc, locale));
   lines.push('');
-  lines.push(`## ${S.sectionTax}`);
+  lines.push(`### ${S.sectionTax}`);
   lines.push('');
   lines.push(renderTaxSection(cc, locale, mark));
-  lines.push(`## ${S.sectionIdentifiers}`);
+  lines.push(`### ${S.sectionIdentifiers}`);
   lines.push('');
   lines.push(renderIdentifiersSection(cc, locale));
-  lines.push(`## ${S.sectionMentions}`);
+  lines.push(`### ${S.sectionMentions}`);
   lines.push('');
   lines.push(renderMentionsSection(cc, locale));
-  lines.push(`## ${mark(S.sectionChannel)}`);
+  lines.push(`### ${mark(S.sectionChannel)}`);
   lines.push('');
   lines.push(renderChannelMandateSection(cc, locale, mark));
   const bonus = renderBonusSections(cc, locale);
