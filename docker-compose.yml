@@ -38,9 +38,16 @@ services:
       - OIDC_CLIENT_ID="your-client-id"
       - OIDC_CLIENT_SECRET="your-client-secret"
 
-      # Optional, but recommended for docker deployments
-      - JWT_SECRET="your_jwt_secret" # Used for JWT authentication, can be any random string
-      - BETTER_AUTH_SECRET="your_better_auth_secret" # Required, generate with: openssl rand -base64 32, falls back to JWT_SECRET if unset
+      # REQUIRED. Generate a real value with: openssl rand -hex 32 — the backend now REFUSES to
+      # boot in production (SECURITY_AUDIT.md finding #3) if this is left empty or set to an
+      # obvious placeholder, specifically so an unmodified copy-paste of this file cannot start
+      # with a PUBLIC secret (this file is committed to the open-source repository, so any string
+      # left here is known to everyone). BETTER_AUTH_SECRET signs every session cookie/JWT; a
+      # deployment running on a known secret lets anyone forge a valid session for any userId.
+      - BETTER_AUTH_SECRET=CHANGE_ME_generate_with_openssl_rand_hex_32
+      # Optional: falls back to BETTER_AUTH_SECRET's value above if unset, kept only for
+      # deployments that already set JWT_SECRET separately. Same rule applies if you do set it.
+      # - JWT_SECRET=CHANGE_ME_generate_with_openssl_rand_hex_32
 
       # Document-action async queue (BullMQ/Redis, TODO.md item 22 — an async "send" and, later,
       # recurring documents both go through it). Redis is REQUIRED for the backend to boot at all,

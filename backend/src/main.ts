@@ -8,8 +8,15 @@ import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { syncDatabaseSchema } from './prisma/sync-schema';
+import { assertSecretsConfiguredForBoot } from './lib/secret-guard';
 
 async function bootstrap() {
+  // SECURITY_AUDIT.md finding #3: refuse to boot on a known-placeholder or empty auth secret
+  // (docker-compose.yml's example `JWT_SECRET`/`BETTER_AUTH_SECRET` values are public). Must run
+  // before anything else touches `lib/auth.ts` — see secret-guard.ts's own header for why this is
+  // gated to production only.
+  assertSecretsConfiguredForBoot();
+
   if (process.env.NODE_ENV === 'production') {
     try {
       await syncDatabaseSchema();
@@ -20,6 +27,18 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule, { bodyParser: false });
+  // SECURITY_AUDIT.md finding #1: nginx (nginx.conf) is the only hop in front of this process
+  // (same container, proxying over loopback — see entrypoint.sh) and now OVERWRITES
+  // X-Forwarded-For with the real client IP it saw ($remote_addr) rather than appending to
+  // whatever a client sent. `trust proxy: 1` tells Express "trust exactly one hop" so
+  // `req.ip` reads that header instead of always resolving to the loopback peer address
+  // (127.0.0.1, since nginx and this process share a container) — otherwise both the global
+  // `ThrottlerGuard` (app.module.ts, keys on `req.ip` by default) and better-auth's own
+  // request-IP reader end up sharing one instance-wide bucket / a spoofable IP, defeating
+  // per-IP rate limiting (e.g. login brute-force). Must be `1`, not `true`: `true` would trust
+  // an arbitrary number of forwarded hops, which is exactly the "trust whatever the client
+  // claims" bug this fixes.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   app.enableCors({
     credentials: true,
     origin: [
