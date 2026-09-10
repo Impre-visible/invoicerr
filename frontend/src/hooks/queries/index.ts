@@ -40,3 +40,9 @@ export {
   useDeleteDocumentSchedule,
 } from "./use-document-schedules"
 export { useShareLinks, useCreateShareLink, useRevokeShareLink, shareLinksKey } from "./use-share-links"
+export {
+  usePublicSignature,
+  useRequestPublicSignatureOtp,
+  useSignPublicSignature,
+  type PublicSignatureView,
+} from "./use-public-signature"

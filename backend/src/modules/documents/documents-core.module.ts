@@ -19,6 +19,7 @@ import { registerExpenseActions } from './actions/expense-actions';
 import { registerInvoiceActions } from './actions/invoice-actions';
 import { registerQuoteActions } from './actions/quote-actions';
 import { registerRequestDepositAction } from './actions/request-deposit';
+import { registerRequestSignatureAction } from './actions/request-signature';
 import { registerCreditNoteActions } from './actions/credit-note-actions';
 import { registerReceivedInvoiceActions } from './actions/received-invoice-actions';
 import { B2gRoutingBootUpsertService } from './b2g-routing/boot-upsert.service';
@@ -59,6 +60,7 @@ import { DocumentQueueModule } from './queue/document-queue.module';
 import { DocumentScheduleSweepRunner } from './schedules/schedule-sweep-runner';
 import { DocumentSchedulesService } from './schedules/schedules.service';
 import { ShareLinksService } from './share-links/share-links.service';
+import { CLIENT_CONTACT_LOOKUP, SignaturesService } from './signatures/signatures.service';
 import { buildArticleReferenceProvider } from './references/article-reference.provider';
 import { buildClientReferenceProvider } from './references/client-reference.provider';
 import { buildDocumentReferenceProvider } from './references/document-reference.provider';
@@ -460,6 +462,7 @@ function buildActionRegistry(
   signingCertificates: SigningCertificatesService,
   eventsPublisher: DocumentEventsPublisher,
   webhookDispatcher: WebhookDispatcherService,
+  signaturesService: SignaturesService,
 ): ActionRegistry {
   const registry = new ActionRegistry();
   registerQuoteActions(registry, {
@@ -474,6 +477,10 @@ function buildActionRegistry(
   });
   registerConvertToInvoiceAction(registry);
   registerRequestDepositAction(registry);
+  // Root TODO item 13 REDONE — see request-signature.ts's own header. `SignaturesService` is a plain
+  // provider of THIS module (below), the same "inject the concrete class here, never `import type`"
+  // rule every other DI token on this page already follows.
+  registerRequestSignatureAction(registry, signaturesService);
   registerInvoiceActions(registry, {
     transportRegistry,
     queueDispatcher,
@@ -579,6 +586,17 @@ function buildEntityReferenceRegistry(
     // `DocumentSchedulesService` right above (a plain class, resolved by Nest, reusing
     // `DocumentsService` for its own tenant-scoped 404s) — no factory needed.
     ShareLinksService,
+    // Root TODO item 13 REDONE — see signatures/signatures.service.ts's own header. A plain class,
+    // resolved by Nest the same way `ShareLinksService` right above already is: Nest auto-wires its
+    // constructor (`ClientsService`, `MailService`, both already available in this module; the
+    // `DOCUMENT_WEBHOOK_EMITTER` token, provided further below) with no factory needed. Exported (see
+    // this module's own `exports` array) so `PublicDocumentsModule`'s controller — a DIFFERENT
+    // module, importing `DocumentsCoreModule` directly — can inject it for the public OTP flow.
+    SignaturesService,
+    // Root TODO item 13 REDONE — see signatures.service.ts's own `CLIENT_CONTACT_LOOKUP` header for
+    // why this is a token/`useExisting` mapping, never a direct `ClientsService` constructor param on
+    // that (decorated) class — the identical shape `DOCUMENT_WEBHOOK_EMITTER` below already uses.
+    { provide: CLIENT_CONTACT_LOOKUP, useExisting: ClientsService },
     // B2G routing (b2g-routing/) — `OnModuleInit`, runs `upsertB2gRoutingRules` on EVERY process that
     // imports this Core module (API inline, or a scaled worker replica) — see that service's own
     // header for why this is registered here, unconditionally, rather than gated the way the queue's
@@ -689,6 +707,7 @@ function buildEntityReferenceRegistry(
         SigningCertificatesService,
         DocumentEventsPublisher,
         WebhookDispatcherService,
+        SignaturesService,
       ],
     },
     {
@@ -719,6 +738,7 @@ function buildEntityReferenceRegistry(
     DocumentSchedulesService,
     DocumentScheduleSweepRunner,
     ShareLinksService,
+    SignaturesService,
     AuthorityStatusPollerRegistry,
     ConformitySweepRunner,
     DeclarationProviderRegistry,

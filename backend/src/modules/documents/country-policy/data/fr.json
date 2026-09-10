@@ -59,6 +59,15 @@
       }
     },
     {
+      "typeId": "quote",
+      "actionId": "request-signature",
+      "allowed": true,
+      "provenance": {
+        "kind": "unverified",
+        "resolutionNote": "Demander à un client de signer électroniquement un devis (par lien + code OTP envoyés par email — root TODO item 13 REDONE, signatures/signatures.service.ts) est une commodité produit du même ordre que 'duplicate' ci-dessus : signer un devis n'est pas un acte juridiquement encadré en droit français (contrairement à la facture, voir invoice.send ci-dessus sur l'art. 289 V/VI du CGI), c'est une simple marque d'acceptation commerciale. Le mécanisme lui-même reste au niveau eIDAS le plus bas (signature électronique SIMPLE — un lien à haute entropie haché plus un code à usage unique, jamais un certificat), donc aucun texte sur la signature électronique avancée/qualifiée ne s'applique ici. À confirmer par une revue dédiée si un texte propre venait un jour à encadrer spécifiquement l'acceptation électronique d'un devis."
+      }
+    },
+    {
       "typeId": "invoice",
       "actionId": "save-draft",
       "allowed": true,

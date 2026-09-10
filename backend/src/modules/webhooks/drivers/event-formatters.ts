@@ -50,6 +50,9 @@ export const EVENT_STYLES: Record<WebhookEvent, EventStyle> = {
   [WebhookEvent.DOCUMENT_SETTLED]: { color: '#10b981', emoji: '✅', title: 'Document Settled' },
   // TODO_CORRECTION.md C3 — see actions/invoice-actions.ts's own "cancel" handler for when this fires.
   [WebhookEvent.DOCUMENT_CANCELLED]: { color: '#ef4444', emoji: '🚫', title: 'Document Cancelled' },
+  // Root TODO item 13 REDONE — see signatures/signatures.service.ts's own "markSigned" for when this
+  // fires (the public OTP-verification flow, never an authenticated action).
+  [WebhookEvent.DOCUMENT_SIGNED]: { color: '#10b981', emoji: '✍️', title: 'Document Signed' },
 
   // Client events - Pink (TODO_SUITE.md P3 — only the four with a real emitter, see schema.prisma's
   // own comment on this enum for the CLIENT_ACTIVATED/CLIENT_DEACTIVATED purge)
@@ -97,6 +100,8 @@ export function formatPayloadForEvent(event: WebhookEvent, payload: any): string
     // TODO_CORRECTION.md C3 — see actions/invoice-actions.ts's own "cancel" handler.
     [WebhookEvent.DOCUMENT_CANCELLED]: (p) =>
       `**${documentLabel(p.typeId)} #${documentNumber(p)}**\n🚫 Cancelled`,
+    // Root TODO item 13 REDONE — see signatures/signatures.service.ts's own "markSigned".
+    [WebhookEvent.DOCUMENT_SIGNED]: (p) => `**${documentLabel(p.typeId)} #${documentNumber(p)}**\n✍️ Signed`,
 
     // Client events (TODO_SUITE.md P3 — only the four with a real emitter)
     [WebhookEvent.CLIENT_CREATED]: (p) =>

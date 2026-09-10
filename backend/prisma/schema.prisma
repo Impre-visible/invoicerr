@@ -388,6 +388,7 @@ model Company {
   currencyRates           CurrencyRate[]
   channelConfigs          CompanyChannelConfig[]
   signingCertificates     CompanySigningCertificate[]
+  signatures              Signature[]
 }
 
 // Manually entered exchange rates (item 9, root TODO — "le multi-devises"). The rule that governs
@@ -617,6 +618,13 @@ enum WebhookEvent {
   // that handler's own header for why this is a dedicated event, never folded into DOCUMENT_DELETED
   // (the row still exists) or a bare re-fire of DOCUMENT_SENT.
   DOCUMENT_CANCELLED
+  // Root TODO item 13 REDONE (2026-09-10) — the hardened, reintroduced e-signature: fires the instant
+  // the PUBLIC OTP-verification flow (documents/signatures/signatures.service.ts, never an
+  // authenticated `runAction`) actually commits a document's own status to "signed". A member of the
+  // generic DOCUMENT_* family, NEVER a resurrection of the purged SIGNATURE_* family (T2bis's own
+  // header, right above this enum, lists SIGNATURE_* among the 51 values purged for having no real
+  // emitter — this one has a real one, the same bar every surviving DOCUMENT_* member already met).
+  DOCUMENT_SIGNED
 
   // Client events (TODO_SUITE.md P3, 2026-09-03) — of the six CLIENT_* members this enum used to
   // carry, grep against `WebhookDispatcherService.dispatch(WebhookEvent.X, ...)` call sites found a
@@ -929,6 +937,11 @@ model DocumentInstance {
   // Root TODO item 24 — see DocumentDownloadToken below. A document can have several (a re-share, a
   // link for two different recipients); each is its own row, never overwritten.
   shareLinkTokens DocumentDownloadToken[]
+
+  // Root TODO item 13 REDONE — see Signature model below. A document can have several across its
+  // life (a fresh request after the previous one locked out) — never overwritten, the same "one row
+  // per grant" posture `shareLinkTokens` above already holds.
+  signatures Signature[]
 
   @@index([companyId, typeId])
 }
@@ -1322,6 +1335,85 @@ model DocumentDownloadToken {
   revokedAt DateTime?
 
   @@index([documentId])
+}
+
+// Root TODO item 13 ("Signature électronique — module supprimé") — REINTRODUCED, dynamically (the
+// "request-signature" ACTION, `documents/actions/request-signature.ts`, declared on the quote
+// descriptor like any other action, gated by the same country-policy/status/implementation/
+// validation four-gate `runAction` already runs for everything else) rather than as the standalone
+// `modules/signatures/` module git tag `avant-refonte-documents` carried, and HARDENED against the
+// published vulnerability that module shipped (GHSA-vhjw-gwc5-pjfp): an 8-digit `Math.random()` OTP,
+// stored and compared in the clear, behind an anonymous endpoint with zero rate-limiting, gated by
+// nothing but the SIGNATURE ROW'S OWN `id` — a UUID is not a secret, so anyone who could enumerate,
+// leak, or merely log-scrape one bypassed the OTP check entirely.
+//
+// This model closes both gaps the same way `DocumentDownloadToken` above already closes the
+// equivalent one for a plain download link:
+//  - the link's ONLY secret is `tokenHash` (a hashed, 256-bit random token — see
+//    `signatures/signature-token.ts`, the exact `share-link-token.ts` pattern), resolved by an exact
+//    unique-index lookup, NEVER the row's own `id`.
+//  - the OTP itself is a CSPRNG value (`signatures/otp.ts` — `crypto.randomInt`, never
+//    `Math.random`), stored HASHED (`otpCodeHash`, never in the clear) and compared in constant time
+//    (`crypto.timingSafeEqual` on the digests).
+//
+// `otpFailedAttempts` is the actual guarantee: a LIFETIME counter (never reset by a re-armed OTP —
+// see `otpResendCount` below and `signatures.service.ts`'s own header for the exact brute-force-budget
+// math) that PERMANENTLY invalidates this row (`lockedAt` set, `isActive` flipped to false — the
+// SAME two fields a threshold-triggered lock and an ordinary "signed, done" write both set, so a
+// caller checking `isActive` alone already catches both) the instant it reaches
+// `MAX_FAILED_ATTEMPTS`. `otpResendCount` is a SEPARATE, much looser cap (`MAX_OTP_MINTS` — see
+// `otp.ts`) on how many times a fresh code may be minted at all; re-arming narrows the CURRENT code's
+// own validity window (`otpExpiresAt`) but never touches the lifetime attempt budget, which is the
+// one fact that must never grow no matter how many times a legitimate client asks for a new code.
+//
+// Unlike `DocumentDownloadToken`, this row carries no `expiresAt` of its own: the ONLY expiring fact
+// here is the current OTP's own `otpExpiresAt` (5-minute window) — a signature request otherwise
+// stays valid (pending a code) until it is either completed (`signedAt`) or permanently locked
+// (`lockedAt`). `typeId` stays a plain, open string (never a hardcoded "quote") for the same reason
+// `DocumentDownloadToken.typeId`/`CompanyChannelConfig.providerId` do — only "quote" declares this
+// action today, but nothing here assumes it always will.
+model Signature {
+  id         String           @id @default(cuid())
+  company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  typeId     String
+  document   DocumentInstance @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String
+
+  // The link's ONLY secret — see this model's own header. Never `id` above.
+  tokenHash String @unique
+
+  // The current OTP challenge, if one was ever minted — see `signatures/otp.ts`. Both null until the
+  // first "POST .../otp" call; left in place (never cleared) once signed, matching
+  // `DocumentDownloadToken`'s own "never delete, only judge from the surrounding fields" posture.
+  otpCodeHash  String?
+  otpExpiresAt DateTime?
+
+  // LIFETIME counters — see this model's own header for the exact guarantee each bounds. Neither is
+  // ever decremented, and `otpFailedAttempts` is never reset by anything in this codebase, including
+  // a fresh OTP mint.
+  otpFailedAttempts Int @default(0)
+  otpResendCount    Int @default(0)
+
+  // Set the instant `otpFailedAttempts` reaches `MAX_FAILED_ATTEMPTS` — PERMANENT, independent of
+  // `otpExpiresAt`/any later re-arming. `isActive` is flipped to false on the SAME write (see this
+  // model's own header) so a caller only ever needs to check ONE field either way.
+  lockedAt DateTime?
+
+  signedAt DateTime?
+
+  // Flipped to false the instant this row stops being usable — either the lifetime lock above fires,
+  // OR the sign actually succeeds (a completed signature must never be replayable), OR a fresh
+  // signature request supersedes it (see `signatures.service.ts`'s own `requestSignature`). Named
+  // `isActive` (not `revokedAt`, unlike `DocumentDownloadToken`) for continuity with the ORIGINAL,
+  // now-removed module's own column.
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([documentId])
+  @@index([companyId])
 }
 
 // The per-(company, type) monotonic counter numbering/sequence.ts's `bumpSequence` advances — see

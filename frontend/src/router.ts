@@ -14,11 +14,13 @@ export type Path =
   | `/documents`
   | `/documents/:typeId`
   | `/settings/:tab?`
+  | `/signature/:token`
   | `/statistics`
 
 export type Params = {
   '/documents/:typeId': { typeId: string }
   '/settings/:tab?': { tab?: string }
+  '/signature/:token': { token: string }
 }
 
 export type ModalPath = never

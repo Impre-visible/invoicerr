@@ -28,6 +28,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SireneModule } from './modules/sirene/sirene.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { LoggerModule } from './modules/logger/logger.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { auth } from './lib/auth';
 
 /**
@@ -51,6 +52,13 @@ const workerInline = process.env.WORKER_INLINE !== 'false';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    // Root TODO item 13 REDONE — the mandant-flagged NEW dependency: defense in depth on top of the
+    // real, mathematical bound `documents/signatures/otp.ts#MAX_FAILED_ATTEMPTS` already gives the
+    // signature OTP flow (see that constant's own header). This is a GLOBAL default (every route gets
+    // it, `ThrottlerGuard` below is a global `APP_GUARD`); `PublicSignaturesController`'s own two
+    // anonymous routes narrow it further with their own `@Throttle()` overrides. `ttl` is
+    // MILLISECONDS in this major version (v5+), never seconds — 60_000 = one minute.
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
     ScheduleModule.forRoot(),
     AuthModule.forRoot({
       auth,
@@ -96,6 +104,13 @@ const workerInline = process.env.WORKER_INLINE !== 'false';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    // Root TODO item 13 REDONE — global rate limiting, see ThrottlerModule.forRoot's own comment
+    // above. A THIRD global APP_GUARD: Nest runs every registered one, ANDing their results, so this
+    // adds a check rather than replacing AuthGuard/RolesGuard's own.
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

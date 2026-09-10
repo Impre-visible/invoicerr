@@ -3531,6 +3531,20 @@
       "revokeError": "The link could not be revoked.",
       "close": "Close"
     },
+    "publicSignature": {
+      "title": "Sign document",
+      "description": "You have been asked to sign this document.",
+      "descriptionWithNumber": "You have been asked to sign {{number}}.",
+      "requestCodeButton": "Send verification code",
+      "resendCodeButton": "Send a new code",
+      "codeSent": "A verification code was sent to your email.",
+      "signButton": "Sign",
+      "successTitle": "Document signed",
+      "successDescription": "Thank you — the document has been signed.",
+      "unavailableTitle": "Link unavailable",
+      "unavailableDescription": "This signature link is invalid, expired, or has already been used.",
+      "genericError": "Something went wrong. Please try again."
+    },
     "conformity": {
       "title": "Compliance tracking",
       "badge": {

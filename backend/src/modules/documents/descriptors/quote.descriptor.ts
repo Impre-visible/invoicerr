@@ -65,6 +65,15 @@ export function buildQuoteDescriptor(): DocumentTypeDescriptor {
       { id: 'sending', label: 'Sending' },
       { id: 'sent', label: 'Sent' },
       { id: 'send_failed', label: 'Send failed' },
+      // Root TODO item 13 REDONE — reached ONLY through the public OTP-signature flow
+      // (signatures/signatures.service.ts#markSigned), never through `runAction`/`ActionRegistry`:
+      // there is no authenticated caller to run a "sign" action AS, the client is anonymous. No
+      // action below declares a `transitions` entry targeting this status (see lifecycle.ts's own
+      // header — a status need not be some action's own transition target to be validly declared),
+      // so `validateLifecycle` never expects one; `findUndeclaredStatusInstances`
+      // (documents.service.ts's own boot check) is the reason this status must be declared here at
+      // all — otherwise every signed quote would read as an undeclared-status anomaly.
+      { id: 'signed', label: 'Signed' },
     ],
     initialStatus: 'draft',
     numbering: { onEnterStatus: 'sending' },
@@ -250,6 +259,23 @@ export function buildQuoteDescriptor(): DocumentTypeDescriptor {
             max: 100,
           },
         ],
+      },
+      {
+        id: 'request-signature',
+        label: 'Request signature',
+        // Root TODO item 13 REDONE — see actions/request-signature.ts's own header (the hardened
+        // OTP-by-email reintroduction of the removed `modules/signatures/`). Only once 'sent' — the
+        // identical reasoning "request-deposit" right above already holds: asking a client to sign a
+        // quote they have not even received yet makes no sense, and 'sent' is also this type's own
+        // `numbering.onEnterStatus`, so a quote this action can run against is always already
+        // numbered (the signature-request email's own {{SIGNATURE_NUMBER}} — signatures.service.ts).
+        availableWhen: ['sent'],
+        // NO `transitions`: exactly like "request-deposit"/"convert-to-invoice" right above, this
+        // action's entire effect is a brand-new `Signature` row plus an email
+        // (signatures/signatures.service.ts) — it never changes THIS quote's own status itself. The
+        // eventual "sent" -> "signed" transition happens entirely outside `runAction`, the moment the
+        // anonymous client verifies their OTP — see quote.descriptor.ts's own "signed" status comment
+        // above and signatures.service.ts#markSigned.
       },
       {
         id: 'share-link',

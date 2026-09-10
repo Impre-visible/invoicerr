@@ -26,6 +26,9 @@ describe('WebhookEvent enum (TODO_SUITE.md P3 — the post-purge pin)', () => {
     'DOCUMENT_DELETED',
     'DOCUMENT_SETTLED',
     'DOCUMENT_CANCELLED',
+    // Root TODO item 13 REDONE (2026-09-10) — see signatures/signatures.service.ts's own
+    // "markSigned" for the real emitter (the public OTP-verification flow).
+    'DOCUMENT_SIGNED',
     'CLIENT_CREATED',
     'CLIENT_UPDATED',
     'CLIENT_DELETED',
@@ -38,7 +41,7 @@ describe('WebhookEvent enum (TODO_SUITE.md P3 — the post-purge pin)', () => {
     'WEBHOOK_DELETED',
   ];
 
-  it('carries exactly the 17 members with a real emitter — nothing purged survives, nothing new sneaks in', () => {
+  it('carries exactly the 18 members with a real emitter — nothing purged survives, nothing new sneaks in', () => {
     expect(Object.values(WebhookEvent)).toEqual(EXPECTED_EVENTS);
   });
 
