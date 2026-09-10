@@ -112,6 +112,26 @@ Chacun exige une identité/entité locale réelle, sans chemin automatisable (d�
 
 ---
 
-*Généré à la clôture des chantiers NLCIUS + OCR local (commits `edd6b5c2`, `fe3f7e11`). Les items
-cochables sont à ta main exclusivement ; quand l'un d'eux est fait, dis-le-moi et je rejoue le
-live correspondant (`LIVE_TESTING.md` donne la commande exacte par canal).*
+## E. Sécurité — actions de déploiement (suite à l'audit SECURITY_AUDIT.md, 2026-09-10)
+
+- [ ] **Générer de VRAIS secrets de session en production** : `JWT_SECRET` et `BETTER_AUTH_SECRET`
+      (chacun `openssl rand -hex 32`). Le correctif ajoute une garde au boot qui REFUSE de démarrer
+      avec les valeurs d'exemple ou vides — donc l'appli te forcera à le faire, mais c'est TON action :
+      poser deux vrais secrets dans l'environnement de déploiement (jamais committés). (Finding #3.)
+- [ ] **Déploiement derrière un proxy TLS** : servir en `https`, poser `APP_URL` en `https://…`, et
+      s'assurer que le proxy de tête (ou l'nginx embarqué, désormais corrigé pour écraser
+      `X-Forwarded-For` avec l'IP réelle) est bien la seule entrée — le backend fait maintenant
+      confiance à 1 hop de proxy. Si tu ajoutes un proxy SUPPLÉMENTAIRE devant, ajuste le nombre de
+      hops de confiance. (Finding #1.)
+- [ ] **Montées de dépendances majeures** (décision produit — je ne les fais pas sans ton aval, elles
+      peuvent casser) : `better-auth`, `nodemailer`, `prisma` (montée majeure à planifier). Je corrige
+      de mon côté `@xmldom/xmldom` (atteignable en anonyme, prioritaire) dans un chantier dédié. Les
+      ~31 autres alertes `npm audit` backend sont en majorité transitives non atteignables
+      (multer/mysql2/puppeteer) — voir SECURITY_AUDIT.md § dépendances.
+
+---
+
+*Généré à la clôture des chantiers NLCIUS + OCR local (commits `edd6b5c2`, `fe3f7e11`), section E
+ajoutée après l'audit sécurité. Les items cochables sont à ta main exclusivement ; quand l'un d'eux
+est fait, dis-le-moi et je rejoue le live correspondant (`LIVE_TESTING.md` donne la commande exacte
+par canal).*
