@@ -2448,6 +2448,25 @@
       "placeholder": "Select a country",
       "searchPlaceholder": "Search countries...",
       "noResults": "No countries found"
+    },
+    "country-readiness-alert": {
+      "title": "{{country}} is not fully supported yet",
+      "description": "The following isn't available for this country yet: {{list}}. You can still continue — some compliance features may not work correctly until this is addressed.",
+      "openIssue": "Open a GitHub issue",
+      "mechanisms": {
+        "countryPolicy": "document rules",
+        "vatRates": "VAT rates",
+        "taxSystems": "tax system",
+        "correctionRoutes": "correction routes",
+        "countryIdentifiers": "identifier requirements"
+      },
+      "issue": {
+        "title": "Support request for {{country}} ({{code}})",
+        "bodyCountry": "Country: {{country}} ({{code}})",
+        "bodyPresent": "Already supported: {{list}}",
+        "bodyMissing": "Missing: {{list}}",
+        "none": "none"
+      }
     }
   },
   "common": {

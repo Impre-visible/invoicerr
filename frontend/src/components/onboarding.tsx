@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import ChannelConnectPrompt from "@/components/channel-connect-prompt"
 import type { Company } from "@/types"
+import CountryReadinessAlert from "@/components/country-readiness-alert"
 import CountrySelect from "@/components/country-select"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -382,6 +383,8 @@ export default function OnBoarding({
                   </FormItem>
                 )}
               />
+
+              <CountryReadinessAlert countryCode={countryCodeValue} countryName={form.watch("country")} />
 
               <div className="flex justify-end pt-4">
                 <Button type="button" onClick={goToIdentifierStep} data-cy="onboarding-country-next-btn">

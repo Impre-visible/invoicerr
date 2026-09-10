@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
 import ChannelConnectPrompt from "@/components/channel-connect-prompt"
+import CountryReadinessAlert from "@/components/country-readiness-alert"
 import CountrySelect from "@/components/country-select"
 import CurrencySelect from "@/components/currency-select"
 import CurrencyRatesSettings from "./currency-rates.settings"
@@ -475,6 +476,7 @@ export default function CompanySettings() {
                       </FormControl>
                       <FormDescription>{t("settings.company.form.country.description")}</FormDescription>
                       <FormMessage />
+                      <CountryReadinessAlert countryCode={countryCodeValue} countryName={field.value} />
                     </FormItem>
                   )}
                 />

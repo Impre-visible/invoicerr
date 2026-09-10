@@ -9,6 +9,7 @@ import { ClientsModule } from './modules/clients/clients.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { CompanyLookupModule } from './modules/company-lookup/company-lookup.module';
 import { CompanyModule } from './modules/company/company.module';
+import { CountryReadinessModule } from './modules/country-readiness/country-readiness.module';
 import { ConfigModule } from '@nestjs/config';
 import { DangerModule } from './modules/danger/danger.module';
 import { DocumentsModule } from './modules/documents/documents.module';
@@ -64,6 +65,7 @@ const workerInline = process.env.WORKER_INLINE !== 'false';
     ArticlesModule,
     CompaniesModule,
     CompanyModule,
+    CountryReadinessModule,
     ClientsModule,
     SireneModule,
     CompanyLookupModule,
