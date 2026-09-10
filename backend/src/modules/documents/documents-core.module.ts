@@ -23,6 +23,8 @@ import { registerCreditNoteActions } from './actions/credit-note-actions';
 import { registerReceivedInvoiceActions } from './actions/received-invoice-actions';
 import { B2gRoutingBootUpsertService } from './b2g-routing/boot-upsert.service';
 import { AuthorityStatusPollerRegistry } from './conformity/authority-status-poller';
+import { CountryIdentifierRequirementsBootReseedService } from './country-identifiers/boot-reseed.service';
+import { CountryPolicyBootReseedService } from './country-policy/boot-reseed.service';
 import { ConformitySweepRunner } from './conformity/conformity-sweep-runner';
 import { buildAnafStatusPoller } from './conformity/pollers/anaf-status-poller';
 import { buildChorusProStatusPoller } from './conformity/pollers/chorus-pro-status-poller';
@@ -582,6 +584,15 @@ function buildEntityReferenceRegistry(
     // header for why this is registered here, unconditionally, rather than gated the way the queue's
     // own repeatable registration is behind `WORKER_INLINE`.
     B2gRoutingBootUpsertService,
+    // Same `OnModuleInit`-on-every-process pattern as `B2gRoutingBootUpsertService` just above,
+    // extended to the two SIBLING country-data tables it didn't originally cover — see each
+    // service's own header (country-policy/boot-reseed.service.ts,
+    // country-identifiers/boot-reseed.service.ts) for the drift-detect-then-reseed mechanism and the
+    // decision to also run it in production. Closes TODO_ISSUES.md's "`resetAndSeed` ne re-sème pas
+    // la politique pays" note, which `B2gRoutingRule`'s own boot-upsert deliberately left open for
+    // these two tables when it first shipped (see `schema.prisma`'s own comment on `B2gRoutingRule`).
+    CountryPolicyBootReseedService,
+    CountryIdentifierRequirementsBootReseedService,
     // Root TODO item 10's own named remainder (post-deposit conformity tracking, `conformity/`) —
     // `AuthorityStatusPollerRegistry` is this mechanism's read-side twin of `TRANSPORT_REGISTRY`
     // (registered as a plain class token, not a string one, the same choice `DocumentScheduleSweepRunner`

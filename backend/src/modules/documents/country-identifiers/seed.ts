@@ -32,6 +32,26 @@ export interface CountryIdentifierRequirementRow {
   notes: string | null;
 }
 
+// The full row shape `findMany` selects, used for BOTH the per-country stale-scheme check below AND
+// (with no `where` at all) the whole-country purge and drift.ts's own comparison — same reasoning as
+// country-policy/seed.ts's own `COUNTRY_POLICY_ROW_SELECT`. `where` is optional for exactly that
+// second, table-wide use.
+export const COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT = {
+  id: true,
+  countryCode: true,
+  scheme: true,
+  appliesTo: true,
+  label: true,
+  required: true,
+  pattern: true,
+  helpText: true,
+  provenanceKind: true,
+  sourceText: true,
+  sourceCheckedAt: true,
+  resolutionNote: true,
+  notes: true,
+} as const;
+
 export interface PrismaCountryIdentifierRequirementsClient {
   countryIdentifierRequirement: {
     upsert: (args: {
@@ -40,9 +60,9 @@ export interface PrismaCountryIdentifierRequirementsClient {
       update: Omit<CountryIdentifierRequirementRow, 'countryCode' | 'scheme'>;
     }) => Promise<unknown>;
     findMany: (args: {
-      where: { countryCode: string };
-      select: { id: true; scheme: true };
-    }) => Promise<{ id: string; scheme: string }[]>;
+      where?: { countryCode: string };
+      select: typeof COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT;
+    }) => Promise<(CountryIdentifierRequirementRow & { id: string })[]>;
     deleteMany: (args: { where: { id: { in: string[] } } }) => Promise<unknown>;
   };
   $transaction: <T>(fn: (tx: PrismaCountryIdentifierRequirementsClient) => Promise<T>) => Promise<T>;
@@ -56,7 +76,10 @@ export interface CountryIdentifierRequirementsSeedSummary {
   deleted: number;
 }
 
-function rowFor(countryCode: string, fact: IdentifierSchemeFact): CountryIdentifierRequirementRow {
+// Exported for drift.ts: computing "what the DB SHOULD look like for this country" is the exact
+// same transform whether it feeds an upsert or a drift comparison — one function, never two
+// versions that could quietly diverge.
+export function rowFor(countryCode: string, fact: IdentifierSchemeFact): CountryIdentifierRequirementRow {
   const legal = fact.provenance.kind === 'legal' ? (fact.provenance as LegalProvenance) : undefined;
   const unverified =
     fact.provenance.kind === 'unverified' ? (fact.provenance as UnverifiedProvenance) : undefined;
@@ -125,7 +148,7 @@ export async function seedCountryIdentifierRequirements(
 
       const existing = await tx.countryIdentifierRequirement.findMany({
         where: { countryCode },
-        select: { id: true, scheme: true },
+        select: COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT,
       });
       const stale = existing.filter((row) => !keepKeys.has(row.scheme));
       if (stale.length > 0) {
@@ -133,6 +156,24 @@ export async function seedCountryIdentifierRequirements(
         deleted += stale.length;
       }
     });
+  }
+
+  // Whole-country purge — TODO_ISSUES.md's own note ("`country-identifiers/seed.ts` ne purge jamais
+  // un pays entièrement retiré", découvert à la tâche 19): the loop above only ever opens a
+  // transaction for a country the FILES still name (`countries`, from `catalog.countries()`), so a
+  // country dropped from `data/*.json` entirely is never visited by it at all — its rows would
+  // otherwise survive forever. One query outside any per-country transaction, precisely because it
+  // has to reach rows for countries the loop above never touched.
+  const keepCountries = new Set(countries);
+  const allRows = await prisma.countryIdentifierRequirement.findMany({
+    select: COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT,
+  });
+  const wholeCountryStale = allRows.filter((row) => !keepCountries.has(row.countryCode));
+  if (wholeCountryStale.length > 0) {
+    await prisma.countryIdentifierRequirement.deleteMany({
+      where: { id: { in: wholeCountryStale.map((row) => row.id) } },
+    });
+    deleted += wholeCountryStale.length;
   }
 
   return { upserted, deleted };

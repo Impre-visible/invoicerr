@@ -26,11 +26,28 @@
   — jamais `sent` sans livraison réelle. Le retry est l'action `send` elle-même, redisponible depuis
   `send_failed`.
 
-- **`resetAndSeed` ne re-sème pas la politique pays** (découvert à la tâche 8) : les tables de
+- ~~**`resetAndSeed` ne re-sème pas la politique pays** (découvert à la tâche 8) : les tables de
   référence sont exclues de la troncature, mais une NOUVELLE règle ajoutée aux JSON n'existe en
   base qu'après un `prisma db seed` manuel — sinon l'action est 403 en silence pour tout le monde.
   À automatiser un jour (seed au boot du backend de test, ou détection de dérive JSON↔base) ; en
-  attendant, toute tâche qui touche `country-policy/data/*.json` doit re-semer les deux bases.
+  attendant, toute tâche qui touche `country-policy/data/*.json` doit re-semer les deux bases.~~ —
+  **RÉSOLU** (mandataire, 2026-09-06) : détection de dérive au boot, sur le modèle du précédent
+  `B2gRoutingRule` (déjà résolu pour cette table-là — `b2g-routing/boot-upsert.service.ts`, un
+  `OnModuleInit`). `country-policy/drift.ts` et `country-identifiers/drift.ts` comparent, PUR et
+  sans I/O (fixtures en mémoire, `drift.spec.ts`), le contenu attendu (fichiers) au contenu réel
+  (lignes DB) par pays ; `boot-reseed.ts` lit, détecte, et n'appelle `seedCountryPolicies`/
+  `seedCountryIdentifierRequirements` QUE s'il y a une dérive (jamais une écriture inutile à chaque
+  boot) ; `boot-reseed.service.ts` (`CountryPolicyBootReseedService`/
+  `CountryIdentifierRequirementsBootReseedService`, enregistrés dans `documents-core.module.ts` à
+  côté de `B2gRoutingBootUpsertService`) tourne sur CHAQUE process (API et worker), sans branche
+  dev/test/prod : décision explicite (commentaire de tête de `boot-reseed.service.ts`) de reseeder
+  aussi en prod, par cohérence avec le précédent B2G ET parce que `sync-schema.ts` (qui, lui, seede
+  déjà ces deux tables en prod) ne tourne QUE pour le rôle API — un worker en prod ne l'appelle
+  jamais (`worker.ts` : « no migrations »), donc sans ce boot-upsert un worker ne recorrigerait
+  jamais ces tables. Côté e2e, `resetDatabase` (cypress.config.ts) ne re-sème plus manuellement :
+  il VÉRIFIE après troncature que les trois tables de référence (`DocumentCountryActionRule`,
+  `CountryIdentifierRequirement`, `B2gRoutingRule`) sont non vides et lève une erreur nommée sinon,
+  au lieu de laisser resurgir un 403 silencieux plus tard dans la suite.
 
 - ~~**Les taux existent, mais paiements et avoirs ne convertissent toujours pas** (choix consigné à la
   tâche 9) : `record-payment` refuse toujours une devise étrangère et le lettrage ignore toujours un
@@ -510,11 +527,22 @@
   own symmetric block, `documents.service.formats.spec.ts`'s own "gate 4… unresolvable SELLER
   country" — vendeur FR normal inchangé (regression guard) dans les trois.
 
-- **`country-identifiers/seed.ts` ne purge jamais un pays entièrement retiré** (découvert à la
+- ~~**`country-identifiers/seed.ts` ne purge jamais un pays entièrement retiré** (découvert à la
   tâche 19, en prouvant une mutation) : le nettoyage des schémas obsolètes ne parcourt que les pays
   encore listés dans `data/all.ts` — retirer un pays du registre laisse ses lignes en base pour
   toujours (0 deleted au lieu de 2, vérifié en direct). Sans conséquence tant qu'on n'enlève jamais
-  de pays ; à corriger le jour où ça arrive (delete WHERE countryCode NOT IN (pays listés)).
+  de pays ; à corriger le jour où ça arrive (delete WHERE countryCode NOT IN (pays listés)).~~ —
+  **RÉSOLU** (mandataire, 2026-09-06) : `country-policy/seed.ts` (`seedCountryPolicies`) partageait
+  EXACTEMENT le même trou (vérifié — même boucle scopée par pays, jamais visitée pour un pays
+  entièrement absent des fichiers) ; corrigé identiquement dans les deux fichiers. Une passe
+  supplémentaire, GLOBALE et hors de toute transaction par-pays (elle doit justement atteindre des
+  pays que la boucle par-pays ne visite jamais), lit TOUTES les lignes de la table
+  (`findMany` sans `where`, `COUNTRY_POLICY_ROW_SELECT`/`COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT`)
+  et supprime celles dont le `countryCode` n'est plus du tout dans `catalog.countries()` — le même
+  patron `findMany` global → filtre → `deleteMany` que `b2g-routing/boot-upsert.ts` tenait déjà pour
+  sa propre table. Test qui mord (mutation vérifiée : retirer ce bloc fait échouer
+  `deleted` attendu) : `seed.spec.ts`'s own "a country ENTIRELY REMOVED from the catalog (not just
+  one of its rules) purges every one of its rows" dans les deux fichiers.
 
 - **SIRET vs SIREN sur la facture française — le champ `LEGAL_ID` de
   `country-identifiers/data/fr.json` demande peut-être le mauvais numéro** (item 21, 2026-09-01) :

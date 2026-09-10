@@ -113,40 +113,71 @@ export default defineConfig({
             // Read the table list from Postgres instead of hardcoding it so this
             // doesn't silently drift when the Prisma schema gains new models.
             //
-            // `DocumentCountryActionRule` and `CountryIdentifierRequirement` are excluded on
-            // purpose, alongside `_prisma_migrations`: both are REFERENCE data mirrored from
-            // backend/src/modules/documents/{country-policy,country-identifiers}/data/*.json by
-            // seedCountryPolicies()/seedCountryIdentifierRequirements() (seeded once, at migration
-            // time — see prisma.config.ts's `migrations.seed` — not reseeded on every backend
-            // request), never per-spec fixture data a test creates and expects wiped. Truncating
-            // either here would leave the backend running EMPTY until the next migration/seed:
-            // `DocumentCountryActionRule` empty means "a country with no policy rows blocks every
-            // document action" (country-policy.ts) — a 403 on every document action in every later
-            // spec; `CountryIdentifierRequirement` empty means every country looks like it has NO
-            // identifier-requirements file at all (country-identifiers.ts) — the client/company/
-            // onboarding identifier fields this task exists to keep visible would silently stop
-            // rendering for the rest of the run, not just this table's own data disappearing quietly.
+            // `DocumentCountryActionRule`, `CountryIdentifierRequirement`, and `B2gRoutingRule` are
+            // excluded on purpose, alongside `_prisma_migrations`: all three are REFERENCE data
+            // mirrored from backend/src/modules/documents/{country-policy,country-identifiers,
+            // b2g-routing}/data/*.json, never per-spec fixture data a test creates and expects
+            // wiped. Truncating any of them here would leave the backend running EMPTY until the
+            // next reseed: `DocumentCountryActionRule` empty means "a country with no policy rows
+            // blocks every document action" (country-policy.ts) — a 403 on every document action in
+            // every later spec; `CountryIdentifierRequirement` empty means every country looks like
+            // it has NO identifier-requirements file at all (country-identifiers.ts) — the
+            // client/company/onboarding identifier fields this task exists to keep visible would
+            // silently stop rendering for the rest of the run; `B2gRoutingRule` empty means every
+            // government client looks like it has no B2G rule at all (`40-b2g-routing.cy.ts` is the
+            // one spec that reads it).
             //
-            // `B2gRoutingRule` (documents/b2g-routing/) joins this SAME exclusion list for the exact
-            // same reason, with one added wrinkle: it is NOT seeded by `prisma/seed.ts` at all — it
-            // is upserted at BACKEND BOOT (`B2gRoutingBootUpsertService`, an `OnModuleInit`), on
-            // purpose (schema.prisma's own comment on `B2gRoutingRule` explains why: fixing exactly
-            // the "`resetAndSeed` ne re-sème pas" gap the two comments above already describe for
-            // those other two tables). The backend process behind this e2e run booted ONCE, before
-            // this task ever runs, and stays running for the whole suite — truncating this table
-            // here would leave it EMPTY until the next full backend restart, which nothing in a
-            // Cypress run ever triggers. `40-b2g-routing.cy.ts` is the one spec that reads it.
+            // HISTORY: until the "seed drift" fix, `DocumentCountryActionRule` and
+            // `CountryIdentifierRequirement` were seeded ONLY at migration time
+            // (`seedCountryPolicies()`/`seedCountryIdentifierRequirements()` from `prisma/seed.ts`'s
+            // `migrations.seed` hook — see prisma.config.ts) — a JSON-only edit to
+            // `country-policy/data/*.json` reached neither an already-migrated e2e database nor a
+            // simply-restarted dev backend without someone remembering to run `prisma db seed` by
+            // hand, and silently 403'd every document action in the meantime (TODO_ISSUES.md's
+            // "`resetAndSeed` ne re-sème pas la politique pays"). `B2gRoutingRule` never had that
+            // problem: it was always upserted at BACKEND BOOT (`B2gRoutingBootUpsertService`, an
+            // `OnModuleInit` — see `schema.prisma`'s own comment on that model). Both other tables
+            // now share that EXACT mechanism (`CountryPolicyBootReseedService` /
+            // `CountryIdentifierRequirementsBootReseedService`, registered in
+            // `documents-core.module.ts` next to `B2gRoutingBootUpsertService` — see each service's
+            // own header for the drift-detect-then-reseed logic), so all three tables are excluded
+            // from truncation for the SAME reason now: the backend process behind this e2e run
+            // booted ONCE, before this task ever runs, and stays running for the whole suite —
+            // truncating any of them here would leave it EMPTY until a full backend restart, which
+            // nothing in a Cypress run ever triggers. `resetDatabase` no longer needs to TRIGGER a
+            // reseed itself (the backend's own boot already did it, unconditionally, before the
+            // suite started) — it VERIFIES one actually happened, right below, instead of quietly
+            // trusting it and letting a real gap resurface as the exact silent 403 this fix exists
+            // to prevent.
             const { rows } = await client.query(
               `SELECT tablename FROM pg_tables WHERE schemaname = 'public'
                  AND tablename NOT IN ('_prisma_migrations', 'DocumentCountryActionRule', 'CountryIdentifierRequirement', 'B2gRoutingRule')`,
             );
-            if (rows.length === 0) {
-              return null;
+            if (rows.length > 0) {
+              const tables = rows.map((row: { tablename: string }) => `"${row.tablename}"`).join(", ");
+              // RESTART IDENTITY resets serial/identity sequences back to their seed;
+              // CASCADE follows foreign keys so table order doesn't matter.
+              await client.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`);
             }
-            const tables = rows.map((row: { tablename: string }) => `"${row.tablename}"`).join(", ");
-            // RESTART IDENTITY resets serial/identity sequences back to their seed;
-            // CASCADE follows foreign keys so table order doesn't matter.
-            await client.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`);
+
+            // Verification, not re-triggering: see the HISTORY note above for why re-seeding from
+            // HERE would be the wrong fix (the backend already did it once, at boot, before this
+            // suite even started, and stays running the whole run — a second reseed from this Node
+            // process would just duplicate logic that already lives in TypeScript on the backend
+            // side). An empty reference table at this point means the backend's own boot-time
+            // reseed either never ran or failed — exactly the silent-403 failure mode this whole
+            // mechanism exists to turn loud, so this throws by name rather than let the next spec
+            // discover it as an unexplained 403.
+            for (const table of ["DocumentCountryActionRule", "CountryIdentifierRequirement", "B2gRoutingRule"]) {
+              const { rows: countRows } = await client.query(`SELECT count(*)::int AS count FROM "${table}"`);
+              if (countRows[0].count === 0) {
+                throw new Error(
+                  `resetDatabase: "${table}" is empty after reset — the backend's boot-time reseed ` +
+                    "either hasn't run yet or failed. Every document action will 403 for the rest of " +
+                    "this run until the backend under test is (re)started with a working reseed.",
+                );
+              }
+            }
             return null;
           } finally {
             await client.end();

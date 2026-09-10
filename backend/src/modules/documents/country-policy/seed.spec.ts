@@ -29,8 +29,12 @@ class FakeCountryPolicyTable {
       },
       findMany: async ({ where }) =>
         this.rows
-          .filter((r) => r.countryCode === where.countryCode)
-          .map((r) => ({ id: r.id, typeId: r.typeId, actionId: r.actionId })),
+          .filter((r) => !where || r.countryCode === where.countryCode)
+          // Full row, not just the natural key: the real client's own `select` clause now asks for
+          // everything (country-policy/seed.ts's `COUNTRY_POLICY_ROW_SELECT`) so the SAME query can
+          // feed both the per-country stale check and the whole-country purge — this fake ignores
+          // `select` (like every fake in this file already does) and just returns the full row.
+          .map((r) => ({ ...r })),
       deleteMany: async ({ where }) => {
         const ids = new Set(where.id.in);
         this.rows = this.rows.filter((r) => !ids.has(r.id));
@@ -122,6 +126,29 @@ describe('seedCountryPolicies', () => {
     expect(table.rows.find((r) => r.actionId === 'save-draft')?.statuses).toEqual(['draft']);
     // ALLOW_SEND never declares `statuses` at all — the row still gets a real array, never null/undefined.
     expect(table.rows.find((r) => r.actionId === 'send')?.statuses).toEqual([]);
+  });
+
+  // TODO_ISSUES.md's remaining note ("country-identifiers/seed.ts ne purge jamais un pays
+  // entièrement retiré") applies identically here: a country ENTIRELY removed from the catalog (not
+  // just one of its rules) must lose ALL of its rows on the next seed, not just be skipped because
+  // the per-country loop never visits a country the catalog no longer names.
+  it('a country ENTIRELY REMOVED from the catalog (not just one of its rules) purges every one of its rows', async () => {
+    const table = new FakeCountryPolicyTable();
+    const withBoth = new CountryPolicyCatalog([
+      { countryCode: 'AA', rules: [ALLOW_SEND, ALLOW_SAVE_DRAFT] },
+      { countryCode: 'BB', rules: [ALLOW_SEND] },
+    ]);
+    await seedCountryPolicies(table.client, withBoth);
+    expect(table.rows).toHaveLength(3);
+
+    const withOnlyAa = new CountryPolicyCatalog([
+      { countryCode: 'AA', rules: [ALLOW_SEND, ALLOW_SAVE_DRAFT] },
+    ]);
+    const result = await seedCountryPolicies(table.client, withOnlyAa);
+
+    expect(result).toEqual({ upserted: 2, deleted: 1 });
+    expect(table.rows).toHaveLength(2);
+    expect(table.rows.every((r) => r.countryCode === 'AA')).toBe(true);
   });
 
   it("seeds several countries independently — one country's rows never leak into another's", async () => {

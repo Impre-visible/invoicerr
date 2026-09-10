@@ -38,6 +38,25 @@ export interface DocumentCountryActionRuleRow {
   notes: string | null;
 }
 
+// The full row shape `findMany` selects, used for BOTH the per-country stale-rule check below AND
+// (with no `where` at all) the whole-country purge and drift.ts's own comparison — one select
+// clause, so a field neither ever forgets to ask for. `where` is optional for exactly that second,
+// table-wide use: Prisma itself treats an absent `where` as "no filter", and the fake client in
+// seed.spec.ts must accept the same.
+export const COUNTRY_POLICY_ROW_SELECT = {
+  id: true,
+  countryCode: true,
+  typeId: true,
+  actionId: true,
+  allowed: true,
+  provenanceKind: true,
+  sourceText: true,
+  sourceCheckedAt: true,
+  resolutionNote: true,
+  statuses: true,
+  notes: true,
+} as const;
+
 export interface PrismaCountryPolicyClient {
   documentCountryActionRule: {
     upsert: (args: {
@@ -48,9 +67,9 @@ export interface PrismaCountryPolicyClient {
       update: Omit<DocumentCountryActionRuleRow, 'countryCode' | 'typeId' | 'actionId'>;
     }) => Promise<unknown>;
     findMany: (args: {
-      where: { countryCode: string };
-      select: { id: true; typeId: true; actionId: true };
-    }) => Promise<{ id: string; typeId: string; actionId: string }[]>;
+      where?: { countryCode: string };
+      select: typeof COUNTRY_POLICY_ROW_SELECT;
+    }) => Promise<(DocumentCountryActionRuleRow & { id: string })[]>;
     deleteMany: (args: { where: { id: { in: string[] } } }) => Promise<unknown>;
   };
   $transaction: <T>(fn: (tx: PrismaCountryPolicyClient) => Promise<T>) => Promise<T>;
@@ -64,7 +83,10 @@ export interface CountryPolicySeedSummary {
   deleted: number;
 }
 
-function rowFor(countryCode: string, rule: DocumentActionRuleFact): DocumentCountryActionRuleRow {
+// Exported for drift.ts: computing "what the DB SHOULD look like for this country" is the exact
+// same transform whether it feeds an upsert or a drift comparison — one function, never two
+// versions that could quietly diverge.
+export function rowFor(countryCode: string, rule: DocumentActionRuleFact): DocumentCountryActionRuleRow {
   const legal = rule.provenance.kind === 'legal' ? (rule.provenance as LegalProvenance) : undefined;
   const unverified =
     rule.provenance.kind === 'unverified' ? (rule.provenance as UnverifiedProvenance) : undefined;
@@ -131,7 +153,7 @@ export async function seedCountryPolicies(
 
       const existing = await tx.documentCountryActionRule.findMany({
         where: { countryCode },
-        select: { id: true, typeId: true, actionId: true },
+        select: COUNTRY_POLICY_ROW_SELECT,
       });
       const stale = existing.filter((row) => !keepKeys.has(`${row.typeId}::${row.actionId}`));
       if (stale.length > 0) {
@@ -139,6 +161,23 @@ export async function seedCountryPolicies(
         deleted += stale.length;
       }
     });
+  }
+
+  // Whole-country purge — TODO_ISSUES.md's own remaining note ("`country-identifiers/seed.ts` ne
+  // purge jamais un pays entièrement retiré") names this gap for the sibling table; this one shares
+  // it identically, and for the same structural reason: the loop above only ever opens a
+  // transaction for a country the FILES still name (`countries`, from `catalog.countries()`). A
+  // country dropped from `data/*.json` entirely is never visited by that loop at all, so its rows
+  // survive forever without this second, GLOBAL pass — one query outside any per-country
+  // transaction, precisely because it has to reach rows for countries the loop above never touched.
+  const keepCountries = new Set(countries);
+  const allRows = await prisma.documentCountryActionRule.findMany({ select: COUNTRY_POLICY_ROW_SELECT });
+  const wholeCountryStale = allRows.filter((row) => !keepCountries.has(row.countryCode));
+  if (wholeCountryStale.length > 0) {
+    await prisma.documentCountryActionRule.deleteMany({
+      where: { id: { in: wholeCountryStale.map((row) => row.id) } },
+    });
+    deleted += wholeCountryStale.length;
   }
 
   return { upserted, deleted };

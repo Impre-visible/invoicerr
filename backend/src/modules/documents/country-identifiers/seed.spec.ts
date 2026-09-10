@@ -31,8 +31,13 @@ class FakeCountryIdentifierRequirementsTable {
       },
       findMany: async ({ where }) =>
         this.rows
-          .filter((r) => r.countryCode === where.countryCode)
-          .map((r) => ({ id: r.id, scheme: r.scheme })),
+          .filter((r) => !where || r.countryCode === where.countryCode)
+          // Full row, not just the natural key: the real client's own `select` clause now asks for
+          // everything (country-identifiers/seed.ts's `COUNTRY_IDENTIFIER_REQUIREMENT_ROW_SELECT`)
+          // so the SAME query can feed both the per-country stale check and the whole-country purge
+          // — this fake ignores `select` (like every fake in this file already does) and just
+          // returns the full row.
+          .map((r) => ({ ...r })),
       deleteMany: async ({ where }) => {
         const ids = new Set(where.id.in);
         this.rows = this.rows.filter((r) => !ids.has(r.id));
@@ -116,6 +121,29 @@ describe('seedCountryIdentifierRequirements', () => {
 
     expect(table.rows).toHaveLength(1);
     expect(table.rows[0].required).toBe(false);
+  });
+
+  // TODO_ISSUES.md's own note ("country-identifiers/seed.ts ne purge jamais un pays entièrement
+  // retiré", découvert à la tâche 19): a country ENTIRELY removed from the catalog (not just one of
+  // its schemes) must lose ALL of its rows on the next seed, not survive because the per-country
+  // loop never visits a country the catalog no longer names.
+  it('a country ENTIRELY REMOVED from the catalog (not just one of its schemes) purges every one of its rows', async () => {
+    const table = new FakeCountryIdentifierRequirementsTable();
+    const withBoth = new CountryIdentifierRequirementsCatalog([
+      { countryCode: 'AA', schemes: [LEGAL_ID_FACT, VAT_FACT] },
+      { countryCode: 'BB', schemes: [LEGAL_ID_FACT] },
+    ]);
+    await seedCountryIdentifierRequirements(table.client, withBoth);
+    expect(table.rows).toHaveLength(3);
+
+    const withOnlyAa = new CountryIdentifierRequirementsCatalog([
+      { countryCode: 'AA', schemes: [LEGAL_ID_FACT, VAT_FACT] },
+    ]);
+    const result = await seedCountryIdentifierRequirements(table.client, withOnlyAa);
+
+    expect(result).toEqual({ upserted: 2, deleted: 1 });
+    expect(table.rows).toHaveLength(2);
+    expect(table.rows.every((r) => r.countryCode === 'AA')).toBe(true);
   });
 
   it("seeds several countries independently — one country's rows never leak into another's", async () => {
